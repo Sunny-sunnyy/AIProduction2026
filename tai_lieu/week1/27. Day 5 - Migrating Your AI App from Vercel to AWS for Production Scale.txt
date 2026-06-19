@@ -1,0 +1,143 @@
+Okay, continuing on day five for part three.
+Getting our application ready, we need to modify our SaaS application to deploy to AWS.
+Now look, if you quite like the vassal application, then you may want to take a backup of this SaaS
+folder and put it somewhere else.
+Because I realize we've not pushed this into GitHub or anything.
+This is just all just a directory.
+So.
+So you might want to copy this and call it SaaS Vassal or something.
+Just so you have that to hand, because we're about to destroy it as we prepare things to deploy to
+AWS.
+So our currently our project should look like this.
+We've got pages and API and styles and public.
+So what we're going to do first is make it so that our front end is is written as a static website.
+We're going to generate the final product that got served up before dynamically on demand.
+So we're going to uh, create a static export so that now it's pure client.
+It's just a set of HTML files generated HTML, JavaScript, and stylesheets generated from the Next.js
+app that we put together.
+Um, and so we are going to change this file next configure to include the fact that we want it to output
+an export.
+So I'm copying this I'm going to next configure.
+Here it is.
+And I am going to paste over this.
+You can see all it's done is it's put this in here which allows us to output this whole site as a static
+site that can be served up our front end part of it.
+Okay.
+Back we go.
+We've made that first change.
+All right.
+We're now going to update our front end calls.
+Now before we're used to with with the vessel we used to be be always posting to slash API.
+Now we need to change this.
+Now we're going to change this to be slash API slash consultation because we need to because we're going
+to have everything running on the same server.
+You'll see more in just a second.
+But what we have to basically do is find this line here which is in the file product TSX, and change
+it from that to this.
+We're basically adding slash consultation in into the fetch uh, call.
+So let's find this.
+It's in pages TSX.
+And if we look in here we should be able to find where it's making that call.
+It's going to be a bit higher.
+Bit higher.
+Here we go right here.
+Fetch events API.
+This is where it's calling.
+The front end is calling the back end right here.
+And we're making that slash API slash consultation.
+That's the second change I've saved that file.
+That is done.
+Okay, back we go.
+All right.
+Now we are now going to to make a new backend file called server.
+And it's basically going to be an alternative to what we have Index.py right now.
+And it's quite a bit chunkier.
+Let me do that for you right now and then we'll talk about it.
+Copy that.
+And now I go to API.
+There is Index.py.
+That's not going to get used anymore.
+We're going to make a new file.
+We could just rename that one.
+But we might as well keep keep that around for reference.
+We'll make a new file.
+We'll call it server.py.
+Here it is.
+And the contents will be this.
+Let's, let's take a dig into this to see what's going on.
+Okay.
+So some things are the same as before.
+We start by creating a fast API app.
+So far so good.
+We've got something interesting here called Cors middleware.
+And this is another of those stories.
+This is another of those rabbit holes we could go down to uh, is about the security setup.
+That means that only the right front end, uh, is allowed to call our back end, preventing other people
+from building websites that also call to our back end pretending to be our front end.
+And we've got something set up here, uh, that is designed to to make sure that we don't block our
+front end from calling us.
+And later we're going to put some more controls around this.
+So I'm not going to go into too much detail on Cors front end.
+People know this so well because cause errors.
+It's like the bane of a front end developers existence.
+Uh, but for others, you can just take this as it is and do some research if you'd like to know more.
+This is the same as before.
+The visit is the same as before.
+The AI stuff is the same as before.
+Not much changed there.
+Uh, as is the user prompt for this part.
+We've changed this route, so it's now slash API slash consultation.
+Uh, and the actual AI code is exactly the same as is our streaming response.
+This is all the same.
+Okay, this is something new.
+We've got a new route called Slash Health, which is a health check.
+And it's just going to return.
+Status is healthy as a JSON object.
+So that's just something else.
+And AWS is going to want us to have that.
+It's going to use this to check that things are going well.
+And then we've got something else here.
+And this is kind of interesting.
+I mentioned way back when we were talking about what backends can do that, that backends can service
+your APIs and can respond with different API routes with, with different things to do, but they can
+also serve up a whole static site.
+They can be your your provider of your web page.
+And that's what's happening here.
+If someone asks for slash for just the root, uh, the root URL of our, of our website, then this
+is going to serve up index.html from our static, uh, site that we are going to build.
+So this here is something which is allowing our back end to serve the entire front end that we will
+have generated as a static website.
+And it can serve that up to someone that hits this root.
+And if you're not following all of this, get a general flavor for it.
+Come back later.
+Play with this yourself.
+And in time I think this will come together.
+Some of you have probably seen this stuff before and know exactly what I mean.
+So that is the new contents of our server dot Pi, our back end serving an API, serving a health check,
+and also being able to serve a static website for our front end.
+Okay.
+Next is to create a dot EMV file which will have our secrets that we'll use for this deployment.
+And you can start by copying the EMV that you already set up, its mind ones right there that you're
+already set up for this project before.
+And it contains, I think, all four of these secrets at the top that you need the next public clerk
+publisher key, the clerk secret key, the clerk URL, and the OpenAI API key.
+But now you need to add in two more ones, which are the default AWS region.
+And now this should be the AWS region, which is closest to you that you want to use as your default.
+Now, I do believe that when you first signed in as your root account or your IAM account, that place
+I showed you, it shows the region should default to the one closest to you, but otherwise if you just
+google AWS regions, there's a AWS page which goes through all of the regions and which ones are closest
+to different locations.
+Uh, there's one.
+If you're in Europe, then I think EU West one, which I think is in Ireland, is a very common choice.
+There's many Asia Pacific ones.
+There's one in Mumbai that's that's very common I think as, as is very large.
+Um, and uh, there's on the West coast, of course, US West one and US West two, uh, very, uh,
+very much used uh, so these, uh, all the different regions you could pick from, there's a huge number
+of them.
+Pick the one that's closest to you, and that should be the one that you go to.
+On the console and us East one, which was I think the first one that they had, uh, is, uh, the
+one that is also closest to me and the one that I choose, um, and then AWS account ID this is, of
+course, the 12 digit number that you took down carefully.
+Uh, that is on that is written by your user ID in the console that you can copy.
+So you should put all of those into a dot EMV file.
+I will go and do that myself right now and see you in a sec.

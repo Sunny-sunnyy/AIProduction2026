@@ -1,0 +1,159 @@
+Okay, so let's get started.
+We're here in the Alex project.
+I'm going to go into the guides folder.
+And the first guide is called permissions.
+Uh and I'm going to right click and do open preview.
+And you know well that we often start with looking at permissions.
+So uh, this begins with a quick introduction about Project Alex, the Genetic Learning Equities explainer,
+an AI powered personal financial planner.
+And it tells you a little bit more about what I have in store for you, which I will talk more about
+in a minute, but, but, uh, or during the course of the next few days.
+But it's about understanding your portfolios, planning for retirement and so on.
+There's then an architecture diagram, and I want you to look the other way for this, because I am
+going to talk through the architecture.
+And we'll do that once we've got our permissions set up.
+You can take a quick peek while you go through it if you wish.
+Uh, but the first thing we're going to do is set up all the permissions that we're going to need in
+order to carry out this master plan.
+So, um, this also explains again about the infrastructure management, the fact that we're doing multiple
+Terraform deployments with separate directories for each piece.
+And it explains some of the pros and cons of doing it that way.
+And it says make sure you've got an AWS account.
+Of course you do with with root access because this is the one of the times when we use root access
+is to set up permissions, make sure your CLI is installed and you are you're ready to go, but I'm
+sure you are since we've got to this point.
+Oh yes.
+I also mentioned here that that uh, I've got this architecture diagram and there's a few other places
+where we have them.
+These are a type of diagram called a mermaid diagram.
+And this might not have appeared nicely for you, in which case you need to install an extension in
+cursor.
+Uh, and you need to install the extension that's written here, the markdown mermaid extension.
+You probably know this, but to install an extension, it's command shift X on a mac or control shift
+X on a PC, and it brings up the extension screen over here and you pick the mermaid one.
+Let me just do this.
+Now, if I do this now, uh, and I type mermaid, we'll see the one I have installed.
+It's, uh, this one right here, this markdown preview.
+Uh, mermaid one here.
+I have that installed, and that's the one that means that I can see mermaid diagrams.
+So remember to do that and then command shift E or control shift E brings back the File explorer.
+Okay.
+So with that it's time for us to go to the, uh, the the console sign in, go in as a root user and
+I will see you there.
+So here I am in the AWS console.
+And you can see I'm signed in there as my root user.
+So what are the instructions in the AWS console.
+Navigate to IAM and click policies.
+Create a new policy and paste in this content as a new policy.
+And then save it as Alex S3 vectors access.
+So this is a bit of a pro move.
+And this is because we're going to be using this way of storing data as vectors, which is called S3
+vectors and which is relatively new.
+It's a fairly new feature in Amazon and AWS, which means that there aren't these kind of pre-baked
+policies for it, which is why we have to do this in this slightly hokey way.
+So let me show you this.
+We're going in here.
+We go to IAM.
+There it is.
+We come in here, we go to policies in the left.
+And you can see I've already set this one up, I believe.
+So if I scroll down, you can see I've already got it.
+Alex S3 vectors access.
+But you'll be pressing create policy to create this.
+And when you're in there, just as it says in the instructions, you'll come in and and and attach your
+JSON and it's going to look just like this.
+I can just press the JSON button there to see it.
+Uh, and it's allowing S3 vectors.
+So follow those instructions and save it as it's described here, to create your policy called Alex
+S3 vectors, which is access, which is going to give Alex the ability to be using the new S3 vectors
+from AWS.
+All right.
+And then the next step is we're going to create a new group.
+We did this before.
+So hopefully it's a little bit familiar to you.
+We're going to go to user groups create a group call it Alex Access and add in these guys SageMaker
+bedrock CloudWatch events Full Access.
+And then we're also going to have Alex S3 vectors access, which is the thing we just set up.
+So those four.
+So have a look at them.
+So if I go back here again we're going to user groups.
+Now you're going to press create group.
+But you can see I've already got Alex access in here.
+And the way it shows for me because I've already set it up.
+There's two tabs Permissions and users permissions is showing that I've got those those things I mentioned.
+There are some other policies in here too, which you may need to add later as we go.
+So if you want to give yourself a shortcut, then take a quick screen grab of this and add all of these,
+not just the four that are on the in the instructions, but all the ones only for the future.
+That's a pro tip that will save you some time later, but you'll see in here are the ones that were
+just mentioned SageMaker, which is we're going to be using today CloudWatch full events.
+Uh, and uh, yeah.
+The, the uh, the others uh, should be here and also the one that we just created.
+There it is.
+Sorry, Alex S3 vectors access the custom policy that we just created.
+So set up this and then make sure that you attach it to the user AI engineer just as it says.
+And then when you come back into it to look at it by going to user groups, you should see it set up
+just like mine is here.
+And then that is the setting up the the new group for Alex.
+Okay, so hopefully you followed the instructions here to create your Alex Access group and to make
+sure that it's associated with your IAM user AI engineer.
+And with that, you should now sign out please, as the root user in the AWS console.
+You shouldn't stick stick around with that kind of permission and sign back in as AI engineer.
+Okay?
+Now let's just check that everything is what we expect at the command line.
+So bring up a new terminal in cursor, and first run this command to check who is logged in.
+If this doesn't say what we expect then you should run AWS configure to sign in.
+But in my case it does.
+That's my user ID apparently my account number that I do recognize because we've done use it a million
+times, and the Arn, the AWS resource number of my user AI engineer.
+There it is.
+Next up we're going to run this command AWS SageMaker list endpoints.
+And you'd be forgiven for saying I don't want SageMaker is yet.
+Why am I calling it?
+But don't fear, we're just doing this to check that we can access it.
+Permissions are good, I can see it and I have no end points.
+We will be building endpoints.
+Well, an end point uh, and I will explain what SageMaker is in just a second.
+All right.
+But first some project setup stuff okay.
+So we're going to set up an environment file a env file.
+So from the uh Alex root directory I'd like you to copy an existing file called env example and make
+it your env file.
+Now you can either do this at the command line or you can just right click and copy and paste in the
+file explorer on the left there.
+But I'll do copy dot EMV dot example to be just dot env.
+And I'm sure you know the joke by now, but it has to be called exactly env nothing more, nothing less.
+Otherwise it won't work.
+Uh, then get your AWS account ID if you don't already know it off by heart.
+By this point in the course there is my ID.
+I copy that to the clipboard and edit the EMV file, which is just a template EMV file.
+These are all of the things we'll be filling in over the course of the next week and a half.
+We start by pasting in the account ID.
+There it is.
+That's mine.
+You should put in yours, not mine, but yours.
+And, uh, then also the default region.
+This is a good moment.
+Mine is US East one.
+You should pick the region that makes most sense for you.
+That will be the default, uh, for for setting up the infrastructure that we use.
+And with that, we will be we'll be adding more to this as we go through.
+It's worth mentioning right now something a bit confusing that there are two different places where
+environment variables are going to go, uh, which which is because we have a reasonably complex infrastructure
+here.
+The EMV file is what we will use for our local secrets that we'll be using in some of our Python scripts
+and services.
+There's also Terraform variables, terraform.tf vars which are used for Terraform infrastructure, and
+they're all get ignored so that we don't accidentally check them in.
+But we will be updating some things twice now.
+It's common in real projects to to to write yourself some scripts that will just automatically copy
+variables like this across, so you don't have to put them in two places.
+But I just figured doing something like that is itself error prone.
+And I want to just take things simple, as simple as possible.
+So even though occasionally we're going to have to put the same information into two different files,
+I would rather do it that way to be clean and simple.
+And so it's clear what goes where.
+And if things don't work, you know where to go.
+Uh, so that then does conclude the, uh, the first, uh, of our of our labs for this project.
+But it's only the preliminaries.
+We do have another lab for today, which is the big lab about SageMaker.
+And it's time for me to explain what SageMaker actually is.

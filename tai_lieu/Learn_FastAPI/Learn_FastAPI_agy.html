@@ -1,0 +1,1633 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FastAPI &amp; Project Book Management API: Hướng dẫn Toàn diện</title>
+    <!-- Google Fonts CDN -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <!-- Prism.js Code Highlight Theme CDN -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet" integrity="sha512-vswe+cgvic/XBoF1OcM/TeJ2FW0OofqAVdCZiEYkd6dwGXthvkSFWOoGGJgS2CW70VK5dQM5Oh+7ne47s74VTg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <style>
+        /* CSS styling tokens based on DESIGN-claude.md */
+        :root {
+            --canvas-bg: #faf9f5;
+            --ink-primary: #141413;
+            --ink-body: #3d3d3a;
+            --ink-body-strong: #252523;
+            --primary-coral: #cc785c;
+            --primary-coral-rgb: 204, 120, 92;
+            --primary-coral-active: #a9583e;
+            --surface-card: #efe9de;
+            --surface-dark: #181715;
+            --surface-dark-soft: #1f1e1b;
+            --border-hairline: #e6dfd8;
+            --font-serif: 'Cormorant Garamond', Garamond, 'Times New Roman', serif;
+            --font-sans: 'Inter', -apple-system, sans-serif;
+            --font-mono: 'JetBrains Mono', monospace;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            background-color: var(--canvas-bg);
+            color: var(--ink-body);
+            font-family: var(--font-sans);
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+        }
+        /* Shell Grid Layout */
+        #app-layout {
+            display: flex;
+            width: 100%;
+            height: 100%;
+        }
+        #sidebar {
+            width: 300px;
+            background-color: var(--surface-card);
+            border-right: 1px solid var(--border-hairline);
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+        }
+        .sidebar-header {
+            padding: 24px;
+            border-bottom: 1px solid var(--border-hairline);
+            display: flex;
+            flex-direction: column;
+        }
+        .sidebar-logo {
+            display: flex;
+            align-items: center;
+            font-family: var(--font-serif);
+            font-size: 20px;
+            font-weight: 600;
+            color: var(--ink-primary);
+        }
+        #search-input {
+            width: 100%;
+            margin-top: 16px;
+            padding: 10px 12px;
+            border-radius: 8px;
+            border: 1px solid var(--border-hairline);
+            background-color: var(--canvas-bg);
+            color: var(--ink-primary);
+            font-family: var(--font-sans);
+            font-size: 14px;
+            outline: none;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+        #search-input::placeholder {
+            color: #9d9c99;
+        }
+        #search-input:focus {
+            border-color: var(--primary-coral);
+            box-shadow: 0 0 0 3px rgba(var(--primary-coral-rgb), 0.15);
+        }
+        .sidebar-nav {
+            flex: 1;
+            overflow-y: auto;
+            padding: 24px;
+        }
+        #nav-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        .nav-item {
+            margin-bottom: 12px;
+            transition: opacity 0.2s, max-height 0.2s;
+        }
+        .nav-item.hidden {
+            display: none;
+        }
+        .nav-link {
+            text-decoration: none;
+            color: var(--ink-body);
+            font-size: 14px;
+            font-weight: 400;
+            transition: color 0.2s, font-weight 0.2s;
+            display: block;
+            cursor: pointer;
+        }
+        .nav-link:hover {
+            color: var(--primary-coral);
+        }
+        .nav-link.active {
+            color: var(--primary-coral);
+            font-weight: 600;
+        }
+        #main-content {
+            flex: 1;
+            overflow-y: auto;
+            padding: 48px;
+            scroll-behavior: smooth;
+        }
+        
+        /* Learning sections style */
+        .test-section {
+            min-height: 80vh;
+            padding: 60px 0;
+            border-bottom: 1px solid var(--border-hairline);
+        }
+        .test-section h2 {
+            font-family: var(--font-serif);
+            font-size: 2.5rem;
+            color: var(--ink-primary);
+            margin-bottom: 24px;
+            border-bottom: 2px solid var(--primary-coral);
+            padding-bottom: 8px;
+        }
+        .test-section h3 {
+            font-family: var(--font-serif);
+            font-size: 1.8rem;
+            color: var(--ink-primary);
+            margin-top: 36px;
+            margin-bottom: 16px;
+            border-bottom: 1px solid var(--border-hairline);
+            padding-bottom: 6px;
+        }
+        .test-section h4 {
+            font-family: var(--font-sans);
+            font-size: 1.15rem;
+            font-weight: 600;
+            color: var(--ink-body-strong);
+            margin-top: 24px;
+            margin-bottom: 10px;
+        }
+        .test-section p {
+            font-size: 1.05rem;
+            line-height: 1.7;
+            color: var(--ink-body);
+            margin-bottom: 18px;
+        }
+        .test-section ul, .test-section ol {
+            margin-left: 24px;
+            margin-bottom: 18px;
+        }
+        .test-section li {
+            margin-bottom: 10px;
+            line-height: 1.6;
+            font-size: 1.05rem;
+        }
+        .section-hidden {
+            display: none !important;
+        }
+
+        /* Custom Premium Table Styling */
+        .premium-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 28px 0;
+            font-size: 0.95rem;
+            font-family: var(--font-sans);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+            border-radius: 8px;
+            overflow: hidden;
+            border: 1px solid var(--border-hairline);
+        }
+        .premium-table th {
+            background-color: var(--surface-card);
+            color: var(--ink-primary);
+            text-align: left;
+            padding: 14px 18px;
+            font-weight: 600;
+            border-bottom: 2px solid var(--primary-coral);
+        }
+        .premium-table td {
+            padding: 14px 18px;
+            border-bottom: 1px solid var(--border-hairline);
+            color: var(--ink-body);
+            background-color: #ffffff;
+        }
+        .premium-table tr:last-child td {
+            border-bottom: none;
+        }
+        .premium-table tr:hover td {
+            background-color: rgba(var(--primary-coral-rgb), 0.03);
+        }
+
+        /* Callout Box Styling */
+        .callout-card {
+            background-color: var(--surface-card);
+            border-left: 4px solid var(--primary-coral);
+            padding: 18px 24px;
+            margin: 24px 0;
+            border-radius: 0 8px 8px 0;
+        }
+        .callout-card p {
+            margin-bottom: 0 !important;
+            font-size: 1.05rem !important;
+            color: var(--ink-body-strong) !important;
+            line-height: 1.6 !important;
+        }
+
+        /* Prism.js Custom Code Style Overrides */
+        code[class*="language-"],
+        pre[class*="language-"] {
+            font-family: var(--font-mono) !important;
+            font-size: 14px !important;
+            line-height: 1.5 !important;
+        }
+        .code-window-card pre {
+            background: transparent !important;
+            margin: 0 !important;
+            padding: 0 !important;
+            border: none !important;
+            box-shadow: none !important;
+            overflow-x: auto;
+        }
+        .code-window-card code {
+            background: transparent !important;
+            padding: 0 !important;
+            border: none !important;
+            color: #f8f8f2 !important;
+        }
+
+        /* Mermaid diagram styling centering */
+        .mermaid {
+            display: flex;
+            justify-content: center;
+            background-color: #ffffff;
+            padding: 24px;
+            border-radius: 12px;
+            border: 1px solid var(--border-hairline);
+            margin: 28px 0;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+        }
+
+        /* Table responsiveness container */
+        .table-container {
+            overflow-x: auto;
+            margin-bottom: 24px;
+            max-width: 100%;
+        }
+
+        /* Code Window Card Stylings */
+        .code-window-card {
+            background-color: var(--surface-dark);
+            border-radius: 12px;
+            padding: 24px;
+            color: var(--canvas-bg);
+            font-family: var(--font-mono);
+            margin-bottom: 24px;
+            position: relative;
+        }
+        .code-window-header {
+            display: flex;
+            gap: 6px;
+            margin-bottom: 12px;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .dot-container {
+            display: flex;
+            gap: 6px;
+        }
+        .mac-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+        }
+        .mac-dot.red {
+            background-color: #ff5f56;
+        }
+        .mac-dot.yellow {
+            background-color: #ffbd2e;
+        }
+        .mac-dot.green {
+            background-color: #27c93f;
+        }
+        
+        .copy-btn {
+            background: none;
+            border: 1px solid var(--border-hairline);
+            color: var(--canvas-bg);
+            padding: 4px 8px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+            font-family: var(--font-sans);
+            transition: all 0.2s ease;
+        }
+        .copy-btn:hover {
+            background-color: rgba(255, 255, 255, 0.15) !important;
+            border-color: var(--canvas-bg) !important;
+        }
+        .copy-btn:active {
+            transform: scale(0.95);
+        }
+
+        /* Hamburger button and Mobile responsive styling */
+        #hamburger-menu {
+            display: none;
+            position: fixed;
+            top: 16px;
+            right: 16px;
+            z-index: 101;
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            background-color: var(--primary-coral);
+            color: #ffffff;
+            border: none;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(var(--primary-coral-rgb), 0.3);
+            justify-content: center;
+            align-items: center;
+            transition: background-color 0.2s, transform 0.2s, box-shadow 0.2s;
+        }
+        #hamburger-menu:hover {
+            background-color: var(--primary-coral-active);
+        }
+        #hamburger-menu:active {
+            transform: scale(0.95);
+        }
+        #hamburger-menu svg {
+            width: 24px;
+            height: 24px;
+            transition: transform 0.3s ease;
+        }
+        #hamburger-menu.open svg {
+            transform: rotate(90deg);
+        }
+
+        #sidebar-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(24, 23, 21, 0.4);
+            backdrop-filter: blur(4px);
+            z-index: 99;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+        }
+        #sidebar-overlay.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        @media (max-width: 767px) {
+            #sidebar {
+                position: fixed;
+                left: -300px;
+                z-index: 100;
+                transition: left 0.3s ease;
+                height: 100%;
+            }
+            #sidebar.open {
+                left: 0;
+                box-shadow: 4px 0 15px rgba(0, 0, 0, 0.1);
+            }
+            #main-content {
+                padding: 24px 16px;
+            }
+            #hamburger-menu {
+                display: flex;
+            }
+        }
+        
+        /* Line Explanation Tooltips */
+        .code-tip {
+            border-bottom: 1px dotted var(--primary-coral);
+            cursor: help;
+            position: relative;
+            display: inline-block;
+        }
+    </style>
+</head>
+<body>
+    <button id="hamburger-menu" aria-label="Chuyển đổi Menu Điều hướng">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="3" y1="12" x2="21" y2="12"></line>
+            <line x1="3" y1="6" x2="21" y2="6"></line>
+            <line x1="3" y1="18" x2="21" y2="18"></line>
+        </svg>
+    </button>
+    <div id="sidebar-overlay"></div>
+    <div id="app-layout">
+        <aside id="sidebar" aria-label="Mục lục">
+            <div class="sidebar-header">
+                <div class="sidebar-logo">
+                    <svg viewBox="0 0 24 24" fill="currentColor" style="width: 24px; height: 24px; color: var(--primary-coral); margin-right: 8px;">
+                        <path d="M12,2 L16,10 L22,12 L16,14 L12,22 L8,14 L2,12 L8,10 Z" />
+                    </svg>
+                    <span class="logo-text">Antigravity FastAPI</span>
+                </div>
+                <input type="text" id="search-input" placeholder="Tìm kiếm hướng dẫn..." aria-label="Tìm kiếm nội dung học tập" />
+            </div>
+            <nav class="sidebar-nav">
+                <ul id="nav-list">
+                    <!-- Dynamically populated links -->
+                </ul>
+            </nav>
+        </aside>
+        <main id="main-content" aria-label="Nội dung học tập chính">
+            <section id="essentials" class="test-section">
+                <h2>1. FastAPI Essentials &amp; Overview - Kiến thức cơ bản &amp; Tổng quan về FastAPI</h2>
+                <p>FastAPI là một web framework - khung công việc web hiện đại, hiệu năng cao để xây dựng các APIs (giao diện lập trình ứng dụng) với Python 3.8+ dựa trên standard Python type hints - gợi ý kiểu tiêu chuẩn của Python. Được tạo bởi <strong>Sebastián Ramírez</strong> vào năm 2018, nó đã nhanh chóng trở thành một trong các framework (khung công việc) tiêu chuẩn cho phát triển backend (phía máy chủ), đặc biệt trong data science - khoa học dữ liệu, machine learning - học máy và các microservices (dịch vụ siêu nhỏ) có độ đồng thời cao.</p>
+
+                <h3>Core Features &amp; Advantages - Các tính năng cốt lõi &amp; Ưu điểm</h3>
+                <p>Khi nghiên cứu FastAPI, điều cần thiết là phải hiểu tại sao nó được ưa chuộng hơn các framework (khung công việc) kế thừa như Flask hoặc Django cho việc phát triển API-first development - phát triển ưu tiên API:</p>
+                <ul>
+                    <li><strong>High Performance - Hiệu năng cao:</strong> FastAPI là một trong những Python framework - khung công việc Python nhanh nhất hiện nay, ngang hàng với NodeJS và Go. Tốc độ này đạt được nhờ tận dụng <strong>Starlette</strong> (cho routing (định tuyến) web và các tính năng) and <strong>Uvicorn</strong> (một ASGI server - máy chủ ASGI).</li>
+                    <li><strong>Asynchronous Support - Hỗ trợ bất đồng bộ:</strong> Nó hỗ trợ tự nhiên lập trình bất đồng bộ Python hiện đại (sử dụng <code>async</code> và <code>await</code>), cho phép server (máy chủ) xử lý hàng ngàn request (yêu cầu) đồng thời một cách hiệu quả.</li>
+                    <li><strong>Automatic Documentation - Tài liệu tự động:</strong> Theo mặc định, FastAPI tự động tạo automatic interactive API documentation - tài liệu API tương tác tự động. Ngay khi cài đặt, bạn có quyền truy cập vào <strong>Swagger UI</strong> - giao diện kiểm thử tương tác tại <code>/docs</code> and <strong>ReDoc</strong> (tài liệu cấu trúc sạch sẽ tại <code>/redoc</code>).</li>
+                    <li><strong>Type Safety &amp; Validation - An toàn kiểu dữ liệu &amp; Xác thực:</strong> Được vận hành bởi <strong>Pydantic</strong>, FastAPI thực hiện data validation - xác thực dữ liệu đối với request (yêu cầu) đầu vào và thực hiện data serialization - tuần tự hóa dữ liệu đối với response (phản hồi) đầu ra dựa trên standard Python type hints - gợi ý kiểu tiêu chuẩn của Python. Các request (yêu cầu) không hợp lệ sẽ tự động bị từ chối với các phản hồi lỗi rõ ràng và có cấu trúc.</li>
+                    <li><strong>Developer Productivity - Năng suất của nhà phát triển:</strong> Bằng cách sử dụng type hints - gợi ý kiểu, các trình soạn thảo mã nguồn cung cấp tính năng tự động hoàn thành (autocompletion) và kiểm tra lỗi (linting) cho tất cả các path parameter - tham số đường dẫn, query parameter - tham số truy vấn và request body - thân yêu cầu. Điều này giúp tăng tốc độ phát triển từ 200% đến 300% và giảm tới 40% lỗi do con người tạo ra.</li>
+                </ul>
+
+                <div class="callout-card">
+                    <p><strong>Note (Lưu ý):</strong> Thực chất ở bên dưới, FastAPI không phải là một web framework - khung công việc web hoàn toàn mới được viết từ đầu. Nó là một lớp bọc mỏng nhưng mạnh mẽ, kết hợp tốc độ thô và khả năng routing (định tuyến) web của <strong>Starlette</strong> với các tính năng data validation - xác thực dữ liệu và data serialization - tuần tự hóa dữ liệu mạnh mẽ của <strong>Pydantic</strong>.</p>
+                </div>
+
+                <h3>FastAPI vs Flask vs Django</h3>
+                <p>Việc chọn đúng Python framework - khung công việc Python phụ thuộc vào các yêu cầu dự án của bạn. Dưới đây là bảng so sánh cấu trúc chỉ ra những điểm FastAPI vượt trội so với các framework (khung công việc) kế thừa:</p>
+                
+                <div class="table-container">
+                    <table class="premium-table">
+                        <thead>
+                            <tr>
+                                <th>Criteria (Tiêu chí)</th>
+                                <th>FastAPI</th>
+                                <th>Flask</th>
+                                <th>Django</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>Performance (Hiệu năng)</strong></td>
+                                <td>High - Cao (ASGI-native - thuần ASGI, vận hành bởi Uvicorn/Starlette)</td>
+                                <td>Moderate - Trung bình (WSGI-based - dựa trên WSGI, đồng bộ mặc định)</td>
+                                <td>Moderate - Trung bình (WSGI-based - dựa trên WSGI, tốn tài nguyên hơn)</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Async Support - Hỗ trợ bất đồng bộ</strong></td>
+                                <td>Native - Tự nhiên, hỗ trợ sẵn (async/await)</td>
+                                <td>Limited - Bị giới hạn (yêu cầu các thư viện hoặc phần mở rộng bên thứ ba)</td>
+                                <td>Limited - Bị giới hạn (giới thiệu ASGI muộn hơn, không hoàn toàn async-native)</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Database ORM - ánh xạ quan hệ đối tượng cơ sở dữ liệu</strong></td>
+                                <td>Independent - Độc lập (hoàn toàn tương thích với SQLAlchemy, SQLModel, Tortoise)</td>
+                                <td>None - Không có (thường phụ thuộc vào phần mở rộng Flask-SQLAlchemy)</td>
+                                <td>Built-in ORM - ORM tích hợp sẵn (tích hợp chặt chẽ, cực kỳ cứng nhắc)</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Doc Generation - Tạo tài liệu</strong></td>
+                                <td>Automatic - Tự động (Swagger UI &amp; ReDoc - tự động tạo và tích hợp sẵn)</td>
+                                <td>Manual - Thủ công (yêu cầu thiết lập thủ công các phần mở rộng)</td>
+                                <td>Manual - Thủ công (yêu cầu các gói bên ngoài như drf-yasg)</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Learning Curve - Đường cong học tập</strong></td>
+                                <td>Gentle - Nhẹ nhàng (rất trực quan, sử dụng nhiều type hints)</td>
+                                <td>Very Gentle - Rất nhẹ nhàng (phong cách micro-framework tối giản)</td>
+                                <td>Steep - Dốc (monolithic - nguyên khối, yêu cầu học hệ sinh thái của Django)</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <h3>FastAPI Architecture - Kiến trúc FastAPI</h3>
+                <p>Biểu đồ dưới đây minh họa cách các request (yêu cầu) từ client (máy khách) chạy qua ASGI server - máy chủ ASGI và lõi Starlette/Pydantic bên trong FastAPI:</p>
+                
+                <div class="mermaid">
+                graph TD
+                    Client[Client Request - Yêu cầu từ máy khách] -->|HTTP / ASGI| Uvicorn[Uvicorn ASGI Server - Máy chủ ASGI Uvicorn]
+                    Uvicorn -->|Forward (Chuyển tiếp)| FastAPI[FastAPI Framework - Khung công việc FastAPI]
+                    subgraph FastAPI Core [Lõi FastAPI]
+                        Starlette[Starlette: Routing &amp; Web Core - Định tuyến &amp; Lõi Web]
+                        Pydantic[Pydantic: Data Validation &amp; Serialization - Xác thực &amp; Tuần tự hóa dữ liệu]
+                    end
+                    FastAPI --> Starlette
+                    FastAPI --> Pydantic
+                </div>
+            </section>
+
+            <section id="setup" class="test-section">
+                <h2>2. Environment Setup &amp; Tooling - Thiết lập Môi trường &amp; Công cụ</h2>
+                <p>Tạo một môi trường cô lập là điều tối quan trọng đối với các ứng dụng Python để tránh xung đột phụ thuộc. Mặc dù công cụ tích hợp sẵn <code>venv</code> (môi trường ảo) của Python hoạt động ổn định, các đội ngũ phát triển hiện đại ưa chuộng <strong>uv</strong> từ Astral, một trình cài đặt và giải quyết gói siêu nhanh viết bằng Rust hoạt động như một sự thay thế trực tiếp cho <code>pip</code> và <code>virtualenv</code>.</p>
+                
+                <h3>Why use uv? - Tại sao nên sử dụng uv?</h3>
+                <ul>
+                    <li><strong>speed (tốc độ):</strong> <code>uv</code> nhanh hơn tới 100 lần so với <code>pip</code> tiêu chuẩn trong việc giải quyết và cài đặt các gói.</li>
+                    <li><strong>global cache - bộ nhớ đệm toàn cục:</strong> Nó chia sẻ một bộ nhớ đệm toàn cục trên tất cả các dự án, ngăn ngừa việc tải xuống trùng lặp và lãng phí không gian đĩa.</li>
+                    <li><strong>environment management - quản lý môi trường:</strong> Nó tự động xử lý việc tạo và kích hoạt môi trường ảo.</li>
+                </ul>
+
+                <h3>Project Initialization and Installation - Khởi tạo Dự án và Cài đặt</h3>
+                <p>Làm theo các bước sau để khởi tạo một môi trường ảo và cài đặt stack (ngăn xếp công cụ) FastAPI được yêu cầu:</p>
+                
+                <div class="code-window-card">
+                    <div class="code-window-header">
+                        <div class="dot-container">
+                            <span class="mac-dot red"></span>
+                            <span class="mac-dot yellow"></span>
+                            <span class="mac-dot green"></span>
+                        </div>
+                        <button class="copy-btn">Copy</button>
+                    </div>
+                    <pre><code class="language-bash"># Initialize venv using uv
+uv venv
+
+# Activate venv (Windows)
+.venv\Scripts\activate
+
+# Install dependencies
+uv pip install fastapi uvicorn[standard] sqlalchemy alembic pydantic python-multipart</code></pre>
+                </div>
+
+                <div class="callout-card">
+                    <p><strong>Windows Activation Note - Lưu ý Kích hoạt trên Windows:</strong> Nếu bạn đang sử dụng Windows PowerShell và gặp lỗi phân quyền khi chạy script kích hoạt, bạn có thể cần chạy <code>Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope Process</code> trước để tạm thời cho phép các script cục bộ thực thi.</p>
+                </div>
+            </section>
+
+            <section id="core-concepts" class="test-section">
+                <h2>3. Core Concepts &amp; Fundamentals - Các Khái niệm Cốt lõi &amp; Cơ bản</h2>
+                <p>Để làm chủ FastAPI, bạn phải hiểu các thành phần xây dựng cốt lõi của nó: request routing - định tuyến yêu cầu, parameter validation - xác thực tham số, request-response pipeline - đường ống yêu cầu-phản hồi (hay request/response lifecycle - chu kỳ sống yêu cầu/phản hồi), data schemas - sơ đồ dữ liệu và dependency injection - tiêm phụ thuộc.</p>
+
+                <h3>Hello World Application - Ứng dụng Hello World</h3>
+                <p>Tạo một API cơ bản rất đơn giản và đòi hỏi rất ít boilerplate (mã nguồn khuôn mẫu). Dưới đây là một ví dụ hoạt động tối giản trong <code>main.py</code>:</p>
+
+                <div class="code-window-card">
+                    <div class="code-window-header">
+                        <div class="dot-container">
+                            <span class="mac-dot red"></span>
+                            <span class="mac-dot yellow"></span>
+                            <span class="mac-dot green"></span>
+                        </div>
+                        <button class="copy-btn">Copy</button>
+                    </div>
+                    <pre><code class="language-python">from fastapi import FastAPI
+
+# 1. Create a FastAPI instance
+app = FastAPI()
+
+# 2. Define a path operation decorator
+@app.get("/")
+# 3. Define an asynchronous path operation function
+async def read_root():
+    # 4. Return a dictionary (automatically serialized to JSON)
+    return {"message": "Hello World"}</code></pre>
+                </div>
+
+                <h4>Line-by-Line Breakdown - Phân tích Từng Dòng:</h4>
+                <ol>
+                    <li><code>from fastapi import FastAPI</code>: Nhập lớp FastAPI chính quản lý routing (định tuyến), các sự kiện và cấu hình ứng dụng.</li>
+                    <li><code>app = FastAPI()</code>: Khởi tạo ứng dụng. Đối tượng này điều phối tất cả các request (yêu cầu), tài liệu và dependency (phụ thuộc).</li>
+                    <li><code>@app.get("/")</code>: Một path operation decorator - bộ trang trí hoạt động đường dẫn. Nó ánh xạ các HTTP <code>GET</code> request (yêu cầu) trên đường dẫn <code>/</code> tới hàm bên dưới.</li>
+                    <li><code>async def read_root()</code>: Một asynchronous path operation function - hàm hoạt động đường dẫn bất đồng bộ. Sử dụng <code>async def</code> cho phép các hoạt động non-blocking - không chặn. Bạn cũng có thể viết <code>def read_root()</code> cho các endpoint (điểm cuối) đồng bộ; FastAPI xử lý cả hai một cách thông minh.</li>
+                    <li><code>return {"message": "Hello World"}</code>: Trả về một từ điển Python (Python dict). FastAPI tự động xử lý data serialization - tuần tự hóa dữ liệu của nó sang JSON và đặt tiêu đề <code>Content-Type</code> thành <code>application/json</code>.</li>
+                </ol>
+
+                <p>Chạy development server - máy chủ phát triển bằng Uvicorn:</p>
+                <div class="code-window-card">
+                    <div class="code-window-header">
+                        <div class="dot-container">
+                            <span class="mac-dot red"></span>
+                            <span class="mac-dot yellow"></span>
+                            <span class="mac-dot green"></span>
+                        </div>
+                        <button class="copy-btn">Copy</button>
+                    </div>
+                    <pre><code class="language-bash"># Run the ASGI server
+# 'main' represents the main.py module
+# 'app' represents the FastAPI instance
+# '--reload' enables hot-reloading on code changes
+uvicorn main:app --reload</code></pre>
+                </div>
+
+                <h3>Routing: Path vs. Query Parameters - Định tuyến: Tham số đường dẫn so với Tham số truy vấn</h3>
+                <p>FastAPI phân tách các tham số yêu cầu thành hai loại chính dựa trên vị trí xuất hiện của chúng trong URL:</p>
+                <ul>
+                    <li><strong>Path Parameters - Tham số đường dẫn:</strong> Là một phần của chính đường dẫn URL, được sử dụng để xác định các tài nguyên cụ thể. Ví dụ, trong <code>/items/42</code>, số <code>42</code> là một path parameter - tham số đường dẫn.</li>
+                    <li><strong>Query Parameters - Tham số truy vấn:</strong> Các tham số tùy chọn được thêm vào sau dấu <code>?</code> trong URL, được sử dụng để lọc, sắp xếp hoặc phân trang. Ví dụ, trong <code>/items?limit=10</code>, <code>limit</code> là một query parameter - tham số truy vấn.</li>
+                </ul>
+
+                <h3>Parameter Validation - Xác thực Tham số</h3>
+                <p>Chúng ta có thể áp đặt các ràng buộc lên các tham số này bằng cách sử dụng các đối tượng <code>Path</code> và <code>Query</code>, các đối tượng này cũng sẽ điền mô tả và siêu dữ liệu xác thực vào tài liệu được tạo tự động:</p>
+
+                <div class="code-window-card">
+                    <div class="code-window-header">
+                        <div class="dot-container">
+                            <span class="mac-dot red"></span>
+                            <span class="mac-dot yellow"></span>
+                            <span class="mac-dot green"></span>
+                        </div>
+                        <button class="copy-btn">Copy</button>
+                    </div>
+                    <pre><code class="language-python">from fastapi import FastAPI, Path, Query
+from typing import Optional
+
+app = FastAPI()
+
+@app.get("/items/{item_id}")
+async def read_item(
+    # Validation: item_id must be an integer greater than 0 (gt=0)
+    item_id: int = Path(..., description="The ID of the item to retrieve", gt=0),
+    # Validation: q is optional, min_length of 3, max_length of 50
+    q: Optional[str] = Query(None, min_length=3, max_length=50, description="Search query string")
+):
+    return {"item_id": item_id, "query": q}
+
+@app.get("/users")
+async def list_users(
+    # Validation: limit has default 10, must be between 1 and 100 (ge=1, le=100)
+    limit: int = Query(10, ge=1, le=100, description="Limit the number of returned users"),
+    active: bool = Query(True, description="Filter users by active status")
+):
+    return {"limit": limit, "active": active}</code></pre>
+                </div>
+
+                <h3>Pydantic Schemas - Sơ đồ Pydantic</h3>
+                <p>Pydantic là validation engine - công cụ xác thực của FastAPI. Bằng cách định nghĩa các lớp kế thừa từ <code>BaseModel</code> của Pydantic, bạn khai báo cấu trúc dữ liệu của mình. Điều này cho phép tự động phân tích request body - thân yêu cầu, xác thực và tạo schema (sơ đồ). Trong các ứng dụng production (môi trường vận hành thực tế), việc phân tách các schema (sơ đồ) dựa trên mục đích sử dụng là một mẫu thiết kế tiêu chuẩn:</p>
+                <ul>
+                    <li><strong>Base Schema - Sơ đồ cơ sở:</strong> Chứa các thuộc tính chung được chia sẻ giữa việc tạo mới và truy xuất.</li>
+                    <li><strong>Create Schema - Sơ đồ tạo mới:</strong> Mở rộng sơ đồ cơ sở với các thuộc tính chỉ ghi (chẳng hạn như mật khẩu văn bản thô).</li>
+                    <li><strong>Response Schema - Sơ đồ phản hồi:</strong> Lọc bỏ các thuộc tính nhạy cảm (chẳng hạn như mật khẩu hoặc các khóa nội bộ) trước khi trả lại dữ liệu cho client (máy khách).</li>
+                </ul>
+
+                <div class="code-window-card">
+                    <div class="code-window-header">
+                        <div class="dot-container">
+                            <span class="mac-dot red"></span>
+                            <span class="mac-dot yellow"></span>
+                            <span class="mac-dot green"></span>
+                        </div>
+                        <button class="copy-btn">Copy</button>
+                    </div>
+                    <pre><code class="language-python">from pydantic import BaseModel, Field
+from typing import Optional
+
+# Base schema containing shared attributes
+class UserBase(BaseModel):
+    username: str = Field(..., min_length=3, max_length=50)
+    email: str # In production, use pydantic.EmailStr (requires email-validator)
+
+# Schema used for user registration
+class UserCreate(UserBase):
+    password: str = Field(..., min_length=8, description="User's plain password")
+
+# Schema returned to the client (excludes password fields)
+class User(UserBase):
+    id: int
+    is_active: bool
+
+    class Config:
+        # In Pydantic v2, from_attributes=True replaces orm_mode=True
+        # This enables deserialization from ORM instances (e.g., SQLAlchemy models)
+        <span class="code-tip" data-tip="Yêu cầu Pydantic đọc dữ liệu từ các đối tượng ORM (như SQLAlchemy) bằng cách tra cứu thuộc tính thay vì ánh xạ từ điển (dict mapping).">from_attributes = True</span></code></pre>
+                </div>
+
+                <h3>Request Body &amp; Response Model - Thân yêu cầu &amp; Mô hình phản hồi</h3>
+                <p>Khi triển khai các endpoint (điểm cuối) định tuyến, chúng ta khai báo các kiểu request body - thân yêu cầu bằng cách sử dụng các Pydantic schemas - sơ đồ Pydantic của mình, và cấu hình serialization (tuần tự hóa) với tham số <code>response_model</code> bên trong route decorator - bộ trang trí định tuyến:</p>
+
+                <div class="code-window-card">
+                    <div class="code-window-header">
+                        <div class="dot-container">
+                            <span class="mac-dot red"></span>
+                            <span class="mac-dot yellow"></span>
+                            <span class="mac-dot green"></span>
+                        </div>
+                        <button class="copy-btn">Copy</button>
+                    </div>
+                    <pre><code class="language-python">from fastapi import FastAPI, HTTPException, status
+
+app = FastAPI()
+
+# Dummy database storage
+db_users = []
+
+# Declaring response_model filters outgoing data, ensuring no password is leaked
+@app.post("/users", response_model=User, status_code=status.HTTP_201_CREATED)
+async def create_user(user_in: UserCreate):
+    # Validate if email is already taken
+    for u in db_users:
+        if u["email"] == user_in.email:
+            raise HTTPException(status_code=400, detail="Email already registered")
+            
+    # Save user (normally password is hashed here)
+    user_dict = user_in.model_dump() # In Pydantic v2, .model_dump() replaces .dict()
+    user_dict["id"] = len(db_users) + 1
+    user_dict["is_active"] = True
+    
+    # Store user database record (which contains password)
+    db_users.append(user_dict)
+    
+    # Returning the dictionary. FastAPI serializes it using the User response schema,
+    # which excludes the 'password' field.
+    return user_dict</code></pre>
+                </div>
+
+                <h3>Dependency Injection - Tiêm phụ thuộc (DI)</h3>
+                <p>Dependency injection - tiêm phụ thuộc (DI) là một mẫu thiết kế phần mềm trong đó các đối tượng hoặc hàm nhận các phụ thuộc khác mà chúng yêu cầu. Trong FastAPI, hệ thống DI được tích hợp sẵn và mạnh mẽ, cho phép các endpoint (điểm cuối) khai báo và nhận tài nguyên một cách động bằng cách sử dụng tiện ích <code>Depends()</code>.</p>
+                
+                <h4>Key Benefits of Dependency Injection in FastAPI - Các lợi ích chính của Dependency Injection trong FastAPI:</h4>
+                <ul>
+                    <li><strong>Lifecycle Management - Quản lý chu kỳ sống:</strong> Lý tưởng để quản lý các tài nguyên như database session - phiên cơ sở dữ liệu, các kết nối mạng hoặc tệp tin. Hệ thống DI tự động xử lý việc khởi tạo và dọn dẹp.</li>
+                    <li><strong>Modularity &amp; Reuse - Tính mô-đun &amp; Tái sử dụng:</strong> Viết mã một lần (ví dụ: logic xác thực hoặc truy xuất cơ sở dữ liệu) và tái sử dụng nó trên nhiều endpoint (điểm cuối).</li>
+                    <li><strong>Seamless Testing - Kiểm thử liền mạch:</strong> Dễ dàng hoán đổi các phụ thuộc bằng các triển khai giả lập (mock) trong môi trường kiểm thử (sử dụng <code>app.dependency_overrides</code>).</li>
+                </ul>
+
+                <p>Dưới đây là một ví dụ về việc tiêm một database session - phiên cơ sở dữ liệu phụ thuộc, cho thấy cách FastAPI xử lý cả việc khởi tạo (yield) và dọn dẹp (đóng phiên) tài nguyên:</p>
+
+                <div class="code-window-card">
+                    <div class="code-window-header">
+                        <div class="dot-container">
+                            <span class="mac-dot red"></span>
+                            <span class="mac-dot yellow"></span>
+                            <span class="mac-dot green"></span>
+                        </div>
+                        <button class="copy-btn">Copy</button>
+                    </div>
+                    <pre><code class="language-python">from fastapi import FastAPI, Depends
+from sqlalchemy.orm import Session
+# Dummy database session for representation
+# from database import SessionLocal, Item
+
+app = FastAPI()
+
+# 1. Define a dependency function managing database session lifecycle
+def get_db():
+    db = SessionLocal() # Establish database session
+    try:
+        yield db       # Inject the session into the endpoint function
+    finally:
+        db.close()     # Executed AFTER the endpoint returns response
+
+# 2. Inject the dependency into path operation functions
+@app.get("/items")
+def read_items(db: Session = <span class="code-tip" data-tip="Dependency Injection - tiêm phụ thuộc trong FastAPI. Nó yêu cầu một database session - phiên cơ sở dữ liệu được tự động tạo và đóng.">Depends(get_db)</span>):
+    # The session is active and safe to use
+    items = db.query(Item).all()
+    return items</code></pre>
+                </div>
+            </section>
+
+            <section id="case-study" class="test-section">
+                <h2>4. Book Management API Case Study - Nghiên cứu Trường hợp API Quản lý Sách</h2>
+                <p>Để chứng minh ứng dụng thực tế của FastAPI, chúng ta phân tích <strong>Book Management API - API Quản lý Sách</strong>. Ứng dụng này hỗ trợ kiểm soát kho sách, phân loại, quản lý tác giả và tải lên hình ảnh bìa tùy chỉnh. Nó được cấu trúc bằng cách sử dụng mẫu thiết kế mô-đun tiêu chuẩn công nghiệp, tách biệt cấu hình, logic cơ sở dữ liệu, ORM models - các mô hình ORM, Pydantic schemas - sơ đồ Pydantic và các bộ định tuyến API thành các mô-đun chuyên dụng.</p>
+
+                <h3>Directory Structure - Cấu trúc Thư mục</h3>
+                <p>Dưới đây là cấu trúc thư mục của dự án <code>fastapi-book-management-api</code>:</p>
+
+                <div class="code-window-card">
+                    <div class="code-window-header">
+                        <div class="dot-container">
+                            <span class="mac-dot red"></span>
+                            <span class="mac-dot yellow"></span>
+                            <span class="mac-dot green"></span>
+                        </div>
+                        <button class="copy-btn">Copy</button>
+                    </div>
+                    <pre><code class="language-text">fastapi-book-management-api/
+├── alembic/                  # Database migration scripts and history
+├── app/
+│   ├── api/                  # Route handlers and endpoints
+│   │   ├── auth.py           # Authentication and token endpoints
+│   │   ├── authors.py        # CRUD endpoints for Authors
+│   │   ├── books.py          # CRUD endpoints for Books and cover uploads
+│   │   └── categories.py     # CRUD endpoints for Categories
+│   ├── core/                 # Application config and security settings
+│   │   ├── config.py         # Base settings and environment loading
+│   │   └── security.py       # Password hashing and JWT generation
+│   ├── db/                   # Database engine and session setup
+│   │   ├── base.py           # Imports all models to expose to Alembic
+│   │   └── session.py        # Engine definition and get_db utility
+│   ├── models/               # SQLAlchemy ORM definitions
+│   │   ├── author.py         # Author database model
+│   │   ├── book.py           # Book database model
+│   │   └── category.py       # Category database model
+│   ├── schemas/              # Pydantic validation and serialization schemas
+│   │   ├── author.py         # Author schemas (Create, Read, Update)
+│   │   ├── book.py           # Book schemas (Create, Read, Update)
+│   │   └── category.py       # Category schemas (Create, Read, Update)
+│   ├── static/               # Mounted directory for serving uploaded static files
+│   │   └── covers/           # Stores uploaded book cover images
+│   └── main.py               # FastAPI application initialization
+├── alembic.ini               # Alembic configuration metadata
+├── requirements.txt          # Python dependencies
+└── README.md                 # Project documentation</code></pre>
+                </div>
+
+                <h4>Roles of Core Modules - Vai trò của các Mô-đun Cốt lõi:</h4>
+                <ul>
+                    <li><strong>core/</strong>: Tập trung các cấu hình hệ thống thông qua Pydantic <code>BaseSettings</code> (ví dụ: đọc thông tin xác thực cơ sở dữ liệu và các nguồn gốc CORS từ <code>.env</code>) và chứa các tiện ích trợ giúp JWT.</li>
+                    <li><strong>db/</strong>: Khởi tạo công cụ SQLAlchemy, cấu hình <code>SessionLocal</code> (nhà máy tạo phiên) và xuất ra dependency (phụ thuộc) <code>get_db</code>.</li>
+                    <li><strong>models/</strong>: Khai báo các mô hình SQLAlchemy ORM - ánh xạ quan hệ đối tượng SQLAlchemy đại diện cho các bảng cơ sở dữ liệu vật lý cùng các chỉ mục, ràng buộc và mối quan hệ của chúng.</li>
+                    <li><strong>schemas/</strong>: Định nghĩa các mô hình Pydantic để xác thực payload (tải trọng dữ liệu) của HTTP request - yêu cầu HTTP đầu vào (ví dụ: <code>BookCreate</code>) và làm sạch response body - thân yêu cầu phản hồi đầu ra (ví dụ: <code>BookResponse</code>).</li>
+                    <li><strong>api/</strong>: Tách biệt các endpoint (điểm cuối) một cách logic thành các bộ định tuyến phụ (ví dụ: <code>books.py</code>, <code>authors.py</code>) bằng cách sử dụng <code>APIRouter</code> của FastAPI, sau đó chúng được hợp nhất vào ứng dụng chính.</li>
+                </ul>
+
+                <h3>Entity Relationship Diagram - Sơ đồ Mối quan hệ Thực thể (ERD)</h3>
+                <p>Hệ thống định nghĩa ba thực thể chính: <strong>Author (Tác giả)</strong>, <strong>Category (Danh mục)</strong> và <strong>Book (Sách)</strong>. Một tác giả có thể viết nhiều cuốn sách, và một danh mục có thể chứa nhiều cuốn sách. Điều này được ánh xạ thông qua các ràng buộc khóa ngoại Một-nhiều trên bảng <code>books</code>.</p>
+
+                <div class="mermaid">
+                erDiagram
+                    authors ||--o{ books : "has many (có nhiều)"
+                    categories ||--o{ books : "contains (chứa)"
+                </div>
+            </section>
+
+            <section id="walkthrough" class="test-section">
+                <h2>5. End-to-End Request-Response Pipeline - Đường ống Yêu cầu-Phản hồi Toàn diện</h2>
+                <p>Hiểu được request-response pipeline - đường ống yêu cầu-phản hồi (hay request/response lifecycle - chu kỳ sống yêu cầu/phản hồi) là rất quan trọng để theo dõi quá trình thực thi và gỡ lỗi. Biểu đồ dưới đây mô tả chi tiết trình tự của một request (yêu cầu) tải lên tệp tin dạng multipart nhắm mục tiêu đến endpoint (điểm cuối) tải lên hình ảnh bìa.</p>
+
+                <h3>Request Pipeline Sequence Diagram - Sơ đồ Tuần tự Đường ống Yêu cầu</h3>
+                <p>Sơ đồ tuần tự này chỉ ra cách request (yêu cầu) truyền từ client (máy khách), qua middleware (phần mềm trung gian) xác thực, thực thi định tuyến, trích xuất phụ thuộc và lưu trữ cơ sở dữ liệu, kết thúc bằng việc lưu trữ vào hệ thống tệp và trả về một response (phản hồi) đã được tuần tự hóa.</p>
+
+                <div class="mermaid">
+                sequenceDiagram
+                    autonumber
+                    actor Client
+                    participant Uvicorn as "Uvicorn (ASGI Server - Máy chủ ASGI)"
+                    participant FastAPI as "FastAPI App (Ứng dụng FastAPI)"
+                    participant Router as "APIRouter (books - Sách)"
+                    participant Depends as "Depends(get_db) (Tiêm Phụ thuộc)"
+                    participant DB as "Database (SQLAlchemy - Cơ sở dữ liệu)"
+                    
+                    Client->>Uvicorn: POST /api/books/1/cover (Multipart form-data)
+                    Uvicorn->>FastAPI: Forward HTTP payload - Chuyển tiếp payload HTTP
+                    FastAPI->>Router: Route matching &amp; schema validation - Khớp định tuyến &amp; xác thực sơ đồ
+                    FastAPI->>Depends: Initialize SessionLocal() - Khởi tạo SessionLocal()
+                    Depends-->>Router: Yield active DB session - Cung cấp phiên CSDL hoạt động
+                    
+                    rect rgb(240, 248, 255)
+                        note over Router: Validation Checks - Các kiểm tra xác thực
+                        Router->>Router: Check File size &lt;= 2MB - Kiểm tra kích thước tệp &lt;= 2MB
+                        Router->>Router: Validate File Extension &amp; MIME Type - Xác thực đuôi tệp &amp; Kiểu MIME
+                        Router->>Router: Generate secure unique filename (UUID4) - Tạo tên tệp độc nhất an toàn (UUID4)
+                    end
+                    
+                    Router->>DB: Query Book by ID - Truy vấn Sách bằng ID
+                    DB-->>Router: Return Book object (or raise 404) - Trả về đối tượng Book (hoặc báo lỗi 404)
+                    
+                    rect rgb(245, 245, 245)
+                        note over Router: Storage &amp; Persistence - Lưu trữ &amp; Đồng bộ
+                        Router->>Router: Write file content to disk (static/covers/) - Ghi nội dung tệp vào đĩa (static/covers/)
+                        Router->>DB: Update cover_image URL string - Cập nhật chuỗi URL cover_image
+                        Router->>DB: Commit transaction - database transaction - giao dịch cơ sở dữ liệu
+                        DB-->>Router: Return Commit Success - Trả về Commit thành công
+                    end
+                    
+                    Router->>Depends: Close DB Session (finally block) - Đóng phiên CSDL (khối finally)
+                    Depends-->>FastAPI: Release Connection - Giải phóng kết nối
+                    Router-->>Client: HTTP 200 OK with serialized Book JSON - HTTP 200 OK với JSON Book được tuần tự hóa
+                </div>
+
+                <h3>Detailed Step-by-Step Walkthrough - Hướng dẫn chi tiết Từng Bước</h3>
+
+                <h4>Phase 1: Bootstrapping &amp; Mounting - Khởi động &amp; Gắn kết</h4>
+                <p>Khi ứng dụng khởi động, Uvicorn khởi tạo đối tượng <code>FastAPI</code> được định nghĩa trong <code>app/main.py</code>. Trong quá trình khởi động này, các routes (tuyến đường) được đăng ký và việc mounting (gắn kết) thư mục tệp tĩnh diễn ra:</p>
+
+                <div class="code-window-card">
+                    <div class="code-window-header">
+                        <div class="dot-container">
+                            <span class="mac-dot red"></span>
+                            <span class="mac-dot yellow"></span>
+                            <span class="mac-dot green"></span>
+                        </div>
+                        <button class="copy-btn">Copy</button>
+                    </div>
+                    <pre><code class="language-python">from fastapi import FastAPI
+from fastapi.staticfiles import StaticFiles
+from app.api import books, authors, categories
+
+app = FastAPI(title="Book Management API")
+
+# Mount the static directory to serve book covers directly
+app.mount("/static", StaticFiles(directory="app/static"), name="static")
+
+# Include the routers for modular API routing
+app.include_router(books.router, prefix="/api/books", tags=["Books"])
+app.include_router(authors.router, prefix="/api/authors", tags=["Authors"])
+app.include_router(categories.router, prefix="/api/categories", tags=["Categories"])</code></pre>
+                </div>
+
+                <h4>Phase 2: Routing &amp; Parsing - Định tuyến &amp; Phân tích cú pháp</h4>
+                <p>Khi nhận được một HTTP request - yêu cầu HTTP đến (ví dụ: <code>POST /api/books/42/cover</code>), bộ định tuyến nội bộ của FastAPI sẽ khớp phương thức request (yêu cầu) và đường dẫn với hàm hoạt động đường dẫn. Các path parameter - tham số đường dẫn (chẳng hạn như <code>42</code>) được trích xuất từ URL và được phân tích cú pháp thành các kiểu dữ liệu Python đã khai báo của chúng.</p>
+
+                <h4>Phase 3: Dependency Resolution (get_db Lifecycle) - Giải quyết Phụ thuộc (Vòng đời của get_db)</h4>
+                <p>Trước khi thực thi route handler - bộ xử lý định tuyến, FastAPI sẽ giải quyết bất kỳ dependency (phụ thuộc) nào được khai báo. Phụ thuộc <code>get_db</code> được giải quyết thông qua một generator:</p>
+                <ol>
+                    <li>FastAPI gọi hàm phụ thuộc <code>get_db()</code>.</li>
+                    <li><code>SessionLocal()</code> được gọi để tạo một kết nối cơ sở dữ liệu phiên SQLAlchemy mới.</li>
+                    <li>Hàm thực thi cho đến câu lệnh <code>yield db</code>, cung cấp phiên hoạt động cho hàm đường dẫn.</li>
+                    <li>Hàm hoạt động đường dẫn chạy.</li>
+                    <li>Sau khi response (phản hồi) được lập ra, generator tiếp tục hoạt động, thực thi khối <code>finally</code> gọi lệnh <code>db.close()</code>. Điều này đảm bảo các kết nối cơ sở dữ liệu được trả lại cho pool (nhóm kết nối), ngăn ngừa rò rỉ bộ nhớ.</li>
+                </ol>
+
+                <h4>Phase 4: Route Handlers (Detailed function analysis) - Route Handler - bộ xử lý định tuyến (Phân tích chi tiết chức năng)</h4>
+
+                <h5>1. Retrieve Book List (list_books) - Truy xuất Danh sách Sách (list_books)</h5>
+                <p>Endpoint (điểm cuối) này xử lý việc truy xuất danh sách và triển khai lọc cũng như phân trang bằng cách sử dụng các query parameter - tham số truy vấn tùy chọn. Truy vấn SQL được xây dựng động bằng cách sử dụng các bộ lọc có điều kiện:</p>
+
+                <div class="code-window-card">
+                    <div class="code-window-header">
+                        <div class="dot-container">
+                            <span class="mac-dot red"></span>
+                            <span class="mac-dot yellow"></span>
+                            <span class="mac-dot green"></span>
+                        </div>
+                        <button class="copy-btn">Copy</button>
+                    </div>
+                    <pre><code class="language-python">@router.get("/", response_model=List[schemas.Book])
+def list_books(
+    skip: int = 0,
+    limit: int = 100,
+    author_id: Optional[int] = None,
+    category_id: Optional[int] = None,
+    keyword: Optional[str] = None,
+    db: Session = <span class="code-tip" data-tip="Lấy một đối tượng database session - phiên cơ sở dữ liệu bằng cách sử dụng hệ thống dependency injection - tiêm phụ thuộc của FastAPI.">Depends(get_db)</span>
+):
+    """
+    Retrieves a list of books with pagination and dynamic filtering.
+    """
+    # Initialize base query
+    query = db.query(models.Book)
+    
+    # Conditionally apply filters
+    if author_id:
+        query = query.filter(models.Book.author_id == author_id)
+    if category_id:
+        query = query.filter(models.Book.category_id == category_id)
+    if keyword:
+        # Case-insensitive search inside title or description
+        query = query.filter(
+            (models.Book.title.ilike(f"%{keyword}%")) | 
+            (models.Book.description.ilike(f"%{keyword}%"))
+        )
+    
+    # Execute paginated query
+    return query.offset(skip).limit(limit).all()</code></pre>
+                </div>
+
+                <h5>2. Create Book Record (create_book) - Tạo Bản ghi Sách (create_book)</h5>
+                <p>Trước khi thêm sách, chúng tôi thực hiện các kiểm tra xác thực để đảm bảo tính toàn vẹn của cơ sở dữ liệu. Chúng tôi kiểm tra xem Tác giả và Danh mục được tham chiếu có tồn tại trước khi chèn hay không:</p>
+
+                <div class="code-window-card">
+                    <div class="code-window-header">
+                        <div class="dot-container">
+                            <span class="mac-dot red"></span>
+                            <span class="mac-dot yellow"></span>
+                            <span class="mac-dot green"></span>
+                        </div>
+                        <button class="copy-btn">Copy</button>
+                    </div>
+                    <pre><code class="language-python">@router.post("/", response_model=schemas.Book, status_code=status.HTTP_201_CREATED)
+def create_book(book_in: schemas.BookCreate, db: Session = <span class="code-tip" data-tip="Lấy một đối tượng database session - phiên cơ sở dữ liệu bằng cách sử dụng hệ thống dependency injection - tiêm phụ thuộc của FastAPI.">Depends(get_db)</span>):
+    """
+    Creates a new book after verifying parent entities exist.
+    """
+    # 1. Verify author exists
+    author_exists = db.query(models.Author).filter(models.Author.id == book_in.author_id).first()
+    if not author_exists:
+        raise HTTPException(status_code=404, detail="Author not found")
+        
+    # 2. Verify category exists
+    category_exists = db.query(models.Category).filter(models.Category.id == book_in.category_id).first()
+    if not category_exists:
+        raise HTTPException(status_code=404, detail="Category not found")
+        
+    # 3. Save book record
+    db_book = models.Book(**book_in.model_dump())
+    db.add(db_book)
+    db.commit()
+    db.refresh(db_book)
+    return db_book</code></pre>
+                </div>
+
+                <h5>3. Update &amp; Delete Book Records - Cập nhật &amp; Xóa các Bản ghi Sách</h5>
+                <p>Cập nhật các bản ghi cơ sở dữ liệu yêu cầu tải thực thể, áp dụng các thuộc tính mới và thực hiện database transaction - giao dịch cơ sở dữ liệu:</p>
+
+                <div class="code-window-card">
+                    <div class="code-window-header">
+                        <div class="dot-container">
+                            <span class="mac-dot red"></span>
+                            <span class="mac-dot yellow"></span>
+                            <span class="mac-dot green"></span>
+                        </div>
+                        <button class="copy-btn">Copy</button>
+                    </div>
+                    <pre><code class="language-python">@router.put("/{book_id}", response_model=schemas.Book)
+def update_book(book_id: int, book_in: schemas.BookUpdate, db: Session = Depends(get_db)):
+    """
+    Modifies an existing book record. Only updates modified fields.
+    """
+    db_book = db.query(models.Book).filter(models.Book.id == book_id).first()
+    if not db_book:
+        raise HTTPException(status_code=404, detail="Book not found")
+        
+    # Extract only provided update parameters
+    update_data = book_in.model_dump(exclude_unset=True)
+    for key, value in update_data.items():
+        setattr(db_book, key, value)
+        
+    db.commit()
+    db.refresh(db_book)
+    return db_book
+ 
+@router.delete("/{book_id}", status_code=status.HTTP_204_NO_CONTENT)
+def delete_book(book_id: int, db: Session = Depends(get_db)):
+    """
+    Removes a book from the inventory.
+    """
+    db_book = db.query(models.Book).filter(models.Book.id == book_id).first()
+    if not db_book:
+        raise HTTPException(status_code=404, detail="Book not found")
+        
+    db.delete(db_book)
+    db.commit()
+    return None</code></pre>
+                </div>
+
+                <h5>4. Upload Book Cover Image (upload_book_cover) - Tải lên Hình ảnh Bìa Sách (upload_book_cover)</h5>
+                <p>Endpoint (điểm cuối) này nhận một payload (dữ liệu tải) nhị phân thông qua multipart/form-data. Nó thực hiện các kiểm tra xác thực bảo mật (kích thước và định dạng tệp), lưu tệp cục bộ bằng các thao tác với tệp của Python, và cập nhật cơ sở dữ liệu với liên kết tĩnh:</p>
+
+                <div class="code-window-card">
+                    <div class="code-window-header">
+                        <div class="dot-container">
+                            <span class="mac-dot red"></span>
+                            <span class="mac-dot yellow"></span>
+                            <span class="mac-dot green"></span>
+                        </div>
+                        <button class="copy-btn">Copy</button>
+                    </div>
+                    <pre><code class="language-python">import os
+import uuid
+from fastapi import APIRouter, Depends, HTTPException, UploadFile, File, status
+from sqlalchemy.orm import Session
+ 
+router = APIRouter()
+ 
+# Security constants
+MAX_FILE_SIZE = 2 * 1024 * 1024  # 2MB Limit
+ALLOWED_MIME_TYPES = ["image/jpeg", "image/png"]
+ALLOWED_EXTENSIONS = [".jpg", ".jpeg", ".png"]
+ 
+@router.post("/{book_id}/cover", response_model=schemas.Book)
+async def upload_book_cover(
+    book_id: int,
+    file: <span class="code-tip" data-tip="Kiểu UploadFile của FastAPI. Nó xử lý tải lên tệp một cách hiệu quả, lưu trữ các tệp nhỏ trong bộ nhớ và các tệp lớn trên đĩa.">UploadFile</span> = <span class="code-tip" data-tip="Chỉ báo tham số File của FastAPI. Ký tự '...' nghĩa là tham số tải lên tệp là bắt buộc.">File(...)</span>,
+    db: Session = <span class="code-tip" data-tip="Lấy một đối tượng database session - phiên cơ sở dữ liệu bằng cách sử dụng hệ thống dependency injection - tiêm phụ thuộc của FastAPI.">Depends(get_db)</span>
+):
+    # 1. Verify book exists
+    db_book = db.query(models.Book).filter(models.Book.id == book_id).first()
+    if not db_book:
+        raise HTTPException(status_code=404, detail="Book not found")
+        
+    # 2. Validate file extension
+    _, ext = os.path.splitext(file.filename.lower())
+    if ext not in ALLOWED_EXTENSIONS:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=f"Invalid file extension. Allowed extensions: {', '.join(ALLOWED_EXTENSIONS)}"
+        )
+        
+    # 3. Validate MIME type
+    if file.content_type not in ALLOWED_MIME_TYPES:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=f"Invalid MIME type. Allowed types: {', '.join(ALLOWED_MIME_TYPES)}"
+        )
+        
+    # 4. Validate file size (Read up to 2MB to verify size)
+    file.file.seek(0, os.SEEK_END)
+    file_size = file.file.tell()
+    file.file.seek(0)  # Reset pointer back to beginning
+    
+    if file_size > MAX_FILE_SIZE:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="File size exceeds the maximum allowed limit of 2MB."
+        )
+        
+    # 5. Generate secure unique filename to avoid collision or path traversal
+    unique_filename = f"{uuid.uuid4()}{ext}"
+    upload_dir = "app/static/covers"
+    os.makedirs(upload_dir, exist_ok=True)
+    file_path = os.path.join(upload_dir, unique_filename)
+    
+    # 6. Save binary stream to file system asynchronously
+    try:
+        with open(file_path, "wb") as buffer:
+            while chunk := <span class="code-tip" data-tip="Đọc không đồng bộ một đoạn (chunk) từ luồng tệp đã tải lên để tránh chặn event loop - vòng lặp sự kiện.">await file.read(1024 * 64)</span>:
+                buffer.write(chunk)
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Could not write file content to disk."
+        )
+        
+    # 7. Persist static URL to the database
+    static_url = f"/static/covers/{unique_filename}"
+    db_book.cover_image = static_url
+    db.commit()
+    db.refresh(db_book)
+    
+    return db_book</code></pre>
+                </div>
+
+                <h4>Phase 5: Cleanup &amp; Serialization - Dọn dẹp &amp; Tuần tự hóa dữ liệu</h4>
+                <p>Sau khi route handler - bộ xử lý định tuyến trả về kết quả, FastAPI xử lý serialization (tuần tự hóa dữ liệu) và session teardown - kết thúc phiên:</p>
+                <ul>
+                    <li><strong>Serialization - Tuần tự hóa dữ liệu:</strong> Thực thể cơ sở dữ liệu được trả về bởi route handler - bộ xử lý định tuyến được phân tích cú pháp bởi Pydantic schema - sơ đồ Pydantic khai báo trong <code>response_model</code>. Pydantic lọc bỏ các thuộc tính nội bộ và nhạy cảm (ví dụ: mật khẩu hoặc các đường dẫn tệp cục bộ) và ánh xạ các bản ghi DB bằng các thuộc tính.</li>
+                    <li><strong>Connection release - Giải phóng kết nối:</strong> FastAPI gọi bước dọn dẹp thực thi của bộ giải quyết phụ thuộc. Trong trường hợp của <code>get_db</code>, điều này kích hoạt khối <code>finally</code>, thực thi <code>db.close()</code> để dọn dẹp các kết nối cơ sở dữ liệu một cách an toàn.</li>
+                </ul>
+            </section>
+
+            <section id="advanced" class="test-section">
+                <h2>6. Advanced Topics &amp; Production Best Practices - Các Chủ đề Nâng cao &amp; Thực tiễn Tốt nhất trong Môi trường Vận hành</h2>
+                <p>Khi ứng dụng mở rộng quy mô từ môi trường phát triển sang production environments - môi trường vận hành thực tế, các khả năng nâng cao như cross-origin resource sharing - chia sẻ tài nguyên nguồn gốc chéo (CORS), middleware (phần mềm trung gian) tùy chỉnh, websocket (giao thức websocket) hai chiều thời gian thực và cấu hình triển khai được tối ưu hóa trở nên quan trọng để xây dựng các API mạnh mẽ, an toàn và hiệu năng cao.</p>
+                
+                <h3>Cross-Origin Resource Sharing (CORS) - Chia sẻ Tài nguyên Nguồn gốc Chéo</h3>
+                <p>CORS là một cơ chế bảo mật do trình duyệt thực thi nhằm ngăn chặn các ứng dụng web chạy trên một miền thực hiện các yêu cầu tài nguyên đến một miền khác, trừ khi được server (máy chủ) cho phép một cách rõ ràng. Để cho phép các frontend framework - khung công việc phía máy khách (như React, Vue hoặc Svelte) tương tác với backend (phía máy chủ) FastAPI của bạn, bạn phải cấu hình <code>CORSMiddleware</code>.</p>
+                
+                <div class="code-window-card">
+                    <div class="code-window-header">
+                        <div class="dot-container">
+                            <span class="mac-dot red"></span>
+                            <span class="mac-dot yellow"></span>
+                            <span class="mac-dot green"></span>
+                        </div>
+                        <button class="copy-btn">Copy</button>
+                    </div>
+                    <pre><code class="language-python">from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
+
+app = FastAPI()
+
+# Define list of origins allowed to make requests to this API
+origins = [
+    "http://localhost:3000",      # Common React dev server port
+    "https://myfrontend.com",     # Production frontend domain
+]
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,            # Allows requests from specific origins
+    allow_credentials=True,           # Allows cookies or authentication headers
+    allow_methods=["*"],              # Allows all HTTP methods (GET, POST, etc.)
+    allow_headers=["*"],              # Allows all request headers
+)</code></pre>
+                </div>
+
+                <h3>Custom Middleware: Execution Time Tracker - Middleware Tùy chỉnh: Bộ theo dõi Thời gian Thực thi</h3>
+                <p>Middleware (phần mềm trung gian) là một hàm chạy trước khi mỗi request (yêu cầu) được xử lý bởi một route handler - bộ xử lý định tuyến cụ thể, và cũng chạy sau khi mỗi response (phản hồi) được tạo ra. Các middleware (phần mềm trung gian) là lý tưởng cho các mối quan tâm chung xuyên suốt như logging (ghi nhật ký), xác thực yêu cầu và profiling (phân tích hiệu năng).</p>
+                
+                <div class="code-window-card">
+                    <div class="code-window-header">
+                        <div class="dot-container">
+                            <span class="mac-dot red"></span>
+                            <span class="mac-dot yellow"></span>
+                            <span class="mac-dot green"></span>
+                        </div>
+                        <button class="copy-btn">Copy</button>
+                    </div>
+                    <pre><code class="language-python">import time
+from fastapi import Request, FastAPI
+
+app = FastAPI()
+
+@app.middleware("http")
+async def add_process_time_header(request: Request, call_next):
+    start_time = time.perf_counter()
+    
+    # Process the request and pass it to the route handler
+    response = await call_next(request)
+    
+    # Calculate execution duration
+    process_time = time.perf_counter() - start_time
+    
+    # Inject execution duration in response headers
+    response.headers["X-Process-Time"] = f"{process_time:.4f}s"
+    
+    return response</code></pre>
+                </div>
+
+                <h3>Real-Time Communication with WebSockets - Giao tiếp Thời gian thực với WebSockets (Giao thức WebSocket)</h3>
+                <p>WebSockets (giao thức websocket) cho phép các kênh giao tiếp hai chiều, song công và lâu dài trên một kết nối TCP duy nhất, điều này lý tưởng cho các ứng dụng thời gian thực như hệ thống trò chuyện, bảng điều khiển trực tiếp và hệ thống thông báo.</p>
+                
+                <div class="code-window-card">
+                    <div class="code-window-header">
+                        <div class="dot-container">
+                            <span class="mac-dot red"></span>
+                            <span class="mac-dot yellow"></span>
+                            <span class="mac-dot green"></span>
+                        </div>
+                        <button class="copy-btn">Copy</button>
+                    </div>
+                    <pre><code class="language-python">from fastapi import FastAPI, WebSocket, WebSocketDisconnect
+
+app = FastAPI()
+
+class ConnectionManager:
+    def __init__(self):
+        self.active_connections: list[WebSocket] = []
+
+    async def connect(self, websocket: WebSocket):
+        await websocket.accept()
+        self.active_connections.append(websocket)
+
+    def disconnect(self, websocket: WebSocket):
+        self.active_connections.remove(websocket)
+
+    async def send_personal_message(self, message: str, websocket: WebSocket):
+        await websocket.send_text(message)
+
+    async def broadcast(self, message: str):
+        for connection in self.active_connections:
+            await connection.send_text(message)
+
+manager = ConnectionManager()
+
+@app.websocket("/ws/{client_id}")
+async def websocket_endpoint(websocket: WebSocket, client_id: int):
+    await manager.connect(websocket)
+    try:
+        while True:
+            # Wait for any incoming client text message
+            data = await websocket.receive_text()
+            await manager.send_personal_message(f"You wrote: {data}", websocket)
+            await manager.broadcast(f"Client #{client_id} says: {data}")
+    except WebSocketDisconnect:
+        manager.disconnect(websocket)
+        await manager.broadcast(f"Client #{client_id} has left the chat")</code></pre>
+                </div>
+
+                <h3>Production Deployment - Triển khai trên Môi trường Vận hành Thực tế</h3>
+                <p>Đối với production environments - môi trường vận hành thực tế, các ứng dụng FastAPI thường được chạy phía sau một ASGI server - máy chủ ASGI như <strong>Uvicorn</strong> hoặc <strong>Gunicorn</strong> (quản lý các uvicorn workers - tiến trình làm việc uvicorn) kết hợp với một reverse proxy - ủy quyền ngược như <strong>Nginx</strong> để chấm dứt kết nối SSL, cân bằng tải và phục vụ tệp tĩnh.</p>
+                
+                <h4>Uvicorn Command Settings - Cài đặt Lệnh Uvicorn</h4>
+                <p>Chạy Uvicorn với nhiều workers (tiến trình làm việc) trong môi trường vận hành thực tế để tận dụng các CPU đa lõi. Một quy tắc chung phổ biến là <code>(2 * số_lượng_lõi_CPU) + 1</code> workers.</p>
+                
+                <div class="code-window-card">
+                    <div class="code-window-header">
+                        <div class="dot-container">
+                            <span class="mac-dot red"></span>
+                            <span class="mac-dot yellow"></span>
+                            <span class="mac-dot green"></span>
+                        </div>
+                        <button class="copy-btn">Copy</button>
+                    </div>
+                    <pre><code class="language-bash"># Run FastAPI in production with 4 worker processes, binding to all interfaces
+uv run uvicorn app.main:app --host 0.0.0.0 --port 8000 --workers 4 --log-level info</code></pre>
+                </div>
+
+                <h4>Nginx Reverse Proxy Configuration Block - Khối Cấu hình Nginx Reverse Proxy - Ủy quyền Ngược Nginx</h4>
+                <p>Nginx chặn lưu lượng HTTP/HTTPS đến, xử lý các client (máy khách) chậm, phục vụ trực tiếp các tài sản tĩnh và ủy quyền các yêu cầu ứng dụng đến ASGI server - máy chủ ASGI backend (phía máy chủ).</p>
+                
+                <div class="code-window-card">
+                    <div class="code-window-header">
+                        <div class="dot-container">
+                            <span class="mac-dot red"></span>
+                            <span class="mac-dot yellow"></span>
+                            <span class="mac-dot green"></span>
+                        </div>
+                        <button class="copy-btn">Copy</button>
+                    </div>
+                    <pre><code class="language-nginx">server {
+    listen 80;
+    server_name api.example.com;
+
+    # Redirect all HTTP traffic to HTTPS (Recommended for Production)
+    return 301 https://$host$request_uri;
+}
+
+server {
+    listen 443 ssl http2;
+    server_name api.example.com;
+
+    ssl_certificate /etc/letsencrypt/live/api.example.com/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/api.example.com/privkey.pem;
+
+    client_max_body_size 10M; # Max file upload size
+
+    # Route request to the FastAPI application
+    location / {
+        proxy_pass http://127.0.0.1:8000;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+
+        # Support WebSockets protocols
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection "upgrade";
+    }
+
+    # Direct static asset caching
+    location /static/ {
+        alias /var/www/fastapi_app/app/static/;
+        expires 30d;
+        add_header Cache-Control "public, no-transform";
+    }
+}</code></pre>
+                </div>
+            </section>
+        </main>
+    </div>
+    <!-- Prism.js CDN -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-core.min.js" integrity="sha512-9khQRAUBYEJDCDVP2yw3LRUQvjJ0Pjx0EShmaQjcHa6AXiOv6qHQu9lCAIR8O+/D8FtaCoJ2c0Tf9Xo7hYH01Q==" crossorigin="anonymous" referrerpolicy="no-referrer" defer></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/autoloader/prism-autoloader.min.js" integrity="sha512-SkmBfuA2hqjzEVpmnMt/LINrjop3GKWqsuLSSB3e7iBmYK7JuWw4ldmmxwD9mdm2IRTTi0OxSAfEGvgEi0i2Kw==" crossorigin="anonymous" referrerpolicy="no-referrer" defer></script>
+    <!-- Prism Keep Markup Plugin to preserve custom spans inside code blocks -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/keep-markup/prism-keep-markup.min.js" integrity="sha512-4J1H6r6fshz5D/cSkV3j9D+G43z1Qc8Yj1/hH9UvL4T3dI911iA28a1Wd5fD4Jj8x15Z+7wV146X15J8X25yA==" crossorigin="anonymous" referrerpolicy="no-referrer" defer></script>
+    <!-- Mermaid.js CDN -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mermaid/10.9.1/mermaid.min.js" integrity="sha384-WmdflGW9aGfoBdHc4rRyWzYuAjEmDwMdGdiPNacbwfGKxBW/SO6guzuQ76qjnSlr" crossorigin="anonymous" referrerpolicy="no-referrer" defer></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const rootStyles = getComputedStyle(document.documentElement);
+            const primaryColor = rootStyles.getPropertyValue('--surface-card').trim();
+            const primaryTextColor = rootStyles.getPropertyValue('--ink-primary').trim();
+            const primaryBorderColor = rootStyles.getPropertyValue('--primary-coral').trim();
+            const lineColor = rootStyles.getPropertyValue('--primary-coral').trim();
+            const secondaryColor = rootStyles.getPropertyValue('--surface-dark').trim();
+            const tertiaryColor = rootStyles.getPropertyValue('--canvas-bg').trim();
+
+            mermaid.initialize({
+                startOnLoad: true,
+                securityLevel: 'strict',
+                theme: 'base',
+                themeVariables: {
+                    primaryColor,
+                    primaryTextColor,
+                    primaryBorderColor,
+                    lineColor,
+                    secondaryColor,
+                    tertiaryColor
+                }
+            });
+
+            // Populate Sidebar Navigation List Dynamically
+            const mainContent = document.getElementById('main-content');
+            const navList = document.getElementById('nav-list');
+            const sections = mainContent.querySelectorAll('section[id]');
+            const cachedSections = [];
+
+            sections.forEach(section => {
+                const id = section.getAttribute('id');
+                const titleElement = section.querySelector('h2, h1, h3');
+                const title = titleElement ? titleElement.textContent : id;
+
+                const li = document.createElement('li');
+                li.className = 'nav-item';
+
+                const a = document.createElement('a');
+                a.className = 'nav-link';
+                a.setAttribute('data-sec', id);
+                a.setAttribute('href', `#${id}`);
+                a.textContent = title;
+
+                // Smooth scroll logic on click
+                a.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    section.scrollIntoView({ behavior: 'smooth' });
+                    if (window.innerWidth < 768) {
+                        closeSidebar();
+                    }
+                });
+
+                li.appendChild(a);
+                navList.appendChild(li);
+
+                cachedSections.push({
+                    element: section,
+                    text: section.textContent.toLowerCase(),
+                    id: id,
+                    link: a
+                });
+            });
+
+            let activeSectionId = null;
+
+            // Helper to check if scrolled to the very bottom of #main-content
+            function isAtBottom() {
+                return (mainContent.scrollHeight - mainContent.scrollTop - mainContent.clientHeight) < 5;
+            }
+
+            // Helper to update active nav link classes
+            function setActiveLink(activeId) {
+                cachedSections.forEach(item => {
+                    if (item.id === activeId && !item.element.classList.contains('section-hidden')) {
+                        item.link.classList.add('active');
+                    } else {
+                        item.link.classList.remove('active');
+                    }
+                });
+            }
+
+            // Core Scrollspy updates
+            function updateScrollspy() {
+                if (isAtBottom()) {
+                    const visibleSections = cachedSections.filter(item => !item.element.classList.contains('section-hidden'));
+                    if (visibleSections.length > 0) {
+                        const lastVisible = visibleSections[visibleSections.length - 1];
+                        setActiveLink(lastVisible.id);
+                        return;
+                    }
+                }
+
+                if (activeSectionId) {
+                    const activeItem = cachedSections.find(item => item.id === activeSectionId);
+                    if (activeItem && !activeItem.element.classList.contains('section-hidden')) {
+                        setActiveLink(activeSectionId);
+                        return;
+                    }
+                }
+
+                // Fallback to first visible section if current active is hidden or null
+                const firstVisible = cachedSections.find(item => !item.element.classList.contains('section-hidden'));
+                if (firstVisible) {
+                    setActiveLink(firstVisible.id);
+                } else {
+                    setActiveLink(null);
+                }
+            }
+
+            // Intersection Observer for Scrollspy
+            const observerOptions = {
+                root: mainContent,
+                rootMargin: '0px 0px -60% 0px',
+                threshold: 0
+            };
+
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        activeSectionId = entry.target.getAttribute('id');
+                        updateScrollspy();
+                    }
+                });
+            }, observerOptions);
+
+            sections.forEach(section => observer.observe(section));
+
+            // Scroll listener on mainContent to catch bottom-of-page and scroll updates
+            mainContent.addEventListener('scroll', updateScrollspy);
+
+            // Live Search Filter Logic via Cached Data
+            const searchInput = document.getElementById('search-input');
+            searchInput.addEventListener('input', (e) => {
+                const query = e.target.value.toLowerCase().trim();
+
+                cachedSections.forEach(item => {
+                    const isMatch = item.text.includes(query);
+
+                    if (isMatch || query === '') {
+                        item.element.classList.remove('section-hidden');
+                        item.link.parentElement.classList.remove('hidden');
+                    } else {
+                        item.element.classList.add('section-hidden');
+                        item.link.parentElement.classList.add('hidden');
+                        item.link.classList.remove('active');
+                    }
+                });
+
+                updateScrollspy();
+            });
+
+            // Clipboard copy function with fallback support
+            function copyToClipboard(text, successCallback, errorCallback) {
+                if (navigator.clipboard && navigator.clipboard.writeText) {
+                    navigator.clipboard.writeText(text).then(successCallback).catch(errorCallback);
+                } else {
+                    try {
+                        const textarea = document.createElement('textarea');
+                        textarea.value = text;
+                        textarea.style.position = 'fixed';
+                        textarea.style.top = '0';
+                        textarea.style.left = '0';
+                        textarea.style.opacity = '0';
+                        document.body.appendChild(textarea);
+                        textarea.focus();
+                        textarea.select();
+                        const successful = document.execCommand('copy');
+                        document.body.removeChild(textarea);
+                        if (successful) {
+                            successCallback();
+                        } else {
+                            errorCallback(new Error('execCommand copy returned false'));
+                        }
+                    } catch (err) {
+                        errorCallback(err);
+                    }
+                }
+            }
+
+            // Code block copy button functionality
+            document.querySelectorAll('.copy-btn').forEach(button => {
+                button.addEventListener('click', () => {
+                    if (button.textContent === 'Copied!') return;
+                    const codeBlock = button.parentElement.nextElementSibling?.querySelector('code');
+                    if (codeBlock) {
+                        const originalText = button.textContent;
+                        copyToClipboard(codeBlock.textContent, () => {
+                            button.textContent = 'Copied!';
+                            button.style.borderColor = '#27c93f';
+                            button.style.color = '#27c93f';
+                            setTimeout(() => {
+                                button.textContent = originalText;
+                                button.style.borderColor = '';
+                                button.style.color = '';
+                            }, 2000);
+                        }, (err) => {
+                            console.error('Failed to copy text: ', err);
+                        });
+                    }
+                });
+            });
+
+            // Mobile sidebar drawer logic
+            const hamburgerMenu = document.getElementById('hamburger-menu');
+            const sidebar = document.getElementById('sidebar');
+            const sidebarOverlay = document.getElementById('sidebar-overlay');
+
+            function toggleSidebar() {
+                const isOpen = sidebar.classList.toggle('open');
+                hamburgerMenu.classList.toggle('open');
+                if (isOpen) {
+                    sidebarOverlay.classList.add('active');
+                } else {
+                    sidebarOverlay.classList.remove('active');
+                }
+            }
+
+            function closeSidebar() {
+                sidebar.classList.remove('open');
+                hamburgerMenu.classList.remove('open');
+                sidebarOverlay.classList.remove('active');
+            }
+
+            if (hamburgerMenu && sidebarOverlay) {
+                hamburgerMenu.addEventListener('click', toggleSidebar);
+                sidebarOverlay.addEventListener('click', closeSidebar);
+            }
+
+            // Dynamic Line Explanations Tooltip implementation
+            const tooltip = document.createElement('div');
+            tooltip.className = 'dynamic-code-tooltip';
+            tooltip.style.position = 'absolute';
+            tooltip.style.backgroundColor = 'var(--surface-card)';
+            tooltip.style.color = 'var(--ink-primary)';
+            tooltip.style.border = '1px solid var(--primary-coral)';
+            tooltip.style.padding = '8px 12px';
+            tooltip.style.borderRadius = '6px';
+            tooltip.style.fontSize = '12px';
+            tooltip.style.maxWidth = '300px';
+            tooltip.style.boxShadow = '0 4px 12px rgba(20,20,19,0.08)';
+            tooltip.style.pointerEvents = 'none';
+            tooltip.style.opacity = '0';
+            tooltip.style.display = 'none';
+            tooltip.style.transition = 'opacity 0.15s ease';
+            tooltip.style.zIndex = '9999';
+            document.body.appendChild(tooltip);
+
+            let currentTarget = null;
+
+            const onMouseMove = (e) => {
+                let x = e.clientX + 10;
+                let y = e.clientY + 10;
+                const tooltipWidth = tooltip.offsetWidth || 250;
+                const tooltipHeight = tooltip.offsetHeight || 80;
+                if (x + tooltipWidth > window.innerWidth) {
+                    x = e.clientX - tooltipWidth - 10;
+                }
+                if (y + tooltipHeight > window.innerHeight) {
+                    y = e.clientY - tooltipHeight - 10;
+                }
+                tooltip.style.left = (x + window.pageXOffset) + 'px';
+                tooltip.style.top = (y + window.pageYOffset) + 'px';
+            };
+
+            document.addEventListener('mouseover', (e) => {
+                const target = e.target.closest('[data-tip]');
+                if (target && target !== currentTarget) {
+                    currentTarget = target;
+                    tooltip.textContent = target.getAttribute('data-tip');
+                    tooltip.style.display = 'block';
+                    tooltip.style.opacity = '1';
+                    document.removeEventListener('mousemove', onMouseMove);
+                    document.addEventListener('mousemove', onMouseMove);
+                }
+            });
+
+            document.addEventListener('mouseout', (e) => {
+                const target = e.target.closest('[data-tip]');
+                const relatedTarget = e.relatedTarget ? e.relatedTarget.closest('[data-tip]') : null;
+                if (target && target !== relatedTarget) {
+                    currentTarget = null;
+                    tooltip.style.display = 'none';
+                    tooltip.style.opacity = '0';
+                    document.removeEventListener('mousemove', onMouseMove);
+                }
+            });
+        });
+    </script>
+</body>
+</html>

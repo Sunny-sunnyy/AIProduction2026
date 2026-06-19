@@ -1,0 +1,106 @@
+So we're now going to talk about AWS components a little bit more.
+Before we get to the to the lab.
+And I just want to make the point that I do think that, that some of the cloud deployment world is
+a bit like learning biology.
+I think of working with LMS.
+The stuff that is my my greatest forte, I feel, is more like physics.
+It's more about understanding, experimenting, learning about the way, what, how it works and why
+it works and that kind of thing.
+With AWS, there's a lot of learning, there's a lot of anatomy, there's a lot of words and acronyms
+and stuff to memorize if you want to feel fluent in it.
+I was never much good at biology at school.
+I'm sure some of you are brilliant at biology or me.
+Uh, so so I do, I find it, I find it hard work.
+And some of you may find it hard work as well.
+I find learning about LMS rather simpler.
+Uh, with AWS, as I say, there's there's going to be lots of terminology.
+And my advice to you is to not let it get to you.
+Just listen to all these words.
+Copy what I do expect that it will sink in over time as you start to have like S2 and S3 and Lambda
+and CloudFront and all these other things just roll off the tongue.
+But we are now going to have a biology lesson as we get into the AWS components that we'll be using
+this week.
+So then I'm going to talk about five of them which are the main five we will use.
+So Amazon S3, S3 which stands for Simple Storage Service.
+Uh this is very simple indeed.
+It is just like having a shared drive, like a Google drive in the cloud that you can access for your
+software.
+And it's organized into things called buckets and an S3 bucket.
+You hear people saying that all the time.
+I'm going to put that in S3 bucket.
+And S3 bucket is like one particular shared drive with one particular name that you can access.
+And in that bucket you can have basically directories and files, just just like any shared drive.
+That is S3.
+And of course there's lots of hair, there's lots of complexity around it.
+But but that's the simple, simple version Lambda we've already talked about.
+You're going to get to love it.
+This is individual functions run on the cloud.
+You only pay for the CPU clock cycles that you use CloudFront.
+front.
+Okay.
+What is CloudFront?
+So have you heard of something called a CDN?
+A content delivery network.
+CDNs are part of the way that the internet works when it comes to to larger files like images and JavaScript
+files.
+It would be very inefficient if every time you looked at a web page like a news web page, it was going
+all the way back to their servers to collect all of the images and bring them back all over the internet
+from wherever the servers are running in, in the States or wherever that particular site is being hosted.
+And so there is this idea that for larger files that are static, like images, it's more efficient
+for, for for companies to push them out to, to smaller data centers all over the world, so that when
+a user brings up a web page, it loads some of the web page from the actual server itself, like CNN.
+If you're looking at CNN's at news, but for some of the images, it's just collecting them from a local
+data center somewhere really near where you're located, so that it only has to travel a little bit.
+And it's really fast.
+And when you have a service that someone like CNN can connect with in order to push out their assets,
+like images to to be located close to everyone all over the world, that service is known as a CDN,
+a content delivery network, and Amazon offers such a service.
+And their offering is known as CloudFront.
+So CloudFront.
+And when you when you work with CloudFront, it's called making CloudFront distribution.
+That means being able to take the assets associated with your with your app and be able to distribute
+them all over the world so that when people bring up a web page, it's collecting.
+It's talking to to Amazon servers for some things, but it's talking to all these CloudFront servers
+all over the world to collect your assets.
+So that is called CloudFront.
+If you didn't get all of that it doesn't matter because we're going to play with it.
+You're going to get a better sense for it later.
+But hopefully you now know three of the Amazon words we'll be doing today.
+And then the next one is called Amazon API gateway.
+And this is another Amazon component where you can manage.
+You can set up the different, uh, External APIs you will offer the world that might then, for example,
+call a lambda function and put some instrumentation around them so you can manage things like rate limiting
+them and managing how they scale and so on.
+Now it happens with Lambda.
+You can set up lambda so that the outside world can go straight to lambda in some ways, but it is considered
+a best practice to set up an API gateway.
+It gives you more controls, it's more bulletproof, and it's more the way you would build an enterprise
+application.
+And so that's what we'll be using today.
+Well, not actually today this week, but we'll be talking about it today.
+And then last but not least is AWS not AWS Amazon Bedrock.
+And this this is something which is one of a two different LLM offerings that Amazon has that we'll
+talk about the other one next week.
+But bedrock is something which allows you to quickly build JNI apps by connecting to Frontier Models
+Foundation LMS through bedrock.
+And it has a number of other features, like it has like an agent platform in there too, that we'll
+look at at some point.
+But this is all part of the Amazon Bedrock product, and it's a very minor point.
+You may have noticed I got tongue tied about Amazon Bedrock versus AWS bedrock.
+It's interesting that Amazon is quite careful with its branding that some of its products are branded
+Amazon.
+And then the product and some of them are AWS and the product, and they are consistent everywhere with
+it.
+So just so that you feel native with AWS products, it's worth knowing.
+Typically the Amazon branding is for some of their earliest offerings, like S3 that that came at the
+very beginning, Amazon S3.
+And also they use the Amazon branding for products that they want to be in front of consumers, products
+which which they want to be out there in the public, not just for us nerds.
+Uh, and so that would be something like bedrock.
+They want to really promote bedrock as, as their gen AI offering.
+So it's Amazon bedrock.
+But for some of the more the nerdier offerings that are meant for us re engineers, uh, they brand
+them AWS.
+So it's AWS Lambda, for example.
+So there's something to know about, if you're wondering, uh, if you want to get it right then then
+you should you should stick with the way that they describe it in their docs.

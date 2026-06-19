@@ -1,0 +1,241 @@
+So just to be clear, everything that we've done up to this point has been a one time setup.
+This is now going to be coding agents.
+So the clock starts now in terms of the actual work we have to do.
+Let's do this.
+So first of all we are going to make a new file in this directory called first Pi.
+For our first ever agent on Agent Core.
+And we're going to put in this code right here.
+So I'm going to copy that code copy to the clipboard within finale new file.
+Call it first dot pi.
+There it is.
+Paste in the code.
+And now let's look at it.
+So there's a couple of imports that we don't use because we're going to use them.
+So so ignore look the other way for those.
+So we we import this bedrock agent core app from the Python client library.
+And from strands we just import agent okay.
+We create a new instance of the app and we create a new agent.
+All right.
+So far so good.
+Now we then have a decorator which is saying this is the entry point to for for our agent world, this
+is where things will begin.
+If a message is received by our deployment, it should come in here.
+And it's got a single simple, uh, function called invoke.
+It takes a payload.
+And what that's going to do, it's going to take that payload and look and see if that payload has a
+field called prompt in it, and if so, it will suck out whatever value we have for the word prompt.
+And we'll call that the user message.
+It then look how simple a strands is.
+You just call the agent with the message this is the agent.
+Call it with the message.
+What could be simpler than that.
+And we get back a result and we will return that result.
+This is it.
+This is the extent of it.
+Okay.
+It's time for us now to give this a try.
+First of all, locally before we deploy.
+All right.
+So we go back to preview, uh, and have a look at what we do next.
+We just do UV run first dot pi.
+That is really it.
+So let's here it is.
+Make sure you've saved it.
+Make sure the white blob has gone here.
+And now we're just in finale.
+We're just going to run UV run first dot pi.
+Let's see what happens.
+Very little happens.
+It sort of sits there.
+Okay.
+That's because a server is running.
+Go back here again.
+What are we going to do next?
+We're going to leave that server running and open a new terminal in cursor and send this message.
+So what does this do.
+It's curls.
+So that's the utility that makes an HTTP request.
+It's going to post locally to to localhost 8080 invocations.
+And it's going to post something like a Python dictionary with prompt or a JSON dictionary prompt is
+the key and the value is hello?
+Can you hear me?
+Uh so that's going to come in here.
+That's this thing is looking for something in the field prompt.
+So this seems good.
+So let's take this code.
+And so I said open a new terminal like this.
+Come in here and paste in that curl.
+Nice.
+What happens.
+Hello.
+Yes I can hear you in the sense that I can read and understand your text message.
+I'm Claude, an AI assistant.
+How can I help you today?
+Ha ha.
+Very nice.
+Okay, so that just worked.
+And before we get too excited, I'm just going to command C that it's not as if a whole lot happened.
+This is running locally on our computer.
+It shows us that the scaffolding is nice.
+We can run things locally.
+We haven't deployed anything.
+That's clearly a bigger deal.
+We've got to deploy everything to AWS.
+So we know that that takes that takes weeks.
+Uh, or at least days.
+Okay.
+Let's do that.
+Okay.
+Here we go.
+We're going to run UV run agent core configure minus E which is this is going to be the entry point
+first.py.
+All right.
+So from the finale directory be sure that you're in the finale directory.
+Make that run.
+So it's now going to ask us a few questions that we are going to do.
+The defaults to everything.
+Default for that.
+Default for the ECR repository.
+Remember that that's where the containers get deployed.
+Because this builds a container default for Pyproject.toml.
+It recognizes we have a UV project.
+And so it's using that for our dependencies and then default for whatever the IAM stuff it wants to
+build.
+And that just happened.
+So, uh, what you will also notice when you do this is that it will create a few files that I've just
+ignored, so they won't be already there for you.
+It created a Docker file, a Docker ignore, and a bedrock agent core YAML.
+They will all have been created and you can go and check them out if you wish to.
+Uh, but uh, it's now telling us that all we have to do is do Agent core launch.
+In fact, we have to do slightly more than that.
+We have to do.
+You've run Agent Core launch because I've done this as a UV project.
+So?
+So don't ignore what it's telling you.
+UV run agent core launch is the right way to do it.
+Uh, let's do this.
+Okay, here we go.
+You've run agent core launch.
+Lots of stuff happening.
+Launching.
+Things are happening.
+Provisioning.
+So take a look through when you do this.
+Uh, hopefully you're doing it with me.
+This.
+This is one project that you can do along with me because it's that that simple.
+Uh, it's created an ECR repository.
+So.
+So you can see that ECR repository.
+Remember the Elastic Container Registry, uh, where containers get built and deployed.
+So, so it, uh, has put it, um, in there.
+It's been, uh, queuing, provisioning, build complete launching.
+Bedrock agent core launching, launching, launching.
+And it's done.
+And it now tells us that we can we can we can, uh, it's been, uh, deployed.
+A container has been built and deployed, and we can run, uh, Agent Core invoke.
+And again, the trick is to do it with UV.
+So so what we do is this UV run agent core invoke uh with a prompt as before prompt.
+Hello?
+Can you hear me?
+And just in case you're in any doubt, hear what this is going to do is it's going to send this message
+to AWS running in the cloud where there are now container containers running.
+Uh, well, a container running, which is like App Runner, there's like an app runner running there
+containing our code.
+And let's see what happens if we just run this.
+Things are heating up and what comes back is again.
+Hello.
+Yes, I can hear you in the sense I can read and understand your message.
+I'm glad.
+How can I help you today?
+That's identical, I think.
+Uh, so I can't understate this.
+This is unbelievable.
+This just made a full deployment to AWS of a containerized app, and we called it.
+And we got back an answer and it called Models on Bedrock.
+And literally it's been a few minutes.
+It's been a few minutes.
+It really is that easy.
+I feel like AWS has set out to make something that was streamlined and simple, and they have crushed
+it.
+It really is phenomenal.
+Uh, so I you can tell I'm gushing away, but I'm really, really impressed with this.
+But it's time for us to to beef it up and give it some more functionality.
+So yeah, I put here okay.
+Goodness.
+Do you realize everything that happened?
+We built a container, deployed it to ECR, set up all the IAM stuff, deployed it to something like
+App Runner and sent it a message.
+And it's like a week's worth of work in like, a minute.
+Uh.
+It's crazy.
+All right.
+Enough.
+Enough with my, uh, overenthusiasm for this.
+Okay, we're going to add in a tool.
+Um, so this is really a feature of strands that it's that it's really, really nice and simple.
+It's like open AI agents SDK, but but even even more, uh, simplistic.
+So here's a tool we're going to add.
+Uh, we'll put it right up at the top of first dot pi.
+Uh, let me show you.
+Here's first dot pi.
+So right up at the top here before these two lines here.
+So just under the imports, not right at the top, just under the imports.
+Um, a tool we decorate it with at tool, which I imported already.
+It's called take square root.
+It takes a float.
+And the comment says calculate the square root of the given number and it returns math dot square root
+of that number.
+That's a pretty simple tool right?
+Okay.
+Back we come to the readme.
+Uh, so we now just want to change agent equals agent to this agent is agent tools equals take square
+root.
+Okay.
+And it couldn't be simpler.
+This line here We just replace it like that and save.
+That's it.
+So now we're creating an agent.
+But when we create the agent we're saying that you have these tools again it's like OpenAI agents SDK,
+only less.
+Um all right what's next?
+Are there lots of steps next?
+No there aren't.
+We just need to run this.
+You've run Agent Core launch, which is going to do a fresh deployment.
+Let's do that.
+Off it goes.
+See all the stuff that's happening?
+It says, uh, starting code, build, build.
+This may take several minutes.
+Uh, but it doesn't take several minutes.
+Maybe because it's still early days that, um, uh, AWS, um, agent core.
+Bedrock agent core, uh, is is still quite underutilized.
+Um, but everything is happening launching Bedrock Agent Core.
+So this time we're going to run Agent Core Invoke.
+And for the prompt we're going to say use your tool to calculate the square root of 123456, 7 to 3
+three decimal places, and hopefully that's something that it wouldn't be able to do without having
+access to the tool.
+So that's the post we're going to make.
+Looks good to me.
+Let's give it a try.
+Let's see what happens.
+So this is being sent out to AWS where our container app is being spun up.
+Our agent is receiving that message.
+It's then going to call the tool.
+And apparently the square root of one two, three, four, five, six, 7 to 3 decimal places is 1111.111.
+Well, we'll see about that.
+See my old human approach?
+Well, not really human approach, is it?
+Uh, one.
+Two.
+Three.
+The old school way.
+Square root and equals.
+And it does appear to have got it right.
+Uh, and rounded it properly to.
+Yes, that does seem to be the right answer.
+We'll give it to Claude.
+Uh, and so this is, again, just a wonderful sign of being able to so easily add a tool and deploy
+that agent to the cloud.
+And it's all just working, and it's still only been a few minutes.

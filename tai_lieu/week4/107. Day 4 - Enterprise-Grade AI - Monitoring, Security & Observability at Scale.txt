@@ -1,0 +1,142 @@
+If you're anything like me, then you will have absolutely loved yesterday.
+So so fun.
+Great to see it all come together.
+Great to see the agentic activity happening, knowing that it's deployed on the cloud.
+But also, if you're anything like me, you felt a little bit unsatisfied at the end of it because it
+was hard to know exactly what was going on.
+We had to sort of take it, take the UI at its at its word that things, things were all happening and
+we didn't really have a good sense of what was happening.
+It just sort of felt a bit magical.
+But magic isn't good when it comes to bulletproof enterprise production deployments.
+And that is the topic for today.
+That is exactly what we're covering.
+And if yesterday was the most fun day of the whole course, and today is perhaps the most important
+day of the whole course, this really is where everything comes together.
+This really is where I cover everything it takes to build an Agentic app or a generative AI app, and
+have it deployed to production at enterprise scale.
+That's what we're covering today.
+It includes monitoring, security, scalability, and super importantly, observability.
+We're going to be looking in longview's dashboards and they're going to look great.
+We're going to be looking at CloudWatch dashboards.
+We're going to be doing a lot of looking at what actually happens behind the scenes, so that we have
+a really good handle on our production deployment.
+And I'm sure at this point, I don't need to remind you what Alex is our SaaS financial planner.
+It we've done so much.
+Last week we did the researcher with the data ingest pipelines using SageMaker.
+Uh, this week we built the database infrastructure.
+We built our five agents.
+We then yesterday built our front end with the API layer and saw it coming together, did our run.
+And what we've still got to do, the big task is making all of this be enterprise grade.
+And uh, just before we do that, let's remind ourselves of the architecture that we built.
+And here is the diagram, the diagram that shows all of the components, the services that we deployed.
+Uh, and I just added one more in there.
+I added the API, API gateway as a separate component.
+I mean, obviously with these diagrams, there's no hard and fast rules about what you consider a box
+and what you don't.
+And we've not got a lot of things on here, a lot of little smaller pieces.
+But I feel like the API gateway is important enough, and particularly in the production construct,
+when we're thinking about things like throttling, it's a it's a really important part of the infrastructure.
+So I've included that here.
+Um, but this is, this is the, the overall setup that we built.
+Uh, and yeah, I put the dotted lines again around the blue boxes to really emphasize that these are
+separate lambda deployments.
+It's not like we've got everything running on one lambda talking amongst itself.
+We've got them deployed as separate endpoints.
+I must have said that a thousand times.
+Sorry.
+Uh, all right, so this is our architecture and it looks fabulous.
+But wait.
+No, it's more than that.
+It's more than that.
+Because let's layer on what we did last week as well.
+This is really the architecture.
+This is what's happening.
+And now I show it to you.
+I feel like if I'd shown you this at the beginning, you'd have been like, okay, I'm not doing this
+course.
+This is crazy.
+This is too much.
+Uh, but because we've got there gradually, I hope when you see all of this, you're like, okay,
+yeah, I know this.
+Uh, so this is the real story.
+These are all of the AWS services that are running, and and even this is like a high level picture.
+There are lots of other services that aren't being shown here, but this these are the big building
+blocks of our architecture.
+And so as things run out there on AWS, there's just a lot happening.
+There's a lot of infrastructure that we built with Terraform.
+And this is a a moment perhaps to take stock and think, imagine if we hadn't used Terraform, imagine
+what it would have taken to have built all of this through the AWS console.
+You'd have hated me.
+There's no way you'd have.
+I'm going to ask for for my stars rating.
+You'd have given me a yeah, a pretty, uh, empty number of stars.
+If we've been going through the AWS console and setting all this up, it would have been awful.
+So it just shows you what a game changer Terraform is and how the fact that we could run these Terraform
+applies and construct this, this whole setup made so much difference.
+But anyways, all of this is running and what we're going to try and do today is get a really good handle
+on it, a really good perspective on what's going on, and have it in a mode where you could be like
+an MLOps or a production AI person that's able to have this running and have good insight into what's
+going on.
+And so let me cover the six categories we'll talk about today, about what it takes to be enterprise
+grade, starting with perhaps the most obvious, which is that you need to be able to scale.
+And when we talk about scalability with these kinds of systems, we're thinking about both being able
+to scale up to meet sudden demand.
+If if your app goes viral and you have a lot of people using it, you need to be able to scale.
+We say scale horizontally, meaning just add on more and more services, um, and not have to have downtime.
+We're not going to have to reprovision more hardware to to meet this demand.
+But it also, particularly in startup land, it's important to think about scaling the other way as
+well in off periods when no one's using your system.
+Maybe over the weekends you don't want to have to pay for massive infrastructure, and a serverless
+architecture gives you both of those.
+So those are some of the scalability concerns.
+It's mostly about being able to ramp up though.
+Security, obviously a topic of its own.
+You can have, of course, many courses talking about cyber security.
+Information security.
+It's a whole profession.
+There are some particularly important aspects of security to think about with agentic systems.
+There's also just generally good cloud security.
+And we'll cover some of the best practices today.
+And then monitoring goes without saying that we need to have good insight into what's happening in production.
+We need to have a good handle on on what's going on.
+We need to be able to to have alerts if things go wrong.
+So so this this kind of good tooling to be able to track and have insight into what's happening in production
+is something we will be covering.
+Guardrails is is more specifically in the LMS context.
+This is about checks that you put in place controls around what goes into your LMS and what comes out
+to protect against some of the common problems using LMS.
+And it's worth spending just a minute on this.
+A lot of people, uh, have very rightly so, big concerns about us relying too much on LMS because
+they are inherently unreliable.
+And it's important to bear in mind that they are unreliable, in that they are statistical models and
+they are unreliable in the same way as any other data science model is.
+In my opinion, the problem comes when people try and think of agents as if they're human like and try
+and project them to be, you know, reasoning machines that you can trust.
+But they are not.
+They are token predictors.
+They are predicting the next tokens statistically, and that's all they are.
+And we can avoid a lot of problems if people keep that in mind and always work that way.
+And that means that, you know, we use the word like don't trust the LM outputs.
+But even the word trust is sort of putting too much of a human like characteristic on this.
+You just need to write bulletproof production code that is testing.
+The outputs are controlled and within the boundaries you would expect, just as if you were writing
+some sort of statistical model to make trading decisions about trading on financial markets.
+You wouldn't just hook that straight up to a trading engine, you would have all of the right checks
+and balances and controls, and you should treat llms and agents exactly the same way.
+And so typically in enterprise systems, when you have agents, both the inputs and the outputs are
+validated.
+And they can be validated by by doing things like calling other llms.
+But at the end of the day, they should be validated with straight up code, with conditions, with
+controls, with tests, as you would with any other statistical model.
+And we will look at some of those kinds of guardrails today.
+And then explainability with a Sherlock Holmes icon there.
+Uh, so this used to be a topic that was very much in vogue a couple of years ago, because these huge
+deep neural networks that are at the heart of Llms, they're very hard to understand why they do what
+they do.
+Uh, they are black boxes, as people say.
+But as it happens, explainability is considered less of a serious issue at the moment, as long as
+one follows a couple of rules.
+And I will go through those with you shortly.
+And then observability.
+That's really going to be the punchline for today.
+This is about just getting deeper insight.

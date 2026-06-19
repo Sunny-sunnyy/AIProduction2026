@@ -1,0 +1,121 @@
+Okay, so now we just need to set up our Terraform.
+So if you come into Terraform on the left here and you see that there's a third section three ingestion.
+That's what we're working on right now.
+And the first step is to set up our Terraform variables.
+There's an existing file Terraform.tf example.
+You can take this copy it, duplicate it to make your own Terraform dot which you're going to then update.
+If we look in this, you'll see that you'll need to change the region to be whatever region you're using.
+And then the SageMaker endpoint name.
+It's by default Alex embedding endpoint.
+And that should be what you already have.
+If for some reason you had a different name of your endpoint, then that's what you should put in here.
+And then you've set up your Terraform variables and your you're almost ready for action.
+We should have a quick look at Main.tf, which is here, which is the Terraform code that creates this
+infrastructure.
+And what you'll see, it's got the usual providers stuff.
+And then we have the Terraform code that gets everything set up.
+There is the AWS S3 bucket and this has the bucket name of Alex vectors dash r account id.
+If for any reason you had to choose a different one, then you would put that in here.
+But otherwise this should work great.
+This is the the default.
+Uh, then um, we've got uh, the, the S3 bucket versioning.
+We've got some configuration here for server side encryption.
+Uh, and we've then got the IAM stuff that needs to be there so that Lambda has access, uh, and uh
+policy.
+And here is our AWS Lambda function called ingest.
+The function name is Alex Ingest.
+This is the role that we just created that it's it's IAM role that gives it access to to carry out the
+functions it needs.
+And this is where to find the zip file.
+So you go up two directories, you go into back end ingest.
+And then it's called lambda function zip.
+That's what we create it.
+And uh then we tell it what handle to use.
+If you remember this from week two and we we give it a timeout of 60s.
+And this is all that it needs to do what it needs to do.
+We also set up an API gateway.
+And this is where we're setting up a gateway called API that will be used to, to ingest, uh, and
+you can read some of the, the uh, the parts what the routes that are supported by this API gateway
+and using API gateway is a way to build bulletproof, secure production endpoints.
+And, uh, you can read in here that, uh, how it's configured to be using our endpoint.
+And, uh, you can see that we're setting up to have an API key.
+We want to make sure that you can only use this endpoint if you have an approved API key.
+And this is a way that we can also set quota and throttling around how much data is ingested.
+So so take a look through these settings.
+You can always ask an LLM to explain them in more detail if you'd like or do some research.
+It's another great rabbit hole.
+But this kind of approach of setting an API key that we'll have to retrieve in a second and use as part
+of our configuration, and having a quota and throttling around an endpoint like this.
+This is the kind of bulletproof way to build production endpoints that scale.
+Okay, so to recap, we've set our configuration variables the AWS region and the SageMaker endpoint
+name.
+And now it's time for us to run Terraform init Terraform.
+Apply those two commands.
+Let's open a new terminal.
+Let's go into the terraform directory.
+Let's go into the third directory.
+Here we are terraform init.
+I've already run it so it's not going to do too much for me.
+There it goes.
+And Terraform apply.
+It's now going to go off and create all of the resources we just looked at.
+Uh it does a plan and we have to type the word yes to confirm that that's what we want to build.
+It's now going to be creating the IAM permissions.
+It's then going to be creating the lambda function itself and uploading that zip file and setting up
+the handler.
+It's also then going to be setting up the API gateway so that we have this kind of bulletproof thing
+and security and scalability constraints around our endpoint.
+And when this is done, I'll be right back and we'll be able to give it a try.
+And now I just wanted to make a point.
+It's already it ran almost immediately after I stopped recording that.
+I want to make a point that you may be thinking, hang on a minute, hang on a minute.
+All this Terraform stuff you're showing us.
+Isn't that what the point of this course?
+Isn't this what I have to learn how to write myself?
+And?
+And you could be forgiven for thinking that.
+And what I will say to you is that it is remarkable how good llms are at generating Terraform code to
+configure different things that you want doing that you can then go through and check.
+So I have to say that that's the way that I built a lot of this.
+I went and I described the resources I needed and I got the Terraform code, the resources written immediately,
+and I checked through them.
+And then I do the kinds of double checking of things that I need to do.
+But because you should always check out Llms.
+But it turns out that they are really great at of this now, so there's little point in me going through
+and giving you all the nitty gritty of setting up the different resources and what attributes are allowed
+and not allowed.
+There are good docs for that, but you don't even need them.
+You can just use an LLM to generate the first pass of your Terraform scripts, and then run them and
+check that everything's configured the way you want.
+That's the way to do it.
+Okay.
+Anyway, with that preamble, let's have a look at what it's outputted.
+It's told us a few things.
+It's told us the vector bucket, which is the vector bucket that we expected the API endpoint.
+This is our API endpoint.
+And it's also told us an instruction for how we can get our private API key.
+So if we look on here we'll see that it says uh, what we now need to do is save our configuration in
+our EMV file.
+And the first thing we need to do is run this bit of code here.
+You can see it's of that form.
+We need to run this code to get our private API key.
+So I'm not going to run it because it will then show you my private API key which would be very insecure
+practice.
+So you should run that and it will immediately print below it an API key.
+Uh, and then we need to update our EMV file.
+Uh, and you can use this is like a mac instruction.
+So that that wouldn't be good for a PC, but it's equally easy and I recommend you do it simply using
+the file browser here.
+So you go to the project root and find your EMV file, and you click on it to edit it, and you need
+to add in three rows.
+You'll find already in the part three section in your EMV file.
+Already vector bucket needs to be the vector bucket.
+That's right here.
+Alex API endpoint needs to be the Alex API endpoint that's right here.
+See how convenient this is?
+And Alex API key is what you will get when you run this right here.
+When you run it it's going to give you the API key, the private API key for this endpoint.
+And that's what you need to put next in your dot EMV file.
+And remember you can always come back and see this by running Terraform output in the future.
+So with that please go ahead and do that.
+Set up your EMV file and I'll see you right back here.

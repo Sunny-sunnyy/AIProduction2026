@@ -1,0 +1,46 @@
+So I thought it was worth taking a moment to look at SageMaker itself.
+So you have a sense of the breadth of capability it offers.
+So from the console page I go to SageMaker, but actually I don't go to SageMaker, I go to SageMaker
+I, which is the new branding for SageMaker.
+I think everyone still calls it SageMaker, but it has been rebranded as SageMaker I.
+And there are a few different sections here to tell you about.
+So you have a sense of what you can do here.
+And this is very much the kind of the home for a professional data scientist who does this for a living,
+and it has the full set of tooling to support data science.
+The applications and Ides are some of the higher level tools.
+So there's SageMaker studio, which is it describes as an IDE for a data scientist to be training debugging
+models, tracking their experiments.
+Uh, there is TensorBoard for people that know TensorFlow people.
+Notebooks may be familiar to many of you.
+This is basically AWS's Amazon's answer to Google Colab.
+These are Jupyter Labs running in the cloud that you can have listed down here and use them.
+And this is an alternative to using Colabs, for example.
+Um, so that that's what notebooks is.
+Uh, there's some configuration stuff.
+There is uh, under Jumpstart, there's foundation models is where you could browse the different open
+source models that they provide.
+Uh, ground truth is where you can manage data sets, training for different training jobs.
+And then here is inference.
+And if we expand inference and come down to endpoints this is what we've been doing.
+There is our Alex embedding endpoint.
+So we are like a sub menu of a sub menu.
+This is very common.
+It is very common for people to use inference endpoints with SageMaker.
+So it's an important one even though it's buried a couple of levels deep and it's the one we've looked
+at.
+But hopefully this gives you a sense of perspective on the breadth of capabilities offered through Amazon
+SageMaker I.
+And that wraps up week three, day three.
+And our SageMaker exploits.
+Yes, really SageMaker inference endpoints.
+But it's given you a teaser, a taste of what SageMaker can offer and what we're going to do tomorrow,
+of course, is we're now going to pull this into a data ingest pipeline.
+We're going to be able to to take these vectors and then store them in S3 vectors with a lambda function
+to take care of that process.
+So that's going to be exciting.
+That's going to be our start of data ingest.
+The data engineers amongst you are going to look forward to this.
+But to everyone congratulations 65% point.
+It's been a purple day today an I day which has been fun.
+And tomorrow will be another purple day.
+I'll see you then.

@@ -1,0 +1,1491 @@
+<!doctype html>
+<html lang="vi">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Building Full-Stack AI Applications (Next.js & FastAPI) - Study Guide</title>
+  <!-- Google Fonts for Editorial Typography -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  
+  <style>
+    :root {
+      /* Claude Light Cream Theme System Tokens */
+      --canvas: #faf9f5;
+      --surface-soft: #f5f0e8;
+      --surface-card: #efe9de;
+      --surface-strong: #e8e0d2;
+      --surface-dark: #181715;
+      --surface-dark-elevated: #252320;
+      --surface-dark-soft: #1f1e1b;
+      --hairline: #e6dfd8;
+      --hairline-soft: #ebe6df;
+      --ink: #141413;
+      --body: #3d3d3a;
+      --body-strong: #252523;
+      --muted: #6c6a64;
+      --muted-soft: #8e8b82;
+      --primary: #cc785c;
+      --primary-active: #a9583e;
+      --accent-teal: #5db8a6;
+      --accent-amber: #e8a55a;
+      --on-dark: #faf9f5;
+      --on-dark-soft: #a09d96;
+      
+      --radius-xs: 4px;
+      --radius-sm: 6px;
+      --radius-md: 8px;
+      --radius-lg: 12px;
+      --radius-xl: 16px;
+      --content: 1200px;
+      
+      --font-display: "Cormorant Garamond", "EB Garamond", Georgia, serif;
+      --font-sans: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      --font-mono: "JetBrains Mono", ui-monospace, monospace;
+    }
+
+    [data-theme="dark"] {
+      /* Claude Dark Theme System Tokens */
+      --canvas: #181715;
+      --surface-soft: #1f1e1b;
+      --surface-card: #252320;
+      --surface-strong: #2d2a26;
+      --surface-dark: #faf9f5;
+      --surface-dark-elevated: #efe9de;
+      --surface-dark-soft: #f5f0e8;
+      --hairline: #3d3d3a;
+      --hairline-soft: #2d2a26;
+      --ink: #faf9f5;
+      --body: #a09d96;
+      --body-strong: #faf9f5;
+      --muted: #8e8b82;
+      --muted-soft: #6c6a64;
+      --primary: #cc785c;
+      --primary-active: #e8a55a;
+      --accent-teal: #5db8a6;
+      --accent-amber: #e8a55a;
+      --on-dark: #181715;
+      --on-dark-soft: #3d3d3a;
+    }
+
+    * {
+      box-sizing: border-box;
+      transition: background-color 0.25s ease, border-color 0.25s ease, color 0.25s ease;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      margin: 0;
+      background: var(--canvas);
+      color: var(--body);
+      font-family: var(--font-sans);
+      line-height: 1.62;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* Typography */
+    h1, h2, h3, h4 {
+      color: var(--ink);
+      font-family: var(--font-display);
+      font-weight: 400;
+      margin: 0;
+    }
+
+    h1 {
+      font-size: clamp(2.2rem, 4.5vw, 3.6rem);
+      line-height: 1.1;
+      letter-spacing: -0.02em;
+    }
+
+    h2 {
+      font-size: clamp(1.6rem, 3vw, 2.2rem);
+      line-height: 1.2;
+      letter-spacing: -0.015em;
+    }
+
+    h3 {
+      font-size: 1.25rem;
+      line-height: 1.35;
+      font-family: var(--font-sans);
+      font-weight: 600;
+    }
+
+    h4 {
+      font-size: 1.05rem;
+      font-family: var(--font-sans);
+      font-weight: 600;
+      color: var(--body-strong);
+    }
+
+    p, li {
+      margin: 0;
+    }
+
+    a {
+      color: var(--primary);
+      text-decoration: none;
+    }
+
+    a:hover {
+      color: var(--primary-active);
+      text-decoration: underline;
+    }
+
+    code {
+      border-radius: var(--radius-xs);
+      background: var(--surface-soft);
+      color: var(--primary-active);
+      font-family: var(--font-mono);
+      font-size: 0.88em;
+      padding: 2px 6px;
+    }
+
+    pre {
+      margin: 0;
+      overflow-x: auto;
+      border-radius: var(--radius-lg);
+      background: var(--surface-dark-soft);
+      color: var(--on-dark);
+      padding: 20px;
+      font-family: var(--font-mono);
+      font-size: 13.5px;
+      line-height: 1.6;
+      border: 1px solid var(--hairline);
+    }
+
+    pre code {
+      background: transparent;
+      color: inherit;
+      padding: 0;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.95rem;
+      margin: 16px 0;
+    }
+
+    th, td {
+      border-bottom: 1px solid var(--hairline);
+      padding: 14px 16px;
+      text-align: left;
+      vertical-align: middle;
+    }
+
+    th {
+      color: var(--ink);
+      font-weight: 600;
+      background: var(--surface-soft);
+    }
+
+    /* Page Layout */
+    .page {
+      max-width: var(--content);
+      margin: 0 auto;
+      padding: 40px 24px 80px;
+    }
+
+    .hero {
+      display: grid;
+      grid-template-columns: minmax(0, 1.2fr) minmax(320px, 0.8fr);
+      gap: 32px;
+      align-items: stretch;
+      padding: 48px;
+      border: 1px solid var(--hairline);
+      border-radius: var(--radius-xl);
+      background: var(--surface-soft);
+      margin-bottom: 32px;
+    }
+
+    .hero-copy {
+      display: grid;
+      gap: 20px;
+      align-content: start;
+    }
+
+    .eyebrow {
+      width: fit-content;
+      border-radius: var(--radius-pill);
+      background: var(--primary);
+      color: var(--canvas);
+      font-size: 0.72rem;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      padding: 5px 12px;
+      text-transform: uppercase;
+      font-family: var(--font-sans);
+    }
+
+    .lead {
+      max-width: 68ch;
+      color: var(--body-strong);
+      font-size: 1.1rem;
+      line-height: 1.5;
+    }
+
+    .tag-row,
+    .source-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .tag,
+    .source {
+      display: inline-flex;
+      align-items: center;
+      border-radius: 9999px;
+      font-size: 0.78rem;
+      font-weight: 500;
+      padding: 4px 12px;
+      font-family: var(--font-sans);
+    }
+
+    .tag {
+      background: var(--surface-card);
+      color: var(--ink);
+      border: 1px solid var(--hairline);
+    }
+
+    .source {
+      border: 1px solid var(--hairline);
+      background: var(--canvas);
+      color: var(--muted);
+    }
+
+    .source.extended {
+      border-color: rgba(204, 120, 92, 0.4);
+      background: rgba(204, 120, 92, 0.08);
+      color: var(--primary);
+    }
+
+    .hero-panel {
+      border-radius: var(--radius-lg);
+      background: var(--surface-dark-elevated);
+      color: var(--on-dark);
+      padding: 28px;
+      display: grid;
+      gap: 20px;
+      align-content: start;
+      border: 1px solid var(--hairline);
+    }
+
+    .hero-panel h2 {
+      font-family: var(--font-sans);
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: var(--on-dark);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .hero-panel p,
+    .hero-panel li {
+      color: var(--on-dark-soft);
+      font-size: 0.92rem;
+    }
+
+    .progress-track {
+      height: 6px;
+      overflow: hidden;
+      border-radius: 9999px;
+      background: var(--surface-soft);
+      margin-top: 6px;
+    }
+
+    .progress-bar {
+      width: 0;
+      height: 100%;
+      background: var(--primary);
+      transition: width 0.1s ease-out;
+    }
+
+    /* Main Area Layout */
+    .layout {
+      display: grid;
+      grid-template-columns: 280px minmax(0, 1fr);
+      gap: 32px;
+      align-items: start;
+    }
+
+    .toc {
+      position: sticky;
+      top: 30px;
+      border: 1px solid var(--hairline);
+      border-radius: var(--radius-lg);
+      background: var(--canvas);
+      padding: 24px;
+      max-height: calc(100vh - 60px);
+      overflow-y: auto;
+    }
+
+    .toc h2 {
+      font-family: var(--font-sans);
+      font-size: 0.95rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: 16px;
+      color: var(--ink);
+    }
+
+    .toc nav {
+      display: grid;
+      gap: 4px;
+    }
+
+    .toc a {
+      border-radius: var(--radius-md);
+      color: var(--muted);
+      padding: 8px 12px;
+      font-size: 0.88rem;
+      font-weight: 500;
+      line-height: 1.4;
+      display: block;
+      transition: all 0.2s ease;
+    }
+
+    .toc a:hover,
+    .toc a.active {
+      background: var(--surface-card);
+      color: var(--primary);
+      text-decoration: none;
+    }
+
+    .toc-tools {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      margin-top: 16px;
+      padding-top: 16px;
+      border-top: 1px solid var(--hairline);
+    }
+
+    .theme-toggle-container {
+      margin-top: 12px;
+      padding-top: 12px;
+      border-top: 1px solid var(--hairline);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .theme-label {
+      font-size: 0.82rem;
+      font-weight: 600;
+      color: var(--muted);
+    }
+
+    .button {
+      min-height: 38px;
+      border: 1px solid var(--hairline);
+      border-radius: var(--radius-md);
+      background: var(--canvas);
+      color: var(--ink);
+      cursor: pointer;
+      font-family: var(--font-sans);
+      font-size: 0.8rem;
+      font-weight: 600;
+      padding: 8px 12px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      outline: none;
+    }
+
+    .button:hover {
+      background: var(--surface-card);
+      border-color: var(--primary);
+    }
+
+    .button.primary {
+      border-color: var(--primary);
+      background: var(--primary);
+      color: var(--canvas);
+    }
+
+    .button.primary:hover {
+      background: var(--primary-active);
+      border-color: var(--primary-active);
+    }
+
+    /* Content Sections */
+    .content {
+      display: grid;
+      gap: 32px;
+    }
+
+    .section {
+      border: 1px solid var(--hairline);
+      border-radius: var(--radius-lg);
+      background: var(--canvas);
+      padding: 36px;
+      scroll-margin-top: 30px;
+    }
+
+    .section-title {
+      display: flex;
+      justify-content: space-between;
+      gap: 16px;
+      align-items: start;
+      margin-bottom: 24px;
+      border-bottom: 1px solid var(--hairline-soft);
+      padding-bottom: 16px;
+    }
+
+    .kicker {
+      color: var(--primary);
+      font-size: 0.72rem;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      margin-bottom: 4px;
+      text-transform: uppercase;
+      font-family: var(--font-sans);
+    }
+
+    .grid-2 {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 20px;
+    }
+
+    .grid-3 {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 16px;
+    }
+
+    .card {
+      border: 1px solid var(--hairline);
+      border-radius: var(--radius-lg);
+      background: var(--surface-card);
+      padding: 24px;
+    }
+
+    .card h3 {
+      margin-bottom: 12px;
+      border-bottom: 1px solid var(--hairline);
+      padding-bottom: 8px;
+    }
+
+    .card p,
+    .card ul,
+    .card ol {
+      margin-top: 8px;
+      font-size: 0.95rem;
+    }
+
+    .list {
+      padding-left: 20px;
+    }
+
+    .list li + li {
+      margin-top: 6px;
+    }
+
+    /* Diagram Styling */
+    .diagram-container {
+      background: var(--surface-soft);
+      padding: 24px;
+      border-radius: var(--radius-lg);
+      border: 1px solid var(--hairline);
+      margin: 20px 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      overflow-x: auto;
+      width: 100%;
+    }
+
+    .diagram-container svg {
+      width: 100% !important;
+      height: auto !important;
+      max-width: 100% !important;
+    }
+
+    .diagram-title {
+      font-family: var(--font-sans);
+      font-size: 0.88rem;
+      font-weight: 700;
+      color: var(--primary);
+      margin-bottom: 16px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    /* Details Elements */
+    details {
+      border: 1px solid var(--hairline);
+      border-radius: var(--radius-lg);
+      background: var(--surface-soft);
+      padding: 16px 20px;
+      margin-top: 16px;
+    }
+
+    summary {
+      color: var(--ink);
+      cursor: pointer;
+      font-weight: 600;
+      font-size: 0.98rem;
+      outline: none;
+      user-select: none;
+    }
+
+    details[open] {
+      background: var(--surface-card);
+    }
+
+    details[open] summary {
+      border-bottom: 1px solid var(--hairline);
+      padding-bottom: 10px;
+      margin-bottom: 10px;
+    }
+
+    .callout {
+      border-left: 4px solid var(--primary);
+      border-radius: var(--radius-md);
+      background: var(--surface-soft);
+      padding: 16px 20px;
+      margin: 16px 0;
+    }
+
+    .callout p {
+      font-size: 0.95rem;
+    }
+
+    /* Code Panels */
+    .code-panel {
+      display: grid;
+      gap: 16px;
+      margin-top: 18px;
+    }
+
+    .code-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      color: var(--muted);
+      font-size: 0.85rem;
+      font-weight: 500;
+    }
+
+    .code-meta span {
+      background: var(--surface-soft);
+      padding: 4px 10px;
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--hairline);
+    }
+
+    /* Interactive Elements */
+    .flashcard {
+      display: grid;
+      gap: 12px;
+    }
+
+    .flash-answer {
+      display: none;
+      border-top: 1px solid var(--hairline);
+      padding-top: 12px;
+      margin-top: 4px;
+      font-size: 0.95rem;
+      color: var(--primary-active);
+    }
+
+    .flashcard.revealed .flash-answer {
+      display: block;
+    }
+
+    .quiz-options {
+      display: grid;
+      gap: 8px;
+      margin-top: 12px;
+    }
+
+    .quiz-option {
+      display: flex;
+      width: 100%;
+      text-align: left;
+      transition: all 0.2s ease;
+    }
+
+    .quiz-option.correct {
+      background: rgba(93, 184, 114, 0.12) !important;
+      border-color: var(--accent-teal) !important;
+      color: var(--accent-teal) !important;
+    }
+
+    .quiz-option.wrong {
+      background: rgba(198, 69, 69, 0.08) !important;
+      border-color: var(--primary) !important;
+      color: var(--primary) !important;
+    }
+
+    .quiz-result {
+      min-height: 24px;
+      margin-top: 12px;
+      color: var(--ink);
+      font-weight: 600;
+      font-size: 0.92rem;
+    }
+
+    /* Footer */
+    .footer {
+      margin-top: 32px;
+      border-radius: var(--radius-lg);
+      background: var(--surface-dark-elevated);
+      color: var(--on-dark-soft);
+      padding: 32px;
+      font-size: 0.88rem;
+      border: 1px solid var(--hairline);
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .footer strong {
+      color: var(--on-dark);
+    }
+
+    .footer-brand {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: var(--on-dark);
+      font-family: var(--font-sans);
+      font-weight: 600;
+      font-size: 1rem;
+      margin-bottom: 4px;
+    }
+
+    .footer-brand svg {
+      fill: currentColor;
+    }
+
+    /* Responsive adjustments */
+    @media (max-width: 960px) {
+      .hero {
+        grid-template-columns: 1fr;
+        padding: 32px;
+      }
+
+      .layout {
+        grid-template-columns: 1fr;
+      }
+
+      .toc {
+        position: static;
+        max-height: none;
+      }
+
+      .grid-2,
+      .grid-3 {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="page">
+    
+    <!-- Hero Block -->
+    <header class="hero">
+      <div class="hero-copy">
+        <span class="eyebrow">Study Guide</span>
+        <h1>Building Full-Stack AI Applications (Next.js & FastAPI)</h1>
+        <p class="lead">Thiết kế kiến trúc hệ thống full-stack hoàn chỉnh kết hợp sức mạnh của React/Next.js cho giao diện người dùng và Python/FastAPI cho logic backend, truyền dữ liệu thời gian thực thông qua giao thức Server-Sent Events (SSE).</p>
+        
+        <div class="tag-row">
+          <span class="tag">AI Engineer Production Track</span>
+          <span class="tag">Tuần 1 - Ngày 2</span>
+          <span class="tag">Full-Stack & Real-time Streaming</span>
+        </div>
+        
+        <div class="source-row">
+          <span class="source" title="Tài liệu tóm tắt từ LLM">Docx LLM (Day 2 Summary)</span>
+          <span class="source" title="Slide bài giảng">Slide (Production W1D2)</span>
+          <span class="source" title="Mã nguồn thực hành">Code (day2.md)</span>
+          <span class="source extended" title="Kiến thức mở rộng từ tác giả">Knowledge Extension</span>
+        </div>
+      </div>
+      
+      <aside class="hero-panel">
+        <h2>Tiêu điểm cần nắm</h2>
+        <ul class="list">
+          <li><strong>Separation of Concerns:</strong> Chia tách rõ Frontend (Next.js) và Backend (FastAPI) để tối ưu bảo mật khóa API.</li>
+          <li><strong>Real-time Streaming:</strong> Sử dụng Server-Sent Events (SSE) giúp stream dữ liệu từ LLM về trình duyệt thời gian thực.</li>
+          <li><strong>Virtual DOM:</strong> Cơ chế tối ưu của React giúp cập nhật giao diện cực nhanh thông qua thuật toán diffing.</li>
+        </ul>
+        <div>
+          <p style="margin-bottom: 6px; font-weight: 600;">Tiến độ đọc của bạn</p>
+          <div class="progress-track" aria-label="Reading progress">
+            <div class="progress-bar" id="progressBar"></div>
+          </div>
+        </div>
+      </aside>
+    </header>
+
+    <!-- Content Layout -->
+    <div class="layout">
+      
+      <!-- Sticky Sidebar Navigation -->
+      <aside class="toc">
+        <h2>Mục lục ôn tập</h2>
+        <nav>
+          <a href="#source-map">1. Source Map</a>
+          <a href="#cheat-sheet">2. Cheat Sheet</a>
+          <a href="#previous-context">3. Previous Context</a>
+          <a href="#core-theory">4. Core Theory</a>
+          <a href="#workflow">5. Workflow / Pipeline</a>
+          <a href="#techniques">6. Techniques</a>
+          <a href="#code-walkthrough">7. Code Walkthrough</a>
+          <a href="#options">8. Options & Trade-offs</a>
+          <a href="#pitfalls">9. Pitfalls</a>
+          <a href="#flashcards">10. Flashcards & Quiz</a>
+          <a href="#memory">11. Quick Memory</a>
+        </nav>
+        
+        <div class="toc-tools">
+          <button class="button" type="button" id="expandAll">Mở rộng</button>
+          <button class="button" type="button" id="collapseAll">Thu gọn</button>
+        </div>
+        
+        <div class="theme-toggle-container">
+          <span class="theme-label">Giao diện:</span>
+          <button class="button" type="button" id="themeToggleBtn">Đổi giao diện</button>
+        </div>
+      </aside>
+
+      <!-- Main Study Notes -->
+      <main class="content">
+        
+        <!-- Section 1: Source Map -->
+        <section id="source-map" class="section">
+          <div class="section-title">
+            <div>
+              <div class="kicker">Mục 1</div>
+              <h2>Source Map - Bản đồ nguồn</h2>
+            </div>
+          </div>
+          <div class="grid-2">
+            <article class="card">
+              <h3>Tài nguyên được sử dụng</h3>
+              <ul class="list">
+                <li><strong>Docx LLM:</strong> Tích hợp Day 2 Summary (Lesson 9, 10, 11, 12, 13).</li>
+                <li><strong>Slide:</strong> Tích hợp lý thuyết trang 1-10 về Next.js, React Components, và FastAPI.</li>
+                <li><strong>Code:</strong> Cấu trúc dự án <code>saas</code>, lệnh scaffolding, mã nguồn `pages/index.tsx`, `api/index.py`, và `styles/globals.css` tại <code>day2.md</code>.</li>
+                <li><strong>Kiến thức mở rộng:</strong> Tích hợp phân tích chi tiết về Virtual DOM, Server-Sent Events (SSE) vs WebSockets, và cơ chế giải phóng tài nguyên server khi khách hàng đóng tab.</li>
+              </ul>
+            </article>
+            <article class="card">
+              <h3>Đánh giá độ tin cậy</h3>
+              <p>Các tài liệu nguồn cung cấp nhất quán quy trình dựng khung (scaffolding) Next.js Pages Router và tích hợp serverless FastAPI backend trên Vercel. Không xảy ra mâu thuẫn kỹ thuật.</p>
+            </article>
+          </div>
+          <div class="callout">
+            <p><strong>Terminology rule - Quy tắc thuật ngữ:</strong> Cụm thuật ngữ chuyên ngành được trình bày ở dạng <code>English - nghĩa tiếng Việt</code>. Các từ đơn phổ biến được viết dưới dạng <code>cost (chi phí)</code>.</p>
+          </div>
+        </section>
+
+        <!-- Section 2: Cheat Sheet -->
+        <section id="cheat-sheet" class="section">
+          <div class="section-title">
+            <div>
+              <div class="kicker">Mục 2</div>
+              <h2>Cheat Sheet - Tóm tắt cốt lõi</h2>
+            </div>
+          </div>
+          <div class="grid-3">
+            <article class="card">
+              <h3>Ý tưởng chính</h3>
+              <p>Xây dựng sản phẩm SaaS hoàn chỉnh bằng cách kết hợp thế mạnh hiển thị, tối ưu hóa của <strong>Next.js Frontend</strong> và sự gọn nhẹ, bảo mật cao của <strong>FastAPI Backend</strong>, đồng thời truyền dữ liệu streaming thời gian thực.</p>
+            </article>
+            <article class="card">
+              <h3>Cần phải nhớ</h3>
+              <ul class="list">
+                <li>Luôn đặt API keys ở backend; tuyệt đối không gọi trực tiếp API của LLM từ frontend để tránh rò rỉ.</li>
+                <li>Next.js Pages Router (thư mục <code>/pages</code>) ổn định và tương thích tốt với các thư viện xác thực Clerk ở các bài sau.</li>
+                <li>SSE truyền phát dữ liệu một chiều từ máy chủ tới trình duyệt cực kỳ hiệu quả qua giao thức HTTP.</li>
+              </ul>
+            </article>
+            <article class="card">
+              <h3>Ứng dụng thực tế</h3>
+              <p>Mẫu thiết kế (design pattern) kinh điển để xây dựng ứng dụng AI SaaS thương mại như sinh ý tưởng kinh doanh, viết content, sinh code có giao diện mượt mà.</p>
+            </article>
+          </div>
+        </section>
+
+        <!-- Section 3: Previous Context -->
+        <section id="previous-context" class="section">
+          <div class="section-title">
+            <div>
+              <div class="kicker">Mục 3</div>
+              <h2>Previous Context - Liên hệ với bài trước</h2>
+            </div>
+          </div>
+          <div class="callout">
+            <p><strong>Bối cảnh lịch sử:</strong> Tiếp nối bài học Ngày 1 (<a href="file:///G:/AIProduction_t6_2026/production/tai_lieu/week1/day1_study_guide.html">day1_study_guide.html</a>) nơi chúng ta chỉ deploy một FastAPI Backend đơn giản trả về text. 
+            Bài học Ngày 2 nâng cấp hệ thống thành kiến trúc full-stack chuyên nghiệp, đặt FastAPI backend làm API ẩn trong thư mục <code>/api</code> và bọc ngoài bằng giao diện người dùng Next.js.</p>
+          </div>
+        </section>
+
+        <!-- Section 4: Core Theory -->
+        <section id="core-theory" class="section">
+          <div class="section-title">
+            <div>
+              <div class="kicker">Mục 4</div>
+              <h2>Core Theory - Lý thuyết cốt lõi</h2>
+            </div>
+            <div class="source-row">
+              <span class="source">Docx LLM</span>
+              <span class="source">Slide</span>
+            </div>
+          </div>
+          <div class="grid-2">
+            <article class="card">
+              <h3>Khái niệm Kiến trúc</h3>
+              <ul class="list">
+                <li><strong>Frontend - giao diện người dùng:</strong> Mã nguồn chạy trên browser (trình duyệt) của client, đảm nhận thiết kế cấu trúc (HTML), giao diện (CSS) và tương tác (JS/TS).</li>
+                <li><strong>Backend - máy chủ dịch vụ:</strong> Logic chạy trên server, quản lý cơ sở dữ liệu, gọi API OpenAI và bảo mật secrets (khóa bí mật).</li>
+                <li><strong>API contract - hợp đồng API:</strong> Định dạng dữ liệu thống nhất (thường là JSON) giúp frontend và backend giao tiếp không bị lỗi.</li>
+                <li><strong>Single Page Application (SPA) - ứng dụng đơn trang:</strong> Chỉ tải trang một lần, quá trình chuyển trang tiếp theo chỉ vẽ lại giao diện qua dữ liệu từ API.</li>
+              </ul>
+            </article>
+            
+            <article class="card">
+              <h3>React & Next.js Cơ bản</h3>
+              <ul class="list">
+                <li><strong>Document Object Model (DOM) - mô hình đối tượng tài liệu:</strong> Cấu trúc cây biểu diễn HTML của trình duyệt.</li>
+                <li><strong>Props - thuộc tính component:</strong> Dữ liệu cấu hình truyền từ cha xuống con, có tính chất read-only (chỉ đọc) ở component con.</li>
+                <li><strong>State - trạng thái dữ liệu:</strong> Dữ liệu nội bộ của component, khi thay đổi sẽ tự động kích hoạt re-render giao diện.</li>
+                <li><strong>Transpiling - biên dịch mã:</strong> Chuyển đổi mã nguồn bậc cao (như TypeScript) sang một ngôn ngữ bậc cao khác (như JavaScript) để trình duyệt hiểu được.</li>
+              </ul>
+            </article>
+          </div>
+          
+          <details>
+            <summary>Giải thích sâu về Virtual DOM trong React</summary>
+            <p>React không can thiệp trực tiếp vào DOM thật của trình duyệt vì việc đó tốn rất nhiều tài nguyên tính toán. Thay vào đó, React sử dụng một bản sao nhẹ nằm trên RAM gọi là <strong>Virtual DOM - DOM ảo</strong>.
+            Khi state (trạng thái) của component thay đổi:</p>
+            <ol class="list">
+              <li>React tự động dựng một cây DOM ảo mới.</li>
+              <li>Chạy thuật toán so sánh (diffing algorithm) để tìm ra sự khác biệt nhỏ nhất giữa cây DOM ảo mới và cây DOM ảo cũ.</li>
+              <li>Chỉ cập nhật những thay đổi thực sự đó (gọi là reconciliation) lên DOM thật của trình duyệt, giúp giao diện phản hồi cực nhanh.</li>
+            </ol>
+          </details>
+        </section>
+
+        <!-- Section 5: Workflow / Pipeline -->
+        <section id="workflow" class="section">
+          <div class="section-title">
+            <div>
+              <div class="kicker">Mục 5</div>
+              <h2>Workflow / Pipeline - Quy trình hoạt động</h2>
+            </div>
+            <div class="source-row">
+              <span class="source">Docx LLM</span>
+              <span class="source">Slide</span>
+              <span class="source">Code</span>
+            </div>
+          </div>
+
+          <div style="display: grid; grid-template-columns: 1fr; gap: 24px;">
+            <article class="card">
+              <h3>Sơ đồ 1: Kiến trúc Full-stack AI & Phân tách mối quan tâm</h3>
+              <p>Mô hình chia lớp của ứng dụng Business Idea Generator.</p>
+              <div class="diagram-container">
+                <span class="diagram-title">System Architecture Block Diagram</span>
+                <pre class="mermaid">
+graph TD
+    subgraph ClientSide ["Client Side (Trình duyệt người dùng)"]
+        NextJS[Next.js Frontend]
+        ReactUI[React UI Components]
+        VOM[Virtual DOM]
+        DOM[Real DOM]
+        EventSourceClient["EventSource API"]
+    end
+
+    subgraph ServerSide ["Server Side (Đám mây Vercel / Server)"]
+        FastAPI[FastAPI Backend]
+        ServerlessFunc[Serverless Functions]
+        EnvVars[Environment Variables]
+    end
+
+    subgraph ExternalService ["Dịch vụ bên ngoài"]
+        OpenAI["OpenAI Platform api.openai.com"]
+    end
+
+    ReactUI -->|Render thông qua| VOM
+    VOM -->|Tính toán diff & cập nhật| DOM
+    EventSourceClient -->|1. Gửi request SSE GET /api| FastAPI
+    EnvVars -.->|3. Inject API Key an toàn| FastAPI
+    FastAPI -->|2. Kích hoạt Serverless Function| ServerlessFunc
+    ServerlessFunc -->|4. Tạo request Chat Completion| OpenAI
+    OpenAI -->|5. Trả dữ liệu dạng chunk| ServerlessFunc
+    ServerlessFunc -->|6. Yield dữ liệu| EventSourceClient
+    EventSourceClient -->|7. Cập nhật state| ReactUI
+                </pre>
+              </div>
+            </article>
+
+            <article class="card">
+              <h3>Sơ đồ 2: Luồng Server-Sent Events (SSE) Streaming</h3>
+              <p>Quy trình truyền phát dữ liệu thời gian thực từ OpenAI qua FastAPI về Frontend.</p>
+              <div class="diagram-container">
+                <span class="diagram-title">SSE Streaming Sequence Diagram</span>
+                <pre class="mermaid">
+sequenceDiagram
+    autonumber
+    participant Client as Trình duyệt (EventSource)
+    participant Server as FastAPI (StreamingResponse)
+    participant API as OpenAI API (Stream=True)
+
+    Client->>Server: "HTTP GET /api (Header: Accept = text/event-stream)"
+    Note over Server: Serverless function khởi động<br/>Nạp OPENAI_API_KEY
+    Server->>API: "HTTP POST /v1/chat/completions (Payload: stream=True)"
+    loop Nhận luồng dữ liệu (Streaming Chunk)
+        API-->>Server: "Trả về Chunk dữ liệu (choices[0].delta.content)"
+        Note over Server: Generator python lọc dữ liệu<br/>Định dạng yield: 'data: {line}\n'
+        Server-->>Client: "Đẩy luồng SSE (text/event-stream)"
+        Note over Client: Sự kiện onmessage kích hoạt<br/>Cộng dồn vào buffer và set state
+    end
+    API-->>Server: "Kết thúc luồng (Done)"
+    Note over Client: onerror bắt sự kiện đóng kết nối<br/>Gọi evt.close() giải phóng tài nguyên
+                </pre>
+              </div>
+            </article>
+          </div>
+
+          <details open>
+            <summary>Quy trình hoạt động chi tiết đầu-cuối (End-to-End Walkthrough)</summary>
+            
+            <h4>1. Dựng dự án và biên dịch mã nguồn (Scaffolding & Compiler Pipeline)</h4>
+            <ol class="list">
+              <li><strong>Khởi tạo:</strong> Chạy lệnh <code>npx create-next-app saas --ts --eslint --tailwind --no-src-dir --no-app</code>. Node.js nạp khung dự án Next.js cấu hình Pages Router, TypeScript, Tailwind CSS.</li>
+              <li><strong>Biên dịch:</strong> Khi deploy lên Vercel:
+                <ul>
+                  <li>Mã Next.js frontend (TypeScript <code>.ts</code>, <code>.tsx</code>) đi qua trình biên dịch (SWC/Babel) để thực hiện quá trình <strong>Transpiling</strong> thành vanilla JavaScript. Đồng thời, quá trình <strong>Bundling</strong> thu gọn tài nguyên vào các file chunk tĩnh để lưu trữ tại các Edge Network (CDN).</li>
+                  <li>Thư mục <code>/api</code> được Vercel tự động map độc lập, sử dụng gói <code>@vercel/python</code> cài đặt các dependencies từ <code>requirements.txt</code> để tạo thành serverless Lambda functions.</li>
+                </ul>
+              </li>
+            </ol>
+
+            <h4 style="margin-top: 20px;">2. Thứ tự gọi hàm và truyền nhận dữ liệu cấp hàm</h4>
+            <ol class="list">
+              <li><strong>Khởi tạo Client:</strong> Người dùng truy cập trang chủ <code>/</code>, Next.js load component <code>Home()</code> tại <code>pages/index.tsx</code>. State <code>idea</code> được khởi tạo bằng chuỗi mặc định <code>'...loading'</code>.</li>
+              <li><strong>Bắt sự kiện kết nối:</strong> Sau khi DOM được dựng xong, hook <code>useEffect()</code> tự động kích hoạt một lần duy nhất tại trình duyệt. Nó tạo kết nối EventSource: 
+                <code>const evt = new EventSource('/api');</code>
+                Trình duyệt gửi HTTP GET request với header <code>Accept: text/event-stream</code> tới server.
+              </li>
+              <li><strong>Xử lý tại Backend (FastAPI):</strong>
+                <ul>
+                  <li>Vercel Router điều hướng yêu cầu tới serverless function của <code>api/index.py</code>. FastAPI tiếp nhận request và gọi hàm xử lý <code>def idea()</code>.</li>
+                  <li>Hàm <code>idea()</code> khởi tạo <code>client = OpenAI()</code>, tự động đọc biến môi trường <code>OPENAI_API_KEY</code>.</li>
+                  <li>Backend gọi OpenAI API: <code>client.chat.completions.create(model="gpt-5-nano", messages=prompt, stream=True)</code>. Tham số <code>stream=True</code> chỉ định OpenAI trả dữ liệu dạng luồng liên tục.</li>
+                  <li>FastAPI chạy hàm sinh generator <code>event_stream()</code>: vòng lặp <code>for chunk in stream</code> duyệt qua từng mảnh dữ liệu trả về từ OpenAI. Mảnh văn bản được lấy qua <code>chunk.choices[0].delta.content</code>.</li>
+                  <li>Do giao thức Server-Sent Events (SSE) sử dụng dòng trống <code>\n\n</code> để phân tách các message, nếu câu trả lời của AI chứa ký tự xuống dòng <code>\n</code>, nó sẽ làm hỏng kết nối SSE của client. Để giải quyết, backend thực hiện tách dòng bằng <code>text.split("\n")</code> và trả về theo chuẩn: <code>yield f"data: {line}\n"</code>, cuối gói gửi thêm <code>yield "\n"</code>.</li>
+                  <li>Hàm <code>idea()</code> trả về một <code>StreamingResponse(event_stream(), media_type="text/event-stream")</code> giúp giữ cổng kết nối HTTP tiếp tục mở.</li>
+                </ul>
+              </li>
+              <li><strong>Render ở Frontend:</strong>
+                <ul>
+                  <li>Tại trình duyệt, mỗi khi nhận được luồng dữ liệu mới từ backend, sự kiện <code>evt.onmessage</code> kích hoạt.</li>
+                  <li>Chương trình tích lũy dữ liệu thô vào biến đệm: <code>buffer += e.data</code> và cập nhật state: <code>setIdea(buffer)</code>.</li>
+                  <li>State <code>idea</code> thay đổi khiến React tính toán lại Virtual DOM và cập nhật trực tiếp lên DOM thật. Thư viện <code>ReactMarkdown</code> phân tích văn bản thô hiển thị thành cấu trúc HTML hoàn chỉnh mà không cần tải lại toàn bộ trang web.</li>
+                  <li>Khi luồng kết thúc hoặc gặp lỗi, sự kiện <code>evt.onerror</code> kích hoạt và gọi <code>evt.close()</code> giải phóng socket kết nối.</li>
+                </ul>
+              </li>
+            </ol>
+          </details>
+        </section>
+
+        <!-- Section 6: Techniques -->
+        <section id="techniques" class="section">
+          <div class="section-title">
+            <div>
+              <div class="kicker">Mục 6</div>
+              <h2>Techniques - Kỹ thuật sử dụng</h2>
+            </div>
+          </div>
+          <div class="grid-2">
+            <article class="card">
+              <h3>Separation of Concerns (SoC)</h3>
+              <p><strong>Mục đích:</strong> Phân tách hoàn toàn phần hiển thị giao diện (Next.js) và phần logic xử lý nặng/bảo mật (FastAPI).</p>
+              <p><strong>Khi nào dùng:</strong> Thiết kế kiến trúc cho tất cả các ứng dụng AI SaaS chuyên nghiệp.</p>
+              <p><strong>Đánh đổi:</strong> Tăng độ phức tạp của hệ thống do phải xây dựng và đồng bộ hóa contract dữ liệu qua tầng API trung gian.</p>
+            </article>
+            
+            <article class="card">
+              <h3>Component-based Architecture</h3>
+              <p><strong>Mục đích:</strong> Xây dựng giao diện bằng cách chia nhỏ thành các thành phần độc lập (React Components), tự quản lý State và tái sử dụng linh hoạt.</p>
+              <p><strong>Khi nào dùng:</strong> Thiết kế UI/UX trên React/Next.js.</p>
+              <p><strong>Đánh đổi:</strong> Tránh lạm dụng truyền dữ liệu lòng vòng (prop drilling), cần cấu hình cấu trúc thư mục rõ ràng từ đầu.</p>
+            </article>
+
+            <article class="card">
+              <h3>CLI-driven Scaffolding</h3>
+              <p><strong>Mục đích:</strong> Tự động dựng khung cấu trúc dự án Next.js Pages Router qua dòng lệnh với các flag tối ưu (như <code>--no-app</code>).</p>
+              <p><strong>Khi nào dùng:</strong> Khi bắt đầu khởi tạo dự án web mới.</p>
+              <p><strong>Đánh đổi:</strong> Cần nắm vững ý nghĩa các tham số cấu hình để tránh việc tạo dư thừa file hoặc sai router mong muốn.</p>
+            </article>
+
+            <article class="card">
+              <h3>SSE Streaming</h3>
+              <p><strong>Mục đích:</strong> Truyền dữ liệu dạng luồng thời gian thực một chiều từ server về trình duyệt qua giao thức HTTP chuẩn.</p>
+              <p><strong>Khi nào dùng:</strong> Stream kết quả sinh chữ từ mô hình ngôn ngữ lớn (LLM) để nâng cao trải nghiệm người dùng, giảm cảm giác chờ đợi.</p>
+              <p><strong>Đánh đổi:</strong> Kết nối một chiều, chỉ truyền từ server về client. Cần xử lý ngắt dòng để tránh lỗi định dạng của SSE.</p>
+            </article>
+          </div>
+        </section>
+
+        <!-- Section 7: Code Walkthrough -->
+        <section id="code-walkthrough" class="section">
+          <div class="section-title">
+            <div>
+              <div class="kicker">Mục 7</div>
+              <h2>Code Walkthrough - Phân tích mã nguồn</h2>
+            </div>
+            <div class="source-row">
+              <span class="source">Code</span>
+              <span class="source">Docx LLM</span>
+            </div>
+          </div>
+
+          <div class="code-panel">
+            <div>
+              <h3>1. api/index.py (FastAPI SSE Streaming Backend)</h3>
+              <p>Khởi tạo FastAPI, kết nối OpenAI và sử dụng <code>StreamingResponse</code> kết hợp generator để đẩy kết quả theo thời gian thực.</p>
+            </div>
+            <div class="code-meta">
+              <span>Đường dẫn: <a href="file:///G:/AIProduction_t6_2026/production/week1/day2.md#L354-L379">G:/AIProduction_t6_2026/production/week1/day2.md</a></span>
+            </div>
+            <pre><code>from fastapi import FastAPI  # type: ignore
+from fastapi.responses import StreamingResponse  # type: ignore # Nhập lớp phản hồi dạng luồng
+from openai import OpenAI  # type: ignore
+
+app = FastAPI()
+
+@app.get("/api")
+def idea():
+    client = OpenAI() # Khởi tạo client OpenAI (tự động đọc API key)
+    prompt = [{"role": "user", "content": "Reply with a new business idea for AI Agents, formatted with headings, sub-headings and bullet points"}]
+    
+    # Gửi yêu cầu sinh text với cờ stream=True để nhận kết quả dạng luồng
+    stream = client.chat.completions.create(model="gpt-5-nano", messages=prompt, stream=True)
+
+    # Định nghĩa generator function để xử lý bất tuần tự
+    def event_stream():
+        for chunk in stream:
+            text = chunk.choices[0].delta.content # Trích xuất phần chữ mới sinh ra ở chunk hiện tại
+            if text:
+                # SSE quy định ngắt bằng \n\n để hết gói tin. Để tránh lỗi khi text chứa \n, ta tách text
+                lines = text.split("\n")
+                for line in lines:
+                    yield f"data: {line}\n" # Gửi dòng text theo chuẩn SSE
+                yield "\n" # Gửi dòng trống để báo hiệu hoàn thành message hiện tại
+
+    # Trả về phản hồi dạng luồng với kiểu dữ liệu chuẩn text/event-stream
+    return StreamingResponse(event_stream(), media_type="text/event-stream")</code></pre>
+          </div>
+
+          <div class="code-panel" style="margin-top: 24px;">
+            <div>
+              <h3>2. pages/index.tsx (React Frontend với SSE & Markdown)</h3>
+              <p>Khởi tạo kết nối <code>EventSource</code> ở trình duyệt, tích lũy dữ liệu vào state và render Markdown động.</p>
+            </div>
+            <div class="code-meta">
+              <span>Đường dẫn: <a href="file:///G:/AIProduction_t6_2026/production/week1/day2.md#L473-L539">G:/AIProduction_t6_2026/production/week1/day2.md</a></span>
+            </div>
+            <pre><code>"use client" // Đánh dấu đây là Client Component chạy trên trình duyệt
+
+import { useEffect, useState } from 'react';
+import ReactMarkdown from 'react-markdown'; // Thư viện parse markdown thành HTML
+import remarkGfm from 'remark-gfm'; // Hỗ trợ định dạng bảng, link trong markdown
+import remarkBreaks from 'remark-breaks'; // Hỗ trợ ngắt dòng tự nhiên của văn bản
+
+export default function Home() {
+    const [idea, setIdea] = useState<string>('…loading'); // State lưu giữ kết quả hiển thị
+
+    useEffect(() => {
+        // Khởi tạo đối tượng lắng nghe Server-Sent Events (SSE) từ API backend
+        const evt = new EventSource('/api');
+        let buffer = '';
+
+        // Lắng nghe dữ liệu đẩy về từ máy chủ
+        evt.onmessage = (e) => {
+            buffer += e.data; // Cộng dồn chuỗi văn bản nhận được
+            setIdea(buffer);  // Cập nhật trạng thái để React kích hoạt re-render
+        };
+
+        // Xử lý khi xảy ra lỗi (ví dụ ngắt luồng hoặc mất kết nối)
+        evt.onerror = () => {
+            console.error('SSE error, closing');
+            evt.close(); // Đóng kết nối để giải phóng socket trên browser
+        };
+
+        // Hàm cleanup dọn dẹp kết nối khi component bị unmounted
+        return () => { evt.close(); };
+    }, []);
+
+    return (
+        &lt;main className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-gray-800"&gt;
+            &lt;div className="container mx-auto px-4 py-12"&gt;
+                &lt;header className="text-center mb-12"&gt;
+                    &lt;h1 className="text-5xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent mb-4"&gt;
+                        Business Idea Generator
+                    &lt;/h1&gt;
+                    &lt;p className="text-gray-600 dark:text-gray-400 text-lg"&gt;
+                        AI-powered innovation at your fingertips
+                    &lt;/p&gt;
+                &lt;/header>
+
+                &lt;div className="max-w-3xl mx-auto"&gt;
+                    &lt;div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-8 backdrop-blur-lg bg-opacity-95"&gt;
+                        {idea === '…loading' ? (
+                            &lt;div className="flex items-center justify-center py-12"&gt;
+                                &lt;div className="animate-pulse text-gray-400"&gt;
+                                    Generating your business idea...
+                                &lt;/div&gt;
+                            &lt;/div&gt;
+                        ) : (
+                            &lt;div className="markdown-content text-gray-700 dark:text-gray-300"&gt;
+                                &lt;ReactMarkdown remarkPlugins={[remarkGfm, remarkBreaks]}&gt;
+                                    {idea}
+                                &lt;/ReactMarkdown&gt;
+                            &lt;/div&gt;
+                        )}
+                    &lt;/div&gt;
+                &lt;/div&gt;
+            &lt;/div&gt;
+        &lt;/main&gt;
+    );
+}</code></pre>
+          </div>
+
+          <div class="code-panel" style="margin-top: 24px;">
+            <div>
+              <h3>3. styles/globals.css (Khôi phục CSS Base cho Markdown)</h3>
+              <p>Khôi phục định dạng hiển thị cho các thẻ tiêu đề, đoạn văn và danh sách thô bị Tailwind CSS reset.</p>
+            </div>
+            <div class="code-meta">
+              <span>Đường dẫn: <a href="file:///G:/AIProduction_t6_2026/production/week1/day2.md#L401-L461">G:/AIProduction_t6_2026/production/week1/day2.md</a></span>
+            </div>
+            <pre><code>@layer base {
+  /* Khôi phục size và margin cho h1 bên trong lớp markdown-content */
+  .markdown-content h1 {
+    font-size: 2em;
+    font-weight: bold;
+    margin: 0.67em 0;
+  }
+  /* Khôi phục size và margin cho h2 */
+  .markdown-content h2 {
+    font-size: 1.5em;
+    font-weight: bold;
+    margin: 0.83em 0;
+  }
+  /* Khôi phục danh sách không có thứ tự (chấm tròn thụt đầu dòng) */
+  .markdown-content ul {
+    list-style-type: disc;
+    padding-left: 2em;
+    margin: 1em 0;
+  }
+  /* Khôi phục danh sách có thứ tự (đánh số) */
+  .markdown-content ol {
+    list-style-type: decimal;
+    padding-left: 2em;
+    margin: 1em 0;
+  }
+}</code></pre>
+          </div>
+        </section>
+
+        <!-- Section 8: Options & Trade-offs -->
+        <section id="options" class="section">
+          <div class="section-title">
+            <div>
+              <div class="kicker">Mục 8</div>
+              <h2>Options &amp; Trade-offs - Bản đồ lựa chọn</h2>
+            </div>
+          </div>
+          <table>
+            <thead>
+              <tr>
+                <th>Lựa chọn - Option</th>
+                <th>Phù hợp nhất khi - Best for</th>
+                <th>Đánh đổi - Trade-off</th>
+                <th>Rủi ro - Risk</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>Gradio (Python Frontend)</strong></td>
+                <td>Xây dựng bản demo nhanh (PoC) trong vài giờ để kiểm tra mô hình AI.</td>
+                <td>Không cần viết HTML/CSS/JS nhưng giao diện bị đóng khung, hiệu năng chịu tải kém.</td>
+                <td>Không thể tùy biến sâu giao diện cho ứng dụng SaaS thương mại chuyên nghiệp.</td>
+              </tr>
+              <tr>
+                <td><strong>Pages Router (Next.js)</strong></td>
+                <td>Dự án yêu cầu độ ổn định cao, tích hợp tốt với các thư viện auth/billing cũ.</td>
+                <td>Phân cấp thư mục kiểu cũ, không tối ưu tốt tính năng React Server Components hiện đại.</td>
+                <td>Công nghệ cũ hơn so với App Router mới của Next.js.</td>
+              </tr>
+              <tr>
+                <td><strong>App Router (Next.js)</strong></td>
+                <td>Các dự án mới hoàn toàn, tận dụng tối đa Server Components và tối ưu hóa SEO.</td>
+                <td>Cú pháp phức tạp hơn, một số thư viện xác thực bên thứ ba chưa tương thích hoàn toàn.</td>
+                <td>Mất nhiều thời gian debug hơn nếu gặp thư viện không tương thích.</td>
+              </tr>
+              <tr>
+                <td><strong>FastAPI (Backend)</strong></td>
+                <td>API endpoints hiệu năng cao, yêu cầu độ trễ thấp, hỗ trợ streaming thời gian thực.</td>
+                <td>Phải tự thiết lập cấu trúc DB và ORM so với Django tích hợp sẵn.</td>
+                <td>Cần viết nhiều code thiết lập cơ sở dữ liệu thủ công hơn.</td>
+              </tr>
+            </tbody>
+          </table>
+        </section>
+
+        <!-- Section 9: Pitfalls -->
+        <section id="pitfalls" class="section">
+          <div class="section-title">
+            <div>
+              <div class="kicker">Mục 9</div>
+              <h2>Pitfalls - Bẫy và Lỗi thường gặp</h2>
+            </div>
+          </div>
+          <div class="grid-2">
+            <article class="card">
+              <h3>Các trường hợp dễ thất bại (Failure Modes)</h3>
+              <ul class="list">
+                <li><strong>Lộ OpenAI API Key:</strong> Thực hiện gọi trực tiếp API OpenAI từ mã nguồn React frontend. Người dùng có thể F12 và lấy trộm key dễ dàng trong tab Network.</li>
+                <li><strong>Mất giao diện Tailwind khi khôi phục Markdown:</strong> Ghi đè toàn bộ nội dung file <code>styles/globals.css</code> bằng các lớp base mới, làm mất các dòng import lõi của Tailwind ở đầu file.</li>
+                <li><strong>Lãng phí cost API khi đóng tab:</strong> Client ngắt kết nối đột ngột giữa chừng nhưng server FastAPI vẫn tiếp tục duy trì vòng lặp gọi OpenAI API vô ích.</li>
+              </ul>
+            </article>
+            <article class="card">
+              <h3>Cách phòng ngừa và sửa chữa</h3>
+              <ul class="list">
+                <li><strong>Tách Backend xử lý key:</strong> Luôn gọi API LLM thông qua server backend. Server backend giữ API key trong biến môi trường bảo mật trên cloud.</li>
+                <li><strong>Dán code ở cuối file CSS:</strong> Chỉ dán thêm (append) đoạn mã CSS khôi phục Markdown vào phía cuối tệp <code>globals.css</code>, giữ nguyên các dòng import Tailwind mặc định.</li>
+                <li><strong>Đóng stream trên server khi ngắt kết nối:</strong> Lồng logic generator trong khối <code>try...finally</code> để khi kết nối TCP đứt (Client closed), khối <code>finally</code> lập tức chạy và gọi <code>stream.close()</code> để ngắt luồng gọi OpenAI.</li>
+              </ul>
+            </article>
+          </div>
+        </section>
+
+        <!-- Section 10: Flashcards & Quiz -->
+        <section id="flashcards" class="section">
+          <div class="section-title">
+            <div>
+              <div class="kicker">Mục 10</div>
+              <h2>Flashcards &amp; Quiz - Ôn tập tương tác</h2>
+            </div>
+          </div>
+          
+          <div class="grid-2">
+            <!-- Flashcard 1 -->
+            <article class="card flashcard">
+              <h3>Q: Tại sao phải sử dụng từ khóa `"use client"` ở đầu tệp index.tsx trong Next.js Pages Router của buổi học này?</h3>
+              <button class="button primary" type="button" data-reveal>Lật xem đáp án</button>
+              <p class="flash-answer"><strong>A:</strong> Để đảm bảo component này chạy hoàn toàn ở phía client (trình duyệt), cho phép sử dụng các React hooks (useState, useEffect) và thực hiện gọi API trực tiếp từ trình duyệt đến backend Python FastAPI độc lập mà không cần Next.js làm server trung gian.</p>
+            </article>
+
+            <!-- Flashcard 2 -->
+            <article class="card flashcard">
+              <h3>Q: Sự khác biệt lớn nhất về mặt tính chất dữ liệu giữa Props và State trong React là gì?</h3>
+              <button class="button primary" type="button" data-reveal>Lật xem đáp án</button>
+              <p class="flash-answer"><strong>A:</strong> Props là dữ liệu cấu hình truyền từ cha xuống con và là read-only (chỉ đọc) đối với component nhận. State là dữ liệu nội bộ tự quản lý bên trong component, có tính chất động (mutable) và re-render giao diện khi thay đổi.</p>
+            </article>
+          </div>
+
+          <!-- Multiple Choice Quiz -->
+          <div class="card" style="margin-top: 20px;">
+            <h3>Trắc nghiệm nhanh: SSE vs WebSockets</h3>
+            <p>Đối với tác vụ truyền phát dữ liệu text thời gian thực từ mô hình ngôn ngữ lớn (LLM streaming), tại sao Server-Sent Events (SSE) lại được ưa chuộng hơn WebSockets?</p>
+            
+            <div class="quiz-options">
+              <button class="button quiz-option" type="button" data-correct="false">A. Vì WebSockets không hỗ trợ truyền tải ký tự Unicode tiếng Việt.</button>
+              <button class="button quiz-option" type="button" data-correct="true">B. Vì SSE chạy trên giao thức HTTP chuẩn, cực nhẹ, tự động kết nối lại và tối ưu cho truyền dữ liệu một chiều.</button>
+              <button class="button quiz-option" type="button" data-correct="false">C. Vì SSE cho phép truyền tải dữ liệu hai chiều song công cùng lúc với tốc độ gấp đôi WebSockets.</button>
+            </div>
+            <div class="quiz-result" aria-live="polite"></div>
+          </div>
+        </section>
+
+        <!-- Section 11: Quick Memory -->
+        <section id="memory" class="section">
+          <div class="section-title">
+            <div>
+              <div class="kicker">Mục 11</div>
+              <h2>Quick Memory - Ôn nhanh cuối bài</h2>
+            </div>
+          </div>
+          <div class="grid-2">
+            <article class="card">
+              <h3>Những điểm bắt buộc phải thuộc</h3>
+              <ol class="list">
+                <li>Vercel tự động nhận diện và build thư mục <code>/api</code> chứa <code>index.py</code> thành serverless FastAPI function mà không cần file cấu hình `vercel.json`.</li>
+                <li>Lệnh khởi tạo Next.js Pages Router: <code>npx create-next-app saas --ts --eslint --tailwind --no-src-dir --no-app</code>.</li>
+                <li>Hàm generator Python sử dụng từ khóa <code>yield</code> thay vì <code>return</code> để trả về dữ liệu streaming từng phần.</li>
+                <li>Media type bắt buộc khai báo cho StreamingResponse SSE trong FastAPI là <code>text/event-stream</code>.</li>
+              </ol>
+            </article>
+            <article class="card">
+              <h3>Checklist tự đánh giá năng lực</h3>
+              <ul class="list">
+                <li>Bạn có tự giải thích được cơ chế Virtual DOM của React hoạt động thế nào để tối ưu cập nhật giao diện không?</li>
+                <li>Bạn có trình bày được tại sao backend là nơi an toàn duy nhất để lưu trữ API keys không?</li>
+                <li>Bạn có nắm được cách khắc phục hiện tượng mất định dạng thẻ tiêu đề, list trong Markdown khi kết hợp Tailwind không?</li>
+              </ul>
+            </article>
+          </div>
+        </section>
+
+        <!-- Footer Info -->
+        <footer class="footer">
+          <div class="footer-brand">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M12 2V22M2 12H22M19.07 4.93L4.93 19.07M19.07 19.07L4.93 4.93" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/>
+            </svg>
+            <span>Claude AI Academy - Antigravity Study Guide</span>
+          </div>
+          <p>Tài liệu này được tạo tự động bởi Coding Agent dựa trên tài nguyên khóa học AI Engineer Production Track. Nội dung lý thuyết và các ghi chú thực hành đã được kiểm chứng cẩn thận.</p>
+        </footer>
+
+      </main>
+    </div>
+  </div>
+
+  <!-- Load Mermaid.js for Rendering Diagrams -->
+  <script type="module">
+    import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+    mermaid.initialize({
+      startOnLoad: true,
+      theme: 'neutral',
+      flowchart: {
+        useMaxWidth: true,
+        htmlLabels: true,
+        nodeSpacing: 50,
+        rankSpacing: 75
+      },
+      sequence: {
+        useMaxWidth: true,
+        width: 180,
+        height: 70,
+        messageFontSize: 13,
+        actorFontSize: 14,
+        boxFontSize: 13
+      },
+      themeVariables: {
+        background: '#efe9de',
+        primaryColor: '#cc785c',
+        primaryTextColor: '#141413',
+        lineColor: '#cc785c',
+        secondaryColor: '#f5f0e8',
+        tertiaryColor: '#faf9f5',
+        fontSize: '15px'
+      }
+    });
+  </script>
+
+  <!-- Interactive JavaScript Features -->
+  <script>
+    // Navigation (TOC) Active Link Tracking & Smooth Scroll Active State
+    const links = Array.from(document.querySelectorAll(".toc a"));
+    const sections = links.map((link) => document.querySelector(link.getAttribute("href"))).filter(Boolean);
+    const progressBar = document.getElementById("progressBar");
+    const detailsNodes = Array.from(document.querySelectorAll("details"));
+
+    function setActiveLink() {
+      let current = sections[0]?.id;
+      const offset = window.scrollY + 180;
+      for (const section of sections) {
+        if (section.offsetTop <= offset) {
+          current = section.id;
+        }
+      }
+      links.forEach((link) => {
+        link.classList.toggle("active", link.getAttribute("href") === `#${current}`);
+      });
+    }
+
+    function updateProgress() {
+      const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+      const progress = docHeight > 0 ? Math.min((window.scrollY / docHeight) * 100, 100) : 0;
+      progressBar.style.width = `${progress}%`;
+    }
+
+    // Expand / Collapse Details Buttons
+    document.getElementById("expandAll").addEventListener("click", () => {
+      detailsNodes.forEach((node) => {
+        node.open = true;
+      });
+    });
+
+    document.getElementById("collapseAll").addEventListener("click", () => {
+      detailsNodes.forEach((node) => {
+        node.open = false;
+      });
+    });
+
+    // Flashcard Reveal Answer Logic
+    document.querySelectorAll("[data-reveal]").forEach((button) => {
+      button.addEventListener("click", () => {
+        const card = button.closest(".flashcard");
+        card.classList.toggle("revealed");
+        button.innerText = card.classList.contains("revealed") ? "Ẩn câu trả lời" : "Lật xem đáp án";
+      });
+    });
+
+    // Quiz Verification Logic
+    document.querySelectorAll(".quiz-option").forEach((button) => {
+      button.addEventListener("click", () => {
+        const parent = button.parentElement;
+        const options = parent.querySelectorAll(".quiz-option");
+        const result = parent.nextElementSibling;
+        
+        options.forEach(opt => {
+          opt.classList.remove("correct", "wrong");
+          opt.disabled = true; // Disable further selections
+        });
+
+        if (button.dataset.correct === "true") {
+          button.classList.add("correct");
+          result.innerHTML = "<span style='color: var(--accent-teal);'>Chính xác!</span> SSE cực kỳ tối ưu vì nó truyền tải một chiều trên HTTP tiêu chuẩn, có sẵn cơ chế kết nối lại tự động ở client và cực kỳ nhẹ so với giao thức WebSockets vốn phức tạp và tốn tài nguyên hơn.";
+        } else {
+          button.classList.add("wrong");
+          result.innerHTML = "<span style='color: var(--primary);'>Chưa chính xác.</span> Hãy đọc lại phần so sánh SSE vs WebSockets tại mục Kiến thức mở rộng.";
+        }
+      });
+    });
+
+    // Theme Switcher (Light Cream vs Dark Navy)
+    const themeToggleBtn = document.getElementById("themeToggleBtn");
+    themeToggleBtn.addEventListener("click", () => {
+      const currentTheme = document.documentElement.getAttribute("data-theme");
+      if (currentTheme === "dark") {
+        document.documentElement.removeAttribute("data-theme");
+      } else {
+        document.documentElement.setAttribute("data-theme", "dark");
+      }
+    });
+
+    // Scroll and Init listeners
+    window.addEventListener("scroll", () => {
+      setActiveLink();
+      updateProgress();
+    }, { passive: true });
+
+    setActiveLink();
+    updateProgress();
+  </script>
+</body>
+
+</html>

@@ -1,0 +1,121 @@
+Look, I promised you a juicy course.
+And if you think that this.
+That Alex is already looking like a juicy project, you ain't seen nothing yet.
+We're getting more stuck into it today.
+We've got a lot to cover.
+Welcome to another Purple day.
+Another AI day.
+This is a day in which we're going to be looking at data ingest, in particular using an embedding model,
+an encoder that we deployed yesterday, uh, to, to create vectors and store them in S3 vectors, a
+new type of storage that offered by AWS.
+So let's get to it.
+First, some quick recaps.
+So the project we're working on, of course, is Alex, our capstone project, our SaaS financial planner.
+Next week is when we're really going to be building out Alex, the Agentic AI platform.
+This week it's all about the data ingest part of it, giving Alex its memory, its mind about financial
+markets and about retirement planning.
+We've started our setup by by cloning a repo.
+We've got Alex as a local project that's got separate Terraform directories for each of the different
+deployment steps that we'll be taking, and they have TF vars inside them for configuration.
+And there's also a env file in the project root that has overall, uh, secrets that govern the whole
+project.
+We've only got one environment I'm not deploying to dev and test to keep things a bit simpler.
+No GitHub actions, but you're very welcome to do that yourself if you'd like.
+And it's so satisfying to be able to do a git push and see it all roll out for you.
+And yesterday, of course, we we played around with SageMaker for the first time.
+We made an endpoint, an inference endpoint with an embedding model, a sentence transformers model
+from hugging face, the all mini lm v2, uh, which is a model you can use to take text and convert
+it into a vector.
+And what we're going to be building today is the data ingest lambda function.
+That will do that and store the results in S3 three vectors and just to be a little bit repetitive,
+but just sometimes it helps to hear things twice, reminding you of the difference between bedrock and
+SageMaker.
+Bedrock, which is about building with frontier models, being able to have, uh, inference that you
+can run with models like, uh, Nova and Claude and be able to run that at scale, whereas SageMaker
+is more the platform for data scientists, it's DevOps for data scientists, and it's where you can
+manage the complete lifecycle of your model development training models, managing different experiments,
+versioning models and data sets.
+It has, as we saw, its own kind of Google Colab Jupyter notebooks in the cloud.
+It's got inference endpoints that we know well because we're using them, uh, and lots of other functionality,
+including a complete kind of IDE built in.
+So lots for data scientists to experiment with in SageMaker.
+We've barely scratched the surface with our deployed SageMaker endpoint.
+I'd also talked about ML ops.
+I'd explain that that term can be used in different contexts.
+It can mean everything that we're doing on this course around platform engineering for AI.
+It can also be referring more specifically to managing different versions of your models and data,
+managing your different data science experiments, and that that is more commonly how it's used in that
+context.
+And when it's used in that way.
+SageMaker is one of your go to platforms.
+That is AWS, ML ops platform.
+And we talked a bit about model drift, this idea that models can kind of decay in their performance
+over time as as the natural language of the world evolves and as a result, something you need to to
+monitor for, to test the performance of your models and then retrain if you need to.
+And SageMaker is a place that you could do that, and you should go around and experiment with some
+of the functionality yourself and see if it's something you can you can find useful.
+You could, for example, if you've taken the LM engineering course, you could take the models that
+we trained there and look to see how you can incorporate them in SageMaker.
+So in the last couple of days, I gave you a little teaser of some of Alex's architecture, its deployment
+architecture, the data ingest side of it.
+And here's a simplified diagram of what we saw in the slightly more complicated mermaid diagrams.
+It's going to have Alex is going to have a scheduler, a lambda function that is going to wake up every
+two hours and say, okay, it's time.
+And when it does that, what it's going to do is it's going to kick off an app runner.
+Uh, it's going to to it's going to kick off something called the researcher, which is going to be
+an agent running in a container.
+It's going to have access to an MCP server because we want to be trying these different things.
+Uh, and so it's going to use the MCP server.
+It's actually going to run a playwright browser to be able to do some research.
+And what's going to come out of that is some information that it wants to add to its memory.
+So this is a typical example of a kind of rag process where you have something happening that's going
+to result in data being ingested.
+And I thought having a researcher that uses an MCP server is a is a really interesting way to to take
+this to be generating data.
+But in your case for your business projects, this might be something that's monitoring incoming feeds.
+It might be something that's looking at news that's being released or or information documents that
+are being saved in your company, anything that's causing an event to come in and new data that needs
+to be stored.
+And of course, the researcher needs a model to do that.
+And it's going to use bedrock as its way of calling a frontier model, and which will then call our
+MCP server.
+And when it's done that, when it's created some data, it's done a search on the internet, it's found
+some information it wants to store.
+It's now got some data that it wants to store in its memory.
+How is it going to do that?
+Well, it's going to pass that over to a lambda function called ingest.
+And ingest is our lambda function that is able to take some data and store it in our memory.
+And how does it store it in our memory?
+Well, the way that llms like to have memory of things is using vector data stores so they can retrieve
+relevant information quickly using Rag processes.
+And so we want to store it as a vector.
+So we've got some text from the researcher.
+We want to turn it into a vector.
+And the way we will do that is of course using the SageMaker inference endpoint that we deployed yesterday.
+So we will call out to the open source model the sentence transformers that we have running in SageMaker
+endpoint to turn it into a vector.
+And we will then store that vector in a vector store.
+And we're going to use a service called S3 vectors, which is you can think of like like it's S3, it's
+a bucket, but it's intended to store vectors.
+And this is actually a relatively new offering from AWS and it's very cost efficient.
+I previously used an alternative called OpenSearch that ended up being quite pricey, and you may know
+that already because you've been seeing it in my Cost Explorer that I spent, I think $70 or something.
+I think it was $50.
+There was also the domain name as well.
+I spent, I think, $50 just experimenting with the prior implementation before I realized that of the
+various alternatives, that was not cost efficient for certainly for our purposes and S3 vectors is
+perfect for this.
+So that is what I'm using.
+That is what the ingest lambda function will use to store the vector and the associated text, so that
+it can be retrieved later.
+So that is the data ingest architecture that we're going to be building today and tomorrow.
+So what part are we doing today.
+Well today we're just going to do this part.
+We're just going to be looking at the ingest lambda function and have it call our SageMaker endpoint
+and store the vectors.
+Very simple.
+These three components we've already built the purple one.
+Those are the blue bits around it.
+We're going to build today.
+And let's get right to it.
+Let's go back to cursor back into the Alix project Alix Repo and get to work.

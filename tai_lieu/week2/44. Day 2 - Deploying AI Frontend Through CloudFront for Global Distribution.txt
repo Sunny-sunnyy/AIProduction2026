@@ -1,0 +1,177 @@
+Okay.
+So for this next step, first go back here again to the gateway.
+And just copy this URL here.
+Copy that into your clipboard.
+This is the endpoint for the Twitter API gateway.
+All right you've done that.
+Then go back to the instructions.
+So we're going to update the front end code in components twin TSX.
+You remember I showed you this line of code that was the actual line that's actually calling the back
+end.
+We're going to change that.
+So instead of calling localhost 8000 it's going to it's going to actually call the real the real web
+service itself the API.
+So let's go in and do that right now.
+So this is in the front end code.
+It's in other components twin TSX.
+And now we're going to look in TSX for that fetch.
+It's right here near the top.
+And we're going to replace all of that with the actual endpoint itself.
+Uh I managed to add an extra empty line there, but that looks better to me.
+There we go.
+You see that?
+This URL right here is where we want to be posting slash chat.
+So that's looking good to me.
+Back to the instructions we've updated to TSX.
+Okay, we now need to change next config so that static exports are allowed so that we can generate
+a static dump of the whole website.
+So next config.
+Let's find that.
+Here it is.
+Change it with this new you can see it's got no config.
+It's empty.
+We're going to paste in and export config.
+There it is.
+Done.
+Okay back to the instructions.
+Next up it's time to build a static export.
+So we do that by bringing up a terminal by going to the front end.
+Uh, which is I think this one right here.
+Here it is.
+And now we're going to do, uh, the, uh.
+Sorry.
+We don't need to do that.
+We need to, um, do npm run build.
+And off it goes building, and it's going to build an optimized production build.
+It's going to create an out directory there.
+You see the out directory has been created and it has all of the files in it, the static files for
+our whole website.
+So if you open this up you can see in here there's a whole bunch of files that are HTML, JavaScript,
+CSS for our website that's been derived from the TypeScript from the Next.js app that we wrote in this
+more modern code.
+And this is all traditional that will work on on any browser.
+And there is an index.html and a 440.
+And that might jog your memory because we set that up when we were configuring our front end.
+Okay.
+So this has been completed and now it's time to upload this to S3.
+So, uh, what we what we do here, we're in the front end directory.
+This AWS command will work because in the previous week we did AWS configure that set up AWS for us.
+So we are now going to upload our front end to our static site.
+And you do that with this command AWS S3 sync out slash the output directory.
+And then we're going to have our front end bucket name.
+So we do S3 colon slash slash.
+And we now have to give it our bucket name.
+Now do you remember what the bucket name was.
+It was twin dash front end dash.
+And now you put in your entire, uh, ID and then you finish this off and then we will press enter.
+So we put in the ID and then a slash at the end.
+Dash dash delete means delete.
+If it's a it can be removed when not in the build.
+And then press enter.
+And it's done.
+It just uploaded the static site to our S3 bucket.
+Okay, it's time to test it.
+Uh, so first of all, uh, we, uh, we need to, uh, go to the S3 bucket and then properties and
+static website hosting.
+Let's go and give this a try.
+We go here to the S3 bucket.
+We find our front end bucket.
+There it is.
+Properties.
+We go down to static hosting which is near the bottom.
+And we're going to look for this URL right here.
+And let's launch it in a separate browser.
+This is going to work.
+Look at that.
+Look at that.
+It comes up.
+We've got ourselves a static site.
+Hi there.
+What happens now?
+Drumroll.
+Something's happening.
+Somewhere machinery is in action.
+A long pause and there we go.
+Hi, Ed.
+Great to see you.
+What's on your mind today?
+There we go.
+We have a front end and a back end, that's all working together.
+The front end is being accessed by a browser and the back end is coming through.
+And we should check that the, uh, that maybe we'll check the memory works later when all of the pieces
+are together.
+Because there's something missing here.
+We're connecting directly to an S3 bucket.
+And that wasn't the architecture.
+The idea is we want to put this under CloudFront distribution so that we're connecting through CloudFront.
+So we've tested that this works by accessing directly the web pages.
+What we now want to do is see if we can get it to run through CloudFront okay.
+So what we're going to do is first get the endpoint that we just got.
+Now the static website endpoint that we just tested.
+We will copy that.
+And we are then going to go and create a CloudFront distribution called Twin Distribution.
+So let's go ahead and get get this show on the road.
+So back over here we need to start by going to.
+This is where we're currently on the twin front end bucket.
+We need to copy this endpoint.
+Copied done.
+All right.
+Now we're going to go and look for CloudFront.
+Here is CloudFront the global content delivery network.
+And we are going to create a CloudFront distribution distribution name.
+We're calling it twin distribution.
+I think let me just check uh twin distribution.
+And then next okay twin distribution.
+And then next.
+Okay.
+Now this is something to watch out for because of the way we're doing this.
+It's a it's a special kind.
+It's an S3 static hosted site.
+We have to press other, not S3.
+Just one of those things to know.
+And then I believe we're going to fill in the the origin field is choose a paste your S3 endpoint without
+the HTTP like that in the origin domain name.
+So let's go and do this origin domain name.
+Custom origin like this, but without the HTTP like that, that's what it has to look like.
+And now there's something super important we have to make sure that it is HTTP only have to go in here
+to customize origin settings and choose HTTP only.
+Otherwise this won't work.
+So you need to do that and see if we need to do anything else here.
+Um, let me just see.
+So uh critical HTTP only.
+And then um origin name.
+Or you can leave that auto generated and then it looks fine.
+Okay.
+I think everything else should be default.
+Let's have a look.
+Let's go back over here and just just take an eye on this.
+All looks good.
+Next.
+Uh, yes.
+So this prompts you to enable web application firewall, which is something that could protect you against
+things like, uh, DDoS attacks.
+Now, this is basically an Amazon upsell.
+You don't need to do that.
+Not in our case.
+Unless your company wants to pay for these extra security protections.
+The very fact that it forces you to say no gives you a little clue.
+It's a bit like when you're buying a flight and the airline wants you to say, no, I do not need your
+extra insurance.
+Uh, so we do that, we check out all of this.
+Everything looks fine.
+Connection timeout of 10s is fine.
+We just need to, uh, hopefully that it's set to be HTTP only.
+And then we say create distribution.
+And now it is going and creating our CloudFront distribution.
+And over here it says deploying.
+And that is our sign that deployment is in process.
+And this are in progress.
+And this is something which actually takes like 5 to 10 minutes to deploy a CloudFront distribution.
+And that's because it's been pushed out all over the world.
+So we have to to accept the fact that it takes a few minutes, because it's not an easy thing for it
+to do at all.
+Uh, so yes, wait 5 to 15 minutes.
+It says here, but it's never taken more than ten minutes for me.
+But but you never know.
+And when it's done, it's going to change from deploy to enabled.
+And that is when we're in good shape.

@@ -1,0 +1,42 @@
+So I'm going to give you like a surface level briefing on databases in AWS.
+And it's one of those rabbit holes that you can go deeper on should you be interested.
+So to to define three different terms that we'll look at.
+One of them is RDS.
+Amazon RDS relational database service.
+It is their their managed service.
+It's like an umbrella which you can slot in different database engines into it.
+So it can have MySQL.
+It can have Postgres database and that can be can be run by RDS.
+And it will do things like standing it up, managing the cluster and so on.
+So that's the first term RDS.
+The second term is called Aurora.
+And Aurora is one of the database engines that you could use under the RDS umbrella.
+So RDS could could use MySQL, Postgres or Aurora.
+And Aurora is Amazon's own proprietary relational database, which is designed and built to be fast
+and scalable by Amazon.
+So that is AWS Aurora and then Aurora serverless or Aurora serverless v2, as we will use the latest
+version, is a scalable version of Aurora, a flexible, elastic version of it which is able to respond
+quickly if you need more scale by growing automatically.
+So it's great for startups because it starts small with a sort of pay as you go model.
+And it's also great for enterprise because if you suddenly get extra demand, it will automatically
+ramp up without any downtime.
+So that that is the sort of serverless architecture type of Aurora.
+And it's called Aurora serverless v2.
+And I should explain that there is like a whole zoo of other database platforms in Amazon.
+So you may have heard of lots of other names.
+You might say to me, okay, so what's Dynamo?
+Uh, which, which you've almost certainly heard of because that's a big one.
+A dynamo is Amazon's NoSQL offering.
+So, so if you don't want a relational database, you want a NoSQL database, then Dynamo might be what
+your go to.
+And Dynamo is it's a different there's there's no equivalent to RDS.
+Dynamo is both the the managed service and the database itself.
+So unlike in the relational world where you pick RDS and then you sort of slot in a different database
+manager in the NoSQL world you just pick Dynamo.
+Uh, there's, there's another one called DocumentDB, which is a sort of MongoDB style NoSQL database.
+There's ElastiCache, which is like Reddis.
+There's a bunch of others.
+I think I've put some more in the in the lab as well.
+And you can you can of course, Google and read about the different database offerings that Amazon offers.
+But for us we are going to do very well indeed with Aurora serverless v2, built for small scale and
+for large scale.

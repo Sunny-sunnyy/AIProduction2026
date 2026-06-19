@@ -1,0 +1,1371 @@
+<!doctype html>
+<html lang="vi">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Instant AI Deployment & Course Introduction - Study Guide</title>
+  <!-- Google Fonts for Editorial Typography -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  
+  <style>
+    :root {
+      /* Claude Light Cream Theme System Tokens */
+      --canvas: #faf9f5;
+      --surface-soft: #f5f0e8;
+      --surface-card: #efe9de;
+      --surface-strong: #e8e0d2;
+      --surface-dark: #181715;
+      --surface-dark-elevated: #252320;
+      --surface-dark-soft: #1f1e1b;
+      --hairline: #e6dfd8;
+      --hairline-soft: #ebe6df;
+      --ink: #141413;
+      --body: #3d3d3a;
+      --body-strong: #252523;
+      --muted: #6c6a64;
+      --muted-soft: #8e8b82;
+      --primary: #cc785c;
+      --primary-active: #a9583e;
+      --accent-teal: #5db8a6;
+      --accent-amber: #e8a55a;
+      --on-dark: #faf9f5;
+      --on-dark-soft: #a09d96;
+      
+      --radius-xs: 4px;
+      --radius-sm: 6px;
+      --radius-md: 8px;
+      --radius-lg: 12px;
+      --radius-xl: 16px;
+      --content: 1200px;
+      
+      --font-display: "Cormorant Garamond", "EB Garamond", Georgia, serif;
+      --font-sans: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      --font-mono: "JetBrains Mono", ui-monospace, monospace;
+    }
+
+    [data-theme="dark"] {
+      /* Claude Dark Theme System Tokens */
+      --canvas: #181715;
+      --surface-soft: #1f1e1b;
+      --surface-card: #252320;
+      --surface-strong: #2d2a26;
+      --surface-dark: #faf9f5;
+      --surface-dark-elevated: #efe9de;
+      --surface-dark-soft: #f5f0e8;
+      --hairline: #3d3d3a;
+      --hairline-soft: #2d2a26;
+      --ink: #faf9f5;
+      --body: #a09d96;
+      --body-strong: #faf9f5;
+      --muted: #8e8b82;
+      --muted-soft: #6c6a64;
+      --primary: #cc785c;
+      --primary-active: #e8a55a;
+      --accent-teal: #5db8a6;
+      --accent-amber: #e8a55a;
+      --on-dark: #181715;
+      --on-dark-soft: #3d3d3a;
+    }
+
+    * {
+      box-sizing: border-box;
+      transition: background-color 0.25s ease, border-color 0.25s ease, color 0.25s ease;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      margin: 0;
+      background: var(--canvas);
+      color: var(--body);
+      font-family: var(--font-sans);
+      line-height: 1.62;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* Typography */
+    h1, h2, h3, h4 {
+      color: var(--ink);
+      font-family: var(--font-display);
+      font-weight: 400;
+      margin: 0;
+    }
+
+    h1 {
+      font-size: clamp(2.2rem, 4.5vw, 3.6rem);
+      line-height: 1.1;
+      letter-spacing: -0.02em;
+    }
+
+    h2 {
+      font-size: clamp(1.6rem, 3vw, 2.2rem);
+      line-height: 1.2;
+      letter-spacing: -0.015em;
+    }
+
+    h3 {
+      font-size: 1.25rem;
+      line-height: 1.35;
+      font-family: var(--font-sans);
+      font-weight: 600;
+    }
+
+    h4 {
+      font-size: 1.05rem;
+      font-family: var(--font-sans);
+      font-weight: 600;
+      color: var(--body-strong);
+    }
+
+    p, li {
+      margin: 0;
+    }
+
+    a {
+      color: var(--primary);
+      text-decoration: none;
+    }
+
+    a:hover {
+      color: var(--primary-active);
+      text-decoration: underline;
+    }
+
+    code {
+      border-radius: var(--radius-xs);
+      background: var(--surface-soft);
+      color: var(--primary-active);
+      font-family: var(--font-mono);
+      font-size: 0.88em;
+      padding: 2px 6px;
+    }
+
+    pre {
+      margin: 0;
+      overflow-x: auto;
+      border-radius: var(--radius-lg);
+      background: var(--surface-dark-soft);
+      color: var(--on-dark);
+      padding: 20px;
+      font-family: var(--font-mono);
+      font-size: 13.5px;
+      line-height: 1.6;
+      border: 1px solid var(--hairline);
+    }
+
+    pre code {
+      background: transparent;
+      color: inherit;
+      padding: 0;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.95rem;
+      margin: 16px 0;
+    }
+
+    th, td {
+      border-bottom: 1px solid var(--hairline);
+      padding: 14px 16px;
+      text-align: left;
+      vertical-align: middle;
+    }
+
+    th {
+      color: var(--ink);
+      font-weight: 600;
+      background: var(--surface-soft);
+    }
+
+    /* Page Layout */
+    .page {
+      max-width: var(--content);
+      margin: 0 auto;
+      padding: 40px 24px 80px;
+    }
+
+    .hero {
+      display: grid;
+      grid-template-columns: minmax(0, 1.2fr) minmax(320px, 0.8fr);
+      gap: 32px;
+      align-items: stretch;
+      padding: 48px;
+      border: 1px solid var(--hairline);
+      border-radius: var(--radius-xl);
+      background: var(--surface-soft);
+      margin-bottom: 32px;
+    }
+
+    .hero-copy {
+      display: grid;
+      gap: 20px;
+      align-content: start;
+    }
+
+    .eyebrow {
+      width: fit-content;
+      border-radius: var(--radius-pill);
+      background: var(--primary);
+      color: var(--canvas);
+      font-size: 0.72rem;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      padding: 5px 12px;
+      text-transform: uppercase;
+      font-family: var(--font-sans);
+    }
+
+    .lead {
+      max-width: 68ch;
+      color: var(--body-strong);
+      font-size: 1.1rem;
+      line-height: 1.5;
+    }
+
+    .tag-row,
+    .source-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .tag,
+    .source {
+      display: inline-flex;
+      align-items: center;
+      border-radius: 9999px;
+      font-size: 0.78rem;
+      font-weight: 500;
+      padding: 4px 12px;
+      font-family: var(--font-sans);
+    }
+
+    .tag {
+      background: var(--surface-card);
+      color: var(--ink);
+      border: 1px solid var(--hairline);
+    }
+
+    .source {
+      border: 1px solid var(--hairline);
+      background: var(--canvas);
+      color: var(--muted);
+    }
+
+    .source.extended {
+      border-color: rgba(204, 120, 92, 0.4);
+      background: rgba(204, 120, 92, 0.08);
+      color: var(--primary);
+    }
+
+    .hero-panel {
+      border-radius: var(--radius-lg);
+      background: var(--surface-dark-elevated);
+      color: var(--on-dark);
+      padding: 28px;
+      display: grid;
+      gap: 20px;
+      align-content: start;
+      border: 1px solid var(--hairline);
+    }
+
+    .hero-panel h2 {
+      font-family: var(--font-sans);
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: var(--on-dark);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .hero-panel p,
+    .hero-panel li {
+      color: var(--on-dark-soft);
+      font-size: 0.92rem;
+    }
+
+    .progress-track {
+      height: 6px;
+      overflow: hidden;
+      border-radius: 9999px;
+      background: var(--surface-soft);
+      margin-top: 6px;
+    }
+
+    .progress-bar {
+      width: 0;
+      height: 100%;
+      background: var(--primary);
+      transition: width 0.1s ease-out;
+    }
+
+    /* Main Area Layout */
+    .layout {
+      display: grid;
+      grid-template-columns: 280px minmax(0, 1fr);
+      gap: 32px;
+      align-items: start;
+    }
+
+    .toc {
+      position: sticky;
+      top: 30px;
+      border: 1px solid var(--hairline);
+      border-radius: var(--radius-lg);
+      background: var(--canvas);
+      padding: 24px;
+      max-height: calc(100vh - 60px);
+      overflow-y: auto;
+    }
+
+    .toc h2 {
+      font-family: var(--font-sans);
+      font-size: 0.95rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: 16px;
+      color: var(--ink);
+    }
+
+    .toc nav {
+      display: grid;
+      gap: 4px;
+    }
+
+    .toc a {
+      border-radius: var(--radius-md);
+      color: var(--muted);
+      padding: 8px 12px;
+      font-size: 0.88rem;
+      font-weight: 500;
+      line-height: 1.4;
+      display: block;
+      transition: all 0.2s ease;
+    }
+
+    .toc a:hover,
+    .toc a.active {
+      background: var(--surface-card);
+      color: var(--primary);
+      text-decoration: none;
+    }
+
+    .toc-tools {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      margin-top: 16px;
+      padding-top: 16px;
+      border-top: 1px solid var(--hairline);
+    }
+
+    .theme-toggle-container {
+      margin-top: 12px;
+      padding-top: 12px;
+      border-top: 1px solid var(--hairline);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .theme-label {
+      font-size: 0.82rem;
+      font-weight: 600;
+      color: var(--muted);
+    }
+
+    .button {
+      min-height: 38px;
+      border: 1px solid var(--hairline);
+      border-radius: var(--radius-md);
+      background: var(--canvas);
+      color: var(--ink);
+      cursor: pointer;
+      font-family: var(--font-sans);
+      font-size: 0.8rem;
+      font-weight: 600;
+      padding: 8px 12px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      outline: none;
+    }
+
+    .button:hover {
+      background: var(--surface-card);
+      border-color: var(--primary);
+    }
+
+    .button.primary {
+      border-color: var(--primary);
+      background: var(--primary);
+      color: var(--canvas);
+    }
+
+    .button.primary:hover {
+      background: var(--primary-active);
+      border-color: var(--primary-active);
+    }
+
+    /* Content Sections */
+    .content {
+      display: grid;
+      gap: 32px;
+    }
+
+    .section {
+      border: 1px solid var(--hairline);
+      border-radius: var(--radius-lg);
+      background: var(--canvas);
+      padding: 36px;
+      scroll-margin-top: 30px;
+    }
+
+    .section-title {
+      display: flex;
+      justify-content: space-between;
+      gap: 16px;
+      align-items: start;
+      margin-bottom: 24px;
+      border-bottom: 1px solid var(--hairline-soft);
+      padding-bottom: 16px;
+    }
+
+    .kicker {
+      color: var(--primary);
+      font-size: 0.72rem;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      margin-bottom: 4px;
+      text-transform: uppercase;
+      font-family: var(--font-sans);
+    }
+
+    .grid-2 {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 20px;
+    }
+
+    .grid-3 {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 16px;
+    }
+
+    .card {
+      border: 1px solid var(--hairline);
+      border-radius: var(--radius-lg);
+      background: var(--surface-card);
+      padding: 24px;
+    }
+
+    .card h3 {
+      margin-bottom: 12px;
+      border-bottom: 1px solid var(--hairline);
+      padding-bottom: 8px;
+    }
+
+    .card p,
+    .card ul,
+    .card ol {
+      margin-top: 8px;
+      font-size: 0.95rem;
+    }
+
+    .list {
+      padding-left: 20px;
+    }
+
+    .list li + li {
+      margin-top: 6px;
+    }
+
+    /* Diagram Styling */
+    .diagram-container {
+      background: var(--surface-soft);
+      padding: 24px;
+      border-radius: var(--radius-lg);
+      border: 1px solid var(--hairline);
+      margin: 20px 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      overflow-x: auto;
+    }
+
+    .diagram-container svg {
+      width: 100% !important;
+      height: auto !important;
+      max-width: 100% !important;
+    }
+
+    .diagram-title {
+      font-family: var(--font-sans);
+      font-size: 0.88rem;
+      font-weight: 700;
+      color: var(--primary);
+      margin-bottom: 16px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    /* Details Elements */
+    details {
+      border: 1px solid var(--hairline);
+      border-radius: var(--radius-lg);
+      background: var(--surface-soft);
+      padding: 16px 20px;
+      margin-top: 16px;
+    }
+
+    summary {
+      color: var(--ink);
+      cursor: pointer;
+      font-weight: 600;
+      font-size: 0.98rem;
+      outline: none;
+      user-select: none;
+    }
+
+    details[open] {
+      background: var(--surface-card);
+    }
+
+    details[open] summary {
+      border-bottom: 1px solid var(--hairline);
+      padding-bottom: 10px;
+      margin-bottom: 10px;
+    }
+
+    .callout {
+      border-left: 4px solid var(--primary);
+      border-radius: var(--radius-md);
+      background: var(--surface-soft);
+      padding: 16px 20px;
+      margin: 16px 0;
+    }
+
+    .callout p {
+      font-size: 0.95rem;
+    }
+
+    /* Code Panels */
+    .code-panel {
+      display: grid;
+      gap: 16px;
+      margin-top: 18px;
+    }
+
+    .code-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      color: var(--muted);
+      font-size: 0.85rem;
+      font-weight: 500;
+    }
+
+    .code-meta span {
+      background: var(--surface-soft);
+      padding: 4px 10px;
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--hairline);
+    }
+
+    /* Interactive Elements */
+    .flashcard {
+      display: grid;
+      gap: 12px;
+    }
+
+    .flash-answer {
+      display: none;
+      border-top: 1px solid var(--hairline);
+      padding-top: 12px;
+      margin-top: 4px;
+      font-size: 0.95rem;
+      color: var(--primary-active);
+    }
+
+    .flashcard.revealed .flash-answer {
+      display: block;
+    }
+
+    .quiz-options {
+      display: grid;
+      gap: 8px;
+      margin-top: 12px;
+    }
+
+    .quiz-option {
+      display: flex;
+      width: 100%;
+      text-align: left;
+      transition: all 0.2s ease;
+    }
+
+    .quiz-option.correct {
+      background: rgba(93, 184, 114, 0.12) !important;
+      border-color: var(--accent-teal) !important;
+      color: var(--accent-teal) !important;
+    }
+
+    .quiz-option.wrong {
+      background: rgba(198, 69, 69, 0.08) !important;
+      border-color: var(--primary) !important;
+      color: var(--primary) !important;
+    }
+
+    .quiz-result {
+      min-height: 24px;
+      margin-top: 12px;
+      color: var(--ink);
+      font-weight: 600;
+      font-size: 0.92rem;
+    }
+
+    /* Footer */
+    .footer {
+      margin-top: 32px;
+      border-radius: var(--radius-lg);
+      background: var(--surface-dark-elevated);
+      color: var(--on-dark-soft);
+      padding: 32px;
+      font-size: 0.88rem;
+      border: 1px solid var(--hairline);
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .footer strong {
+      color: var(--on-dark);
+    }
+
+    .footer-brand {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: var(--on-dark);
+      font-family: var(--font-sans);
+      font-weight: 600;
+      font-size: 1rem;
+      margin-bottom: 4px;
+    }
+
+    .footer-brand svg {
+      fill: currentColor;
+    }
+
+    /* Responsive adjustments */
+    @media (max-width: 960px) {
+      .hero {
+        grid-template-columns: 1fr;
+        padding: 32px;
+      }
+
+      .layout {
+        grid-template-columns: 1fr;
+      }
+
+      .toc {
+        position: static;
+        max-height: none;
+      }
+
+      .grid-2,
+      .grid-3 {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="page">
+    
+    <!-- Hero Block -->
+    <header class="hero">
+      <div class="hero-copy">
+        <span class="eyebrow">Study Guide</span>
+        <h1>Instant AI Deployment & Course Introduction</h1>
+        <p class="lead">Triển khai nhanh chóng một ứng dụng API Python FastAPI tích hợp trí tuệ nhân tạo OpenAI lên đám mây Vercel chỉ trong vài phút, đồng thời thiết lập tư duy hệ thống DevOps cho kỹ sư AI.</p>
+        
+        <div class="tag-row">
+          <span class="tag">AI Engineer Production Track</span>
+          <span class="tag">Tuần 1 - Ngày 1</span>
+          <span class="tag">Serverless & DevOps Foundation</span>
+        </div>
+        
+        <div class="source-row">
+          <span class="source" title="Tài liệu tóm tắt từ LLM">Docx LLM (Day 1 Summary)</span>
+          <span class="source" title="Slide bài giảng">Slide (Production W1D1)</span>
+          <span class="source" title="Mã nguồn thực hành">Code (day1.md, day1.part2.md)</span>
+          <span class="source extended" title="Kiến thức mở rộng từ tác giả">Knowledge Extension</span>
+        </div>
+      </div>
+      
+      <aside class="hero-panel">
+        <h2>Tiêu điểm cần nắm</h2>
+        <ul class="list">
+          <li><strong>Deployment Protection:</strong> Tính năng xác thực mặc định của Vercel cần tắt để ứng dụng SaaS có thể truy cập công khai.</li>
+          <li><strong>DevOps Landscape:</strong> Thực tế 70-80% khối lượng công việc đưa mô hình AI vào sản xuất là DevOps và Platform Engineering.</li>
+          <li><strong>System Architecture Mismatch:</strong> Sự bất tương thích phần cứng giữa môi trường build (local) và chạy (cloud) gây lỗi runtime.</li>
+        </ul>
+        <div>
+          <p style="margin-bottom: 6px; font-weight: 600;">Tiến độ đọc của bạn</p>
+          <div class="progress-track" aria-label="Reading progress">
+            <div class="progress-bar" id="progressBar"></div>
+          </div>
+        </div>
+      </aside>
+    </header>
+
+    <!-- Content Layout -->
+    <div class="layout">
+      
+      <!-- Sticky Sidebar Navigation -->
+      <aside class="toc">
+        <h2>Mục lục ôn tập</h2>
+        <nav>
+          <a href="#source-map">1. Source Map</a>
+          <a href="#cheat-sheet">2. Cheat Sheet</a>
+          <a href="#previous-context">3. Previous Context</a>
+          <a href="#core-theory">4. Core Theory</a>
+          <a href="#workflow">5. Workflow / Pipeline</a>
+          <a href="#techniques">6. Techniques</a>
+          <a href="#code-walkthrough">7. Code Walkthrough</a>
+          <a href="#options">8. Options & Trade-offs</a>
+          <a href="#pitfalls">9. Pitfalls</a>
+          <a href="#flashcards">10. Flashcards & Quiz</a>
+          <a href="#memory">11. Quick Memory</a>
+        </nav>
+        
+        <div class="toc-tools">
+          <button class="button" type="button" id="expandAll">Mở rộng</button>
+          <button class="button" type="button" id="collapseAll">Thu gọn</button>
+        </div>
+        
+        <div class="theme-toggle-container">
+          <span class="theme-label">Giao diện:</span>
+          <button class="button" type="button" id="themeToggleBtn">Đổi giao diện</button>
+        </div>
+      </aside>
+
+      <!-- Main Study Notes -->
+      <main class="content">
+        
+        <!-- Section 1: Source Map -->
+        <section id="source-map" class="section">
+          <div class="section-title">
+            <div>
+              <div class="kicker">Mục 1</div>
+              <h2>Source Map - Bản đồ nguồn</h2>
+            </div>
+          </div>
+          <div class="grid-2">
+            <article class="card">
+              <h3>Tài nguyên được sử dụng</h3>
+              <ul class="list">
+                <li><strong>Docx LLM:</strong> Trích xuất toàn bộ Day 1 Summary (Lesson 1, 2, 3, 4, 5, 6, 7, 8).</li>
+                <li><strong>Slide:</strong> Tích hợp lý thuyết trang 1-9 và 15-16.</li>
+                <li><strong>Code:</strong> Mã nguồn FastAPI, requirements và vercel.json tại <code>day1.md</code> and <code>day1.part2.md</code>.</li>
+                <li><strong>Kiến thức mở rộng:</strong> Tích hợp phân tích chi tiết về AWS Lambda container, Edge Router, cơ chế biên dịch C-binary trong Python và các giải pháp quản lý cost API.</li>
+              </ul>
+            </article>
+            <article class="card">
+              <h3>Đánh giá độ tin cậy</h3>
+              <p>Mã nguồn thực tế hoàn toàn đồng nhất với tài liệu hướng dẫn và video. Quá trình cấu hình trên Dashboard của Vercel được ghi nhận chính xác theo hoạt động thực tiễn của Edge Network.</p>
+            </article>
+          </div>
+          <div class="callout">
+            <p><strong>Terminology rule - Quy tắc thuật ngữ:</strong> Cụm thuật ngữ chuyên ngành được trình bày ở dạng <code>English - nghĩa tiếng Việt</code>. Các từ đơn phổ biến được viết dưới dạng <code>cost (chi phí)</code>.</p>
+          </div>
+        </section>
+
+        <!-- Section 2: Cheat Sheet -->
+        <section id="cheat-sheet" class="section">
+          <div class="section-title">
+            <div>
+              <div class="kicker">Mục 2</div>
+              <h2>Cheat Sheet - Tóm tắt cốt lõi</h2>
+            </div>
+          </div>
+          <div class="grid-3">
+            <article class="card">
+              <h3>Ý tưởng chính</h3>
+              <p>Bắt đầu ngay việc xây dựng và triển khai một Web API AI lên đám mây Vercel bằng mô hình Serverless để tối ưu hóa thời gian đưa sản phẩm ra thị trường, song song với việc định hình tư duy thực tế của kỹ sư AI.</p>
+            </article>
+            <article class="card">
+              <h3>Cần phải nhớ</h3>
+              <ul class="list">
+                <li>Vercel dùng cơ chế xác thực mặc định trên môi trường Preview, cần tắt <code>Deployment Protection</code> để người ngoài có thể truy cập.</li>
+                <li>Hạ tầng AWS Lambda chạy serverless đằng sau Vercel Functions.</li>
+                <li>Thiết lập cảnh báo chi phí (billing alerts) là ưu tiên số một khi bắt đầu làm việc với Cloud.</li>
+              </ul>
+            </article>
+            <article class="card">
+              <h3>Ứng dụng thực tế</h3>
+              <p>Giúp xây dựng nhanh các prototype (mẫu thử) hoặc sản phẩm SaaS ở giai đoạn MVP (sản phẩm khả dụng tối thiểu) mà không tốn công cấu hình server và mạng phức tạp.</p>
+            </article>
+          </div>
+        </section>
+
+        <!-- Section 3: Previous Context -->
+        <section id="previous-context" class="section">
+          <div class="section-title">
+            <div>
+              <div class="kicker">Mục 3</div>
+              <h2>Previous Context - Liên hệ với bài trước</h2>
+            </div>
+          </div>
+          <div class="callout">
+            <p><strong>Bối cảnh lịch sử:</strong> Đây là buổi học mở đầu (Week 1 Day 1) của khóa học, do đó không có bài học trước đó. Hệ thống bắt đầu cấu hình từ con số không.</p>
+          </div>
+        </section>
+
+        <!-- Section 4: Core Theory -->
+        <section id="core-theory" class="section">
+          <div class="section-title">
+            <div>
+              <div class="kicker">Mục 4</div>
+              <h2>Core Theory - Lý thuyết cốt lõi</h2>
+            </div>
+            <div class="source-row">
+              <span class="source">Docx LLM</span>
+              <span class="source">Slide</span>
+            </div>
+          </div>
+          <div class="grid-2">
+            <article class="card">
+              <h3>Khái niệm cơ bản</h3>
+              <ul class="list">
+                <li><strong>App server - máy chủ ứng dụng:</strong> Phần mềm chịu trách nhiệm thực thi mã logic (FastAPI) để xử lý các request (yêu cầu) của người dùng.</li>
+                <li><strong>Serverless deployment - triển khai không máy chủ:</strong> Mô hình đám mây trong đó lập trình viên không cần quản lý hạ tầng vật lý, tài nguyên được tự động mở rộng và tự động co về 0 khi không có request.</li>
+                <li><strong>Routing - định tuyến:</strong> Bản đồ hóa đường dẫn URL của HTTP request tới các hàm tương ứng trong mã nguồn.</li>
+              </ul>
+            </article>
+            
+            <article class="card">
+              <h3>Bối cảnh DevOps & Khóa học</h3>
+              <ul class="list">
+                <li><strong>Platform engineering - kỹ thuật nền tảng:</strong> Xây dựng hạ tầng tự phục vụ nhằm giảm tải việc cấu hình hệ thống cho nhà phát triển.</li>
+                <li><strong>T-shape model - mô hình chữ T:</strong> Kiến thức rộng trên nhiều Cloud (Azure, GCP, Docker) nhưng đi sâu đặc biệt vào Amazon AWS.</li>
+                <li><strong>Pay-as-you-go - Trả tiền theo thực tế sử dụng:</strong> Mô hình tính phí dịch vụ cloud linh hoạt dựa trên tài nguyên tiêu thụ thực tế.</li>
+              </ul>
+            </article>
+          </div>
+          
+          <details>
+            <summary>Giải thích sâu về Serverless đằng sau Vercel</summary>
+            <p>Vercel sử dụng hạ tầng <strong>AWS Lambda</strong> làm lõi vận hành cho các Vercel Functions. Khi lập trình viên cấu hình <code>"use": "@vercel/python"</code> trong file <code>vercel.json</code>, hệ thống tự động đóng gói mã Python của dự án vào một máy ảo cô lập (sandbox container) sử dụng hệ điều hành Amazon Linux. 
+            Mỗi khi nhận HTTP Request, container được kích hoạt để thực thi hàm FastAPI. Nếu không có lưu lượng truy cập trong thời gian nhất định, container sẽ bị giải phóng về 0 để tránh tiêu tốn cost (chi phí) chạy nhàn rỗi.</p>
+          </details>
+        </section>
+
+        <!-- Section 5: Workflow / Pipeline -->
+        <section id="workflow" class="section">
+          <div class="section-title">
+            <div>
+              <div class="kicker">Mục 5</div>
+              <h2>Workflow / Pipeline - Quy trình hoạt động</h2>
+            </div>
+            <div class="source-row">
+              <span class="source">Docx LLM</span>
+              <span class="source">Slide</span>
+              <span class="source">Code</span>
+            </div>
+          </div>
+
+          <div style="display: grid; grid-template-columns: 1fr; gap: 24px;">
+            <article class="card">
+              <h3>Sơ đồ 1: Luồng deploy & chạy FastAPI cơ bản</h3>
+              <p>Mô tả quy trình gửi yêu cầu từ phía Client đến Web App tĩnh trên Vercel.</p>
+              <div class="diagram-container">
+                <span class="diagram-title">FastAPI Basic Deployment Flow</span>
+                <pre class="mermaid">
+graph TD
+    Client["Trình duyệt / Client"] -->|1. HTTP Request GET /| Router["Vercel Edge Network Router"]
+    Router -->|2. Chuyển hướng request| Serverless["Vercel Serverless Function - @vercel/python"]
+    Serverless -->|3. Gọi hàm xử lý| Handler["instant.py: def instant()"]
+    Handler -->|4. Trả về plain text| ReturnText["Live from production!"]
+    ReturnText --> Serverless
+    Serverless --> Router
+    Router -->|5. HTTP Response 200 OK| Client
+                </pre>
+              </div>
+            </article>
+
+            <article class="card">
+              <h3>Sơ đồ 2: Luồng FastAPI tích hợp OpenAI & Environment Variables</h3>
+              <p>Mô tả cơ chế xác thực và bảo mật biến môi trường khi gọi OpenAI API.</p>
+              <div class="diagram-container">
+                <span class="diagram-title">FastAPI AI Integration Flow</span>
+                <pre class="mermaid">
+graph TD
+    Client["Trình duyệt / Client"] -->|1. HTTP Request GET /| Router["Vercel Edge Network Router"]
+    Router -->|2. Kiểm tra Deployment Protection| AuthCheck{"Vercel Auth?"}
+    AuthCheck -->|Bật - On| LoginPrompt["Yêu cầu đăng nhập Vercel"]
+    AuthCheck -->|Tắt - Off| AccessGranted["Cho phép truy cập"]
+    AccessGranted -->|3. Kích hoạt Serverless Function| Serverless["Vercel Serverless Function - AWS Lambda"]
+    Serverless -->|4. Inject Env Variable| EnvVar["OPENAI_API_KEY"]
+    Serverless -->|5. Gọi hàm xử lý| Handler["instant.py: def instant()"]
+    Handler -->|6. Đọc key tự động| EnvVar
+    Handler -->|7. Gửi Chat Completion Request| OpenAI["OpenAI API Platform"]
+    OpenAI -->|8. Trả về kết quả JSON| Handler
+    Handler -->|9. Xây dựng HTML Response| HTMLBuild["HTML Response"]
+    HTMLBuild --> Serverless
+    Serverless --> Router
+    Router -->|10. HTTP Response 200 HTML| Client
+                </pre>
+              </div>
+            </article>
+          </div>
+
+          <details open>
+            <summary>Quy trình hoạt động chi tiết đầu-cuối (End-to-End Walkthrough)</summary>
+            
+            <h4>Giai đoạn 1: Triển khai và chạy ứng dụng cơ bản tĩnh</h4>
+            <ol class="list" style="margin-top: 10px;">
+              <li><strong>Khởi chạy Local:</strong> Khi chạy local bằng lệnh <code>uvicorn instant:app --reload</code>, ASGI server Uvicorn sẽ quét file <code>instant.py</code>, tìm đối tượng <code>app</code> (được khởi tạo bằng <code>FastAPI()</code>) và lắng nghe HTTP requests tại cổng mặc định 8000. 
+              Khi client truy cập <code>http://127.0.0.1:8000/</code>, Uvicorn đóng gói request theo chuẩn ASGI và gọi hàm <code>def instant()</code> được ánh xạ bằng decorator <code>@app.get("/")</code>. Hàm xử lý trả về chuỗi văn bản tĩnh.</li>
+              <li><strong>Cấu hình Vercel Build:</strong> Khi chạy lệnh <code>vercel .</code>, Vercel CLI tải toàn bộ thư mục lên máy chủ. Edge Router của Vercel đọc tệp tin <code>vercel.json</code>.
+                <ul>
+                  <li>Tầng Builder: Node.js runtime của Vercel sử dụng gói <code>@vercel/python</code> để phân tích <code>instant.py</code> và đóng gói các thư viện phụ thuộc trong <code>requirements.txt</code> thành một AWS Lambda package.</li>
+                  <li>Tầng Định tuyến: Regex <code>/(.*)</code> cấu hình định tuyến chuyển toàn bộ request đến tệp tin <code>instant.py</code>.</li>
+                </ul>
+              </li>
+            </ol>
+
+            <h4 style="margin-top: 20px;">Giai đoạn 2: Nâng cấp ứng dụng tích hợp OpenAI API</h4>
+            <ol class="list" style="margin-top: 10px;">
+              <li><strong>Nạp biến môi trường:</strong> Lệnh <code>vercel env add OPENAI_API_KEY</code> cho phép lưu trữ khóa bí mật an toàn trên Vercel Cloud. Khi container serverless khởi động, Vercel tự động inject (tiêm) biến này vào môi trường OS của Lambda.</li>
+              <li><strong>Thực thi code cấp hàm:</strong>
+                <ul>
+                  <li>Khi HTTP request đi qua lớp Edge Network (và đã tắt Deployment Protection), nó kích hoạt serverless container.</li>
+                  <li>Hàm <code>instant()</code> được kích hoạt. Lệnh <code>client = OpenAI()</code> khởi tạo kết nối. Thư viện <code>openai</code> tự động đọc biến môi trường <code>OPENAI_API_KEY</code> từ hệ thống để xác thực.</li>
+                  <li>Chương trình gửi request POST dạng JSON tới OpenAI endpoint API bằng câu lệnh <code>client.chat.completions.create(model="gpt-5-nano", messages=messages)</code>.</li>
+                  <li>Sau khi nhận phản hồi, hàm trích xuất nội dung thông qua <code>response.choices[0].message.content</code>.</li>
+                  <li>Hàm thực hiện hàm chuỗi <code>.replace("\n", "&lt;br/&gt;")</code> để định dạng hiển thị xuống dòng trên web, bọc kết quả vào khung HTML và trả về dưới dạng <code>HTMLResponse</code>.</li>
+                </ul>
+              </li>
+            </ol>
+          </details>
+        </section>
+
+        <!-- Section 6: Techniques -->
+        <section id="techniques" class="section">
+          <div class="section-title">
+            <div>
+              <div class="kicker">Mục 6</div>
+              <h2>Techniques - Kỹ thuật sử dụng</h2>
+            </div>
+          </div>
+          <div class="grid-3">
+            <article class="card">
+              <h3>CLI Deployment</h3>
+              <p><strong>Mục đích:</strong> Triển khai mã nguồn trực tiếp từ terminal cục bộ lên đám mây Vercel thông qua lệnh <code>vercel .</code>.</p>
+              <p><strong>Khi nào dùng:</strong> Giai đoạn thử nghiệm ban đầu, phát triển prototype nhanh.</p>
+              <p><strong>Đánh đổi:</strong> Dễ gây nhầm lẫn phiên bản do thao tác thủ công, thiếu sự kiểm soát của hệ thống CI/CD tự động.</p>
+            </article>
+            
+            <article class="card">
+              <h3>Incognito Verification</h3>
+              <p><strong>Mục đích:</strong> Sử dụng <code>Incognito mode - chế độ ẩn danh</code> của trình duyệt để kiểm tra quyền truy cập công khai của website.</p>
+              <p><strong>Khi nào dùng:</strong> Khi thay đổi các cài đặt phân quyền, tắt Deployment Protection trên Vercel Dashboard.</p>
+              <p><strong>Đánh đổi:</strong> Phải copy-paste link thủ công nhưng loại bỏ được toàn bộ cache và session cookie quản trị viên.</p>
+            </article>
+
+            <article class="card">
+              <h3>Cost Monitoring</h3>
+              <p><strong>Mục đích:</strong> Thiết lập các cảnh báo chi phí (billing alerts) trên AWS/OpenAI để nhận cảnh báo khi vượt định mức.</p>
+              <p><strong>Khi nào dùng:</strong> Ngay sau khi đăng ký tài khoản Cloud, trước khi chạy ứng dụng thực tế.</p>
+              <p><strong>Đánh đổi:</strong> Cảnh báo gửi qua Email có độ trễ nhất định, không thể ngắt tài nguyên tức thì nhưng ngăn ngừa thiệt hại tài chính lớn.</p>
+            </article>
+          </div>
+        </section>
+
+        <!-- Section 7: Code Walkthrough -->
+        <section id="code-walkthrough" class="section">
+          <div class="section-title">
+            <div>
+              <div class="kicker">Mục 7</div>
+              <h2>Code Walkthrough - Phân tích mã nguồn</h2>
+            </div>
+            <div class="source-row">
+              <span class="source">Code</span>
+              <span class="source">Docx LLM</span>
+            </div>
+          </div>
+
+          <div class="code-panel">
+            <div>
+              <h3>1. instant.py (Phiên bản tĩnh cơ bản)</h3>
+              <p>Khởi tạo ứng dụng FastAPI và trả về phản hồi văn bản đơn giản tại route gốc.</p>
+            </div>
+            <div class="code-meta">
+              <span>Đường dẫn: <a href="file:///G:/AIProduction_t6_2026/production/week1/day1.md#L63-L71">G:/AIProduction_t6_2026/production/week1/day1.md</a></span>
+              <span>Hàm chính: <code>instant()</code></span>
+            </div>
+            <pre><code>from fastapi import FastAPI # Nhập thư viện FastAPI để xây dựng dịch vụ web API
+
+app = FastAPI() # Khởi tạo đối tượng ứng dụng FastAPI chính
+
+@app.get("/") # Khai báo định tuyến (route) lắng nghe HTTP GET request gửi tới đường dẫn gốc "/"
+def instant():
+    return "Live from production!" # Phản hồi lại trình duyệt bằng chuỗi văn bản tĩnh</code></pre>
+          </div>
+
+          <div class="code-panel" style="margin-top: 24px;">
+            <div>
+              <h3>2. instant.py (Phiên bản tích hợp OpenAI API)</h3>
+              <p>Gọi OpenAI API để sinh lời chào mừng ngẫu nhiên và phản hồi dưới dạng HTML động.</p>
+            </div>
+            <div class="code-meta">
+              <span>Đường dẫn: <a href="file:///G:/AIProduction_t6_2026/production/week1/day1.part2.md#L52-L71">G:/AIProduction_t6_2026/production/week1/day1.part2.md</a></span>
+              <span>Thư viện: <code>openai</code>, <code>fastapi.responses</code></span>
+            </div>
+            <pre><code>from fastapi import FastAPI
+from fastapi.responses import HTMLResponse # Nhập HTMLResponse để trả về định dạng HTML thay vì JSON mặc định
+from openai import OpenAI # Nhập thư viện client chính thức của OpenAI
+
+app = FastAPI()
+
+@app.get("/", response_class=HTMLResponse) # Chỉ định kiểu phản hồi trả về là HTMLResponse
+def instant():
+    client = OpenAI() # Khởi tạo client OpenAI. Nó sẽ tự động đọc biến môi trường OPENAI_API_KEY từ hệ điều hành
+    message = """
+You are on a website that has just been deployed to production for the first time!
+Please reply with an enthusiastic announcement to welcome visitors to the site, explaining that it is live on production for the first time!
+"""
+    messages = [{"role": "user", "content": message}] # Thiết lập bối cảnh hội thoại đầu vào cho mô hình AI
+    
+    # Gửi request tạo phản hồi chat completion sử dụng model gpt-5-nano (tên model mô phỏng từ bài học)
+    response = client.chat.completions.create(model="gpt-5-nano", messages=messages)
+    
+    # Nhận câu trả lời từ AI và thay thế các ký tự xuống dòng bằng thẻ xuống hàng <br/> của HTML
+    reply = response.choices[0].message.content.replace("\n", "<br/>")
+    
+    # Tạo cấu trúc tài liệu HTML cơ bản chứa nội dung chào mừng từ AI
+    html = f"<html><head><title>Live in an Instant!</title></head><body><p>{reply}</p></body></html>"
+    return html</code></pre>
+          </div>
+
+          <div class="code-panel" style="margin-top: 24px;">
+            <div>
+              <h3>3. requirements.txt (Quản lý thư viện phụ thuộc)</h3>
+              <p>Khai báo các thư viện Python cần thiết để Vercel tự động tải xuống khi build serverless function.</p>
+            </div>
+            <div class="code-meta">
+              <span>Đường dẫn: <a href="file:///G:/AIProduction_t6_2026/production/week1/day1.part2.md#L40-L44">G:/AIProduction_t6_2026/production/week1/day1.part2.md</a></span>
+            </div>
+            <pre><code>fastapi # Thư viện chính dùng để xây dựng cấu trúc ứng dụng Web API
+uvicorn # ASGI server hỗ trợ chạy ứng dụng và test tại máy cục bộ (local)
+openai # Thư viện SDK hỗ trợ tương tác và gọi API đến nền tảng trí tuệ nhân tạo OpenAI</code></pre>
+          </div>
+
+          <div class="code-panel" style="margin-top: 24px;">
+            <div>
+              <h3>4. vercel.json (Cấu hình hạ tầng Vercel)</h3>
+              <p>Quy định chi tiết cơ chế biên dịch dự án và định tuyến Edge Network của Vercel.</p>
+            </div>
+            <div class="code-meta">
+              <span>Đường dẫn: <a href="file:///G:/AIProduction_t6_2026/production/week1/day1.md#L90-L105">G:/AIProduction_t6_2026/production/week1/day1.md</a></span>
+            </div>
+            <pre><code>{
+    "builds": [
+        {
+            "src": "instant.py", // Xác định file mã nguồn chính cần biên dịch
+            "use": "@vercel/python" // Sử dụng gói runtime Python chính thức để tạo Serverless Function
+        }
+    ],
+    "routes": [
+        {
+            "src": "/(.*)", // Khớp mọi đường dẫn URL người dùng nhập vào trình duyệt
+            "dest": "instant.py" // Chuyển tiếp toàn bộ request đó đến file instant.py xử lý định tuyến tiếp
+        }
+    ]
+}</code></pre>
+          </div>
+        </section>
+
+        <!-- Section 8: Options & Trade-offs -->
+        <section id="options" class="section">
+          <div class="section-title">
+            <div>
+              <div class="kicker">Mục 8</div>
+              <h2>Options &amp; Trade-offs - Bản đồ lựa chọn</h2>
+            </div>
+          </div>
+          <table>
+            <thead>
+              <tr>
+                <th>Lựa chọn - Option</th>
+                <th>Phù hợp nhất khi - Best for</th>
+                <th>Đánh đổi - Trade-off</th>
+                <th>Rủi ro - Risk</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>Vercel Hobby (Cá nhân)</strong></td>
+                <td>Học tập, thử nghiệm tính năng nhanh, làm dự án MVP cá nhân.</td>
+                <td>Hoàn toàn miễn phí nhưng bị giới hạn băng thông và thời gian chạy serverless.</td>
+                <td>Không phù hợp cho ứng dụng doanh nghiệp quy mô lớn chịu tải cao.</td>
+              </tr>
+              <tr>
+                <td><strong>Học thực hành Cloud Lab (Tự trả phí)</strong></td>
+                <td>Xây dựng kỹ năng thực chiến DevOps, tự tin đi phỏng vấn việc làm.</td>
+                <td>Phải tự liên kết thẻ thanh toán và chi trả khoản phí nhỏ ($5 - $10).</td>
+                <td>Có thể phát sinh hóa đơn lớn ngoài ý muốn nếu quên tắt tài nguyên nhàn rỗi.</td>
+              </tr>
+              <tr>
+                <td><strong>Học lý thuyết chay (Chỉ xem video)</strong></td>
+                <td>Tìm hiểu tổng quan hệ thống mà không có nhu cầu làm kỹ sư triển khai.</td>
+                <td>Tiết kiệm cost (chi phí) hoàn toàn nhưng không tích lũy được kinh nghiệm gỡ lỗi.</td>
+                <td>Bị ngợp và không biết xử lý khi gặp sự cố cấu hình thực tế trong công việc.</td>
+              </tr>
+            </tbody>
+          </table>
+        </section>
+
+        <!-- Section 9: Pitfalls -->
+        <section id="pitfalls" class="section">
+          <div class="section-title">
+            <div>
+              <div class="kicker">Mục 9</div>
+              <h2>Pitfalls - Bẫy và Lỗi thường gặp</h2>
+            </div>
+          </div>
+          <div class="grid-2">
+            <article class="card">
+              <h3>Các trường hợp dễ thất bại (Failure Modes)</h3>
+              <ul class="list">
+                <li><strong>Lỗi <code>vercel: command not found</code>:</strong> Lệnh cài đặt Vercel CLI toàn cục qua npm thành công nhưng gõ lệnh terminal không nhận diện.</li>
+                <li><strong>Bất tương thích kiến trúc hệ thống (<code>System architecture mismatch</code>):</strong> Triển khai các thư viện Python biên dịch bằng nhân C/C++ (NumPy, Pydantic bản mới) gặp lỗi <code>ImportError</code> bí ẩn khi chạy trên AWS Lambda.</li>
+                <li><strong>Lạm dụng sửa lỗi bề mặt của LLM (Band-aid fixes):</strong> Copy-paste toàn bộ log lỗi dán vào LLM và đổi code ứng dụng liên tục trong khi lỗi thực chất nằm ở cấu hình môi trường cloud.</li>
+              </ul>
+            </article>
+            <article class="card">
+              <h3>Cách phòng ngừa và sửa chữa</h3>
+              <ul class="list">
+                <li><strong>Khởi động lại Terminal:</strong> Hãy tắt terminal hiện tại trong Cursor và mở một cái mới để hệ điều hành nạp lại biến môi trường PATH chứa thư mục npm toàn cục.</li>
+                <li><strong>Build qua Docker:</strong> Sử dụng môi trường ảo hóa Docker chạy hệ điều hành Linux (tương đồng với Vercel/Lambda) để thực hiện build dependencies và đóng gói trước khi tải lên Cloud.</li>
+                <li><strong>Phân tích nguyên nhân gốc rễ (Root Cause Analysis):</strong> Luôn đặt câu hỏi ngược lại cho LLM: "Giải pháp sửa lỗi này có ảnh hưởng tới môi trường cloud không? Nguyên nhân gốc rễ gây ra lỗi này là gì?"</li>
+              </ul>
+            </article>
+          </div>
+        </section>
+
+        <!-- Section 10: Flashcards & Quiz -->
+        <section id="flashcards" class="section">
+          <div class="section-title">
+            <div>
+              <div class="kicker">Mục 10</div>
+              <h2>Flashcards &amp; Quiz - Ôn tập tương tác</h2>
+            </div>
+          </div>
+          
+          <div class="grid-2">
+            <!-- Flashcard 1 -->
+            <article class="card flashcard">
+              <h3>Q: Tại sao phải vô hiệu hóa Deployment Protection trên Dashboard của Vercel?</h3>
+              <button class="button primary" type="button" data-reveal>Lật xem đáp án</button>
+              <p class="flash-answer"><strong>A:</strong> Vercel mặc định bật tính năng này để bảo vệ các phiên bản preview (thử nghiệm), yêu cầu người dùng phải đăng nhập tài khoản Vercel team mới xem được. Việc tắt nó đi giúp ứng dụng SaaS của bạn có thể truy cập công khai bởi bất kỳ ai trên internet.</p>
+            </article>
+
+            <!-- Flashcard 2 -->
+            <article class="card flashcard">
+              <h3>Q: Lệnh để cài đặt Vercel CLI toàn cục trên máy tính là gì?</h3>
+              <button class="button primary" type="button" data-reveal>Lật xem đáp án</button>
+              <p class="flash-answer"><strong>A:</strong> Chạy câu lệnh <code>npm install -g vercel</code> trong terminal. Yêu cầu máy tính đã cài đặt sẵn môi trường chạy Node.js trước đó.</p>
+            </article>
+          </div>
+
+          <!-- Multiple Choice Quiz -->
+          <div class="card" style="margin-top: 20px;">
+            <h3>Trắc nghiệm nhanh: DevOps in AI Production</h3>
+            <p>Theo phân tích của Ed Donner, tỷ lệ khối lượng công việc thực tế giữa DevOps/Platform Engineering và lập trình logic AI thuần túy khi đưa sản phẩm AI vào vận hành sản xuất thực tế là bao nhiêu?</p>
+            
+            <div class="quiz-options">
+              <button class="button quiz-option" type="button" data-correct="false">A. 20% DevOps và 80% Lập trình logic AI</button>
+              <button class="button quiz-option" type="button" data-correct="true">B. 70% - 80% DevOps/Platform và 20% - 30% Lập trình AI</button>
+              <button class="button quiz-option" type="button" data-correct="false">C. Phân bổ cân bằng 50% - 50% cho cả hai mảng công việc</button>
+            </div>
+            <div class="quiz-result" aria-live="polite"></div>
+          </div>
+        </section>
+
+        <!-- Section 11: Quick Memory -->
+        <section id="memory" class="section">
+          <div class="section-title">
+            <div>
+              <div class="kicker">Mục 11</div>
+              <h2>Quick Memory - Ôn nhanh cuối bài</h2>
+            </div>
+          </div>
+          <div class="grid-2">
+            <article class="card">
+              <h3>Những điểm bắt buộc phải thuộc</h3>
+              <ol class="list">
+                <li>FastAPI chạy ở môi trường phát triển local luôn cần một ASGI server như <strong>Uvicorn</strong> để thực thi.</li>
+                <li>Vercel tự quản lý runtime engine trên môi trường đám mây bằng serverless functions, không cần Uvicorn tại production.</li>
+                <li>Thư viện <code>openai</code> tự động xác thực bằng biến môi trường có tên chính xác là <code>OPENAI_API_KEY</code>.</li>
+                <li>Lệnh <code>vercel --prod</code> dùng để đẩy phiên bản code hiện tại lên môi trường sản xuất (production) chính thức, thay thế bản build preview trước đó.</li>
+              </ol>
+            </article>
+            <article class="card">
+              <h3>Checklist tự đánh giá năng lực</h3>
+              <ul class="list">
+                <li>Bạn có tự cấu hình và giải thích được vai trò của 2 mảng chính: <code>builds</code> và <code>routes</code> trong file <code>vercel.json</code> không?</li>
+                <li>Bạn có nắm được triết lý phát triển năng lực dạng chữ T (T-shape model) áp dụng thế nào trong khóa học này không?</li>
+                <li>Bạn có giải thích được sự khác biệt về vai trò giữa Applied AI Engineer và Data Scientist không?</li>
+              </ul>
+            </article>
+          </div>
+        </section>
+
+        <!-- Footer Info -->
+        <footer class="footer">
+          <div class="footer-brand">
+            <!-- Simple Radial-Spike Mark SVG inline -->
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M12 2V22M2 12H22M19.07 4.93L4.93 19.07M19.07 19.07L4.93 4.93" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/>
+            </svg>
+            <span>Claude AI Academy - Antigravity Study Guide</span>
+          </div>
+          <p>Tài liệu này được tạo tự động bởi Coding Agent dựa trên tài nguyên khóa học AI Engineer Production Track. Nội dung lý thuyết và các ghi chú thực hành đã được kiểm chứng cẩn thận.</p>
+        </footer>
+
+      </main>
+    </div>
+  </div>
+
+  <!-- Load Mermaid.js for Rendering Diagrams -->
+  <script type="module">
+    import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+    mermaid.initialize({
+      startOnLoad: true,
+      theme: 'neutral',
+      flowchart: {
+        useMaxWidth: true,
+        htmlLabels: true,
+        nodeSpacing: 50,
+        rankSpacing: 75
+      },
+      themeVariables: {
+        background: '#efe9de',
+        primaryColor: '#cc785c',
+        primaryTextColor: '#141413',
+        lineColor: '#cc785c',
+        secondaryColor: '#f5f0e8',
+        tertiaryColor: '#faf9f5',
+        fontSize: '15px'
+      }
+    });
+  </script>
+
+  <!-- Interactive JavaScript Features -->
+  <script>
+    // Navigation (TOC) Active Link Tracking & Smooth Scroll Active State
+    const links = Array.from(document.querySelectorAll(".toc a"));
+    const sections = links.map((link) => document.querySelector(link.getAttribute("href"))).filter(Boolean);
+    const progressBar = document.getElementById("progressBar");
+    const detailsNodes = Array.from(document.querySelectorAll("details"));
+
+    function setActiveLink() {
+      let current = sections[0]?.id;
+      const offset = window.scrollY + 180;
+      for (const section of sections) {
+        if (section.offsetTop <= offset) {
+          current = section.id;
+        }
+      }
+      links.forEach((link) => {
+        link.classList.toggle("active", link.getAttribute("href") === `#${current}`);
+      });
+    }
+
+    function updateProgress() {
+      const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+      const progress = docHeight > 0 ? Math.min((window.scrollY / docHeight) * 100, 100) : 0;
+      progressBar.style.width = `${progress}%`;
+    }
+
+    // Expand / Collapse Details Buttons
+    document.getElementById("expandAll").addEventListener("click", () => {
+      detailsNodes.forEach((node) => {
+        node.open = true;
+      });
+    });
+
+    document.getElementById("collapseAll").addEventListener("click", () => {
+      detailsNodes.forEach((node) => {
+        node.open = false;
+      });
+    });
+
+    // Flashcard Reveal Answer Logic
+    document.querySelectorAll("[data-reveal]").forEach((button) => {
+      button.addEventListener("click", () => {
+        const card = button.closest(".flashcard");
+        card.classList.toggle("revealed");
+        button.innerText = card.classList.contains("revealed") ? "Ẩn câu trả lời" : "Lật xem đáp án";
+      });
+    });
+
+    // Quiz Verification Logic
+    document.querySelectorAll(".quiz-option").forEach((button) => {
+      button.addEventListener("click", () => {
+        const parent = button.parentElement;
+        const options = parent.querySelectorAll(".quiz-option");
+        const result = parent.nextElementSibling;
+        
+        options.forEach(opt => {
+          opt.classList.remove("correct", "wrong");
+          opt.disabled = true; // Disable further selections
+        });
+
+        if (button.dataset.correct === "true") {
+          button.classList.add("correct");
+          result.innerHTML = "<span style='color: var(--accent-teal);'>Chính xác!</span> DevOps chiếm đa số thời lượng vì mã hóa logic AI thường rất ngắn nhưng việc phân quyền mạng, xây dựng container và cấu hình Cloud tốn rất nhiều thời gian thực thi.";
+        } else {
+          button.classList.add("wrong");
+          result.innerHTML = "<span style='color: var(--primary);'>Chưa chính xác.</span> Xem lại lý thuyết về DevOps Landscape ở mục Core Theory bên trên.";
+        }
+      });
+    });
+
+    // Theme Switcher (Light Cream vs Dark Navy)
+    const themeToggleBtn = document.getElementById("themeToggleBtn");
+    themeToggleBtn.addEventListener("click", () => {
+      const currentTheme = document.documentElement.getAttribute("data-theme");
+      if (currentTheme === "dark") {
+        document.documentElement.removeAttribute("data-theme");
+      } else {
+        document.documentElement.setAttribute("data-theme", "dark");
+      }
+    });
+
+    // Scroll and Init listeners
+    window.addEventListener("scroll", () => {
+      setActiveLink();
+      updateProgress();
+    }, { passive: true });
+
+    setActiveLink();
+    updateProgress();
+  </script>
+</body>
+
+</html>

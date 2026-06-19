@@ -1,0 +1,104 @@
+Now, I appreciate that some of you have seen Vassell before and deployed your own stuff and are probably
+thinking, ah, this is small potatoes.
+Uh, but maybe, maybe not yet.
+Mind blowing.
+But hopefully for those new to it, you were pleased to see that it's really not that hard.
+Okay, so if we go back to cursor, in addition to the link to production, there was another link here
+called inspect.
+And I just want to take you through that, uh, command.
+Click to go through that link.
+This shows us the screen in Vercel where we can look at our deployment.
+See a little preview of it right here.
+Now one of the things you might have noticed is that when you went to this web page, you actually had
+to be signed in to Vercel to be able to access it.
+And you could argue that it's not really live on the internet if you need to be signed into Vercel,
+but we can change that if you look down.
+If you may need to expand this section here, deployment configuration, you'll see that there is deployment
+protection.
+Standard protection is turned on.
+If you click on that it takes us over to the settings page.
+And you can see that we've got Vercel authentication turned on.
+This ensures visitors need to be logged in to vessel and a member of our team.
+So.
+So unfortunately, probably only us could see this right now, but luckily we can turn this off, press
+save.
+And that tells us that it's been changed.
+And now, for example, uh, we can do something like let's go back here again, copy this URL to our
+web page, and I'm going to create a new incognito window.
+Here it is in Chrome.
+And go and visit this page.
+And I'm thrilled to see that live from production is being served now to anybody on the internet.
+So there we are, live on the internet in minutes.
+And never fear, we'll be coming back to add a healthy dose of artificial intelligence team.
+Okay, so this is what I have in store for you.
+We are going to be doing some hardcore learning.
+This is probably the most intensive of any course that I've made.
+It's all in four weeks, but I have packed those four weeks in.
+We're going to be working on some of the juiciest projects I've ever built.
+Very commercial, very hands on.
+They're going to be really interesting and quite challenging projects.
+But at the same time, I'm hoping to make this a lot of fun.
+That is always that's definitely my my vibe, making sure that it's entertaining as well as educational.
+And so hopefully you're going to be enjoying it as we go and as we build things that are scalable and
+resilient and secure.
+All right.
+So let me tell you about the objectives, who the course is for and how you'll know you've been successful
+at the end of it.
+So there's really two different audiences that I've designed this course for.
+On the one hand are entrepreneurs.
+If you are someone that's coming along and you want to take a SaaS app and deploy it online on the internet,
+it's got authentication, it's got SSL, it's got subscription built in so people can sign up and start
+paying for it, and it's secure and scalable.
+Then this course is for you.
+And in fact, the first week is the most intense week because we're going to do all of that in the first
+week and then just build on it.
+Also, if you're someone who's coming at this wanting to get an enterprise level of knowledge on AI
+being deployed in the cloud for scale and resiliency, so you want to be able to scale an AI on a major
+cloud provider like AWS and GCP and Azure, and you want to also have the kind of relevant expertise
+that means that you could apply for roles that need all of that.
+Then this is also for you.
+And I'm here to tell you that whilst it is intended for one of those two audiences, there is a whole
+continuum of people that sit between those two extremes.
+Maybe you're someone who wants to be an entrepreneur, but right now you're working in a particular
+company.
+Maybe you're in a medium sized company, but you want to be able to deploy for future growth and scale.
+Maybe you'd like to at least beef up your resume so that you're able to apply to the most possible jobs
+and everything in between.
+If you are anywhere on that spectrum, then I've designed this course for you.
+So what will you get out of it at the end?
+What are the success factors?
+Well, by the end of this, there are three things that you should be able to do.
+The first of them is is for the entrepreneur.
+You should be able to deploy and monetize and make money from your own AI application.
+Now of course, you'll have to have product market fit.
+I can't promise you that people will come and pay for it, but if you've built a product and you've
+got good go to market and people will pay for it, then the technology part will be solved for you.
+The second thing is that you'll be able to implement production grade AI at major companies, and you
+will have transferable skills that you can apply to different situations.
+I focus on transferable skills on the most common kinds of platforms and frameworks, so you will have
+that capability.
+And then along with that, you'll be able to apply for roles that have that kind of skill set requirements.
+So I've taken a careful look at many different job descriptions.
+And also as a hiring manager in the space myself, I know what people look for.
+And when I look at the other courses that I've offered, I cover a lot of the bases, but there is one
+piece that I don't, and that is the productionization of AI.
+And that is what you will leave this course with.
+But I have I have something to tell you.
+This course alone won't do it.
+You won't get that only from taking the course.
+You will get that from taking the course and also completing the assignments as we go.
+I find that the best way to learn is by doing.
+And you don't do by listening to me yabbering away.
+You have to do it yourself.
+That means that that as I go through things, you need to be doing it too.
+When you get stuck and you hit problems, that's the time to be fixing them and understanding them.
+Frustrating though it can be.
+That's where the real learning happens.
+So you have to complete the projects with me.
+You have to fix the problems when they happen, and then you have to make the projects your own.
+Make changes, do something different, add your own flair to the projects as we go, and take on some
+of the assignments I give you as we go.
+And that is the real way to learn these these videos and the the stuff I do, that's just that's the
+foundation.
+Uh, the part that matters isn't what I do.
+It's what you do.

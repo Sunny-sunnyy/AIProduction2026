@@ -1,0 +1,143 @@
+But I know you.
+You're not the trusting sort.
+You want evidence that we're calling Nova?
+It's not clear.
+Maybe it's still calling OpenAI.
+Just in a more chatty kind of way or something.
+We need to see what's going on.
+And that is a great moment for us to dive into.
+CloudWatch, the monitoring side of AWS, which will give us exposure to everything going on.
+So from the AWS console we're going to go to CloudWatch.
+We're going to go to all metrics.
+And we're going to start by looking at some metrics associated with our Lambda function.
+So let's do that right now.
+Um and there are a bunch of different ways you can get to this actually.
+But but let's start with with CloudWatch.
+Here is CloudWatch.
+And we start by going to all metrics on the left.
+And then in all metrics we can see all these different things we can choose from.
+We are going to begin by looking for Lambda which is right here.
+And within Lambda we can choose uh by resource or by function name.
+Let's go by function name.
+Let's choose the.
+You can see there's a few more functions that we're going to have coming up soon.
+Uh, but we are going to try and not get too lost in this and find an API.
+And we can see errors, duration, concurrent executions and invocations and throttles.
+And this is showing us everything that's gone on on the twin MPI, uh, in the last whatever this is.
+And we've got this nice little charts up here that can tell us what's happening, and we can look back
+in time, or we can really zoom in on the last hour to see what's been going on.
+And this will give you all the visibility into what's happening with your Lambda function.
+Okay.
+And now to look at the bedrock metrics.
+Let's see what's been going on there.
+You click up here somewhere and you navigate your way to all so that we can come back to bedrock.
+It's kind of confusing, but it shows on this timeline all the metrics that you've checked.
+So you get to see everything together.
+So we're now coming into bedrock.
+I'm going to choose by model ID, and I can choose to say I want to see Nova Lite, the model I chose,
+how many invocations, input tokens and output tokens and latency.
+And now that information is being superimposed on this diagram along with other things.
+So we're looking for, um, these bedrock, uh, events down here.
+Um, and uh, let's see if we can find them.
+Uh, here we go.
+So here's an example right here.
+Uh, you can see that bedrock, uh, a bit hard to show you, that sort of green one there is saying
+that bedrock was called the latency.
+Uh, I presume that's 1000 milliseconds to look like a second to come up with this.
+And you can see that the input token count was 4800.
+And you can see the output token count was 134 tokens.
+Uh, and the invocations was one.
+So this shows you how, first of all, there is your proof.
+Uh, if you didn't believe me, we did, in fact, call Amazon Nova Lite.
+And we did so because CloudWatch tells us so.
+And this shows you how you can add different metrics and see them on this timeline that you can then
+control up here so that you can see everything laid out together based on what you check down here,
+and by navigating around these menus here starting from all.
+So that's the way that you put everything together into your metrics and see what's going on in your
+AWS world.
+So you can also see logs in a convenient way from CloudWatch.
+You just on the left here in this sidebar you go to Log groups and then you can pick something that
+that we would be interested in, like twin API, which is presumably all that you see.
+And then you can look at these different times when it made some log information.
+Pick one of them and up it will come.
+You may need to click display and uh, expand all rows to see it quite the way I've seen it.
+But you'll see in here things like the requests coming in and then how long it took to respond to the
+requests and how much that was billed as and memory and memory used, and some other interesting bits
+and pieces along the way.
+So this is showing us our login.
+We haven't put much extensive logging in, but this is where you could go.
+And you can also set up dashboards as well, which can be useful in CloudWatch.
+You go to dashboards at the top here.
+Create a dashboard.
+We'll call our dashboard twin dashboard.
+Create dashboard.
+Here we have it.
+And we are now going to have a line on our on our dashboard.
+Let's do one from bedrock.
+Let's go with model ID and let's put on our line the things that we care about input tokens, output
+tokens uh invocations and latency.
+Here we go.
+We now have a line chart on our dashboard showing this.
+Let's also add something with a plus button here.
+Let's add lines that are related to Lambda.
+So we go into our lambda section.
+There it is.
+We'll say um by function name, and we'll go with the twin API.
+Let's see.
+Let's go for, uh, duration invocations and have that as a widget on here.
+There we go.
+That's when when how long it took and how often it was.
+It was called.
+Um.
+And then let's add one more.
+Let's add something about errors but not have it be a line.
+Let's have it be a number, a number to show us the number of errors.
+Next.
+So we pick lambda again which is scroll down.
+It's a lot to navigate here.
+Uh lambda uh by function name to an API.
+Again where are you.
+There you are twin API.
+And we want to say twin API errors.
+So this will be the number of errors.
+And there we go a big old zero.
+That's what we like to see.
+No errors from Lambda.
+Um okay.
+I think that's probably enough to show you a dashboard.
+So this would now be our twin dashboard, and you could build your own dashboard so that you could be
+watching out for how often your twin is called and what's going on.
+And finally, I do want to show you you can get a lot of this information from the Lambda page itself
+to in quite a nice way.
+So if I go to Lambda and I then bring up our twin API here, there is a monitor tab right here.
+And when you go to that you get a bunch of CloudWatch metrics automatically configured and showing for
+you.
+You could of course put this on the dashboard that you're creating as well, but it shows you invocations,
+duration and so on.
+Uh, and you also get down below it your CloudWatch logs that you can access immediately as well, the
+most recent and the most expensive.
+Um, and then there's some other stuff here.
+Uh, but but this, I think, is the quickest way to access your logs and visuals associated with any
+one lambda function.
+And that is a wrap for week two.
+Day three.
+We just added Amazon Bedrock to our are AWS deployment, and it just all worked really nicely with just
+a couple of changes here and there.
+It was also a good way to practice re-uploading your Lambda function, which wasn't that hard, and
+everything seemed to be nice, and we were able to use the Nova models to boot, which was good.
+And then we were able to use CloudWatch to convince ourselves that we were in fact calling the Amazon
+Nova models via bedrock.
+So that's a big moment.
+Uh, I promise you a lighter day.
+And it was a bit lighter.
+We made great progress.
+Tomorrow is a huge deal.
+We are now going to move to using Terraform infrastructure as code to build the entire twin environment.
+And it's going to be like, oh, why don't we just start with this?
+Uh, but this was important.
+It was a rite of passage.
+It was something that you had to go through so that you would.
+I did it all so that you would appreciate how great Terraform is.
+Uh, and so that will be the fare for tomorrow.
+Uh, I'm really, really looking forward to showing you what Terraform can do.
+Uh, and I will see you then.

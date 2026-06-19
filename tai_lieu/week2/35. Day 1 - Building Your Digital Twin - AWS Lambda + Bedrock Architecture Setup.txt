@@ -1,0 +1,195 @@
+And now let me unveil to you the project we'll be working on throughout this week.
+The digital twin people who took my Agentic course will have already built a digital twin.
+I think I called it your career alter Ego in that course, which is basically a chat bot which is there
+to represent you to the outside world.
+It's like the future of the resume.
+Instead of having a resume on your website, you have like a chat bot that knows about you and your
+career history and your interests, and recruiters or managers can interact with that to ask questions
+about what you and what you might be interested in.
+And you can you can prep it and make it be better and better at answering the kinds of questions people
+might want to ask.
+Now I'm calling this digital twin Mark two, because it's like a big step ahead of what I did in the
+Agentic course, although some parts of it, I'm not going to do some of the functionality, which in
+terms of things like tool use, which is going to be an assignment for you if you took the Agentic course.
+Uh, but so it's going to be Mark two.
+But don't worry if you didn't.
+If you haven't taken the genetic course, you don't have a mark one you don't need to.
+We're gonna also be starting from scratch with the new version.
+So what is this going to do?
+Okay, I'm going to tell you about the deployment architecture of the digital twin and this deployment
+architecture.
+It's going to look a bit unwieldy if you've not seen these sorts of things before.
+There's going to be a bunch of boxes with different AWS components on them.
+But I'm here to tell you, rest assured, however unwieldy this looks, it's going to be like five times
+worse next week.
+So.
+So you better be able to withstand this one.
+Because because this this is this is easy peasy compared to what I have in store for you.
+But here we go.
+This is the deployment architecture that we're going to be building this week for our digital twin.
+So the digital twin begins with lambda functions that we'll write one lambda function which will handle
+the business logic of digital twin.
+It's something which can basically respond to a request by from a hiring manager about to chat with
+you about what you might be interested in working on, or what your background experience, your proudest
+accomplishment, or whatever.
+So that's the first first component using Lambda.
+It is going to need to keep track of the conversation which it's having with the user.
+And as you hopefully know from using Llms, every call to an LLM is completely stateless.
+It has no knowledge of what was said before.
+If you want an LLM to be able to apparently have a conversation where it keeps the context of the conversation,
+you need to supply the full conversation so far every time you call the LLM.
+And we're going to store that in S3.
+There's going to be an S3 bucket called memory.
+And in that S3 bucket we're going to have separate files for each of the different user conversations.
+That'll be in an S3 bucket that Lambda will access.
+So far so good.
+We are going to build API gateway that is going to allow the outside world to come in and call our lambda
+function and be able to, uh, be be used that in order to have a conversation with our LM and that
+those blue boxes make up the backend of our system.
+That was the back end.
+Let's talk about the front end.
+So look, we built a Next.js app.
+You remember from last week that one of the things we can do with that is export a static website that
+represents our front end.
+And we will do that.
+And we will put that static website, a set of HTML, JavaScript and CSS that's generated from the TypeScript
+and tailwind and all the rest of it that generated static website.
+We will go and put that on an S3 bucket, another S3 bucket called front end.
+So we now have like a two S3 buckets.
+One is called memory used by the back end and one is called front end uh, and is used by the front
+end.
+And then we will deliver that to CloudFront.
+We will set up a CloudFront distribution, and that means that our static site will be considered an
+asset that will be distributed around the world, so that anyone can quickly access it from a data center
+that's near to them.
+That's our front end.
+So now we have a front end and a back end.
+How do these two things come together?
+Well, it's actually the same as day five of last week, although I didn't necessarily explain it in
+full detail, but the place where the front end and back end comes together is in fact the browser,
+the user's browser.
+The user starts by going to a web address or URL, and it will be the web address of our CloudFront
+distribution.
+So when they enter in that web address, basically they will collect the entire static site and they
+will render that in the browser.
+The browser will display the full web page, which will show like a chat bot, ability to have a conversation
+with your digital twin.
+And when they enter in something into that, that browser, into that static website, it will make
+an API call, and the place it will go with.
+That API call is of course API gateway, and that means that it will go through hit our Lambda business
+function and it will indeed chat with them, taking memory from the S3 bucket with memory.
+And that is how the front end and the back end fits together.
+Is there anything missing from this?
+We've forgotten anything.
+Anything at all.
+Can you think?
+Yes.
+We forgot to mention the LM.
+The LM does feature here.
+Our lambda business logic is going to make a call to an LM, and it's going to do that by using a service
+called bedrock, which is Amazon's service for for wrapping LM calls.
+So there is some purple.
+Remember purple is for our AI.
+There is some purple on this screen.
+And it's it's for bedrock.
+There it is.
+And that is our full deployment architecture for the digital twin Mk two.
+It's not so bad.
+Uh, that's that's what we'll be doing throughout this week, and it's all going to come together.
+So before we go to the lab one final time to remind you that this is going to be somewhat tiresome for
+you, basically, this entire week is one massive environment setup.
+Everyone's favorite part of this course of my previous courses, anyway.
+Uh, so, uh, I suggest that you follow along.
+You watch me do it first, and then afterwards you go through the the guides that that I have, which
+are like set up guides and you just just go through and set everything up and look, I'm going to be
+honest, it's a lot of like copying and pasting.
+It's lots of we won't be typing out any code.
+And it's not like labs where they're not like notebooks where the code is there for you to inspect and
+look at.
+It's going to be setting up all these different bits of code.
+So it's going to feel like a lot of busy work.
+Um, but this this is where you'll do the learning and you may need to do some repetition like I, do,
+sometimes suggest that you do these things a couple of times over as a way to build the muscle memory
+and really get so familiar with these AWS components.
+Again, it's biology.
+There's some learning.
+Uh, I don't like learning.
+Uh, I mean, I like understanding, I don't like having to memorize.
+And there's some of that.
+Uh, so, uh, read the guides.
+Uh, check check them.
+Because I update them as as you hit problems.
+And there's going to be problems because there's so many possible systems out there, so many ways to
+to to make a mistake.
+Uh, I will be, uh, adding things to the guides to help explain.
+So keep an eye on the guides.
+Keep an eye on community contributions for any extra troubleshooting tips from students.
+Uh, do keep an eye on the docs.
+Use LMS so in cursor.
+If you're using cursor, use use agents.
+If you use cloud code.
+I love cloud code.
+I use it a lot.
+Then use that too.
+And there are some tricks for how to use it effectively when you get stuck.
+When something goes wrong.
+First of all, tell them to read the guide.
+Say I'm doing a course on blah blah blah.
+I'm on guide number three.
+Please read guides one, two and three to understand where I am.
+Make sure you tell it to do that so it knows exactly what you're trying to do.
+Show them the error that you've got.
+Paste that in there and get them to go and check.
+They can run AWS commands.
+They can run GitHub commands.
+So you can tell these agents to go and do some research for you.
+But most importantly, do not trust what they tell you.
+This is the path to despair.
+What they tell you needs to be checked.
+Unless it's unless it really lands with you.
+Unless it's something obvious.
+You know, they say, hey, you've spelt us East one wrong, and you're like, oh, so I did then fine,
+do that.
+But if it's something where they have a theory, they add on an extra parameter somewhere, you must
+check it because they do often hallucinate.
+And they also often they just sort of solve an immediate problem in a, in a very mediocre way.
+And so check it.
+Challenge them.
+Say, have you really thought about x and Y that this doesn't feel right to me?
+Are you sure?
+Like B treat it like an eager junior assistant junior coder who has a lot of time on their hands and
+does tons of internet searching before they come and talk to you.
+So keep that mental model in mind.
+Otherwise you can easily get taken off on a side track and it can be very painful.
+So.
+So they are hard workers.
+They are.
+They need to be validated.
+And then finally remember I am here for questions.
+I'm always, always around.
+I respond quickly, uh, often within hours, unless I'm sleeping or traveling, in which case it's
+whenever I stop sleeping on traveling, uh, but I respond quickly.
+As I said at the very beginning, it's going to be much harder than my other courses.
+I'm usually quite quick to to debug and find problems.
+It's going to be harder for me this time, and I am going to suggest that you spend more time trying
+to figure out strategies for debugging, unless I know what the problem is.
+In which case, of course, I'll tell you right away.
+Uh, so so I'm going to be probably suggesting some of that and giving you resources.
+There are also I mean, I think AWS has a paid plan if you want to get like AWS official support.
+And I'm sure that that those guys could sort out anything.
+Uh, so you've got other options available for you if you want it.
+But but I would say this should set you up.
+And probably more important than any of this, more important than LMS and me and everything else is
+patience.
+Oodles of patience.
+This this is a grind environment setup can can feel, uh, quite, quite irritating.
+So have have patience when it comes together.
+It's so satisfying.
+And that's where we'll be in a few days time.
+And with that, let's go to the lab.
+Let's go back to cursor.
+Let's get started.
+Let's build ourselves for for today we're going to just build the twin locally.
+We're not going to do any actual AWS deployment today, but it's going to be all ready for showtime
+tomorrow.
+But let's go and do that right now.

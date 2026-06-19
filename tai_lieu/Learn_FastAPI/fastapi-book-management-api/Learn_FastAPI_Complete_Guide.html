@@ -1,0 +1,2403 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FastAPI From Zero to Real Project</title>
+  <meta name="description" content="Tài liệu nhập môn FastAPI từ số 0 đến mini project Book Management API, dành cho người mới bắt đầu.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary: #cc785c;
+      --primary-active: #a9583e;
+      --ink: #141413;
+      --body: #3d3d3a;
+      --body-strong: #252523;
+      --muted: #6c6a64;
+      --muted-soft: #8e8b82;
+      --hairline: #e6dfd8;
+      --hairline-soft: #ebe6df;
+      --canvas: #faf9f5;
+      --surface-soft: #f5f0e8;
+      --surface-card: #efe9de;
+      --surface-cream-strong: #e8e0d2;
+      --surface-dark: #181715;
+      --surface-dark-elevated: #252320;
+      --surface-dark-soft: #1f1e1b;
+      --on-primary: #ffffff;
+      --on-dark: #faf9f5;
+      --on-dark-soft: #a09d96;
+      --accent-teal: #5db8a6;
+      --accent-amber: #e8a55a;
+      --success: #5db872;
+      --warning: #d4a017;
+      --error: #c64545;
+      --shadow-soft: 0 24px 60px rgba(20, 20, 19, 0.07);
+      --shadow-card: 0 10px 35px rgba(20, 20, 19, 0.08);
+      --max-width: 1220px;
+      --nav-width: 280px;
+      --radius-md: 10px;
+      --radius-lg: 16px;
+      --radius-xl: 22px;
+      --radius-pill: 999px;
+      --section-gap: 96px;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      margin: 0;
+      font-family: "Inter", "Segoe UI", sans-serif;
+      background:
+        radial-gradient(circle at top right, rgba(204, 120, 92, 0.12), transparent 22%),
+        radial-gradient(circle at left 20%, rgba(93, 184, 166, 0.08), transparent 25%),
+        var(--canvas);
+      color: var(--body);
+      line-height: 1.65;
+    }
+
+    a {
+      color: var(--primary);
+      text-decoration: none;
+    }
+
+    a:hover {
+      color: var(--primary-active);
+    }
+
+    code, pre {
+      font-family: "JetBrains Mono", ui-monospace, monospace;
+    }
+
+    .progress-bar {
+      position: fixed;
+      inset: 0 0 auto 0;
+      height: 4px;
+      background: rgba(20, 20, 19, 0.06);
+      z-index: 50;
+    }
+
+    .progress-bar span {
+      display: block;
+      height: 100%;
+      width: 0;
+      background: linear-gradient(90deg, var(--primary), var(--accent-amber));
+      transition: width 0.2s ease;
+    }
+
+    .shell {
+      max-width: var(--max-width);
+      margin: 0 auto;
+      padding: 48px 24px 120px;
+      display: grid;
+      grid-template-columns: minmax(0, 1fr);
+      gap: 28px;
+    }
+
+    .topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 18px;
+      padding: 18px 20px;
+      border: 1px solid var(--hairline-soft);
+      background: rgba(250, 249, 245, 0.88);
+      border-radius: var(--radius-xl);
+      backdrop-filter: blur(16px);
+      position: sticky;
+      top: 18px;
+      z-index: 20;
+      box-shadow: var(--shadow-soft);
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .brand-mark {
+      width: 38px;
+      height: 38px;
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+      background: var(--surface-dark);
+      color: var(--on-dark);
+      font-size: 18px;
+    }
+
+    .brand-text strong {
+      display: block;
+      color: var(--ink);
+      font-size: 14px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .brand-text span {
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .topbar-links {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+    }
+
+    .pill-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 14px;
+      border-radius: var(--radius-pill);
+      border: 1px solid var(--hairline);
+      background: var(--canvas);
+      color: var(--ink);
+      font-size: 13px;
+      font-weight: 600;
+    }
+
+    .page {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 32px;
+    }
+
+    .toc {
+      display: none;
+    }
+
+    .content {
+      min-width: 0;
+    }
+
+    .hero {
+      padding: 42px;
+      border-radius: 28px;
+      background:
+        linear-gradient(135deg, rgba(204, 120, 92, 0.14), rgba(250, 249, 245, 0.72)),
+        var(--canvas);
+      border: 1px solid var(--hairline-soft);
+      box-shadow: var(--shadow-soft);
+      display: grid;
+      grid-template-columns: minmax(0, 1.25fr) minmax(320px, 0.9fr);
+      gap: 30px;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .hero::after {
+      content: "";
+      position: absolute;
+      right: -120px;
+      top: -120px;
+      width: 280px;
+      height: 280px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(204, 120, 92, 0.22), transparent 65%);
+      pointer-events: none;
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      padding: 8px 12px;
+      border-radius: var(--radius-pill);
+      background: var(--surface-card);
+      color: var(--body-strong);
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      margin-bottom: 18px;
+    }
+
+    .hero h1,
+    h2,
+    h3,
+    h4 {
+      margin: 0;
+      color: var(--ink);
+      font-family: "Cormorant Garamond", Georgia, serif;
+      line-height: 1.08;
+      letter-spacing: -0.02em;
+    }
+
+    .hero h1 {
+      font-size: clamp(44px, 5vw, 72px);
+      font-weight: 500;
+      max-width: 10ch;
+    }
+
+    .hero p.lead {
+      font-size: 18px;
+      color: var(--body-strong);
+      max-width: 62ch;
+      margin: 18px 0 22px;
+    }
+
+    .hero-points {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 14px;
+      margin-top: 24px;
+    }
+
+    .hero-point {
+      padding: 18px;
+      border-radius: var(--radius-lg);
+      background: rgba(255, 255, 255, 0.52);
+      border: 1px solid var(--hairline-soft);
+    }
+
+    .hero-point strong {
+      display: block;
+      color: var(--ink);
+      margin-bottom: 8px;
+      font-size: 15px;
+    }
+
+    .hero-card {
+      padding: 26px;
+      border-radius: 24px;
+      background: var(--surface-dark);
+      color: var(--on-dark);
+      box-shadow: var(--shadow-card);
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero-card::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background:
+        linear-gradient(160deg, rgba(255, 255, 255, 0.04), transparent 45%),
+        radial-gradient(circle at top right, rgba(93, 184, 166, 0.18), transparent 28%);
+      pointer-events: none;
+    }
+
+    .hero-card > * {
+      position: relative;
+      z-index: 1;
+    }
+
+    .hero-card .label {
+      color: var(--on-dark-soft);
+      font-size: 12px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      font-weight: 700;
+    }
+
+    .mini-window {
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 18px;
+      overflow: hidden;
+      background: var(--surface-dark-soft);
+    }
+
+    .mini-window-head {
+      padding: 12px 16px;
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      color: var(--on-dark-soft);
+      font-size: 13px;
+    }
+
+    .mini-window-head span {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.18);
+    }
+
+    .mini-window-body {
+      padding: 18px 18px 20px;
+      font-size: 13px;
+      color: var(--on-dark);
+    }
+
+    .mini-window-body pre {
+      margin: 0;
+      white-space: pre-wrap;
+    }
+
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    .stat-card {
+      padding: 16px;
+      border-radius: 16px;
+      background: var(--surface-card);
+      border: 1px solid var(--hairline-soft);
+      color: var(--body-strong);
+    }
+
+    .stat-card strong {
+      display: block;
+      color: var(--ink);
+      font-size: 28px;
+      margin-bottom: 4px;
+    }
+
+    .section {
+      padding-top: 18px;
+      scroll-margin-top: 92px;
+    }
+
+    .section + .section {
+      margin-top: var(--section-gap);
+    }
+
+    .section-header {
+      margin-bottom: 22px;
+    }
+
+    .section-header .kicker {
+      display: inline-block;
+      margin-bottom: 10px;
+      color: var(--primary);
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+    }
+
+    .section-header h2 {
+      font-size: clamp(34px, 4vw, 52px);
+      font-weight: 500;
+      margin-bottom: 10px;
+    }
+
+    .section-header p {
+      max-width: 72ch;
+      margin: 0;
+      color: var(--body-strong);
+      font-size: 17px;
+    }
+
+    .two-col,
+    .three-col,
+    .cards,
+    .grid-2,
+    .grid-3 {
+      display: grid;
+      gap: 18px;
+    }
+
+    .two-col,
+    .grid-2 {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .three-col,
+    .grid-3 {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+
+    .card {
+      padding: 24px;
+      border-radius: var(--radius-lg);
+      background: var(--surface-card);
+      border: 1px solid var(--hairline-soft);
+      box-shadow: var(--shadow-card);
+      min-width: 0;
+    }
+
+    .card.dark {
+      background: var(--surface-dark);
+      color: var(--on-dark);
+      border-color: rgba(255, 255, 255, 0.08);
+    }
+
+    .card.dark h3,
+    .card.dark h4 {
+      color: var(--on-dark);
+    }
+
+    .hero-card .tip,
+    .hero-card .note,
+    .hero-card .warning,
+    .card.dark .tip,
+    .card.dark .note,
+    .card.dark .warning {
+      color: var(--on-dark);
+      background: rgba(93, 184, 166, 0.14);
+      border-color: rgba(93, 184, 166, 0.28);
+    }
+
+    .hero-card .tip strong,
+    .hero-card .note strong,
+    .hero-card .warning strong,
+    .card.dark .tip strong,
+    .card.dark .note strong,
+    .card.dark .warning strong {
+      color: var(--on-dark);
+    }
+
+    .card h3 {
+      font-size: 28px;
+      margin-bottom: 10px;
+    }
+
+    .card h4 {
+      font-size: 24px;
+      margin-bottom: 10px;
+    }
+
+    .chip-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .chip {
+      padding: 7px 12px;
+      border-radius: var(--radius-pill);
+      background: rgba(204, 120, 92, 0.12);
+      color: var(--body-strong);
+      font-size: 13px;
+      font-weight: 600;
+    }
+
+    .note,
+    .warning,
+    .tip {
+      padding: 18px 20px;
+      border-radius: 16px;
+      margin-top: 16px;
+      border: 1px solid var(--hairline-soft);
+      background: var(--surface-soft);
+      color: var(--body-strong);
+    }
+
+    .warning {
+      background: rgba(212, 160, 23, 0.11);
+      border-color: rgba(212, 160, 23, 0.26);
+    }
+
+    .tip {
+      background: rgba(93, 184, 166, 0.11);
+      border-color: rgba(93, 184, 166, 0.24);
+    }
+
+    .note strong,
+    .warning strong,
+    .tip strong {
+      color: var(--ink);
+    }
+
+    .code-card {
+      background: var(--surface-dark);
+      color: var(--on-dark);
+      border-radius: 20px;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      overflow: hidden;
+      box-shadow: var(--shadow-card);
+    }
+
+    .code-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 14px 18px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      background: rgba(255, 255, 255, 0.02);
+    }
+
+    .code-head strong {
+      color: var(--on-dark);
+      font-size: 14px;
+      font-family: "Inter", sans-serif;
+    }
+
+    .copy-btn {
+      border: none;
+      border-radius: 999px;
+      padding: 8px 12px;
+      background: rgba(255, 255, 255, 0.08);
+      color: var(--on-dark);
+      cursor: pointer;
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .copy-btn:hover {
+      background: rgba(255, 255, 255, 0.14);
+    }
+
+    .code-body {
+      padding: 20px;
+      overflow-x: auto;
+    }
+
+    .code-body pre {
+      margin: 0;
+      font-size: 13px;
+      line-height: 1.75;
+      white-space: pre;
+    }
+
+    .inline-list {
+      padding-left: 20px;
+      margin: 12px 0 0;
+    }
+
+    .inline-list li + li {
+      margin-top: 8px;
+    }
+
+    .compare-table,
+    .workflow-table,
+    .glossary-table {
+      width: 100%;
+      border-collapse: collapse;
+      border: 1px solid var(--hairline);
+      background: rgba(255, 255, 255, 0.45);
+      border-radius: 18px;
+      overflow: hidden;
+      box-shadow: var(--shadow-card);
+    }
+
+    .compare-table th,
+    .compare-table td,
+    .workflow-table th,
+    .workflow-table td,
+    .glossary-table th,
+    .glossary-table td {
+      padding: 14px 16px;
+      text-align: left;
+      vertical-align: top;
+      border-bottom: 1px solid var(--hairline-soft);
+    }
+
+    .compare-table th,
+    .workflow-table th,
+    .glossary-table th {
+      color: var(--ink);
+      background: var(--surface-soft);
+      font-size: 13px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+
+    .compare-table tr:last-child td,
+    .workflow-table tr:last-child td,
+    .glossary-table tr:last-child td {
+      border-bottom: none;
+    }
+
+    .callout-band {
+      padding: 28px;
+      border-radius: 22px;
+      background: linear-gradient(135deg, var(--primary), #d5916f);
+      color: var(--on-primary);
+      box-shadow: var(--shadow-soft);
+    }
+
+    .callout-band h3,
+    .callout-band h4,
+    .callout-band strong {
+      color: var(--on-primary);
+    }
+
+    .mermaid-panel {
+      padding: 18px;
+      border-radius: 20px;
+      background: var(--surface-dark);
+      color: var(--on-dark);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      box-shadow: var(--shadow-card);
+    }
+
+    .mermaid-panel .mermaid {
+      background: var(--surface-dark);
+      border-radius: 16px;
+      overflow-x: auto;
+    }
+
+    details.fold {
+      border: 1px solid var(--hairline-soft);
+      border-radius: 16px;
+      background: rgba(255, 255, 255, 0.52);
+      overflow: hidden;
+    }
+
+    details.fold + details.fold {
+      margin-top: 14px;
+    }
+
+    details.fold summary {
+      cursor: pointer;
+      padding: 16px 18px;
+      font-weight: 700;
+      color: var(--ink);
+      list-style: none;
+    }
+
+    details.fold summary::-webkit-details-marker {
+      display: none;
+    }
+
+    details.fold .fold-body {
+      padding: 0 18px 18px;
+    }
+
+    .flow-phase {
+      position: relative;
+      padding: 22px 24px 22px 28px;
+      border-left: 4px solid var(--primary);
+      background: rgba(255, 255, 255, 0.52);
+      border-radius: 0 18px 18px 0;
+      box-shadow: var(--shadow-card);
+    }
+
+    .flow-phase + .flow-phase {
+      margin-top: 16px;
+    }
+
+    .phase-number {
+      display: inline-grid;
+      place-items: center;
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      background: var(--primary);
+      color: var(--on-primary);
+      font-weight: 700;
+      margin-bottom: 10px;
+    }
+
+    .mini-map {
+      border-radius: 18px;
+      padding: 18px;
+      background: var(--surface-dark);
+      color: var(--on-dark);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      font-size: 13px;
+      line-height: 1.75;
+      overflow-x: auto;
+    }
+
+    .footer {
+      margin-top: 70px;
+      padding: 28px 30px;
+      border-radius: 22px;
+      background: var(--surface-dark);
+      color: var(--on-dark-soft);
+    }
+
+    .section-link {
+      color: inherit;
+    }
+
+    .muted {
+      color: var(--muted);
+    }
+
+    .reveal {
+      opacity: 1;
+      transform: none;
+    }
+
+    .reveal.visible {
+      opacity: 1;
+      transform: none;
+    }
+
+    @media (min-width: 1120px) {
+      .page {
+        grid-template-columns: var(--nav-width) minmax(0, 1fr);
+        align-items: start;
+      }
+
+      .toc {
+        display: block;
+        position: sticky;
+        top: 110px;
+        align-self: start;
+        padding: 22px 18px;
+        border-radius: 20px;
+        background: rgba(255, 255, 255, 0.7);
+        border: 1px solid var(--hairline-soft);
+        box-shadow: var(--shadow-soft);
+        max-height: calc(100vh - 140px);
+        overflow: auto;
+      }
+
+      .toc h3 {
+        font-size: 22px;
+        margin-bottom: 14px;
+      }
+
+      .toc a {
+        display: block;
+        padding: 8px 10px;
+        border-radius: 12px;
+        color: var(--muted);
+        font-size: 14px;
+      }
+
+      .toc a.active {
+        background: var(--surface-card);
+        color: var(--ink);
+        font-weight: 700;
+      }
+    }
+
+    @media (max-width: 1024px) {
+      .hero {
+        grid-template-columns: 1fr;
+      }
+
+      .two-col,
+      .three-col,
+      .grid-2,
+      .grid-3,
+      .stats-grid,
+      .hero-points {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 720px) {
+      .shell {
+        padding: 24px 14px 80px;
+      }
+
+      .topbar {
+        position: static;
+      }
+
+      .hero {
+        padding: 26px 20px;
+      }
+
+      .section + .section {
+        margin-top: 70px;
+      }
+
+      .card,
+      .callout-band,
+      .flow-phase {
+        padding: 18px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="progress-bar"><span id="progressBar"></span></div>
+
+  <div class="shell">
+    <header class="topbar">
+      <div class="brand">
+        <div class="brand-mark">✶</div>
+        <div class="brand-text">
+          <strong>FastAPI Study Guide</strong>
+          <span>Từ số 0 đến mini project thực tế</span>
+        </div>
+      </div>
+      <nav class="topbar-links">
+        <a class="pill-link" href="#architecture">Architecture</a>
+        <a class="pill-link" href="#workflow">Workflow</a>
+        <a class="pill-link" href="#appendix">Cheat Sheet</a>
+      </nav>
+    </header>
+
+    <div class="page">
+      <aside class="toc">
+        <h3>Mục lục</h3>
+        <a href="#hero">Tổng quan</a>
+        <a href="#api-basics">API căn bản</a>
+        <a href="#fastapi-overview">FastAPI là gì</a>
+        <a href="#hello-world">App đầu tiên</a>
+        <a href="#project-structure">Cấu trúc project</a>
+        <a href="#routes-data">Routes và dữ liệu</a>
+        <a href="#pydantic">Pydantic Schemas</a>
+        <a href="#depends">Depends và get_db</a>
+        <a href="#sqlalchemy">SQLAlchemy Models</a>
+        <a href="#alembic">Alembic Migration</a>
+        <a href="#crud">CRUD thực chiến</a>
+        <a href="#filtering">Filter và pagination</a>
+        <a href="#uploads">Upload và static files</a>
+        <a href="#docs-testing">Swagger và test</a>
+        <a href="#architecture">Architecture</a>
+        <a href="#workflow">End-to-End Workflow</a>
+        <a href="#pitfalls">Lỗi thường gặp</a>
+        <a href="#roadmap">Roadmap</a>
+        <a href="#appendix">Phụ lục</a>
+      </aside>
+
+      <main class="content">
+        <section class="hero reveal" id="hero">
+          <div>
+            <div class="eyebrow">Beginner to Builder</div>
+            <h1>FastAPI từ số 0 đến một project API thật</h1>
+            <p class="lead">
+              Tài liệu này được viết cho người chưa biết gì về FastAPI. Chúng ta sẽ đi từ khái niệm API cơ bản, tới cách FastAPI hoạt động, rồi nối toàn bộ lý thuyết đó vào mini project <code>Book Management API</code> của khóa học.
+            </p>
+            <div class="chip-row">
+              <span class="chip">FastAPI</span>
+              <span class="chip">Pydantic</span>
+              <span class="chip">SQLAlchemy</span>
+              <span class="chip">Alembic</span>
+              <span class="chip">CRUD</span>
+              <span class="chip">Upload File</span>
+            </div>
+            <div class="hero-points">
+              <div class="hero-point">
+                <strong>Bạn sẽ hiểu</strong>
+                API là gì, request/response là gì, và tại sao FastAPI rất hợp cho backend Python.
+              </div>
+              <div class="hero-point">
+                <strong>Bạn sẽ làm được</strong>
+                Đọc và chạy một project FastAPI nhiều file, có database, migration, CRUD, filter và upload ảnh.
+              </div>
+              <div class="hero-point">
+                <strong>Xương sống nội dung</strong>
+                8 transcript bài học, repo <code>fastapi-book-management-api</code>, tài liệu FastAPI chính thức, và phần research bổ sung.
+              </div>
+              <div class="hero-point">
+                <strong>Cách học trong tài liệu này</strong>
+                Mỗi khái niệm sẽ có ví dụ nhỏ để hiểu nhanh, sau đó nối sang code thật của project khóa học.
+              </div>
+            </div>
+          </div>
+
+          <div class="hero-card">
+            <div class="label">Reading map</div>
+            <h3>Hành trình học</h3>
+            <div class="mini-window">
+              <div class="mini-window-head">
+                <span></span><span></span><span></span>
+                <div>from-zero-to-project</div>
+              </div>
+              <div class="mini-window-body">
+                <pre>1. API fundamentals
+2. FastAPI core ideas
+3. First app
+4. Project structure
+5. Schemas + Depends
+6. Models + migration
+7. CRUD + filtering
+8. Upload + static
+9. Architecture + workflow
+10. Best practices</pre>
+              </div>
+            </div>
+            <div class="stats-grid">
+              <div class="stat-card">
+                <strong>8</strong>
+                Transcript bài học được đọc và tổng hợp
+              </div>
+              <div class="stat-card">
+                <strong>1</strong>
+                Repo thực tế làm trục giải thích
+              </div>
+              <div class="stat-card">
+                <strong>20+</strong>
+                Khái niệm và phần thực hành được nối lại thành một flow học
+              </div>
+            </div>
+            <div class="tip">
+              <strong>Gợi ý học:</strong> nếu bạn rất mới, hãy đọc từ trên xuống. Nếu bạn đã biết API cơ bản, có thể nhảy nhanh tới các phần <code>Pydantic</code>, <code>Depends</code>, <code>SQLAlchemy</code>, rồi quay lại xem <code>End-to-End Workflow</code>.
+            </div>
+          </div>
+        </section>
+
+        <section class="section reveal" id="api-basics">
+          <div class="section-header">
+            <span class="kicker">Foundation</span>
+            <h2>1. API căn bản cho người mới hoàn toàn</h2>
+            <p>Trước khi học FastAPI, bạn cần hiểu API là gì. Nếu phần nền này mơ hồ, những khái niệm như route, request body, response model, status code sẽ rất khó tiêu hóa.</p>
+          </div>
+
+          <div class="two-col">
+            <div class="card">
+              <h3>API là gì?</h3>
+              <p>Hiểu đơn giản, API là một "cổng giao tiếp" giữa hai phần mềm. Một bên gửi yêu cầu, bên kia nhận yêu cầu, xử lý, rồi trả kết quả về.</p>
+              <ul class="inline-list">
+                <li><strong>Client</strong>: bên gọi API, ví dụ browser, mobile app, frontend app, Postman.</li>
+                <li><strong>Server</strong>: bên cung cấp API, nhận yêu cầu và trả dữ liệu.</li>
+                <li><strong>JSON</strong>: định dạng dữ liệu phổ biến nhất khi trao đổi qua API.</li>
+              </ul>
+              <div class="note">
+                <strong>Mental model:</strong> frontend giống như người phục vụ gọi món, backend giống như bếp xử lý món ăn, còn API là tờ phiếu order quy định hai bên trao đổi với nhau thế nào.
+              </div>
+            </div>
+
+            <div class="card dark">
+              <h3>Request và Response</h3>
+              <p>Mỗi lần client gọi API, thường sẽ có các thành phần sau:</p>
+              <ul class="inline-list">
+                <li><strong>URL</strong>: gọi endpoint nào.</li>
+                <li><strong>HTTP method</strong>: hành động gì, ví dụ xem, tạo, sửa, xóa.</li>
+                <li><strong>Headers</strong>: metadata đi kèm.</li>
+                <li><strong>Body</strong>: dữ liệu gửi lên, thường dùng khi tạo hoặc sửa.</li>
+              </ul>
+              <div class="mini-window">
+                <div class="mini-window-head">
+                  <span></span><span></span><span></span>
+                  <div>example-response.json</div>
+                </div>
+                <div class="mini-window-body">
+                  <pre>{
+  "id": 1,
+  "name": "George Orwell",
+  "bio": "Author of 1984"
+}</pre>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <table class="compare-table" style="margin-top:18px;">
+            <thead>
+              <tr>
+                <th>HTTP Method</th>
+                <th>Ý nghĩa</th>
+                <th>Ví dụ trong project</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><code>GET</code></td>
+                <td>Lấy dữ liệu</td>
+                <td><code>GET /authors</code>, <code>GET /books/1</code></td>
+              </tr>
+              <tr>
+                <td><code>POST</code></td>
+                <td>Tạo mới dữ liệu</td>
+                <td><code>POST /categories</code>, <code>POST /books</code></td>
+              </tr>
+              <tr>
+                <td><code>PUT</code></td>
+                <td>Cập nhật dữ liệu</td>
+                <td><code>PUT /authors/1</code></td>
+              </tr>
+              <tr>
+                <td><code>DELETE</code></td>
+                <td>Xóa dữ liệu</td>
+                <td><code>DELETE /books/1</code></td>
+              </tr>
+            </tbody>
+          </table>
+
+          <div class="three-col" style="margin-top:18px;">
+            <div class="card">
+              <h4><code>200 OK</code></h4>
+              <p>Request thành công và có phản hồi bình thường.</p>
+            </div>
+            <div class="card">
+              <h4><code>201 Created</code></h4>
+              <p>Tạo mới thành công, rất hay dùng với <code>POST</code>.</p>
+            </div>
+            <div class="card">
+              <h4><code>204 No Content</code></h4>
+              <p>Thành công nhưng không cần trả body, thường dùng khi xóa.</p>
+            </div>
+            <div class="card">
+              <h4><code>400 Bad Request</code></h4>
+              <p>Client gửi dữ liệu không hợp lệ về mặt business logic.</p>
+            </div>
+            <div class="card">
+              <h4><code>404 Not Found</code></h4>
+              <p>Không tìm thấy resource theo ID hoặc URL.</p>
+            </div>
+            <div class="card">
+              <h4><code>422 Unprocessable Entity</code></h4>
+              <p>Dữ liệu gửi lên không khớp schema validation của FastAPI/Pydantic.</p>
+            </div>
+          </div>
+        </section>
+
+        <section class="section reveal" id="fastapi-overview">
+          <div class="section-header">
+            <span class="kicker">FastAPI Core</span>
+            <h2>2. FastAPI là gì và vì sao nó dễ học</h2>
+            <p>FastAPI là Python web framework chuyên để xây API. Điểm mạnh nhất của nó là tận dụng type hints của Python để vừa viết code gọn, vừa tự validation, vừa tự sinh tài liệu API.</p>
+          </div>
+
+          <div class="grid-3">
+            <div class="card">
+              <h3>Type hints</h3>
+              <p>Khi bạn viết <code>book_id: int</code> hoặc <code>name: str</code>, FastAPI không chỉ dùng để gợi ý code, mà còn dùng để parse dữ liệu và validate luôn.</p>
+            </div>
+            <div class="card">
+              <h3>Pydantic</h3>
+              <p>Pydantic giúp định nghĩa schema dữ liệu. Bạn mô tả data bằng class Python, FastAPI dùng class đó để validate input và format output.</p>
+            </div>
+            <div class="card">
+              <h3>Docs tự sinh</h3>
+              <p>FastAPI tự tạo Swagger UI ở <code>/docs</code> và ReDoc ở <code>/redoc</code>. Đây là lý do nó cực kỳ hợp để học API.</p>
+            </div>
+          </div>
+
+          <div class="two-col" style="margin-top:18px;">
+            <div class="card dark">
+              <h3>FastAPI đứng trên gì?</h3>
+              <ul class="inline-list">
+                <li><strong>Starlette</strong>: lo phần ASGI/web layer, routing, request/response, middleware.</li>
+                <li><strong>Pydantic</strong>: lo phần data validation và serialization.</li>
+              </ul>
+              <div class="tip">
+                <strong>Nói ngắn gọn:</strong> FastAPI là framework "ghép" một web layer mạnh với một data validation layer rất tiện.
+              </div>
+            </div>
+            <div class="card">
+              <h3>Khi nào nên dùng FastAPI?</h3>
+              <ul class="inline-list">
+                <li>Khi bạn làm backend API bằng Python.</li>
+                <li>Khi bạn muốn docs tự sinh rõ ràng.</li>
+                <li>Khi bạn muốn code sạch nhờ schemas và type hints.</li>
+                <li>Khi bạn cần phát triển nhanh một service hoặc MVP backend.</li>
+              </ul>
+              <div class="warning">
+                <strong>Lưu ý:</strong> FastAPI không tự thay thế database, ORM, auth, queue hay caching. Nó là framework web/API, không phải toàn bộ hệ thống.
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section class="section reveal" id="hello-world">
+          <div class="section-header">
+            <span class="kicker">First App</span>
+            <h2>3. App FastAPI đầu tiên</h2>
+            <p>Phần này là bước tối thiểu để bạn hiểu cách một FastAPI app được tạo ra và chạy bằng <code>uvicorn</code>.</p>
+          </div>
+
+          <div class="code-card">
+            <div class="code-head">
+              <strong>main.py - ví dụ nhỏ nhất</strong>
+              <button class="copy-btn" data-copy-target="helloWorldCode">Copy</button>
+            </div>
+            <div class="code-body">
+              <pre id="helloWorldCode">from fastapi import FastAPI
+
+app = FastAPI()
+
+@app.get("/")
+def read_root():
+    return {"message": "Hello World"}</pre>
+            </div>
+          </div>
+
+          <div class="two-col" style="margin-top:18px;">
+            <div class="card">
+              <h3>Giải thích từng dòng</h3>
+              <ul class="inline-list">
+                <li><code>FastAPI()</code> tạo application object trung tâm.</li>
+                <li><code>@app.get("/")</code> đăng ký route cho URL gốc với method <code>GET</code>.</li>
+                <li>Hàm <code>read_root()</code> là hàm sẽ chạy khi route này được gọi.</li>
+                <li>FastAPI tự chuyển dict Python thành JSON response.</li>
+              </ul>
+            </div>
+            <div class="card">
+              <h3>Chạy app</h3>
+              <div class="code-card" style="box-shadow:none; border-radius:16px;">
+                <div class="code-head">
+                  <strong>Terminal</strong>
+                  <button class="copy-btn" data-copy-target="runCode">Copy</button>
+                </div>
+                <div class="code-body">
+                  <pre id="runCode">uvicorn app.main:app --reload</pre>
+                </div>
+              </div>
+              <ul class="inline-list" style="margin-top:16px;">
+                <li><code>app.main</code>: module chứa app.</li>
+                <li><code>:app</code>: object tên <code>app</code> trong module đó.</li>
+                <li><code>--reload</code>: tự restart server khi code thay đổi.</li>
+              </ul>
+            </div>
+          </div>
+
+          <div class="callout-band" style="margin-top:18px;">
+            <h3>Micro-example -> Project thật</h3>
+            <p>Trong repo khóa học, file khởi chạy chính là <code>app/main.py</code>. Nó cũng tạo <code>app = FastAPI(...)</code>, nhưng ngoài route gốc còn mount static files và include 3 router lớn: <code>authors</code>, <code>categories</code>, <code>books</code>.</p>
+          </div>
+        </section>
+
+        <section class="section reveal" id="project-structure">
+          <div class="section-header">
+            <span class="kicker">Project Map</span>
+            <h2>4. Cách đọc cấu trúc project FastAPI của khóa học</h2>
+            <p>Đây là một project nhiều file. Khi mới học, bạn rất dễ bị lạc nếu chưa hiểu file nào giữ vai trò gì.</p>
+          </div>
+
+          <div class="two-col">
+            <div class="mini-map">
+<pre>fastapi-book-management-api/
+├─ app/
+│  ├─ main.py
+│  ├─ api/
+│  │  ├─ deps.py
+│  │  └─ endpoints/
+│  │     ├─ authors.py
+│  │     ├─ categories.py
+│  │     └─ books.py
+│  ├─ core/
+│  │  └─ config.py
+│  ├─ db/
+│  │  ├─ base.py
+│  │  └─ session.py
+│  ├─ models/
+│  │  ├─ author.py
+│  │  ├─ category.py
+│  │  └─ book.py
+│  ├─ schemas/
+│  │  ├─ author.py
+│  │  ├─ category.py
+│  │  └─ book.py
+│  └─ static/covers/
+├─ migrations/
+├─ alembic.ini
+└─ app.db</pre>
+            </div>
+
+            <div class="card">
+              <h3>Ý nghĩa từng khu vực</h3>
+              <table class="workflow-table">
+                <thead>
+                  <tr>
+                    <th>File / thư mục</th>
+                    <th>Vai trò</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><code>app/main.py</code></td>
+                    <td>Điểm vào chính của web app. Tạo <code>FastAPI()</code>, mount static, include routers.</td>
+                  </tr>
+                  <tr>
+                    <td><code>app/api/endpoints</code></td>
+                    <td>Nơi chứa các API routes cho từng resource.</td>
+                  </tr>
+                  <tr>
+                    <td><code>app/api/deps.py</code></td>
+                    <td>Chứa dependency dùng chung, đặc biệt là <code>get_db()</code>.</td>
+                  </tr>
+                  <tr>
+                    <td><code>app/models</code></td>
+                    <td>SQLAlchemy ORM models, mapping sang database tables.</td>
+                  </tr>
+                  <tr>
+                    <td><code>app/schemas</code></td>
+                    <td>Pydantic schemas cho input/output của API.</td>
+                  </tr>
+                  <tr>
+                    <td><code>app/db/session.py</code></td>
+                    <td>Tạo database engine và <code>SessionLocal</code>.</td>
+                  </tr>
+                  <tr>
+                    <td><code>migrations</code> + <code>alembic.ini</code></td>
+                    <td>Quản lý thay đổi schema database bằng Alembic.</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <section class="section reveal" id="routes-data">
+          <div class="section-header">
+            <span class="kicker">Routes</span>
+            <h2>5. Routes, path params, query params và request body</h2>
+            <p>Đây là phần cốt lõi của FastAPI: làm sao định nghĩa URL, lấy dữ liệu từ URL, từ query string, hoặc từ body JSON.</p>
+          </div>
+
+          <div class="grid-2">
+            <div class="card">
+              <h3>Path parameter</h3>
+              <p>Path parameter nằm ngay trong URL, ví dụ:</p>
+              <div class="code-card" style="box-shadow:none; border-radius:16px;">
+                <div class="code-head">
+                  <strong>Path param</strong>
+                  <button class="copy-btn" data-copy-target="pathCode">Copy</button>
+                </div>
+                <div class="code-body">
+                  <pre id="pathCode">@app.get("/books/{book_id}")
+def get_book(book_id: int):
+    return {"book_id": book_id}</pre>
+                </div>
+              </div>
+              <p><code>book_id</code> được FastAPI parse từ URL sang kiểu <code>int</code>.</p>
+            </div>
+
+            <div class="card">
+              <h3>Query parameter</h3>
+              <p>Query parameter nằm sau dấu <code>?</code>, ví dụ:</p>
+              <div class="code-card" style="box-shadow:none; border-radius:16px;">
+                <div class="code-head">
+                  <strong>Query param</strong>
+                  <button class="copy-btn" data-copy-target="queryCode">Copy</button>
+                </div>
+                <div class="code-body">
+                  <pre id="queryCode">@app.get("/books")
+def list_books(skip: int = 0, limit: int = 10):
+    return {"skip": skip, "limit": limit}</pre>
+                </div>
+              </div>
+              <p>URL ví dụ: <code>/books?skip=20&amp;limit=10</code>.</p>
+            </div>
+
+            <div class="card">
+              <h3>Request body</h3>
+              <p>Khi tạo mới dữ liệu, client thường gửi JSON trong body:</p>
+              <div class="code-card" style="box-shadow:none; border-radius:16px;">
+                <div class="code-head">
+                  <strong>Body JSON</strong>
+                  <button class="copy-btn" data-copy-target="bodyCode">Copy</button>
+                </div>
+                <div class="code-body">
+                  <pre id="bodyCode">class AuthorCreate(BaseModel):
+    name: str
+    bio: str | None = None
+
+@app.post("/authors")
+def create_author(author: AuthorCreate):
+    return author</pre>
+                </div>
+              </div>
+            </div>
+
+            <div class="card dark">
+              <h3>Trong repo khóa học</h3>
+              <ul class="inline-list">
+                <li><code>GET /authors/{author_id}</code> dùng path param.</li>
+                <li><code>GET /books?author_id=...&amp;year=...</code> dùng query params để filter.</li>
+                <li><code>POST /books</code> dùng body JSON theo schema <code>BookCreate</code>.</li>
+                <li><code>POST /books/{book_id}/cover</code> dùng path param + file upload.</li>
+              </ul>
+            </div>
+          </div>
+        </section>
+
+        <section class="section reveal" id="pydantic">
+          <div class="section-header">
+            <span class="kicker">Schemas</span>
+            <h2>6. Pydantic schemas: lý do FastAPI vừa gọn vừa chặt chẽ</h2>
+            <p>Schema là nơi bạn mô tả "dữ liệu hợp lệ trông như thế nào". Nếu mô hình này rõ, API của bạn sẽ dễ hiểu, dễ validate, và docs tự sinh cũng đẹp hơn.</p>
+          </div>
+
+          <div class="three-col">
+            <div class="card">
+              <h3><code>Create</code></h3>
+              <p>Schema dùng khi tạo dữ liệu mới. Các field thường là bắt buộc nếu business logic cần.</p>
+            </div>
+            <div class="card">
+              <h3><code>Update</code></h3>
+              <p>Schema dùng khi sửa dữ liệu. Thường để field optional để hỗ trợ partial update.</p>
+            </div>
+            <div class="card">
+              <h3><code>Response</code></h3>
+              <p>Schema dùng để trả ra cho client. Đây là lớp rất quan trọng để kiểm soát output.</p>
+            </div>
+          </div>
+
+          <div class="code-card" style="margin-top:18px;">
+            <div class="code-head">
+              <strong>Ví dụ rút gọn từ project</strong>
+              <button class="copy-btn" data-copy-target="schemaCode">Copy</button>
+            </div>
+            <div class="code-body">
+              <pre id="schemaCode">from pydantic import BaseModel
+
+class CategoryBase(BaseModel):
+    name: str
+    description: str | None = None
+
+class CategoryCreate(CategoryBase):
+    pass
+
+class CategoryUpdate(BaseModel):
+    name: str | None = None
+    description: str | None = None
+
+class CategoryInDBBase(CategoryBase):
+    id: int
+
+    class Config:
+        from_attributes = True
+
+class Category(CategoryInDBBase):
+    pass</pre>
+            </div>
+          </div>
+
+          <div class="two-col" style="margin-top:18px;">
+            <div class="card">
+              <h3>Tại sao phải tách nhiều schema?</h3>
+              <ul class="inline-list">
+                <li><code>Create</code> và <code>Update</code> không có cùng yêu cầu validation.</li>
+                <li>Response model thường có thêm <code>id</code>, timestamp, nested object...</li>
+                <li>Tách schema giúp API sạch, rõ ràng, dễ mở rộng.</li>
+              </ul>
+            </div>
+            <div class="card">
+              <h3>Điểm đáng chú ý ở project</h3>
+              <p>Schema <code>Book</code> trong repo dùng nested response: nó không chỉ trả <code>author_id</code> hay <code>category_id</code>, mà còn trả cả object <code>author</code> và <code>category</code>.</p>
+              <div class="tip">
+                <strong>Lợi ích:</strong> frontend lấy được dữ liệu giàu hơn.  
+                <br><strong>Đánh đổi:</strong> response lớn hơn một chút.
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section class="section reveal" id="depends">
+          <div class="section-header">
+            <span class="kicker">Dependencies</span>
+            <h2>7. <code>Depends</code> và <code>get_db()</code>: cơ chế cực quan trọng của FastAPI</h2>
+            <p>Rất nhiều người mới học FastAPI chưa thấy ngay tầm quan trọng của dependency injection. Trong project này, dependency quan trọng nhất là database session.</p>
+          </div>
+
+          <div class="code-card">
+            <div class="code-head">
+              <strong>app/api/deps.py</strong>
+              <button class="copy-btn" data-copy-target="depsCode">Copy</button>
+            </div>
+            <div class="code-body">
+              <pre id="depsCode">from typing import Generator
+from app.db.session import SessionLocal
+
+def get_db() -> Generator:
+    db = SessionLocal()
+    try:
+        yield db
+    finally:
+        db.close()</pre>
+            </div>
+          </div>
+
+          <div class="two-col" style="margin-top:18px;">
+            <div class="card">
+              <h3>Nó hoạt động thế nào?</h3>
+              <ol class="inline-list">
+                <li>FastAPI thấy route cần <code>db: Session = Depends(get_db)</code>.</li>
+                <li>Nó gọi <code>get_db()</code> trước khi chạy route function.</li>
+                <li><code>SessionLocal()</code> tạo session kết nối database.</li>
+                <li><code>yield db</code> đưa session đó vào route function.</li>
+                <li>Sau khi route chạy xong, khối <code>finally</code> luôn đóng session.</li>
+              </ol>
+            </div>
+            <div class="card dark">
+              <h3>Tại sao cách này tốt?</h3>
+              <ul class="inline-list">
+                <li>Không phải lặp code mở/đóng DB ở mọi route.</li>
+                <li>Giảm nguy cơ quên đóng session.</li>
+                <li>Rất hợp để sau này override trong test.</li>
+              </ul>
+            </div>
+          </div>
+        </section>
+
+        <section class="section reveal" id="sqlalchemy">
+          <div class="section-header">
+            <span class="kicker">ORM</span>
+            <h2>8. SQLAlchemy models và quan hệ dữ liệu</h2>
+            <p>Trong project này, FastAPI lo phần web/API, còn SQLAlchemy lo việc map class Python sang bảng database.</p>
+          </div>
+
+          <div class="grid-3">
+            <div class="card">
+              <h3>Author</h3>
+              <p><code>authors</code> table chứa <code>id</code>, <code>name</code>, <code>bio</code>. Một tác giả có thể có nhiều sách.</p>
+            </div>
+            <div class="card">
+              <h3>Category</h3>
+              <p><code>categories</code> table chứa <code>id</code>, <code>name</code>, <code>description</code>. Một danh mục có thể chứa nhiều sách.</p>
+            </div>
+            <div class="card">
+              <h3>Book</h3>
+              <p><code>books</code> chứa dữ liệu sách và giữ <code>author_id</code>, <code>category_id</code> để liên kết.</p>
+            </div>
+          </div>
+
+          <div class="mermaid-panel" style="margin-top:18px;">
+            <div class="mermaid">
+erDiagram
+    AUTHORS ||--o{ BOOKS : writes
+    CATEGORIES ||--o{ BOOKS : groups
+
+    AUTHORS {
+      int id
+      string name
+      text bio
+    }
+
+    CATEGORIES {
+      int id
+      string name
+      text description
+    }
+
+    BOOKS {
+      int id
+      string title
+      text description
+      int published_year
+      int author_id
+      int category_id
+      string cover_image
+      datetime created_at
+      datetime updated_at
+    }
+            </div>
+          </div>
+
+          <div class="two-col" style="margin-top:18px;">
+            <div class="card">
+              <h3>Ví dụ từ model <code>Book</code></h3>
+              <div class="code-card" style="box-shadow:none; border-radius:16px;">
+                <div class="code-head">
+                  <strong>app/models/book.py</strong>
+                  <button class="copy-btn" data-copy-target="bookModelCode">Copy</button>
+                </div>
+                <div class="code-body">
+                  <pre id="bookModelCode">author_id = Column(
+    Integer,
+    ForeignKey("authors.id", ondelete="RESTRICT"),
+    nullable=False
+)
+
+category_id = Column(
+    Integer,
+    ForeignKey("categories.id", ondelete="RESTRICT"),
+    nullable=False
+)
+
+author = relationship("Author", back_populates="books")
+category = relationship("Category", back_populates="books")</pre>
+                </div>
+              </div>
+            </div>
+            <div class="card">
+              <h3>Đọc ý nghĩa</h3>
+              <ul class="inline-list">
+                <li><code>ForeignKey</code> buộc sách phải tham chiếu sang tác giả và danh mục tồn tại.</li>
+                <li><code>nullable=False</code> nghĩa là không được bỏ trống.</li>
+                <li><code>relationship()</code> giúp bạn truy cập object liên quan thuận tiện hơn.</li>
+                <li><code>ondelete="RESTRICT"</code> nói rằng không được xóa record cha khi record con còn tham chiếu.</li>
+              </ul>
+            </div>
+          </div>
+        </section>
+
+        <section class="section reveal" id="alembic">
+          <div class="section-header">
+            <span class="kicker">Migration</span>
+            <h2>9. Alembic migration: biến model thành database schema</h2>
+            <p>Model Python chưa tự động tạo bảng cho bạn trong môi trường bài bản. Alembic giúp quản lý lịch sử thay đổi schema một cách có kiểm soát.</p>
+          </div>
+
+          <div class="two-col">
+            <div class="card">
+              <h3>Chu trình cơ bản</h3>
+              <div class="code-card" style="box-shadow:none; border-radius:16px;">
+                <div class="code-head">
+                  <strong>Commands</strong>
+                  <button class="copy-btn" data-copy-target="alembicCode">Copy</button>
+                </div>
+                <div class="code-body">
+                  <pre id="alembicCode">alembic revision --autogenerate -m "init tables"
+alembic upgrade head</pre>
+                </div>
+              </div>
+              <ul class="inline-list" style="margin-top:16px;">
+                <li><code>revision --autogenerate</code> sinh file migration dựa trên model metadata.</li>
+                <li><code>upgrade head</code> áp migration mới nhất vào database.</li>
+              </ul>
+            </div>
+
+            <div class="card dark">
+              <h3>Vai trò file</h3>
+              <ul class="inline-list">
+                <li><code>alembic.ini</code>: cấu hình chung cho Alembic.</li>
+                <li><code>migrations/env.py</code>: nơi lấy DB URL và metadata.</li>
+                <li><code>migrations/versions/*.py</code>: từng revision cụ thể.</li>
+              </ul>
+            </div>
+          </div>
+
+          <div class="mermaid-panel" style="margin-top:18px;">
+            <div class="mermaid">
+flowchart LR
+    A[Edit SQLAlchemy models] --> B[Base.metadata exposes models]
+    B --> C[alembic revision --autogenerate]
+    C --> D[New migration file in versions/]
+    D --> E[alembic upgrade head]
+    E --> F[SQLite app.db schema updated]
+            </div>
+          </div>
+
+          <details class="fold" style="margin-top:18px;" open>
+            <summary>Repo note: các điểm đáng lưu ý trong project khóa học</summary>
+            <div class="fold-body">
+              <ul class="inline-list">
+                <li><code>app/db/base.py</code> hiện đang comment phần import model. Trong nhiều setup Alembic, nếu metadata không "thấy" model thì autogenerate sẽ không ra bảng như mong muốn.</li>
+                <li>Repo có một revision đầu gần như rỗng, rồi revision sau mới chứa lệnh <code>create_table</code>. Đây là ví dụ rất thực tế cho chuyện migration có thể bị sinh chưa đúng ở lần đầu.</li>
+                <li>Vì vậy, về mặt học tập, bạn nên hiểu <strong>concept đúng</strong> là: model phải được Alembic nhìn thấy qua metadata trước khi autogenerate.</li>
+              </ul>
+            </div>
+          </details>
+        </section>
+
+        <section class="section reveal" id="crud">
+          <div class="section-header">
+            <span class="kicker">Practical API</span>
+            <h2>10. CRUD thực chiến trong mini project Book Management API</h2>
+            <p>Project khóa học đi qua đầy đủ CRUD cho <code>Author</code>, <code>Category</code>, và <code>Book</code>. Đây là phần giúp bạn nối các mảnh kiến thức lại với nhau.</p>
+          </div>
+
+          <div class="grid-2">
+            <div class="card">
+              <h3>Create</h3>
+              <p>Tạo mới thường có flow:</p>
+              <ol class="inline-list">
+                <li>Nhận dữ liệu qua schema <code>Create</code>.</li>
+                <li>Kiểm tra business rule nếu cần, ví dụ duplicate name.</li>
+                <li>Tạo ORM object.</li>
+                <li><code>db.add()</code>, <code>db.commit()</code>, <code>db.refresh()</code>.</li>
+                <li>Trả object đã tạo theo response model.</li>
+              </ol>
+            </div>
+            <div class="card">
+              <h3>Read</h3>
+              <p>Đọc dữ liệu thường có 2 dạng:</p>
+              <ul class="inline-list">
+                <li><strong>List</strong>: lấy nhiều record, thường có <code>skip</code>, <code>limit</code>, filter.</li>
+                <li><strong>Detail</strong>: lấy 1 record theo ID, nếu không có thì trả <code>404</code>.</li>
+              </ul>
+            </div>
+            <div class="card">
+              <h3>Update</h3>
+              <p>Update trong project thường theo chiến lược "chỉ sửa field nào được gửi lên". Vì vậy schema update dùng nhiều field optional.</p>
+            </div>
+            <div class="card">
+              <h3>Delete</h3>
+              <p>Delete sẽ tìm record trước. Nếu có thì xóa và commit. Nếu không có thì trả <code>404</code>. Nhiều route delete trong repo dùng <code>204 No Content</code>.</p>
+            </div>
+          </div>
+
+          <div class="code-card" style="margin-top:18px;">
+            <div class="code-head">
+              <strong>Ví dụ rút gọn từ create_book()</strong>
+              <button class="copy-btn" data-copy-target="createBookCode">Copy</button>
+            </div>
+            <div class="code-body">
+              <pre id="createBookCode">@router.post("/", response_model=Book, status_code=status.HTTP_201_CREATED)
+def create_book(book_in: BookCreate, db: Session = Depends(get_db)):
+    author = db.query(models.Author).filter(
+        models.Author.id == book_in.author_id
+    ).first()
+    if not author:
+        raise HTTPException(status_code=400, detail="Author does not exist")
+
+    category = db.query(models.Category).filter(
+        models.Category.id == book_in.category_id
+    ).first()
+    if not category:
+        raise HTTPException(status_code=400, detail="Category does not exist")
+
+    book = models.Book(
+        title=book_in.title,
+        description=book_in.description,
+        published_year=book_in.published_year,
+        author_id=book_in.author_id,
+        category_id=book_in.category_id,
+    )
+    db.add(book)
+    db.commit()
+    db.refresh(book)
+    return book</pre>
+            </div>
+          </div>
+
+          <div class="note">
+            <strong>Điểm hay để học:</strong> hàm này cho bạn thấy FastAPI không chỉ nhận request và trả response. Nó còn là nơi phối hợp schema input, ORM model, dependency DB, validation business rule và response model trong cùng một flow rõ ràng.
+          </div>
+        </section>
+
+        <section class="section reveal" id="filtering">
+          <div class="section-header">
+            <span class="kicker">Query Flow</span>
+            <h2>11. Filter, search và pagination</h2>
+            <p>Đây là phần rất thực tế vì API list hiếm khi chỉ "trả hết dữ liệu". Bạn thường muốn giới hạn số lượng và lọc theo điều kiện.</p>
+          </div>
+
+          <div class="code-card">
+            <div class="code-head">
+              <strong>Logic list_books() rút gọn</strong>
+              <button class="copy-btn" data-copy-target="filterCode">Copy</button>
+            </div>
+            <div class="code-body">
+              <pre id="filterCode">query = db.query(models.Book)
+
+if author_id is not None:
+    query = query.filter(models.Book.author_id == author_id)
+
+if category_id is not None:
+    query = query.filter(models.Book.category_id == category_id)
+
+if year is not None:
+    query = query.filter(models.Book.published_year == year)
+
+if keyword is not None:
+    like_pattern = f"%{keyword}%"
+    query = query.filter(
+        or_(
+            models.Book.title.ilike(like_pattern),
+            models.Book.description.ilike(like_pattern),
+        )
+    )
+
+books = query.offset(skip).limit(limit).all()</pre>
+            </div>
+          </div>
+
+          <div class="two-col" style="margin-top:18px;">
+            <div class="card">
+              <h3>Tại sao filter nằm trong query params?</h3>
+              <p>Vì filter là cách "chọn dữ liệu nào cần xem" chứ không phải tạo hoặc sửa dữ liệu. Query params rất hợp cho các tình huống này.</p>
+            </div>
+            <div class="card dark">
+              <h3>Ví dụ URL</h3>
+              <div class="mini-window">
+                <div class="mini-window-head">
+                  <span></span><span></span><span></span>
+                  <div>sample-request</div>
+                </div>
+                <div class="mini-window-body">
+                  <pre>GET /books?author_id=1&amp;category_id=2&amp;year=1949&amp;keyword=dystopia&amp;skip=0&amp;limit=20</pre>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section class="section reveal" id="uploads">
+          <div class="section-header">
+            <span class="kicker">Files</span>
+            <h2>12. Upload file và serve static files</h2>
+            <p>Phần này là điểm nổi bật của project khóa học: upload ảnh bìa sách, lưu file xuống ổ đĩa, rồi trả URL ảnh để frontend hoặc browser mở lại được.</p>
+          </div>
+
+          <div class="mermaid-panel">
+            <div class="mermaid">
+flowchart TD
+    A["Client sends POST /books/{book_id}/cover"] --> B["FastAPI receives UploadFile"]
+    B --> C["Check book exists"]
+    C --> D["Validate content type and extension"]
+    D --> E["Read bytes"]
+    E --> F["Check max size 2MB"]
+    F --> G["Generate unique filename"]
+    G --> H["Write file to app/static/covers"]
+    H --> I["Update book.cover_image in database"]
+    I --> J["Return updated book response"]
+            </div>
+          </div>
+
+          <div class="two-col" style="margin-top:18px;">
+            <div class="card">
+              <h3>2 phần phải có</h3>
+              <ul class="inline-list">
+                <li><strong>Upload API</strong>: nhận file từ request.</li>
+                <li><strong>Static mount</strong>: cho phép browser đọc lại file đã lưu.</li>
+              </ul>
+              <div class="code-card" style="box-shadow:none; border-radius:16px; margin-top:14px;">
+                <div class="code-head">
+                  <strong>Static mount</strong>
+                  <button class="copy-btn" data-copy-target="mountCode">Copy</button>
+                </div>
+                <div class="code-body">
+                  <pre id="mountCode">app.mount("/static", StaticFiles(directory="app/static"), name="static")</pre>
+                </div>
+              </div>
+            </div>
+
+            <div class="card">
+              <h3>Điểm cần nhớ</h3>
+              <ul class="inline-list">
+                <li><code>UploadFile</code> phù hợp hơn file bytes thô trong nhiều trường hợp.</li>
+                <li>Luôn validate <code>content_type</code> và extension.</li>
+                <li>Luôn giới hạn size khi cần.</li>
+                <li>Tên file nên có yếu tố unique, project dùng <code>uuid</code>.</li>
+              </ul>
+            </div>
+          </div>
+
+          <details class="fold" style="margin-top:18px;">
+            <summary>Repo note: một rough edge nhỏ trong upload endpoint</summary>
+            <div class="fold-body">
+              <p>Trong <code>upload_book_cover()</code>, repo hiện tại có dòng <code>db.refresh</code> nhưng chưa gọi thành <code>db.refresh(book)</code>. Về mặt học tập, ý tưởng của hàm vẫn đúng, nhưng khi làm project thật bạn nên gọi hàm đầy đủ để refresh object sau commit.</p>
+            </div>
+          </details>
+        </section>
+
+        <section class="section reveal" id="docs-testing">
+          <div class="section-header">
+            <span class="kicker">Docs & Validation</span>
+            <h2>13. Swagger UI, ReDoc và cách test API nhanh</h2>
+            <p>FastAPI mạnh ở chỗ nó không chỉ "chạy được", mà còn sinh tài liệu API gần như ngay lập tức từ type hints và schemas bạn đã viết.</p>
+          </div>
+
+          <div class="grid-2">
+            <div class="card">
+              <h3><code>/docs</code></h3>
+              <p>Swagger UI phù hợp khi bạn muốn trực tiếp bấm thử endpoint, điền request body, upload file, xem response ngay trên trình duyệt.</p>
+            </div>
+            <div class="card">
+              <h3><code>/redoc</code></h3>
+              <p>ReDoc phù hợp để đọc tài liệu API ở dạng trình bày gọn và sạch hơn, thiên về đọc hơn là test.</p>
+            </div>
+          </div>
+
+          <div class="tip" style="margin-top:18px;">
+            <strong>Đây là lý do FastAPI rất hợp để học:</strong> bạn viết schema, route và type hints một lần, rồi có luôn docs để nhìn thấy API của mình hoạt động ra sao.
+          </div>
+        </section>
+
+        <section class="section reveal" id="architecture">
+          <div class="section-header">
+            <span class="kicker">Architecture & System Design</span>
+            <h2>14. Architecture và System Design của project</h2>
+            <p>Phần này giúp bạn nhìn project ở góc độ "hệ thống" thay vì chỉ từng file lẻ. Hãy xem kiến trúc này như một sơ đồ đường đi của dữ liệu.</p>
+          </div>
+
+          <div class="mermaid-panel">
+            <div class="mermaid">
+flowchart LR
+    Client[Browser / Frontend / Postman] --> Uvicorn[Uvicorn ASGI Server]
+    Uvicorn --> Main[app/main.py]
+    Main --> Routers[APIRouters]
+    Routers --> Authors[authors.py]
+    Routers --> Categories[categories.py]
+    Routers --> Books[books.py]
+    Authors --> Depends[get_db dependency]
+    Categories --> Depends
+    Books --> Depends
+    Depends --> Session[SessionLocal]
+    Session --> SQLite[(SQLite app.db)]
+    Authors --> Schemas[Pydantic Schemas]
+    Categories --> Schemas
+    Books --> Schemas
+    Authors --> Models[SQLAlchemy Models]
+    Categories --> Models
+    Books --> Models
+    Main --> Static[StaticFiles /static]
+    Static --> Covers[app/static/covers]
+            </div>
+          </div>
+
+          <div class="two-col" style="margin-top:18px;">
+            <div class="card">
+              <h3>Nhìn kiến trúc theo lớp</h3>
+              <ul class="inline-list">
+                <li><strong>Web layer</strong>: <code>FastAPI</code>, routes, request/response.</li>
+                <li><strong>Dependency layer</strong>: <code>get_db()</code> cấp DB session cho request.</li>
+                <li><strong>Data model layer</strong>: SQLAlchemy models định nghĩa bảng và quan hệ.</li>
+                <li><strong>Schema layer</strong>: Pydantic kiểm soát input và output.</li>
+                <li><strong>Persistence layer</strong>: SQLite file <code>app.db</code>.</li>
+                <li><strong>File storage layer</strong>: thư mục <code>app/static/covers</code>.</li>
+              </ul>
+            </div>
+            <div class="card dark">
+              <h3>Ý nghĩa học tập</h3>
+              <p>Project này đủ nhỏ để người mới không bị choáng, nhưng vẫn đủ nhiều thành phần để bạn thấy một FastAPI app thực tế gồm những lớp nào và giao tiếp với nhau ra sao.</p>
+            </div>
+          </div>
+
+          <div class="mermaid-panel" style="margin-top:18px;">
+            <div class="mermaid">
+sequenceDiagram
+    participant C as Client
+    participant M as app.main
+    participant R as books router
+    participant D as get_db
+    participant S as SQLAlchemy Session
+    participant DB as SQLite
+    participant P as Pydantic Response Model
+
+    C->>M: GET /books/1
+    M->>R: dispatch request
+    R->>D: resolve Depends(get_db)
+    D->>S: create SessionLocal()
+    S->>DB: query books table
+    DB-->>S: row data
+    S-->>R: ORM Book object
+    R->>P: serialize via response_model=Book
+    P-->>C: JSON response
+    D-->>S: close session in finally
+            </div>
+          </div>
+        </section>
+
+        <section class="section reveal" id="workflow">
+          <div class="section-header">
+            <span class="kicker">Deep Walkthrough</span>
+            <h2>15. End-to-End Detailed Workflow Walkthrough</h2>
+            <p>Đây là phần quan trọng nhất nếu bạn muốn thật sự hiểu project chạy thế nào từ đầu đến cuối. Chúng ta sẽ đi đúng thứ tự: từ lúc chạy server, tới lúc request đi vào app, tới lúc query database, tới lúc response quay lại client.</p>
+          </div>
+
+          <div class="flow-phase">
+            <div class="phase-number">1</div>
+            <h3>Giai đoạn khởi chạy server</h3>
+            <p>Bạn chạy lệnh kiểu <code>uvicorn app.main:app --reload</code>. Uvicorn sẽ import module <code>app.main</code> và tìm object tên <code>app</code> trong module đó.</p>
+            <ul class="inline-list">
+              <li><strong>File tham gia đầu tiên:</strong> <code>app/main.py</code>.</li>
+              <li><strong>Việc quan trọng nhất:</strong> tạo ra đối tượng <code>FastAPI</code>.</li>
+              <li><strong>Hàm liên quan:</strong> route gốc <code>read_root()</code> cũng được đăng ký ở đây.</li>
+            </ul>
+          </div>
+
+          <div class="flow-phase">
+            <div class="phase-number">2</div>
+            <h3>Giai đoạn import và lắp ráp app</h3>
+            <p>Khi <code>app/main.py</code> được import, nó tiếp tục import các router từ <code>app.api.endpoints</code>. Điều này kéo theo việc Python đọc thêm các file route như <code>authors.py</code>, <code>categories.py</code>, <code>books.py</code>.</p>
+            <ul class="inline-list">
+              <li><code>authors.py</code> khai báo router cho tài nguyên tác giả.</li>
+              <li><code>categories.py</code> khai báo router cho tài nguyên danh mục.</li>
+              <li><code>books.py</code> khai báo router cho tài nguyên sách và upload cover.</li>
+            </ul>
+            <p>Sau khi import xong, <code>app.include_router(...)</code> trong <code>main.py</code> gắn các router đó vào app chính với prefix riêng.</p>
+          </div>
+
+          <div class="flow-phase">
+            <div class="phase-number">3</div>
+            <h3>Giai đoạn cấu hình nền</h3>
+            <p>Các route không hoạt động một mình. Chúng còn phụ thuộc vào config, session và models.</p>
+            <table class="workflow-table">
+              <thead>
+                <tr>
+                  <th>File</th>
+                  <th>Vai trò thực tế trong flow</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><code>app/core/config.py</code></td>
+                  <td>Tạo object <code>settings</code>, cung cấp <code>PROJECT_NAME</code> và <code>SQLALCHEMY_DATABASE_URI</code>.</td>
+                </tr>
+                <tr>
+                  <td><code>app/db/session.py</code></td>
+                  <td>Dùng settings để tạo <code>engine</code>, rồi tạo <code>SessionLocal</code>.</td>
+                </tr>
+                <tr>
+                  <td><code>app/api/deps.py</code></td>
+                  <td>Tạo dependency <code>get_db()</code> để cấp session cho từng request.</td>
+                </tr>
+                <tr>
+                  <td><code>app/models/*.py</code></td>
+                  <td>Định nghĩa shape của các bảng <code>authors</code>, <code>categories</code>, <code>books</code>.</td>
+                </tr>
+                <tr>
+                  <td><code>app/schemas/*.py</code></td>
+                  <td>Định nghĩa input và output shape cho API.</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="flow-phase">
+            <div class="phase-number">4</div>
+            <h3>Giai đoạn route nhận request</h3>
+            <p>Giả sử client gọi <code>GET /authors</code>. Khi đó FastAPI nhìn vào route map đã đăng ký và tìm ra hàm <code>list_authors()</code> trong <code>app/api/endpoints/authors.py</code>.</p>
+            <p>Ví dụ route file và các hàm chính:</p>
+            <table class="workflow-table">
+              <thead>
+                <tr>
+                  <th>File route</th>
+                  <th>Hàm</th>
+                  <th>Nhiệm vụ</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><code>authors.py</code></td>
+                  <td><code>list_authors()</code></td>
+                  <td>Lấy danh sách tác giả với <code>skip</code> và <code>limit</code>.</td>
+                </tr>
+                <tr>
+                  <td><code>authors.py</code></td>
+                  <td><code>get_author()</code></td>
+                  <td>Lấy chi tiết một tác giả theo ID.</td>
+                </tr>
+                <tr>
+                  <td><code>authors.py</code></td>
+                  <td><code>create_author()</code></td>
+                  <td>Kiểm tra trùng tên, tạo tác giả mới.</td>
+                </tr>
+                <tr>
+                  <td><code>authors.py</code></td>
+                  <td><code>update_author()</code></td>
+                  <td>Cập nhật tên hoặc bio, có check duplicate name.</td>
+                </tr>
+                <tr>
+                  <td><code>categories.py</code></td>
+                  <td><code>list_categories()</code>, <code>create_category()</code>...</td>
+                  <td>CRUD cho danh mục.</td>
+                </tr>
+                <tr>
+                  <td><code>books.py</code></td>
+                  <td><code>list_books()</code></td>
+                  <td>Lấy danh sách sách kèm filter.</td>
+                </tr>
+                <tr>
+                  <td><code>books.py</code></td>
+                  <td><code>create_book()</code></td>
+                  <td>Check <code>author_id</code>, <code>category_id</code>, rồi tạo sách.</td>
+                </tr>
+                <tr>
+                  <td><code>books.py</code></td>
+                  <td><code>upload_book_cover()</code></td>
+                  <td>Nhận file upload, validate, lưu file, cập nhật URL ảnh.</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="flow-phase">
+            <div class="phase-number">5</div>
+            <h3>Giai đoạn FastAPI resolve dependencies</h3>
+            <p>Trước khi route function thật sự chạy, FastAPI nhìn vào chữ ký hàm. Nếu nó thấy tham số như <code>db: Session = Depends(get_db)</code>, nó sẽ gọi dependency trước.</p>
+            <ul class="inline-list">
+              <li><code>get_db()</code> tạo một session mới từ <code>SessionLocal()</code>.</li>
+              <li>Session này được truyền vào tham số <code>db</code> của route function.</li>
+              <li>Sau khi route xong, session được đóng ở khối <code>finally</code>.</li>
+            </ul>
+            <p>Điều này có nghĩa là <strong>mỗi request thường có vòng đời DB session riêng</strong>.</p>
+          </div>
+
+          <div class="flow-phase">
+            <div class="phase-number">6</div>
+            <h3>Giai đoạn parse input dữ liệu</h3>
+            <p>Nếu route nhận body JSON, FastAPI sẽ dùng schema Pydantic tương ứng để parse dữ liệu.</p>
+            <ul class="inline-list">
+              <li><code>create_author(author_in: AuthorCreate, ...)</code> dùng <code>AuthorCreate</code>.</li>
+              <li><code>create_category(category_in: CategoryCreate, ...)</code> dùng <code>CategoryCreate</code>.</li>
+              <li><code>create_book(book_in: BookCreate, ...)</code> dùng <code>BookCreate</code>.</li>
+              <li><code>update_*</code> thường dùng schema với field optional.</li>
+            </ul>
+            <p>Nếu dữ liệu không khớp schema, FastAPI trả <code>422</code> trước cả khi vào logic route.</p>
+          </div>
+
+          <div class="flow-phase">
+            <div class="phase-number">7</div>
+            <h3>Giai đoạn chạy business logic trong từng route</h3>
+            <p>Đây là lúc logic "thật sự" của API xảy ra. Route function dùng session để query database, kiểm tra điều kiện, và commit thay đổi nếu cần.</p>
+            <div class="grid-2" style="margin-top:10px;">
+              <div class="card">
+                <h4><code>create_author()</code></h4>
+                <ul class="inline-list">
+                  <li>Query xem tên tác giả đã tồn tại chưa.</li>
+                  <li>Nếu trùng thì raise <code>HTTPException(400)</code>.</li>
+                  <li>Nếu không trùng thì tạo ORM object mới.</li>
+                  <li>Add -> commit -> refresh -> return.</li>
+                </ul>
+              </div>
+              <div class="card">
+                <h4><code>create_category()</code></h4>
+                <ul class="inline-list">
+                  <li>Flow gần giống create_author.</li>
+                  <li>Check unique name.</li>
+                  <li>Tạo category mới và commit.</li>
+                </ul>
+              </div>
+              <div class="card">
+                <h4><code>create_book()</code></h4>
+                <ul class="inline-list">
+                  <li>Không check duplicate title.</li>
+                  <li>Check <code>author_id</code> có tồn tại không.</li>
+                  <li>Check <code>category_id</code> có tồn tại không.</li>
+                  <li>Nếu 2 foreign key hợp lệ thì tạo record sách.</li>
+                </ul>
+              </div>
+              <div class="card">
+                <h4><code>update_book()</code></h4>
+                <ul class="inline-list">
+                  <li>Tìm sách theo ID.</li>
+                  <li>Chỉ update field nào người dùng gửi lên.</li>
+                  <li>Nếu đổi <code>author_id</code> hoặc <code>category_id</code> thì phải check tồn tại trước.</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+
+          <div class="flow-phase">
+            <div class="phase-number">8</div>
+            <h3>Giai đoạn query database</h3>
+            <p>Session SQLAlchemy dùng các ORM model như <code>models.Author</code>, <code>models.Category</code>, <code>models.Book</code> để tạo câu query. Bạn có thể hình dung:</p>
+            <ul class="inline-list">
+              <li><code>db.query(models.Author)</code> tương đương "làm việc với bảng authors".</li>
+              <li><code>.filter(models.Author.id == author_id)</code> thêm điều kiện WHERE.</li>
+              <li><code>.first()</code> lấy một record đầu tiên hoặc <code>None</code>.</li>
+              <li><code>.all()</code> lấy toàn bộ danh sách kết quả.</li>
+            </ul>
+            <p>Với SQLite, tất cả dữ liệu đang nằm trong file <code>app.db</code>.</p>
+          </div>
+
+          <div class="flow-phase">
+            <div class="phase-number">9</div>
+            <h3>Giai đoạn serialize response bằng Pydantic</h3>
+            <p>Sau khi route trả ORM object, FastAPI dùng <code>response_model=...</code> để biến object đó thành JSON chuẩn.</p>
+            <ul class="inline-list">
+              <li>Ví dụ <code>response_model=Author</code> nghĩa là response phải theo schema <code>Author</code>.</li>
+              <li>Schema nào có <code>from_attributes = True</code> sẽ đọc dữ liệu từ ORM object.</li>
+              <li>Schema <code>Book</code> trong repo trả nested <code>author</code> và <code>category</code>, nên JSON trả về khá giàu dữ liệu.</li>
+            </ul>
+          </div>
+
+          <div class="flow-phase">
+            <div class="phase-number">10</div>
+            <h3>Giai đoạn đóng DB session</h3>
+            <p>Sau khi response đã được tạo, FastAPI quay lại dependency <code>get_db()</code>. Khối <code>finally</code> chạy và gọi <code>db.close()</code>.</p>
+            <p>Đây là bước dọn dẹp tài nguyên rất quan trọng để request sau không dùng chung session theo cách không kiểm soát.</p>
+          </div>
+
+          <div class="flow-phase">
+            <div class="phase-number">11</div>
+            <h3>Workflow riêng của upload ảnh bìa</h3>
+            <p>Upload khác CRUD JSON ở chỗ nó nhận file nhị phân thay vì body JSON thường. Trong repo, <code>upload_book_cover()</code> là hàm xử lý chính.</p>
+            <ul class="inline-list">
+              <li>Tìm sách theo <code>book_id</code>.</li>
+              <li>Kiểm tra MIME type.</li>
+              <li>Kiểm tra extension file.</li>
+              <li>Đọc bytes của file upload.</li>
+              <li>Giới hạn size tối đa 2MB.</li>
+              <li>Tạo filename unique bằng <code>uuid</code>.</li>
+              <li>Ghi file vào <code>app/static/covers</code>.</li>
+              <li>Cập nhật <code>book.cover_image</code> thành URL kiểu <code>/static/covers/....jpg</code>.</li>
+              <li>Commit thay đổi, rồi trả object sách đã có URL ảnh.</li>
+            </ul>
+          </div>
+
+          <div class="flow-phase">
+            <div class="phase-number">12</div>
+            <h3>Workflow của static file serving</h3>
+            <p>Sau khi ảnh đã được lưu vào đĩa, route ảnh không cần viết thủ công nữa. Vì <code>main.py</code> đã mount:</p>
+            <div class="code-card" style="box-shadow:none; border-radius:16px; margin-top:12px;">
+              <div class="code-head">
+                <strong>Static files</strong>
+                <button class="copy-btn" data-copy-target="staticCode">Copy</button>
+              </div>
+              <div class="code-body">
+                <pre id="staticCode">app.mount("/static", StaticFiles(directory="app/static"), name="static")</pre>
+              </div>
+            </div>
+            <p>Nghĩa là browser có thể gọi trực tiếp URL như <code>/static/covers/book_1_xxx.jpg</code>, và FastAPI/Starlette sẽ trả file đó ra làm response.</p>
+          </div>
+
+          <div class="flow-phase">
+            <div class="phase-number">13</div>
+            <h3>Workflow của migration setup</h3>
+            <p>Đây là flow không xảy ra ở mỗi request, nhưng rất quan trọng lúc khởi tạo project hoặc thay đổi schema database.</p>
+            <ol class="inline-list">
+              <li>Bạn sửa model trong <code>app/models</code>.</li>
+              <li>Alembic chạy <code>migrations/env.py</code>.</li>
+              <li><code>env.py</code> lấy DB URL từ <code>app/core/config.py</code>.</li>
+              <li><code>target_metadata = Base.metadata</code> giúp Alembic nhìn vào models.</li>
+              <li><code>revision --autogenerate</code> sinh file mô tả thay đổi schema.</li>
+              <li><code>upgrade head</code> áp thay đổi đó xuống database thật.</li>
+            </ol>
+          </div>
+
+          <div class="callout-band" style="margin-top:18px;">
+            <h3>Tóm gọn toàn bộ luồng chạy</h3>
+            <p><strong>Uvicorn</strong> gọi <strong>app.main</strong> -> <strong>FastAPI app</strong> được tạo -> <strong>routers</strong> được include -> client gửi request -> FastAPI tìm đúng <strong>route function</strong> -> resolve <strong>Depends(get_db)</strong> -> route query/commit qua <strong>SQLAlchemy Session</strong> -> dữ liệu ORM được serialize bằng <strong>Pydantic schema</strong> -> response trả về client -> session được đóng.</p>
+          </div>
+        </section>
+
+        <section class="section reveal" id="pitfalls">
+          <div class="section-header">
+            <span class="kicker">Common Pitfalls</span>
+            <h2>16. Lỗi thường gặp và cách nghĩ đúng</h2>
+            <p>Phần này đặc biệt hữu ích vì nó nối những lỗi của người mới với chính rough edges trong repo khóa học.</p>
+          </div>
+
+          <details class="fold" open>
+            <summary>1. Nhầm giữa SQLAlchemy model và Pydantic schema</summary>
+            <div class="fold-body">
+              <p><strong>Model</strong> dùng để map sang bảng database. <strong>Schema</strong> dùng để định nghĩa dữ liệu vào/ra của API. Hai thứ này liên quan nhưng không giống nhau.</p>
+            </div>
+          </details>
+
+          <details class="fold">
+            <summary>2. Path parameter đặt tên không nhất quán</summary>
+            <div class="fold-body">
+              <p>Trong project có route như <code>"/{cate_id}"</code> nhưng hàm lại nhận <code>category_id</code>. Về mặt thiết kế, bạn nên luôn đồng nhất tên path param với tên tham số để tránh lỗi và tránh gây nhiễu khi đọc code.</p>
+            </div>
+          </details>
+
+          <details class="fold">
+            <summary>3. Tưởng rằng migration luôn sinh đúng ngay lần đầu</summary>
+            <div class="fold-body">
+              <p>Thực tế không phải vậy. Nếu metadata không được expose đúng, file migration có thể rỗng hoặc thiếu. Vì thế bạn nên luôn đọc migration file sau khi autogenerate.</p>
+            </div>
+          </details>
+
+          <details class="fold">
+            <summary>4. Quên rằng FastAPI tự validate trước khi vào route logic</summary>
+            <div class="fold-body">
+              <p>Nếu body không khớp schema, bạn sẽ nhận <code>422</code> và route function có thể còn chưa chạy. Đây là behavior chuẩn của FastAPI, không phải lỗi ngẫu nhiên.</p>
+            </div>
+          </details>
+
+          <details class="fold">
+            <summary>5. Nhầm giữa validation kỹ thuật và validation business</summary>
+            <div class="fold-body">
+              <p><code>name: str</code> là validation kỹ thuật về kiểu dữ liệu.  
+              Còn "author name không được trùng" hay "author_id phải tồn tại" là validation business logic, và bạn phải tự viết trong route hoặc service layer.</p>
+            </div>
+          </details>
+        </section>
+
+        <section class="section reveal" id="roadmap">
+          <div class="section-header">
+            <span class="kicker">Next Steps</span>
+            <h2>17. Sau khi hiểu phần này, nên học tiếp gì?</h2>
+            <p>Project khóa học hiện tại đã giúp bạn có nền tảng tốt. Bước tiếp theo là mở rộng từ CRUD API sang backend thực tế hơn.</p>
+          </div>
+
+          <div class="grid-3">
+            <div class="card">
+              <h3>Auth</h3>
+              <p>Học OAuth2/JWT, permission, current user, bảo vệ route.</p>
+            </div>
+            <div class="card">
+              <h3>Testing</h3>
+              <p>Học <code>TestClient</code>, test dependency override, test database.</p>
+            </div>
+            <div class="card">
+              <h3>Settings</h3>
+              <p>Chuyển config cứng sang environment variables và settings chuẩn hơn.</p>
+            </div>
+            <div class="card">
+              <h3>CORS & Middleware</h3>
+              <p>Để frontend gọi API an toàn và có logging hoặc xử lý request tập trung.</p>
+            </div>
+            <div class="card">
+              <h3>PostgreSQL</h3>
+              <p>Sau SQLite, bạn nên chuyển sang database server thực tế hơn.</p>
+            </div>
+            <div class="card">
+              <h3>Deploy</h3>
+              <p>Học cách chạy production bằng Uvicorn workers, Docker, reverse proxy.</p>
+            </div>
+          </div>
+        </section>
+
+        <section class="section reveal" id="appendix">
+          <div class="section-header">
+            <span class="kicker">Appendix</span>
+            <h2>18. Phụ lục: glossary, cheat sheet và nguồn tham khảo</h2>
+            <p>Đây là phần để bạn quay lại tra cứu nhanh sau khi học xong lần đầu.</p>
+          </div>
+
+          <div class="two-col">
+            <div class="card">
+              <h3>Glossary Anh - Việt</h3>
+              <table class="glossary-table">
+                <thead>
+                  <tr>
+                    <th>Term</th>
+                    <th>Giải thích ngắn</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>Route</td>
+                    <td>Đường dẫn API được map tới một hàm xử lý.</td>
+                  </tr>
+                  <tr>
+                    <td>Schema</td>
+                    <td>Mẫu dữ liệu hợp lệ cho input hoặc output.</td>
+                  </tr>
+                  <tr>
+                    <td>Dependency</td>
+                    <td>Thứ mà route cần để chạy, ví dụ DB session.</td>
+                  </tr>
+                  <tr>
+                    <td>ORM</td>
+                    <td>Cách làm việc với database bằng object/class thay vì SQL thô.</td>
+                  </tr>
+                  <tr>
+                    <td>Migration</td>
+                    <td>Lịch sử thay đổi schema database.</td>
+                  </tr>
+                  <tr>
+                    <td>Serialization</td>
+                    <td>Biến object Python thành dữ liệu JSON trả ra ngoài.</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <div class="card">
+              <h3>Cheat sheet lệnh</h3>
+              <div class="code-card" style="box-shadow:none; border-radius:16px;">
+                <div class="code-head">
+                  <strong>Command shortcuts</strong>
+                  <button class="copy-btn" data-copy-target="cheatCode">Copy</button>
+                </div>
+                <div class="code-body">
+                  <pre id="cheatCode"># Run app
+uvicorn app.main:app --reload
+
+# Open docs
+http://127.0.0.1:8000/docs
+http://127.0.0.1:8000/redoc
+
+# Create migration
+alembic revision --autogenerate -m "describe changes"
+
+# Apply migration
+alembic upgrade head</pre>
+                </div>
+              </div>
+              <div class="note" style="margin-top:16px;">
+                <strong>Checklist tự học:</strong>  
+                <br>1. Tự viết lại route Hello World  
+                <br>2. Tự viết một schema Create/Update/Response  
+                <br>3. Tự thêm một bảng mới vào project  
+                <br>4. Tự tạo migration mới  
+                <br>5. Tự thêm một endpoint filter mới
+              </div>
+            </div>
+          </div>
+
+          <div class="card" style="margin-top:18px;">
+            <h3>Nguồn tham khảo chính của tài liệu này</h3>
+            <ul class="inline-list">
+              <li>8 file transcript trong thư mục <code>Learn_FastAPI</code>.</li>
+              <li>Repo <code>fastapi-book-management-api</code> của khóa học.</li>
+              <li>Tài liệu PDF FastAPI bạn cung cấp.</li>
+              <li>FastAPI official docs cho tutorial, dependencies, SQL databases, deployment, release notes.</li>
+            </ul>
+          </div>
+        </section>
+
+        <footer class="footer">
+          <h3 style="color:var(--on-dark); font-size:32px; margin-bottom:10px;">Kết luận</h3>
+          <p>Từ góc nhìn học tập, project này rất phù hợp để bắt đầu với FastAPI vì nó cho bạn thấy gần như toàn bộ đường đi cơ bản của một backend API: route, schema, database session, ORM model, migration, CRUD, filter và file upload. Khi bạn hiểu được flow đầu-cuối của project này, bạn đã có một nền rất chắc để học tiếp các chủ đề production hơn.</p>
+          <p style="margin-bottom:0;">Nếu bạn muốn dùng tài liệu này như handbook, hãy quay lại các phần <code>Depends</code>, <code>SQLAlchemy</code>, <code>Alembic</code> và <code>End-to-End Workflow</code> nhiều lần. Đó là 4 vùng người mới thường vỡ ra kiến thức mạnh nhất sau vài lượt đọc.</p>
+        </footer>
+      </main>
+    </div>
+  </div>
+
+  <script type="module">
+    import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs";
+
+    mermaid.initialize({
+      startOnLoad: true,
+      theme: "base",
+      securityLevel: "loose",
+      fontFamily: "Inter, sans-serif",
+      themeVariables: {
+        primaryColor: "#efe9de",
+        primaryTextColor: "#141413",
+        primaryBorderColor: "#cc785c",
+        lineColor: "#cc785c",
+        secondaryColor: "#f5f0e8",
+        tertiaryColor: "#faf9f5",
+        background: "#181715",
+        mainBkg: "#efe9de",
+        nodeTextColor: "#141413",
+        clusterBkg: "#f5f0e8",
+        clusterBorder: "#e6dfd8"
+      }
+    });
+  </script>
+
+  <script>
+    const progressBar = document.getElementById("progressBar");
+    const sectionNodes = [...document.querySelectorAll(".section, .hero")];
+    const tocLinks = [...document.querySelectorAll(".toc a")];
+    const revealNodes = [...document.querySelectorAll(".reveal")];
+
+    function updateProgress() {
+      const scrollTop = window.scrollY;
+      const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+      const progress = docHeight > 0 ? (scrollTop / docHeight) * 100 : 0;
+      progressBar.style.width = `${progress}%`;
+    }
+
+    function updateTOC() {
+      const offset = window.scrollY + 150;
+      let currentId = "";
+      for (const node of sectionNodes) {
+        if (node.offsetTop <= offset) {
+          currentId = node.id;
+        }
+      }
+
+      tocLinks.forEach((link) => {
+        const target = link.getAttribute("href").slice(1);
+        link.classList.toggle("active", target === currentId);
+      });
+    }
+
+    const revealObserver = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add("visible");
+          revealObserver.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.12 });
+
+    revealNodes.forEach((node) => revealObserver.observe(node));
+
+    window.addEventListener("scroll", () => {
+      updateProgress();
+      updateTOC();
+    });
+
+    updateProgress();
+    updateTOC();
+
+    document.querySelectorAll(".copy-btn").forEach((button) => {
+      button.addEventListener("click", async () => {
+        const targetId = button.getAttribute("data-copy-target");
+        const target = document.getElementById(targetId);
+        if (!target) return;
+        try {
+          await navigator.clipboard.writeText(target.textContent);
+          const original = button.textContent;
+          button.textContent = "Copied";
+          setTimeout(() => {
+            button.textContent = original;
+          }, 1400);
+        } catch {
+          button.textContent = "Copy failed";
+          setTimeout(() => {
+            button.textContent = "Copy";
+          }, 1400);
+        }
+      });
+    });
+  </script>
+</body>
+</html>

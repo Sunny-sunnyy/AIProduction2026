@@ -1,0 +1,1695 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FastAPI &amp; Project Book Management API: Comprehensive Guide</title>
+    <!-- Google Fonts CDN -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <!-- Prism.js Code Highlight Theme CDN -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet" integrity="sha512-vswe+cgvic/XBoF1OcM/TeJ2FW0OofqAVdCZiEYkd6dwGXthvkSFWOoGGJgS2CW70VK5dQM5Oh+7ne47s74VTg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <style>
+        /* CSS styling tokens based on DESIGN-claude.md */
+        :root {
+            --canvas-bg: #faf9f5;
+            --ink-primary: #141413;
+            --ink-body: #3d3d3a;
+            --ink-body-strong: #252523;
+            --primary-coral: #cc785c;
+            --primary-coral-rgb: 204, 120, 92;
+            --primary-coral-active: #a9583e;
+            --surface-card: #efe9de;
+            --surface-dark: #181715;
+            --surface-dark-soft: #1f1e1b;
+            --border-hairline: #e6dfd8;
+            --font-serif: 'Cormorant Garamond', Garamond, 'Times New Roman', serif;
+            --font-sans: 'Inter', -apple-system, sans-serif;
+            --font-mono: 'JetBrains Mono', monospace;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            background-color: var(--canvas-bg);
+            color: var(--ink-body);
+            font-family: var(--font-sans);
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+        }
+        /* Shell Grid Layout */
+        #app-layout {
+            display: flex;
+            width: 100%;
+            height: 100%;
+        }
+        #sidebar {
+            width: 300px;
+            background-color: var(--surface-card);
+            border-right: 1px solid var(--border-hairline);
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+        }
+        .sidebar-header {
+            padding: 24px;
+            border-bottom: 1px solid var(--border-hairline);
+            display: flex;
+            flex-direction: column;
+        }
+        .sidebar-logo {
+            display: flex;
+            align-items: center;
+            font-family: var(--font-serif);
+            font-size: 20px;
+            font-weight: 600;
+            color: var(--ink-primary);
+        }
+        #search-input {
+            width: 100%;
+            margin-top: 16px;
+            padding: 10px 12px;
+            border-radius: 8px;
+            border: 1px solid var(--border-hairline);
+            background-color: var(--canvas-bg);
+            color: var(--ink-primary);
+            font-family: var(--font-sans);
+            font-size: 14px;
+            outline: none;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+        #search-input::placeholder {
+            color: #9d9c99;
+        }
+        #search-input:focus {
+            border-color: var(--primary-coral);
+            box-shadow: 0 0 0 3px rgba(var(--primary-coral-rgb), 0.15);
+        }
+        .sidebar-nav {
+            flex: 1;
+            overflow-y: auto;
+            padding: 24px;
+        }
+        #nav-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        .nav-item {
+            margin-bottom: 12px;
+            transition: opacity 0.2s, max-height 0.2s;
+        }
+        .nav-item.hidden {
+            display: none;
+        }
+        .nav-link {
+            text-decoration: none;
+            color: var(--ink-body);
+            font-size: 14px;
+            font-weight: 400;
+            transition: color 0.2s, font-weight 0.2s;
+            display: block;
+            cursor: pointer;
+        }
+        .nav-link:hover {
+            color: var(--primary-coral);
+        }
+        .nav-link.active {
+            color: var(--primary-coral);
+            font-weight: 600;
+        }
+        #main-content {
+            flex: 1;
+            overflow-y: auto;
+            padding: 48px;
+            scroll-behavior: smooth;
+        }
+        
+        /* Learning sections style */
+        .test-section {
+            min-height: 80vh;
+            padding: 60px 0;
+            border-bottom: 1px solid var(--border-hairline);
+        }
+        .test-section h2 {
+            font-family: var(--font-serif);
+            font-size: 2.5rem;
+            color: var(--ink-primary);
+            margin-bottom: 24px;
+            border-bottom: 2px solid var(--primary-coral);
+            padding-bottom: 8px;
+        }
+        .test-section h3 {
+            font-family: var(--font-serif);
+            font-size: 1.8rem;
+            color: var(--ink-primary);
+            margin-top: 36px;
+            margin-bottom: 16px;
+            border-bottom: 1px solid var(--border-hairline);
+            padding-bottom: 6px;
+        }
+        .test-section h4 {
+            font-family: var(--font-sans);
+            font-size: 1.15rem;
+            font-weight: 600;
+            color: var(--ink-body-strong);
+            margin-top: 24px;
+            margin-bottom: 10px;
+        }
+        .test-section p {
+            font-size: 1.05rem;
+            line-height: 1.7;
+            color: var(--ink-body);
+            margin-bottom: 18px;
+        }
+        .test-section ul, .test-section ol {
+            margin-left: 24px;
+            margin-bottom: 18px;
+        }
+        .test-section li {
+            margin-bottom: 10px;
+            line-height: 1.6;
+            font-size: 1.05rem;
+        }
+        .section-hidden {
+            display: none !important;
+        }
+
+        /* Custom Premium Table Styling */
+        .premium-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 28px 0;
+            font-size: 0.95rem;
+            font-family: var(--font-sans);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+            border-radius: 8px;
+            overflow: hidden;
+            border: 1px solid var(--border-hairline);
+        }
+        .premium-table th {
+            background-color: var(--surface-card);
+            color: var(--ink-primary);
+            text-align: left;
+            padding: 14px 18px;
+            font-weight: 600;
+            border-bottom: 2px solid var(--primary-coral);
+        }
+        .premium-table td {
+            padding: 14px 18px;
+            border-bottom: 1px solid var(--border-hairline);
+            color: var(--ink-body);
+            background-color: #ffffff;
+        }
+        .premium-table tr:last-child td {
+            border-bottom: none;
+        }
+        .premium-table tr:hover td {
+            background-color: rgba(var(--primary-coral-rgb), 0.03);
+        }
+
+        /* Callout Box Styling */
+        .callout-card {
+            background-color: var(--surface-card);
+            border-left: 4px solid var(--primary-coral);
+            padding: 18px 24px;
+            margin: 24px 0;
+            border-radius: 0 8px 8px 0;
+        }
+        .callout-card p {
+            margin-bottom: 0 !important;
+            font-size: 1.05rem !important;
+            color: var(--ink-body-strong) !important;
+            line-height: 1.6 !important;
+        }
+
+        /* Prism.js Custom Code Style Overrides */
+        code[class*="language-"],
+        pre[class*="language-"] {
+            font-family: var(--font-mono) !important;
+            font-size: 14px !important;
+            line-height: 1.5 !important;
+        }
+        .code-window-card pre {
+            background: transparent !important;
+            margin: 0 !important;
+            padding: 0 !important;
+            border: none !important;
+            box-shadow: none !important;
+            overflow-x: auto;
+        }
+        .code-window-card code {
+            background: transparent !important;
+            padding: 0 !important;
+            border: none !important;
+            color: #f8f8f2 !important;
+        }
+
+        /* Mermaid diagram styling centering */
+        .mermaid {
+            display: flex;
+            justify-content: center;
+            background-color: #ffffff;
+            padding: 24px;
+            border-radius: 12px;
+            border: 1px solid var(--border-hairline);
+            margin: 28px 0;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+        }
+
+        /* Table responsiveness container */
+        .table-container {
+            overflow-x: auto;
+            margin-bottom: 24px;
+            max-width: 100%;
+        }
+
+        /* Code Window Card Stylings */
+        .code-window-card {
+            background-color: var(--surface-dark);
+            border-radius: 12px;
+            padding: 24px;
+            color: var(--canvas-bg);
+            font-family: var(--font-mono);
+            margin-bottom: 24px;
+            position: relative;
+        }
+        .code-window-header {
+            display: flex;
+            gap: 6px;
+            margin-bottom: 12px;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .dot-container {
+            display: flex;
+            gap: 6px;
+        }
+        .mac-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+        }
+        .mac-dot.red {
+            background-color: #ff5f56;
+        }
+        .mac-dot.yellow {
+            background-color: #ffbd2e;
+        }
+        .mac-dot.green {
+            background-color: #27c93f;
+        }
+        
+        .copy-btn {
+            background: none;
+            border: 1px solid var(--border-hairline);
+            color: var(--canvas-bg);
+            padding: 4px 8px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+            font-family: var(--font-sans);
+            transition: all 0.2s ease;
+        }
+        .copy-btn:hover {
+            background-color: rgba(255, 255, 255, 0.15) !important;
+            border-color: var(--canvas-bg) !important;
+        }
+        .copy-btn:active {
+            transform: scale(0.95);
+        }
+
+        /* Hamburger button and Mobile responsive styling */
+        #hamburger-menu {
+            display: none;
+            position: fixed;
+            top: 16px;
+            right: 16px;
+            z-index: 101;
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            background-color: var(--primary-coral);
+            color: #ffffff;
+            border: none;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(var(--primary-coral-rgb), 0.3);
+            justify-content: center;
+            align-items: center;
+            transition: background-color 0.2s, transform 0.2s, box-shadow 0.2s;
+        }
+        #hamburger-menu:hover {
+            background-color: var(--primary-coral-active);
+        }
+        #hamburger-menu:active {
+            transform: scale(0.95);
+        }
+        #hamburger-menu svg {
+            width: 24px;
+            height: 24px;
+            transition: transform 0.3s ease;
+        }
+        #hamburger-menu.open svg {
+            transform: rotate(90deg);
+        }
+
+        #sidebar-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(24, 23, 21, 0.4);
+            backdrop-filter: blur(4px);
+            z-index: 99;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+        }
+        #sidebar-overlay.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        @media (max-width: 767px) {
+            #sidebar {
+                position: fixed;
+                left: -300px;
+                z-index: 100;
+                transition: left 0.3s ease;
+                height: 100%;
+            }
+            #sidebar.open {
+                left: 0;
+                box-shadow: 4px 0 15px rgba(0, 0, 0, 0.1);
+            }
+            #main-content {
+                padding: 24px 16px;
+            }
+            #hamburger-menu {
+                display: flex;
+            }
+        }
+        
+        /* Line Explanation Tooltips */
+        .code-tip {
+            border-bottom: 1px dotted var(--primary-coral);
+            cursor: help;
+            position: relative;
+            display: inline-block;
+        }
+    </style>
+</head>
+<body>
+    <button id="hamburger-menu" aria-label="Toggle Navigation Menu">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="3" y1="12" x2="21" y2="12"></line>
+            <line x1="3" y1="6" x2="21" y2="6"></line>
+            <line x1="3" y1="18" x2="21" y2="18"></line>
+        </svg>
+    </button>
+    <div id="sidebar-overlay"></div>
+    <div id="app-layout">
+        <aside id="sidebar" aria-label="Table of Contents">
+            <div class="sidebar-header">
+                <div class="sidebar-logo">
+                    <svg viewBox="0 0 24 24" fill="currentColor" style="width: 24px; height: 24px; color: var(--primary-coral); margin-right: 8px;">
+                        <path d="M12,2 L16,10 L22,12 L16,14 L12,22 L8,14 L2,12 L8,10 Z" />
+                    </svg>
+                    <span class="logo-text">Antigravity FastAPI</span>
+                </div>
+                <input type="text" id="search-input" placeholder="Search guide..." aria-label="Search learning content" />
+            </div>
+            <nav class="sidebar-nav">
+                <ul id="nav-list">
+                    <!-- Dynamically populated links -->
+                </ul>
+            </nav>
+        </aside>
+        <main id="main-content" aria-label="Main Learning Content">
+            <section id="essentials" class="test-section">
+                <h2>1. FastAPI Essentials &amp; Overview</h2>
+                <p>FastAPI is a modern, high-performance web framework for building APIs with Python 3.8+ based on standard Python type hints. Created by <strong>Sebastián Ramírez</strong> in 2018, it has quickly risen to become one of the standard frameworks for backend development, particularly in data science, machine learning, and high-concurrency microservices.</p>
+
+                <h3>Core Features &amp; Advantages</h3>
+                <p>When studying FastAPI, it is essential to understand why it is preferred over legacy frameworks like Flask or Django for API-first development:</p>
+                <ul>
+                    <li><strong>High Performance:</strong> FastAPI is one of the fastest Python frameworks available, on par with NodeJS and Go. This speed is achieved by leveraging <strong>Starlette</strong> (for web routing and features) and <strong>Uvicorn</strong> (an ASGI server).</li>
+                    <li><strong>Asynchronous Support:</strong> It natively supports modern Python asynchronous programming (using <code>async</code> and <code>await</code>), allowing the server to handle thousands of concurrent requests efficiently.</li>
+                    <li><strong>Automatic Documentation:</strong> By default, FastAPI automatically generates interactive API documentation. Out of the box, you get access to <strong>Swagger UI</strong> (interactive testing interface at <code>/docs</code>) and <strong>ReDoc</strong> (clean, structured documentation at <code>/redoc</code>).</li>
+                    <li><strong>Type Safety &amp; Validation:</strong> Powered by <strong>Pydantic</strong>, FastAPI validates incoming request data and serializes outgoing response data based on standard Python type hints. Invalid requests are rejected automatically with clear, structured error responses.</li>
+                    <li><strong>Developer Productivity:</strong> By utilizing type hints, editors provide autocompletion and linting for all path parameters, queries, and request bodies. This increases development speed by 200% to 300% and reduces human errors by up to 40%.</li>
+                </ul>
+
+                <div class="callout-card">
+                    <p><strong>Note:</strong> Under the hood, FastAPI is not an entirely new web framework from scratch. It is a thin, powerful wrapper that combines the raw speed and web routing capabilities of <strong>Starlette</strong> with the robust data validation and serialization features of <strong>Pydantic</strong>.</p>
+                </div>
+
+                <h3>FastAPI vs Flask vs Django</h3>
+                <p>Choosing the right Python framework depends on your project requirements. Below is a structural comparison showcasing where FastAPI excels compared to legacy frameworks:</p>
+                
+                <div class="table-container">
+                    <table class="premium-table">
+                        <thead>
+                            <tr>
+                                <th>Criteria</th>
+                                <th>FastAPI</th>
+                                <th>Flask</th>
+                                <th>Django</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>Performance</strong></td>
+                                <td>High (ASGI-native, powered by Uvicorn/Starlette)</td>
+                                <td>Moderate (WSGI-based, synchronous by default)</td>
+                                <td>Moderate (WSGI-based, heavier footprint)</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Async Support</strong></td>
+                                <td>Native, out-of-the-box (async/await)</td>
+                                <td>Limited (requires third-party libraries or extensions)</td>
+                                <td>Limited (introduced ASGI later, not fully async-native)</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Database ORM</strong></td>
+                                <td>Independent (fully compatible with SQLAlchemy, SQLModel, Tortoise)</td>
+                                <td>None (typically relies on Flask-SQLAlchemy extension)</td>
+                                <td>Built-in ORM (tightly integrated, highly rigid)</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Doc Generation</strong></td>
+                                <td>Automatic (Swagger UI &amp; ReDoc generated out-of-the-box)</td>
+                                <td>Manual (requires manual setup of extensions)</td>
+                                <td>Manual (requires external packages like drf-yasg)</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Learning Curve</strong></td>
+                                <td>Gentle (highly intuitive, heavily uses type hints)</td>
+                                <td>Very Gentle (minimal micro-framework style)</td>
+                                <td>Steep (monolithic, requires learning Django's ecosystem)</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <h3>FastAPI Architecture</h3>
+                <p>The diagram below illustrates how client requests flow through the ASGI server and Starlette/Pydantic cores within FastAPI:</p>
+                
+                <div class="mermaid">
+                graph TD
+                    Client[Client Request] -->|HTTP / ASGI| Uvicorn[Uvicorn ASGI Server]
+                    Uvicorn -->|Forward| FastAPI[FastAPI Framework]
+                    subgraph FastAPI Core
+                        Starlette[Starlette: Routing &amp; Web Core]
+                        Pydantic[Pydantic: Data Validation &amp; Serialization]
+                    end
+                    FastAPI --> Starlette
+                    FastAPI --> Pydantic
+                </div>
+            </section>
+
+            <section id="setup" class="test-section">
+                <h2>2. Environment Setup &amp; Tooling</h2>
+                <p>Creating an isolated environment is crucial for Python applications to avoid dependency conflicts. While Python's built-in <code>venv</code> is stable, modern development teams prefer <strong>uv</strong> by Astral, a lightning-fast package installer and resolver written in Rust that acts as a drop-in replacement for <code>pip</code> and <code>virtualenv</code>.</p>
+                
+                <h3>Why use uv?</h3>
+                <ul>
+                    <li><strong>Speed:</strong> <code>uv</code> is up to 100x faster than standard <code>pip</code> at resolving and installing packages.</li>
+                    <li><strong>Global Cache:</strong> It shares a global cache across all projects, preventing redundant downloads and disk space waste.</li>
+                    <li><strong>Environment Management:</strong> It handles virtual environment creation and activation automatically.</li>
+                </ul>
+
+                <h3>Project Initialization and Installation</h3>
+                <p>Follow these steps to initialize a virtual environment and install the required FastAPI stack:</p>
+                
+                <div class="code-window-card">
+                    <div class="code-window-header">
+                        <div class="dot-container">
+                            <span class="mac-dot red"></span>
+                            <span class="mac-dot yellow"></span>
+                            <span class="mac-dot green"></span>
+                        </div>
+                        <button class="copy-btn">Copy</button>
+                    </div>
+                    <pre><code class="language-bash"># Initialize venv using uv
+uv venv
+
+# Activate venv (Windows)
+.venv\Scripts\activate
+
+# Install dependencies
+uv pip install fastapi uvicorn[standard] sqlalchemy alembic pydantic python-multipart</code></pre>
+                </div>
+
+                <div class="callout-card">
+                    <p><strong>Windows Activation Note:</strong> If you are using Windows PowerShell and receive a permission error while running the activation script, you may need to run <code>Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope Process</code> first to temporarily allow local scripts to execute.</p>
+                </div>
+            </section>
+
+            <section id="core-concepts" class="test-section">
+                <h2>3. Core Concepts &amp; Fundamentals</h2>
+                <p>To master FastAPI, you must understand its core building blocks: request routing, parameter validation, request/response lifecycle, data schemas, and dependency injection.</p>
+
+                <h3>Hello World Application</h3>
+                <p>Creating a basic API is simple and requires very little boilerplate. Below is a minimal working example in <code>main.py</code>:</p>
+
+                <div class="code-window-card">
+                    <div class="code-window-header">
+                        <div class="dot-container">
+                            <span class="mac-dot red"></span>
+                            <span class="mac-dot yellow"></span>
+                            <span class="mac-dot green"></span>
+                        </div>
+                        <button class="copy-btn">Copy</button>
+                    </div>
+                    <pre><code class="language-python">from fastapi import FastAPI
+
+# 1. Create a FastAPI instance
+app = FastAPI()
+
+# 2. Define a path operation decorator
+@app.get("/")
+# 3. Define an asynchronous path operation function
+async def read_root():
+    # 4. Return a dictionary (automatically serialized to JSON)
+    return {"message": "Hello World"}</code></pre>
+                </div>
+
+                <h4>Line-by-Line Breakdown:</h4>
+                <ol>
+                    <li><code>from fastapi import FastAPI</code>: Imports the main FastAPI class which manages routing, events, and app configurations.</li>
+                    <li><code>app = FastAPI()</code>: Instantiates the application. This object coordinates all requests, documentations, and dependencies.</li>
+                    <li><code>@app.get("/")</code>: A path operation decorator. It maps HTTP <code>GET</code> requests on the path <code>/</code> to the function below.</li>
+                    <li><code>async def read_root()</code>: An asynchronous path operation function. Using <code>async def</code> permits non-blocking operations. You can also write <code>def read_root()</code> for synchronous endpoints; FastAPI handles both intelligently.</li>
+                    <li><code>return {"message": "Hello World"}</code>: Returns a Python dict. FastAPI automatically handles its serialization to JSON and sets the <code>Content-Type</code> header to <code>application/json</code>.</li>
+                </ol>
+
+                <p>Run the development server using Uvicorn:</p>
+                <div class="code-window-card">
+                    <div class="code-window-header">
+                        <div class="dot-container">
+                            <span class="mac-dot red"></span>
+                            <span class="mac-dot yellow"></span>
+                            <span class="mac-dot green"></span>
+                        </div>
+                        <button class="copy-btn">Copy</button>
+                    </div>
+                    <pre><code class="language-bash"># Run the ASGI server
+# 'main' represents the main.py module
+# 'app' represents the FastAPI instance
+# '--reload' enables hot-reloading on code changes
+uvicorn main:app --reload</code></pre>
+                </div>
+
+                <h3>Routing: Path vs. Query Parameters</h3>
+                <p>FastAPI separates request parameters into two main types based on where they appear in the URL:</p>
+                <ul>
+                    <li><strong>Path Parameters:</strong> Part of the URL path itself, used to target specific resources. For example, in <code>/items/42</code>, the number <code>42</code> is a path parameter.</li>
+                    <li><strong>Query Parameters:</strong> Optional parameters appended after a <code>?</code> in the URL, used for filtering, sorting, or pagination. For example, in <code>/items?limit=10</code>, <code>limit</code> is a query parameter.</li>
+                </ul>
+
+                <h3>Parameter Validation</h3>
+                <p>We can enforce constraints on these parameters using <code>Path</code> and <code>Query</code> objects, which also populate the generated documentation with description and validation metadata:</p>
+
+                <div class="code-window-card">
+                    <div class="code-window-header">
+                        <div class="dot-container">
+                            <span class="mac-dot red"></span>
+                            <span class="mac-dot yellow"></span>
+                            <span class="mac-dot green"></span>
+                        </div>
+                        <button class="copy-btn">Copy</button>
+                    </div>
+                    <pre><code class="language-python">from fastapi import FastAPI, Path, Query
+from typing import Optional
+
+app = FastAPI()
+
+@app.get("/items/{item_id}")
+async def read_item(
+    # Validation: item_id must be an integer greater than 0 (gt=0)
+    item_id: int = Path(..., description="The ID of the item to retrieve", gt=0),
+    # Validation: q is optional, min_length of 3, max_length of 50
+    q: Optional[str] = Query(None, min_length=3, max_length=50, description="Search query string")
+):
+    return {"item_id": item_id, "query": q}
+
+@app.get("/users")
+async def list_users(
+    # Validation: limit has default 10, must be between 1 and 100 (ge=1, le=100)
+    limit: int = Query(10, ge=1, le=100, description="Limit the number of returned users"),
+    active: bool = Query(True, description="Filter users by active status")
+):
+    return {"limit": limit, "active": active}</code></pre>
+                </div>
+
+                <h3>Pydantic Schemas</h3>
+                <p>Pydantic is the validation engine of FastAPI. By defining classes that inherit from Pydantic's <code>BaseModel</code>, you declare the structure of your data. This allows automatic request body parsing, validation, and schema generation. In production apps, it is a standard design pattern to separate schemas based on their purpose:</p>
+                <ul>
+                    <li><strong>Base Schema:</strong> Contains common attributes shared between creation and retrieval.</li>
+                    <li><strong>Create Schema:</strong> Extends the base schema with write-only attributes (such as plain-text passwords).</li>
+                    <li><strong>Response Schema:</strong> Filters out sensitive attributes (such as passwords or internal keys) before returning data to the client.</li>
+                </ul>
+
+                <div class="code-window-card">
+                    <div class="code-window-header">
+                        <div class="dot-container">
+                            <span class="mac-dot red"></span>
+                            <span class="mac-dot yellow"></span>
+                            <span class="mac-dot green"></span>
+                        </div>
+                        <button class="copy-btn">Copy</button>
+                    </div>
+                    <pre><code class="language-python">from pydantic import BaseModel, Field
+from typing import Optional
+
+# Base schema containing shared attributes
+class UserBase(BaseModel):
+    username: str = Field(..., min_length=3, max_length=50)
+    email: str # In production, use pydantic.EmailStr (requires email-validator)
+
+# Schema used for user registration
+class UserCreate(UserBase):
+    password: str = Field(..., min_length=8, description="User's plain password")
+
+# Schema returned to the client (excludes password fields)
+class User(UserBase):
+    id: int
+    is_active: bool
+
+    class Config:
+        # In Pydantic v2, from_attributes=True replaces orm_mode=True
+        # This enables deserialization from ORM instances (e.g., SQLAlchemy models)
+        <span class="code-tip" data-tip="Tells Pydantic to read data from ORM objects (like SQLAlchemy) using attribute lookup instead of dict mapping.">from_attributes = True</span></code></pre>
+                </div>
+
+                <h3>Request Body &amp; Response Model</h3>
+                <p>When implementing route endpoints, we declare request body types using our Pydantic schemas, and configure serialization with the <code>response_model</code> parameter inside the route decorator:</p>
+
+                <div class="code-window-card">
+                    <div class="code-window-header">
+                        <div class="dot-container">
+                            <span class="mac-dot red"></span>
+                            <span class="mac-dot yellow"></span>
+                            <span class="mac-dot green"></span>
+                        </div>
+                        <button class="copy-btn">Copy</button>
+                    </div>
+                    <pre><code class="language-python">from fastapi import FastAPI, HTTPException, status
+
+app = FastAPI()
+
+# Dummy database storage
+db_users = []
+
+# Declaring response_model filters outgoing data, ensuring no password is leaked
+@app.post("/users", response_model=User, status_code=status.HTTP_201_CREATED)
+async def create_user(user_in: UserCreate):
+    # Validate if email is already taken
+    for u in db_users:
+        if u["email"] == user_in.email:
+            raise HTTPException(status_code=400, detail="Email already registered")
+            
+    # Save user (normally password is hashed here)
+    user_dict = user_in.model_dump() # In Pydantic v2, .model_dump() replaces .dict()
+    user_dict["id"] = len(db_users) + 1
+    user_dict["is_active"] = True
+    
+    # Store user database record (which contains password)
+    db_users.append(user_dict)
+    
+    # Returning the dictionary. FastAPI serializes it using the User response schema,
+    # which excludes the 'password' field.
+    return user_dict</code></pre>
+                </div>
+
+                <h3>Dependency Injection (DI)</h3>
+                <p>Dependency Injection (DI) is a software design pattern where objects or functions receive other dependencies they require. In FastAPI, the DI system is built-in and powerful, enabling endpoints to dynamically declare and receive resources using the <code>Depends()</code> utility.</p>
+                
+                <h4>Key Benefits of Dependency Injection in FastAPI:</h4>
+                <ul>
+                    <li><strong>Lifecycle Management:</strong> Ideal for managing resources like database sessions, network clients, or files. The DI system handles the initialization and cleanup automatically.</li>
+                    <li><strong>Modularity &amp; Reuse:</strong> Write code once (e.g., authentication logic or database retrieval) and reuse it across multiple endpoints.</li>
+                    <li><strong>Seamless Testing:</strong> Easily swap dependencies with mock implementations in test environments (using <code>app.dependency_overrides</code>).</li>
+                </ul>
+
+                <p>Here is an example of injecting a database session dependency, showing how FastAPI handles both generation (yield) and cleanup (closing the session) of resources:</p>
+
+                <div class="code-window-card">
+                    <div class="code-window-header">
+                        <div class="dot-container">
+                            <span class="mac-dot red"></span>
+                            <span class="mac-dot yellow"></span>
+                            <span class="mac-dot green"></span>
+                        </div>
+                        <button class="copy-btn">Copy</button>
+                    </div>
+                    <pre><code class="language-python">from fastapi import FastAPI, Depends
+from sqlalchemy.orm import Session
+# Dummy database session for representation
+# from database import SessionLocal, Item
+
+app = FastAPI()
+
+# 1. Define a dependency function managing database session lifecycle
+def get_db():
+    db = SessionLocal() # Establish database session
+    try:
+        yield db       # Inject the session into the endpoint function
+    finally:
+        db.close()     # Executed AFTER the endpoint returns response
+
+# 2. Inject the dependency into path operation functions
+@app.get("/items")
+def read_items(db: Session = <span class="code-tip" data-tip="Dependency Injection in FastAPI. It requests a database session that is automatically created and closed.">Depends(get_db)</span>):
+    # The session is active and safe to use
+    items = db.query(Item).all()
+    return items</code></pre>
+                </div>
+            </section>
+
+            <section id="case-study" class="test-section">
+                <h2>4. Book Management API Case Study</h2>
+                <p>To demonstrate the real-world application of FastAPI, we analyze the <strong>Book Management API</strong>. This application supports book inventory control, categorization, author management, and custom cover image uploads. It is structured using the industry-standard modular design pattern, separating configuration, database logic, ORM models, Pydantic schemas, and API routers into dedicated modules.</p>
+
+                <h3>Directory Structure</h3>
+                <p>Below is the folder structure for the <code>fastapi-book-management-api</code> project:</p>
+
+                <div class="code-window-card">
+                    <div class="code-window-header">
+                        <div class="dot-container">
+                            <span class="mac-dot red"></span>
+                            <span class="mac-dot yellow"></span>
+                            <span class="mac-dot green"></span>
+                        </div>
+                        <button class="copy-btn">Copy</button>
+                    </div>
+                    <pre><code class="language-text">fastapi-book-management-api/
+├── alembic/                  # Database migration scripts &amp; history
+├── app/
+│   ├── api/                  # Route handlers &amp; endpoints
+│   │   ├── auth.py           # Authentication and token endpoints
+│   │   ├── authors.py        # CRUD endpoints for Authors
+│   │   ├── books.py          # CRUD endpoints for Books &amp; cover uploads
+│   │   └── categories.py     # CRUD endpoints for Categories
+│   ├── core/                 # Application config &amp; security settings
+│   │   ├── config.py         # Base settings and environment loading
+│   │   └── security.py       # Password hashing &amp; JWT generation
+│   ├── db/                   # Database engine &amp; session setup
+│   │   ├── base.py           # Imports all models to expose to Alembic
+│   │   └── session.py        # Engine definition &amp; get_db utility
+│   ├── models/               # SQLAlchemy ORM definitions
+│   │   ├── author.py         # Author database model
+│   │   ├── book.py           # Book database model
+│   │   └── category.py       # Category database model
+│   ├── schemas/              # Pydantic validation &amp; serialization schemas
+│   │   ├── author.py         # Author schemas (Create, Read, Update)
+│   │   ├── book.py           # Book schemas (Create, Read, Update)
+│   │   └── category.py       # Category schemas (Create, Read, Update)
+│   ├── static/               # Mounted directory for serving uploaded static files
+│   │   └── covers/           # Stores uploaded book cover images
+│   └── main.py               # FastAPI application initialization
+├── alembic.ini               # Alembic configuration metadata
+├── requirements.txt          # Python dependencies
+└── README.md                 # Project documentation</code></pre>
+                </div>
+
+                <h4>Roles of Core Modules:</h4>
+                <ul>
+                    <li><strong>core/</strong>: Centralizes system configurations via Pydantic <code>BaseSettings</code> (e.g., reading database credentials and CORS origins from <code>.env</code>) and contains JWT helper utilities.</li>
+                    <li><strong>db/</strong>: Initializes the SQLAlchemy engine, configures <code>SessionLocal</code> (the session factory), and exports the dependency <code>get_db</code>.</li>
+                    <li><strong>models/</strong>: Declares SQLAlchemy ORM models representing the physical database tables and their indexes, constraints, and relationships.</li>
+                    <li><strong>schemas/</strong>: Defines Pydantic models to validate incoming HTTP request payloads (e.g., <code>BookCreate</code>) and sanitize outgoing response bodies (e.g., <code>BookResponse</code>).</li>
+                    <li><strong>api/</strong>: Separates endpoints logically into sub-routers (e.g., <code>books.py</code>, <code>authors.py</code>) using FastAPI's <code>APIRouter</code>, which are subsequently merged into the main application.</li>
+                </ul>
+
+                <h3>Entity-Relationship Model (ERD)</h3>
+                <p>The system defines three main entities: <strong>Author</strong>, <strong>Category</strong>, and <strong>Book</strong>. One author can write multiple books, and one category can contain multiple books. This is mapped via One-to-Many foreign key constraints on the <code>books</code> table.</p>
+
+                <div class="mermaid">
+                erDiagram
+                    authors ||--o{ books : "has many"
+                    categories ||--o{ books : "contains"
+                    
+                    authors {
+                        int id PK
+                        string name
+                        string bio
+                    }
+                    categories {
+                        int id PK
+                        string name
+                        string description
+                    }
+                    books {
+                        int id PK
+                        string title
+                        string description
+                        int published_year
+                        string cover_image
+                        int author_id FK
+                        int category_id FK
+                    }
+                </div>
+
+                <h3>Alembic Database Migrations</h3>
+                <p>Alembic acts as the version control system for your SQL database. Rather than executing manual <code>CREATE TABLE</code> scripts, developers write SQLAlchemy models and use Alembic to sync the database schema automatically.</p>
+
+                <div class="mermaid">
+                graph TD
+                    Start[Modify SQLAlchemy Models] --> RunAuto[Run: alembic revision --autogenerate]
+                    RunAuto --> Compare[Alembic compares Models Metadata with DB Schema]
+                    Compare --> GenScript[Generate migration script in alembic/versions/]
+                    GenScript --> Review[Review migration script for accuracy]
+                    Review --> RunUpgrade[Run: alembic upgrade head]
+                    RunUpgrade --> Success[Database schema updated successfully]
+                </div>
+
+                <p>Below is the standard workflow to initialize and manage migrations using Alembic:</p>
+
+                <div class="code-window-card">
+                    <div class="code-window-header">
+                        <div class="dot-container">
+                            <span class="mac-dot red"></span>
+                            <span class="mac-dot yellow"></span>
+                            <span class="mac-dot green"></span>
+                        </div>
+                        <button class="copy-btn">Copy</button>
+                    </div>
+                    <pre><code class="language-bash"># 1. Initialize Alembic inside the project root
+alembic init alembic
+
+# 2. Generate a migration revision automatically based on model changes
+alembic revision --autogenerate -m "Create initial tables"
+
+# 3. Apply the generated migration script to upgrade database schema
+alembic upgrade head
+
+# 4. View current database migration status
+alembic current</code></pre>
+                </div>
+
+                <div class="callout-card">
+                    <p><strong>Configuring env.py for Autogenerate:</strong> For Alembic's <code>--autogenerate</code> flag to recognize your models, edit <code>alembic/env.py</code> to import your SQLAlchemy base. Point <code>target_metadata</code> to your model metadata: 
+                    <code>from app.db.base import Base</code> and <code>target_metadata = Base.metadata</code>. Additionally, configure your SQL connection string in <code>alembic.ini</code> or dynamically within <code>env.py</code> using environment variables.</p>
+                </div>
+            </section>
+
+            <section id="walkthrough" class="test-section">
+                <h2>5. End-to-End Request-Response Pipeline</h2>
+                <p>Understanding the request-response lifecycle is vital for tracing execution and debugging issues. The diagram below details the sequence of a multipart file upload request targeting the cover image upload endpoint.</p>
+
+                <h3>Request Pipeline Sequence Diagram</h3>
+                <p>This sequence diagram shows how the request travels from the client, through validation middleware, route execution, dependency extraction, and database persistence, ending with file system storage and a serialized response return.</p>
+
+                <div class="mermaid">
+                sequenceDiagram
+                    autonumber
+                    actor Client
+                    participant Uvicorn as "Uvicorn (ASGI Server)"
+                    participant FastAPI as "FastAPI App"
+                    participant Router as "APIRouter (books)"
+                    participant Depends as "Depends(get_db)"
+                    participant DB as "Database (SQLAlchemy)"
+                    
+                    Client->>Uvicorn: POST /api/books/1/cover (Multipart form-data)
+                    Uvicorn->>FastAPI: Forward HTTP payload
+                    FastAPI->>Router: Route matching &amp; schema validation
+                    FastAPI->>Depends: Initialize SessionLocal()
+                    Depends-->>Router: Yield active DB session
+                    
+                    rect rgb(240, 248, 255)
+                        note over Router: Validation Checks
+                        Router->>Router: Check File size &lt;= 2MB
+                        Router->>Router: Validate File Extension &amp; MIME Type
+                        Router->>Router: Generate secure unique filename (UUID4)
+                    end
+                    
+                    Router->>DB: Query Book by ID
+                    DB-->>Router: Return Book object (or raise 404)
+                    
+                    rect rgb(245, 245, 245)
+                        note over Router: Storage &amp; Persistence
+                        Router->>Router: Write file content to disk (static/covers/)
+                        Router->>DB: Update cover_image URL string
+                        Router->>DB: Commit transaction
+                        DB-->>Router: Return Commit Success
+                    end
+                    
+                    Router->>Depends: Close DB Session (finally block)
+                    Depends-->>FastAPI: Release Connection
+                    Router-->>Client: HTTP 200 OK with serialized Book JSON
+                </div>
+
+                <h3>Detailed Step-by-Step Walkthrough</h3>
+
+                <h4>Phase 1: Bootstrapping &amp; Mounting</h4>
+                <p>When the application starts, Uvicorn initializes the <code>FastAPI</code> instance defined in <code>app/main.py</code>. During this startup, routes are registered and static file mounting takes place:</p>
+
+                <div class="code-window-card">
+                    <div class="code-window-header">
+                        <div class="dot-container">
+                            <span class="mac-dot red"></span>
+                            <span class="mac-dot yellow"></span>
+                            <span class="mac-dot green"></span>
+                        </div>
+                        <button class="copy-btn">Copy</button>
+                    </div>
+                    <pre><code class="language-python">from fastapi import FastAPI
+from fastapi.staticfiles import StaticFiles
+from app.api import books, authors, categories
+
+app = FastAPI(title="Book Management API")
+
+# Mount the static directory to serve book covers directly
+app.mount("/static", StaticFiles(directory="app/static"), name="static")
+
+# Include the routers for modular API routing
+app.include_router(books.router, prefix="/api/books", tags=["Books"])
+app.include_router(authors.router, prefix="/api/authors", tags=["Authors"])
+app.include_router(categories.router, prefix="/api/categories", tags=["Categories"])</code></pre>
+                </div>
+
+                <h4>Phase 2: Routing &amp; Parsing</h4>
+                <p>When an incoming HTTP request is received (e.g., <code>POST /api/books/42/cover</code>), FastAPI's internal router matches the request method and path to the path operation function. Path parameters (such as <code>42</code>) are extracted from the URL and parsed into their declared Python types.</p>
+
+                <h4>Phase 3: Dependency Resolution (get_db Lifecycle)</h4>
+                <p>Before executing the route handler, FastAPI resolves any declared dependencies. The <code>get_db</code> dependency is resolved via a generator:</p>
+                <ol>
+                    <li>FastAPI calls the dependency function <code>get_db()</code>.</li>
+                    <li><code>SessionLocal()</code> is called to create a new SQLAlchemy session database connection.</li>
+                    <li>The function executes up to the <code>yield db</code> statement, providing the active session to the path function.</li>
+                    <li>The path operation function runs.</li>
+                    <li>After the response is formulated, the generator resumes, executing the <code>finally</code> block which calls <code>db.close()</code>. This guarantees database connections are returned to the pool, preventing memory leaks.</li>
+                </ol>
+
+                <h4>Phase 4: Route Handlers (Detailed function analysis)</h4>
+
+                <h5>1. Retrieve Book List (list_books)</h5>
+                <p>This endpoint handles list retrieval and implements filtering and pagination using optional query parameters. The SQL query is built dynamically using conditional filters:</p>
+
+                <div class="code-window-card">
+                    <div class="code-window-header">
+                        <div class="dot-container">
+                            <span class="mac-dot red"></span>
+                            <span class="mac-dot yellow"></span>
+                            <span class="mac-dot green"></span>
+                        </div>
+                        <button class="copy-btn">Copy</button>
+                    </div>
+                    <pre><code class="language-python">@router.get("/", response_model=List[schemas.Book])
+def list_books(
+    skip: int = 0,
+    limit: int = 100,
+    author_id: Optional[int] = None,
+    category_id: Optional[int] = None,
+    keyword: Optional[str] = None,
+    db: Session = <span class="code-tip" data-tip="Obtains a database session instance using FastAPI's dependency injection system.">Depends(get_db)</span>
+):
+    """
+    Retrieves a list of books with pagination and dynamic filtering.
+    """
+    # Initialize base query
+    query = db.query(models.Book)
+    
+    # Conditionally apply filters
+    if author_id:
+        query = query.filter(models.Book.author_id == author_id)
+    if category_id:
+        query = query.filter(models.Book.category_id == category_id)
+    if keyword:
+        # Case-insensitive search inside title or description
+        query = query.filter(
+            (models.Book.title.ilike(f"%{keyword}%")) | 
+            (models.Book.description.ilike(f"%{keyword}%"))
+        )
+    
+    # Execute paginated query
+    return query.offset(skip).limit(limit).all()</code></pre>
+                </div>
+
+                <h5>2. Create Book Record (create_book)</h5>
+                <p>Before adding a book, we perform validation checks to ensure database integrity. We check that the referenced Author and Category exist prior to insertion:</p>
+
+                <div class="code-window-card">
+                    <div class="code-window-header">
+                        <div class="dot-container">
+                            <span class="mac-dot red"></span>
+                            <span class="mac-dot yellow"></span>
+                            <span class="mac-dot green"></span>
+                        </div>
+                        <button class="copy-btn">Copy</button>
+                    </div>
+                    <pre><code class="language-python">@router.post("/", response_model=schemas.Book, status_code=status.HTTP_201_CREATED)
+def create_book(book_in: schemas.BookCreate, db: Session = <span class="code-tip" data-tip="Obtains a database session instance using FastAPI's dependency injection system.">Depends(get_db)</span>):
+    """
+    Creates a new book after verifying parent entities exist.
+    """
+    # 1. Verify author exists
+    author_exists = db.query(models.Author).filter(models.Author.id == book_in.author_id).first()
+    if not author_exists:
+        raise HTTPException(status_code=404, detail="Author not found")
+        
+    # 2. Verify category exists
+    category_exists = db.query(models.Category).filter(models.Category.id == book_in.category_id).first()
+    if not category_exists:
+        raise HTTPException(status_code=404, detail="Category not found")
+        
+    # 3. Save book record
+    db_book = models.Book(**book_in.model_dump())
+    db.add(db_book)
+    db.commit()
+    db.refresh(db_book)
+    return db_book</code></pre>
+                </div>
+
+                <h5>3. Update &amp; Delete Book Records</h5>
+                <p>Updating database records requires loading the entity, applying new properties, and committing the changes:</p>
+
+                <div class="code-window-card">
+                    <div class="code-window-header">
+                        <div class="dot-container">
+                            <span class="mac-dot red"></span>
+                            <span class="mac-dot yellow"></span>
+                            <span class="mac-dot green"></span>
+                        </div>
+                        <button class="copy-btn">Copy</button>
+                    </div>
+                    <pre><code class="language-python">@router.put("/{book_id}", response_model=schemas.Book)
+def update_book(book_id: int, book_in: schemas.BookUpdate, db: Session = Depends(get_db)):
+    """
+    Modifies an existing book record. Only updates modified fields.
+    """
+    db_book = db.query(models.Book).filter(models.Book.id == book_id).first()
+    if not db_book:
+        raise HTTPException(status_code=404, detail="Book not found")
+        
+    # Extract only provided update parameters
+    update_data = book_in.model_dump(exclude_unset=True)
+    for key, value in update_data.items():
+        setattr(db_book, key, value)
+        
+    db.commit()
+    db.refresh(db_book)
+    return db_book
+
+@router.delete("/{book_id}", status_code=status.HTTP_204_NO_CONTENT)
+def delete_book(book_id: int, db: Session = Depends(get_db)):
+    """
+    Removes a book from the inventory.
+    """
+    db_book = db.query(models.Book).filter(models.Book.id == book_id).first()
+    if not db_book:
+        raise HTTPException(status_code=404, detail="Book not found")
+        
+    db.delete(db_book)
+    db.commit()
+    return None</code></pre>
+                </div>
+
+                <h5>4. Upload Book Cover Image (upload_book_cover)</h5>
+                <p>This endpoint receives a binary payload via multipart/form-data. It performs security validations (file size and format), saves the file locally using Python file operations, and updates the database with the static link:</p>
+
+                <div class="code-window-card">
+                    <div class="code-window-header">
+                        <div class="dot-container">
+                            <span class="mac-dot red"></span>
+                            <span class="mac-dot yellow"></span>
+                            <span class="mac-dot green"></span>
+                        </div>
+                        <button class="copy-btn">Copy</button>
+                    </div>
+                    <pre><code class="language-python">import os
+import uuid
+from fastapi import APIRouter, Depends, HTTPException, UploadFile, File, status
+from sqlalchemy.orm import Session
+
+router = APIRouter()
+
+# Security constants
+MAX_FILE_SIZE = 2 * 1024 * 1024  # 2MB Limit
+ALLOWED_MIME_TYPES = ["image/jpeg", "image/png"]
+ALLOWED_EXTENSIONS = [".jpg", ".jpeg", ".png"]
+
+@router.post("/{book_id}/cover", response_model=schemas.Book)
+async def upload_book_cover(
+    book_id: int,
+    file: <span class="code-tip" data-tip="FastAPI's UploadFile type. It handles file uploads efficiently, storing small files in memory and large files on disk.">UploadFile</span> = <span class="code-tip" data-tip="FastAPI's File parameter indicator. The '...' means the file upload parameter is mandatory.">File(...)</span>,
+    db: Session = <span class="code-tip" data-tip="Obtains a database session instance using FastAPI's dependency injection system.">Depends(get_db)</span>
+):
+    # 1. Verify book exists
+    db_book = db.query(models.Book).filter(models.Book.id == book_id).first()
+    if not db_book:
+        raise HTTPException(status_code=404, detail="Book not found")
+        
+    # 2. Validate file extension
+    _, ext = os.path.splitext(file.filename.lower())
+    if ext not in ALLOWED_EXTENSIONS:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=f"Invalid file extension. Allowed extensions: {', '.join(ALLOWED_EXTENSIONS)}"
+        )
+        
+    # 3. Validate MIME type
+    if file.content_type not in ALLOWED_MIME_TYPES:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=f"Invalid MIME type. Allowed types: {', '.join(ALLOWED_MIME_TYPES)}"
+        )
+        
+    # 4. Validate file size (Read up to 2MB to verify size)
+    file.file.seek(0, os.SEEK_END)
+    file_size = file.file.tell()
+    file.file.seek(0)  # Reset pointer back to beginning
+    
+    if file_size > MAX_FILE_SIZE:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="File size exceeds the maximum allowed limit of 2MB."
+        )
+        
+    # 5. Generate secure unique filename to avoid collision or path traversal
+    unique_filename = f"{uuid.uuid4()}{ext}"
+    upload_dir = "app/static/covers"
+    os.makedirs(upload_dir, exist_ok=True)
+    file_path = os.path.join(upload_dir, unique_filename)
+    
+    # 6. Save binary stream to file system asynchronously
+    try:
+        with open(file_path, "wb") as buffer:
+            while chunk := <span class="code-tip" data-tip="Asynchronously reads a chunk from the uploaded file stream to prevent blocking the event loop.">await file.read(1024 * 64)</span>:
+                buffer.write(chunk)
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Could not write file content to disk."
+        )
+        
+    # 7. Persist static URL to the database
+    static_url = f"/static/covers/{unique_filename}"
+    db_book.cover_image = static_url
+    db.commit()
+    db.refresh(db_book)
+    
+    return db_book</code></pre>
+                </div>
+
+                <h4>Phase 5: Cleanup &amp; Serialization</h4>
+                <p>After the handler returns, FastAPI handles serialization and session teardown:</p>
+                <ul>
+                    <li><strong>Serialization:</strong> The database entity returned by the route handler is parsed by the Pydantic schema declared in <code>response_model</code>. Pydantic filters out internal and sensitive attributes (e.g. passwords or local file paths) and maps DB records using attributes.</li>
+                    <li><strong>Connection release:</strong> FastAPI calls the clean up execution step of the dependency resolver. In the case of <code>get_db</code>, this triggers the <code>finally</code> block, executing <code>db.close()</code> to clean up database connections safely.</li>
+                </ul>
+            </section>
+
+            <section id="advanced" class="test-section">
+                <h2>6. Advanced Topics &amp; Production Best Practices</h2>
+                <p>As applications scale from development to production environments, advanced capabilities such as Cross-Origin Resource Sharing (CORS), custom Middlewares, real-time bi-directional WebSockets, and optimized deployment configurations become crucial for building robust, secure, and performant APIs.</p>
+                
+                <h3>Cross-Origin Resource Sharing (CORS)</h3>
+                <p>CORS is a browser-enforced security mechanism that prevents web applications running on one domain from making resource requests to a different domain, unless explicitly allowed by the server. To enable frontend frameworks (like React, Vue, or Svelte) to interact with your FastAPI backend, you must configure <code>CORSMiddleware</code>.</p>
+                
+                <div class="code-window-card">
+                    <div class="code-window-header">
+                        <div class="dot-container">
+                            <span class="mac-dot red"></span>
+                            <span class="mac-dot yellow"></span>
+                            <span class="mac-dot green"></span>
+                        </div>
+                        <button class="copy-btn">Copy</button>
+                    </div>
+                    <pre><code class="language-python">from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
+
+app = FastAPI()
+
+# Define list of origins allowed to make requests to this API
+origins = [
+    "http://localhost:3000",      # Common React dev server port
+    "https://myfrontend.com",     # Production frontend domain
+]
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,            # Allows requests from specific origins
+    allow_credentials=True,           # Allows cookies or authentication headers
+    allow_methods=["*"],              # Allows all HTTP methods (GET, POST, etc.)
+    allow_headers=["*"],              # Allows all request headers
+)</code></pre>
+                </div>
+
+                <h3>Custom Middleware: Execution Time Tracker</h3>
+                <p>Middleware is a function that runs before every request is processed by a specific route handler, and also after every response is generated. Middlewares are ideal for cross-cutting concerns like logging, request validation, and profiling.</p>
+                
+                <div class="code-window-card">
+                    <div class="code-window-header">
+                        <div class="dot-container">
+                            <span class="mac-dot red"></span>
+                            <span class="mac-dot yellow"></span>
+                            <span class="mac-dot green"></span>
+                        </div>
+                        <button class="copy-btn">Copy</button>
+                    </div>
+                    <pre><code class="language-python">import time
+from fastapi import Request, FastAPI
+
+app = FastAPI()
+
+@app.middleware("http")
+async def add_process_time_header(request: Request, call_next):
+    start_time = time.perf_counter()
+    
+    # Process the request and pass it to the route handler
+    response = await call_next(request)
+    
+    # Calculate execution duration
+    process_time = time.perf_counter() - start_time
+    
+    # Inject execution duration in response headers
+    response.headers["X-Process-Time"] = f"{process_time:.4f}s"
+    
+    return response</code></pre>
+                </div>
+
+                <h3>Real-Time Communication with WebSockets</h3>
+                <p>WebSockets enable persistent, bi-directional, full-duplex communication channels over a single TCP connection, which is ideal for real-time applications such as chat systems, live dashboards, and notification systems.</p>
+                
+                <div class="code-window-card">
+                    <div class="code-window-header">
+                        <div class="dot-container">
+                            <span class="mac-dot red"></span>
+                            <span class="mac-dot yellow"></span>
+                            <span class="mac-dot green"></span>
+                        </div>
+                        <button class="copy-btn">Copy</button>
+                    </div>
+                    <pre><code class="language-python">from fastapi import FastAPI, WebSocket, WebSocketDisconnect
+
+app = FastAPI()
+
+class ConnectionManager:
+    def __init__(self):
+        self.active_connections: list[WebSocket] = []
+
+    async def connect(self, websocket: WebSocket):
+        await websocket.accept()
+        self.active_connections.append(websocket)
+
+    def disconnect(self, websocket: WebSocket):
+        self.active_connections.remove(websocket)
+
+    async def send_personal_message(self, message: str, websocket: WebSocket):
+        await websocket.send_text(message)
+
+    async def broadcast(self, message: str):
+        for connection in self.active_connections:
+            await connection.send_text(message)
+
+manager = ConnectionManager()
+
+@app.websocket("/ws/{client_id}")
+async def websocket_endpoint(websocket: WebSocket, client_id: int):
+    await manager.connect(websocket)
+    try:
+        while True:
+            # Wait for any incoming client text message
+            data = await websocket.receive_text()
+            await manager.send_personal_message(f"You wrote: {data}", websocket)
+            await manager.broadcast(f"Client #{client_id} says: {data}")
+    except WebSocketDisconnect:
+        manager.disconnect(websocket)
+        await manager.broadcast(f"Client #{client_id} has left the chat")</code></pre>
+                </div>
+
+                <h3>Production Deployment</h3>
+                <p>For production environments, FastAPI applications are typically run behind an ASGI server like <strong>Uvicorn</strong> or <strong>Gunicorn</strong> (managing Uvicorn workers) combined with a reverse proxy like <strong>Nginx</strong> for SSL termination, load balancing, and static file serving.</p>
+                
+                <h4>Uvicorn Command Settings</h4>
+                <p>Run Uvicorn with multiple workers in production to leverage multi-core CPUs. A common rule of thumb is <code>(2 * number_of_cores) + 1</code> workers.</p>
+                
+                <div class="code-window-card">
+                    <div class="code-window-header">
+                        <div class="dot-container">
+                            <span class="mac-dot red"></span>
+                            <span class="mac-dot yellow"></span>
+                            <span class="mac-dot green"></span>
+                        </div>
+                        <button class="copy-btn">Copy</button>
+                    </div>
+                    <pre><code class="language-bash"># Run FastAPI in production with 4 worker processes, binding to all interfaces
+uv run uvicorn app.main:app --host 0.0.0.0 --port 8000 --workers 4 --log-level info</code></pre>
+                </div>
+
+                <h4>Nginx Reverse Proxy Configuration Block</h4>
+                <p>Nginx intercepts incoming HTTP/HTTPS traffic, handles slow clients, serves static assets directly, and proxies application requests to the backend ASGI server.</p>
+                
+                <div class="code-window-card">
+                    <div class="code-window-header">
+                        <div class="dot-container">
+                            <span class="mac-dot red"></span>
+                            <span class="mac-dot yellow"></span>
+                            <span class="mac-dot green"></span>
+                        </div>
+                        <button class="copy-btn">Copy</button>
+                    </div>
+                    <pre><code class="language-nginx">server {
+    listen 80;
+    server_name api.example.com;
+
+    # Redirect all HTTP traffic to HTTPS (Recommended for Production)
+    return 301 https://$host$request_uri;
+}
+
+server {
+    listen 443 ssl http2;
+    server_name api.example.com;
+
+    ssl_certificate /etc/letsencrypt/live/api.example.com/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/api.example.com/privkey.pem;
+
+    client_max_body_size 10M; # Max file upload size
+
+    # Route request to the FastAPI application
+    location / {
+        proxy_pass http://127.0.0.1:8000;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+
+        # Support WebSockets protocols
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection "upgrade";
+    }
+
+    # Direct static asset caching
+    location /static/ {
+        alias /var/www/fastapi_app/app/static/;
+        expires 30d;
+        add_header Cache-Control "public, no-transform";
+    }
+}</code></pre>
+                </div>
+            </section>
+        </main>
+    </div>
+    <!-- Prism.js CDN -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-core.min.js" integrity="sha512-9khQRAUBYEJDCDVP2yw3LRUQvjJ0Pjx0EShmaQjcHa6AXiOv6qHQu9lCAIR8O+/D8FtaCoJ2c0Tf9Xo7hYH01Q==" crossorigin="anonymous" referrerpolicy="no-referrer" defer></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/autoloader/prism-autoloader.min.js" integrity="sha512-SkmBfuA2hqjzEVpmnMt/LINrjop3GKWqsuLSSB3e7iBmYK7JuWw4ldmmxwD9mdm2IRTTi0OxSAfEGvgEi0i2Kw==" crossorigin="anonymous" referrerpolicy="no-referrer" defer></script>
+    <!-- Prism Keep Markup Plugin to preserve custom spans inside code blocks -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/keep-markup/prism-keep-markup.min.js" integrity="sha512-4J1H6r6fshz5D/cSkV3j9D+G43z1Qc8Yj1/hH9UvL4T3dI911iA28a1Wd5fD4Jj8x15Z+7wV146X15J8X25yA==" crossorigin="anonymous" referrerpolicy="no-referrer" defer></script>
+    <!-- Mermaid.js CDN -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mermaid/10.9.1/mermaid.min.js" integrity="sha384-WmdflGW9aGfoBdHc4rRyWzYuAjEmDwMdGdiPNacbwfGKxBW/SO6guzuQ76qjnSlr" crossorigin="anonymous" referrerpolicy="no-referrer" defer></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const rootStyles = getComputedStyle(document.documentElement);
+            const primaryColor = rootStyles.getPropertyValue('--surface-card').trim();
+            const primaryTextColor = rootStyles.getPropertyValue('--ink-primary').trim();
+            const primaryBorderColor = rootStyles.getPropertyValue('--primary-coral').trim();
+            const lineColor = rootStyles.getPropertyValue('--primary-coral').trim();
+            const secondaryColor = rootStyles.getPropertyValue('--surface-dark').trim();
+            const tertiaryColor = rootStyles.getPropertyValue('--canvas-bg').trim();
+
+            mermaid.initialize({
+                startOnLoad: true,
+                securityLevel: 'strict',
+                theme: 'base',
+                themeVariables: {
+                    primaryColor,
+                    primaryTextColor,
+                    primaryBorderColor,
+                    lineColor,
+                    secondaryColor,
+                    tertiaryColor
+                }
+            });
+
+            // Populate Sidebar Navigation List Dynamically
+            const mainContent = document.getElementById('main-content');
+            const navList = document.getElementById('nav-list');
+            const sections = mainContent.querySelectorAll('section[id]');
+            const cachedSections = [];
+
+            sections.forEach(section => {
+                const id = section.getAttribute('id');
+                const titleElement = section.querySelector('h2, h1, h3');
+                const title = titleElement ? titleElement.textContent : id;
+
+                const li = document.createElement('li');
+                li.className = 'nav-item';
+
+                const a = document.createElement('a');
+                a.className = 'nav-link';
+                a.setAttribute('data-sec', id);
+                a.setAttribute('href', `#${id}`);
+                a.textContent = title;
+
+                // Smooth scroll logic on click
+                a.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    section.scrollIntoView({ behavior: 'smooth' });
+                    if (window.innerWidth < 768) {
+                        closeSidebar();
+                    }
+                });
+
+                li.appendChild(a);
+                navList.appendChild(li);
+
+                cachedSections.push({
+                    element: section,
+                    text: section.textContent.toLowerCase(),
+                    id: id,
+                    link: a
+                });
+            });
+
+            let activeSectionId = null;
+
+            // Helper to check if scrolled to the very bottom of #main-content
+            function isAtBottom() {
+                return (mainContent.scrollHeight - mainContent.scrollTop - mainContent.clientHeight) < 5;
+            }
+
+            // Helper to update active nav link classes
+            function setActiveLink(activeId) {
+                cachedSections.forEach(item => {
+                    if (item.id === activeId && !item.element.classList.contains('section-hidden')) {
+                        item.link.classList.add('active');
+                    } else {
+                        item.link.classList.remove('active');
+                    }
+                });
+            }
+
+            // Core Scrollspy updates
+            function updateScrollspy() {
+                if (isAtBottom()) {
+                    const visibleSections = cachedSections.filter(item => !item.element.classList.contains('section-hidden'));
+                    if (visibleSections.length > 0) {
+                        const lastVisible = visibleSections[visibleSections.length - 1];
+                        setActiveLink(lastVisible.id);
+                        return;
+                    }
+                }
+
+                if (activeSectionId) {
+                    const activeItem = cachedSections.find(item => item.id === activeSectionId);
+                    if (activeItem && !activeItem.element.classList.contains('section-hidden')) {
+                        setActiveLink(activeSectionId);
+                        return;
+                    }
+                }
+
+                // Fallback to first visible section if current active is hidden or null
+                const firstVisible = cachedSections.find(item => !item.element.classList.contains('section-hidden'));
+                if (firstVisible) {
+                    setActiveLink(firstVisible.id);
+                } else {
+                    setActiveLink(null);
+                }
+            }
+
+            // Intersection Observer for Scrollspy
+            const observerOptions = {
+                root: mainContent,
+                rootMargin: '0px 0px -60% 0px',
+                threshold: 0
+            };
+
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        activeSectionId = entry.target.getAttribute('id');
+                        updateScrollspy();
+                    }
+                });
+            }, observerOptions);
+
+            sections.forEach(section => observer.observe(section));
+
+            // Scroll listener on mainContent to catch bottom-of-page and scroll updates
+            mainContent.addEventListener('scroll', updateScrollspy);
+
+            // Live Search Filter Logic via Cached Data
+            const searchInput = document.getElementById('search-input');
+            searchInput.addEventListener('input', (e) => {
+                const query = e.target.value.toLowerCase().trim();
+
+                cachedSections.forEach(item => {
+                    const isMatch = item.text.includes(query);
+
+                    if (isMatch || query === '') {
+                        item.element.classList.remove('section-hidden');
+                        item.link.parentElement.classList.remove('hidden');
+                    } else {
+                        item.element.classList.add('section-hidden');
+                        item.link.parentElement.classList.add('hidden');
+                        item.link.classList.remove('active');
+                    }
+                });
+
+                updateScrollspy();
+            });
+
+            // Clipboard copy function with fallback support
+            function copyToClipboard(text, successCallback, errorCallback) {
+                if (navigator.clipboard && navigator.clipboard.writeText) {
+                    navigator.clipboard.writeText(text).then(successCallback).catch(errorCallback);
+                } else {
+                    try {
+                        const textarea = document.createElement('textarea');
+                        textarea.value = text;
+                        textarea.style.position = 'fixed';
+                        textarea.style.top = '0';
+                        textarea.style.left = '0';
+                        textarea.style.opacity = '0';
+                        document.body.appendChild(textarea);
+                        textarea.focus();
+                        textarea.select();
+                        const successful = document.execCommand('copy');
+                        document.body.removeChild(textarea);
+                        if (successful) {
+                            successCallback();
+                        } else {
+                            errorCallback(new Error('execCommand copy returned false'));
+                        }
+                    } catch (err) {
+                        errorCallback(err);
+                    }
+                }
+            }
+
+            // Code block copy button functionality
+            document.querySelectorAll('.copy-btn').forEach(button => {
+                button.addEventListener('click', () => {
+                    if (button.textContent === 'Copied!') return;
+                    const codeBlock = button.parentElement.nextElementSibling?.querySelector('code');
+                    if (codeBlock) {
+                        const originalText = button.textContent;
+                        copyToClipboard(codeBlock.textContent, () => {
+                            button.textContent = 'Copied!';
+                            button.style.borderColor = '#27c93f';
+                            button.style.color = '#27c93f';
+                            setTimeout(() => {
+                                button.textContent = originalText;
+                                button.style.borderColor = '';
+                                button.style.color = '';
+                            }, 2000);
+                        }, (err) => {
+                            console.error('Failed to copy text: ', err);
+                        });
+                    }
+                });
+            });
+
+            // Mobile sidebar drawer logic
+            const hamburgerMenu = document.getElementById('hamburger-menu');
+            const sidebar = document.getElementById('sidebar');
+            const sidebarOverlay = document.getElementById('sidebar-overlay');
+
+            function toggleSidebar() {
+                const isOpen = sidebar.classList.toggle('open');
+                hamburgerMenu.classList.toggle('open');
+                if (isOpen) {
+                    sidebarOverlay.classList.add('active');
+                } else {
+                    sidebarOverlay.classList.remove('active');
+                }
+            }
+
+            function closeSidebar() {
+                sidebar.classList.remove('open');
+                hamburgerMenu.classList.remove('open');
+                sidebarOverlay.classList.remove('active');
+            }
+
+            if (hamburgerMenu && sidebarOverlay) {
+                hamburgerMenu.addEventListener('click', toggleSidebar);
+                sidebarOverlay.addEventListener('click', closeSidebar);
+            }
+
+            // Dynamic Line Explanations Tooltip implementation
+            const tooltip = document.createElement('div');
+            tooltip.className = 'dynamic-code-tooltip';
+            tooltip.style.position = 'absolute';
+            tooltip.style.backgroundColor = 'var(--surface-card)';
+            tooltip.style.color = 'var(--ink-primary)';
+            tooltip.style.border = '1px solid var(--primary-coral)';
+            tooltip.style.padding = '8px 12px';
+            tooltip.style.borderRadius = '6px';
+            tooltip.style.fontSize = '12px';
+            tooltip.style.maxWidth = '300px';
+            tooltip.style.boxShadow = '0 4px 12px rgba(20,20,19,0.08)';
+            tooltip.style.pointerEvents = 'none';
+            tooltip.style.opacity = '0';
+            tooltip.style.display = 'none';
+            tooltip.style.transition = 'opacity 0.15s ease';
+            tooltip.style.zIndex = '9999';
+            document.body.appendChild(tooltip);
+
+            let currentTarget = null;
+
+            const onMouseMove = (e) => {
+                let x = e.clientX + 10;
+                let y = e.clientY + 10;
+                const tooltipWidth = tooltip.offsetWidth || 250;
+                const tooltipHeight = tooltip.offsetHeight || 80;
+                if (x + tooltipWidth > window.innerWidth) {
+                    x = e.clientX - tooltipWidth - 10;
+                }
+                if (y + tooltipHeight > window.innerHeight) {
+                    y = e.clientY - tooltipHeight - 10;
+                }
+                tooltip.style.left = (x + window.pageXOffset) + 'px';
+                tooltip.style.top = (y + window.pageYOffset) + 'px';
+            };
+
+            document.addEventListener('mouseover', (e) => {
+                const target = e.target.closest('[data-tip]');
+                if (target && target !== currentTarget) {
+                    currentTarget = target;
+                    tooltip.textContent = target.getAttribute('data-tip');
+                    tooltip.style.display = 'block';
+                    tooltip.style.opacity = '1';
+                    document.removeEventListener('mousemove', onMouseMove);
+                    document.addEventListener('mousemove', onMouseMove);
+                }
+            });
+
+            document.addEventListener('mouseout', (e) => {
+                const target = e.target.closest('[data-tip]');
+                const relatedTarget = e.relatedTarget ? e.relatedTarget.closest('[data-tip]') : null;
+                if (target && target !== relatedTarget) {
+                    currentTarget = null;
+                    tooltip.style.display = 'none';
+                    tooltip.style.opacity = '0';
+                    document.removeEventListener('mousemove', onMouseMove);
+                }
+            });
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,126 @@
+All right.
+This is now the big moment when we get to create our own Docker image, starting with the Docker file.
+So in this step I've got a Docker file written right here.
+So let me copy all of this text.
+Remember the docker file is the description of how to create a Docker image.
+So we're now going to go to the project root and make a new file.
+And we're going to call it Dockerfile exactly like that.
+And paste it in there.
+And here it is.
+All right so let me just explain this Docker file.
+Now some people will have used Docker files many times before.
+And this will be old hat.
+Some people.
+This is the first Dockerfile you've ever seen.
+And this is going to blow your mind.
+Uh, and don't worry.
+Get intuition.
+You don't need to understand this.
+You just have to get a feel for it.
+So this set of instructions is actually going to end up creating two different Docker images.
+One of them we're only using temporarily.
+And we begin with the temporary one.
+So this from command says I want you to connect to something called the Docker Hub, which is a well
+known repository of existing Docker images, and use something as a starting point.
+I want you to use a node version 22 Docker image as your starting point, and then I want to run a few
+commands, which includes setting an environment variable and then running npm run build.
+And that's the command you may remember, which we've set up so that that will generate a static version
+of our website of our front end.
+Based on what we built in Next.js.
+It's going to ask Next.js to turn it into a static set of files.
+Okay, that's now been done.
+Now I'm going to work on the Docker image.
+I'm going to start with a version of Python 3.12, a slim, a very simple version of it, using an existing
+Docker image that's out there.
+And I'm going to adapt it.
+What am I going to do?
+Well, I'm going to start by pip installing all the packages in my requirements.txt.
+So everything's ready.
+I'm going to copy in my file API slash server dot Pi, which has my backend, and then I'm going to
+copy across from the temporary image that I just built a moment ago.
+I'm going to copy across this static website, and I'm going to plonk it in this new image I'm creating.
+You follow me here.
+And then I'm going to have this thing called a health check, which is going to be able to hit our health
+endpoint regularly.
+And then finally I'm going to say port 8000 is where I'm going to be running my server.
+And then I'm going to start up my server by making the command uvicorn.
+I'm going to say it's in the server module, the app, uh, class.
+And then I set my, my host and my port port 8000.
+And that will launch our web server listening on port 8000 within this Docker image.
+And so this then completes the definition of our of our Docker file, which defines the Docker image
+that we want to create.
+You can see it's not been saved yet I'm going to save it.
+And now this is saved.
+And now I'm going to do a quick best practice of creating a file called dockerignore.
+Not strictly required here, but this these have files that get excluded from building the Docker image.
+So new file dockerignore.
+It's a similar concept to a git.
+Ignore and paste in those files and save.
+And that's done.
+Okay.
+Uh there is now we're going to now go ahead and build a Docker image from this Docker file.
+So there's a script here, one for people on Mac and Linux and one for people on windows, which is
+very simple.
+All this does is it takes the environments that we set up in the env file, and it actually sets those
+as environment variables in our terminal.
+So if I open a new terminal here and I just run this script on a mac where I am when I run this, bam,
+it's done.
+Those environment variables are now set.
+Okay.
+And now this is the command I'm going to run this docker build command.
+So for you to have this straight.
+What this command does is it's going to take the Docker file, and it's going to use that to build a
+new Docker image as described in that file.
+And when I run this stuff starts to happen.
+And in my case it's very quick because I've already run it and it's able to use the thing that's run
+before.
+In your case, it will take longer because it will need to do each of the different steps.
+And you can see here how it's cached, the various different steps.
+But what it will need to do is copy in the requirements, run pip install to install everything on the
+Python side and then it will copy across.
+It will do a run npm run build which builds your your front end server, and then it will copy across
+those front end that static website from app out into static.
+And that means we've now used npm run build to build a static front end.
+And we've copied that into our server.
+And finally that is then running or getting ready to run.
+And at the end here, you'll see there are two warnings.
+And these warnings are warning you that we are using a, an environment, uh, secret that we're using
+it officially in our Docker container.
+And it's worried about that.
+But actually it's wrong to worry.
+This is in fact, it's even called a public publishable key.
+This key is something that can be public.
+It's okay to use this.
+So this warning, these two warnings can be safely ignored.
+You should expect them and ignore them.
+And that concludes we have just successfully built a Docker image from our Docker file.
+Uh, and as part of it, we created another Docker container and then ran it in order to be able to
+build our Docker image.
+But that is now done.
+It is built.
+It probably took 2 to 3 minutes for you.
+And then if you run it a second time, it will be instant like me.
+And congratulations, you're now the proud owner of a Docker image that you have defined and described
+that packages the back end and front end of this app, and what remains to be done next is to actually
+run it to make a Docker container out of this image.
+Let's give that a whirl.
+Are you excited?
+I hope you're excited.
+We're about to launch first Docker container.
+You probably forgot what our app even does now.
+It seems like such a long time ago.
+Uh, here it is.
+This is the docker run command for Mac and for windows.
+I'm going to run it on my Mac.
+Copy that command, paste it in the terminal.
+Let's see our Docker container come to life.
+It's using our image that's called consultation app.
+It started it and it's apparently running uh and it called its own health root to make sure it's okay.
+Let's launch and see what we have here.
+Uh, we'll say open.
+Okay.
+That's a good sign.
+That's our user interface.
+So just to make sure that you've really got this, this is running on my local box in a Docker container.
+This is the front end.
+And it's, it recognizes that I'm already logged in.

@@ -1,0 +1,164 @@
+Okay, we have just one more thing to do to this.
+We're going to add in one of the the managed tools, one of the tools that comes with bedrock.
+We're going to add in the code interpreter.
+So what we're going to do is it's going to be really simple.
+We're going to add in one more tool right under the imports.
+We're going to add this.
+So let's go back to looper.py under these imports here.
+Add this.
+It's got another import.
+It imports the code interpreter and also JSON.
+And then what we do here is we create a code client code interpreter in US West two, which I believe
+right now at least it has to be US West two.
+That is the only place where this code interpreter runs.
+And we're then going to create a new tool.
+So the code interpreter is the thing that actually runs the code.
+But we have to create the tool that we will give to strands.
+Um, and this tool is will call it execute Python.
+We could call it whatever we want and we give it a comment.
+Execute Python code in the code interpreter.
+Uh and we call this code client.
+We call invoke execute code and language Python, and we pass in whatever came in in our input to this
+function.
+And then this is some stuff to get back the output and return it.
+All right.
+That is our execute Python code function I just did save.
+If you saw that let's go back here.
+Let's change the system prompt to give it a little bit of a juicier, beefier system prompt.
+Here we go.
+Paste save.
+So I'm saying you're given a problem to solve.
+Same as before.
+You also have access to execute Python tool to run Python.
+Your plan should include solving the problem without Python and then writing Python code to validate
+your solution.
+I should probably say Python code and running it to validate your solution.
+To use the execute Python tool to validate your solution, you must have a task on your to do list prefixed
+with write python code to uh and now blah blah blah.
+So of course you don't need to have exactly the system prompt.
+You can play around with it as you wish.
+but I think this is going to be an intriguing way for us to see the to do list and Python execution
+in action together.
+Okay, back we go to the Readme.
+There's just a couple more things to do.
+Uh, so we want to update the print method so that when it's doing coding, it will print it in red
+so that we just get a little bit more insight into this.
+This is just a cosmetic change, really.
+Look, if it's a if Python is in the description, then we put it in red just because it's going to
+look cool.
+Um, okay.
+And then the only final step is to replace the tools call with this.
+We're just going to add in execute Python as a tool.
+Uh so where do we do the tools.
+Right here.
+We're just going to put in there comma execute Python just as cursor as telling us okay.
+So now the agent is equipped with creative DOS mark complete list to DOS and execute Python.
+All right back here we go.
+It's now a matter of doing.
+You've run agent or launch.
+Did I save?
+Yes, I did, so I can just run this.
+And off it goes.
+And I will see you a second when this is deployed.
+And we will be able to give this a whirl.
+Okay.
+So we're going to give it the same as before.
+Exactly the same challenge.
+This time it's equipped with a tool to run Python code.
+So here we go.
+Uh let me see.
+It says it needs to, uh, solve the problem step by step.
+It's giving itself, uh, seven to do's.
+The first one is to identify the given information.
+Just like before.
+These look pretty similar, but it ends with a step to write Python code to validate the solution.
+Uh, which is a printed in red because of that little extra thing that I did.
+Uh, and so this is really cool.
+And I'm not this time going to sit here to give you the running commentary for the next minute.
+While I believe Claude is ferociously retrying with rate limits behind the scenes, but I will, I will
+I will just look at that.
+Look at that as it crosses things off.
+It's so great.
+I hope you've got the same experience.
+You're seeing this happening, and I will come back in a second when this is complete and we'll see
+what answer we get.
+And there we go.
+It completed.
+Hopefully yours did too.
+And I do believe we got yes.
+4:06 p.m..
+We got a more accurate answer this time, although it came up with that answer before it even used the
+Python tool.
+But but so interesting.
+But but there we go.
+It's able to use the managed tool as well.
+We have success.
+We have a deployed agent using tools all running in the cloud on AWS.
+That's pretty awesome.
+And the final step in in our sheet here is that we just want to go and go, go and look at the observability,
+which will have us go back to the AWS console as your IAM user, go to the Bedrock Agent Core service
+and look at observability.
+Let's go and do that now.
+So here we are in AWS console check.
+It's the IAM user.
+On the top right we go to Bedrock Agent Core.
+There it is.
+Click there.
+And now here on the left is observability.
+So we can go into this and check out what we can see.
+Uh so as long as you configured everything then you should see stuff like this.
+I've got a couple of agents, got some sessions, some traces, some error and throttles.
+Stuff happening here are the agents.
+Uh, this is, uh, the, uh, first that we did, and then this is Looper, uh, which which we just
+built and got a couple of sessions, a couple of traces, and.
+Yeah, you can click on sessions to view the the different sessions you had.
+You can see I'm getting lots of errors and throttles and stuff and go to traces to look more at the
+actual traces that, uh, that have been left by, by the agent.
+A bit like the traces we get in OpenAI agents SDK.
+So if we come in to to one of these traces, we see, uh, all of this, uh, spans.
+And this is where I mentioned you could see a lot of for me, I get a lot of these red things here.
+If I click on that, uh, I'm getting a rate limit error that's coming from this, uh, with some,
+some retries, and it's, uh, continually retries until it gets through, which is great.
+Uh, so it's surprisingly robust given given how much, uh, trouble I've given it.
+So I'm very happy to see this.
+Uh, and it's interesting.
+And I didn't even realize that this retrying was happened.
+I, I'd noticed how slow it was, and I thought, I wonder why it's so slow.
+Maybe there's some queuing thing happening.
+Uh, but it didn't occur to me that I was getting rate limit errors, and it was automatically retrying
+until I brought up the traces and saw this.
+So, uh, very, very insightful.
+And anyway, you may have a better tracer than me, but you should take a look through it and have a
+look at some of what's going on.
+Take a look at the, uh, the code tools that are getting the mark complete and so on.
+everything running away and read through your traces.
+As always, get a good sense of it and have a look at the different bits of information that you can
+review on the observability page of Amazon Bedrock Agent Core.
+And that is a rather satisfying wrap on our last lab of our last day, of our last week.
+And I hope you're impressed by AWS Bedrock Agent Core.
+It definitely is what it says on the tin.
+Easy to get your agent deployment out there.
+And as I say, as long as you are comfortable sticking within the kind of scaffolding that it's set
+for you, then I can't imagine an easier way to get something deployed out onto AWS services.
+So I think it's a great entrance to the market and I look forward to playing with it.
+My suggestion for you is do a quick assignment to take this further, so you could build a local front
+end app using Next.js, just so you could drive it from a from a screen, unless you enjoy using the
+terminal, in which case you can you can keep doing that the code style experience, but add in the
+other managed tool, the browser automation tool, so that it can do that as well as running code,
+and then turn this into something which is like a co-worker for you.
+I like to call it a sidekick.
+My on my Agentic course, we build out a sidekick agent, and you could do this here, but it's a sidekick
+running on AWS and using its managed tools.
+And it would also, of course, now have this to do list, which we didn't do last time.
+And being a single agent loop, which is which is which is.
+So yeah, easy and cool to see this happening.
+So build all of that, make a sidekick.
+And since you happen to already be in the production repo, what could be easier than just taking your
+your agent and plonking it in to community contributions?
+There it is.
+Put it in community contributions.
+Send a PR.
+I would love some wonderful agent called deployments examples in here that others can then take, and
+I would like to try it out myself.
+So please do that.
+That would be great.

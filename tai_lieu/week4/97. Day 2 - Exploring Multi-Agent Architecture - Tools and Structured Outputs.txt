@@ -1,0 +1,85 @@
+So next up, what I've got is something which is a bit of an exercise for you, uh, which is going
+to be some, some reading.
+A reading assignment, as you will see.
+It will make sense in a second.
+I want to take you to the back end folder in Alex.
+Open it up and you'll see a number of directories here.
+Some of them you know very well.
+You already know, of course, from last week like ingest and, uh, researcher, our research agent.
+So those you're familiar with and you're also familiar with database because that's what we worked on
+yesterday.
+So you know these ones.
+But there's a bunch of them that are new.
+And the ones we'll look at right now are of course, charter and planner and reporter and and retirement
+and tagger.
+Those are the new the agent directories.
+Let's pick one.
+Let's, let's pick a retirement and open it up and have a look at what it contains.
+And what you'll find is that each of these subdirectories, each agent directory has very similar structure.
+So once you get the structure of one of them you've got them all.
+So first of all it has a Python module called Lambda Handler, and you hopefully remember that from
+week two.
+This is the Python module that will get deployed to Lambda, and which when you come into it and have
+a look at it, you'll see that it has a bunch of stuff, but most importantly it has lambda handler
+as a function.
+This is the function that will get called on our lambda process, on our on our lambda serverless deployment
+instance every time it is invoked.
+So that is our lambda handler function.
+We have a separate class called agent Pi, which is where we're putting our actual agent functionality.
+And I'm using OpenAI agents SDK for our agent functionality in this in this course.
+And I'm using that because that's my favorite.
+But it really doesn't matter.
+You could use any one.
+We're not using any of the clever features of OpenAI agents SDK.
+We're just using an agent call, an LLM call.
+And we're using tools, of course, and we're using structured outputs, of course.
+And all of the agent frameworks support that.
+OpenAI agents SDK integrates with bedrock via light LM, and that's how we're going to be doing it.
+So does crew AI.
+Same thing.
+Also uses light LM so many of these frameworks are exactly the same.
+And you could use any that is not important, but the code itself is in agent py.
+This is where is the code.
+There's some other stuff to do with with preparing the data.
+But then ultimately it's got the code that creates the agent right here.
+There's also a separate class called templates.
+And templates.py is where I've put the text that will get used in the prompts.
+It's the key part of context engineering that happens there along with agent py.
+So templates for each of these directories is where that happens.
+Each of them is of course a UV project in its own right.
+So it's got its own like UV and its own Pyproject.toml.
+We'll see here somewhere.
+And there it is.
+And it's got its own virtual environment in here too.
+And each of them has a file called package_docker.py and package docker.
+Um it's not it's not a Docker container.
+It's a Python module which is able to package up lambda into a zip file.
+This one is called retirement lambda zip.
+And it does that using a Docker container to do the packaging.
+And why does it use a Docker container?
+Because we want to make sure that we package this for a Lambda instance for for a Linux server.
+So we use a special Docker container to do that for us Docker image that AWS has produced.
+And this is something we also did in week two.
+So hopefully you remember this and you're like, yeah, I remember that.
+Uh, so this is this is a great technique I think if I remember right, yes.
+When we did it in week two, we had lots of scripts that we had.
+We had like a shell script and a PowerShell script.
+This time we're doing it all in Python code, which makes life easier for us because we don't need to
+have a windows version and a mac version.
+You can just run it by running this module in this UV folder.
+So this is possibly a better way of doing it.
+So these are all the different classes.
+And ignore observability.py for now.
+That's one that we'll be coming back to.
+Um yes you could you could pretend that's not there.
+So these these are the classes.
+And I also there's also some testing classes I'm going to come back to in a second.
+But first the exercise for you, the exercise is now to go into each of these folders.
+Look through each of the each of the five.
+And I want you to see how are the agents created and which of them use tools and which of them use structured
+outputs.
+And take a little note, and then we will come back in a second and uh, compare notes and see if you
+found that correctly.
+See, see which what agent does what and how they use tools and structured outputs to achieve their
+task by looking in the implementations of agents in each of those five directories and put me on pause.
+Go and do that and we'll come back in a minute to compare notes.

@@ -1,0 +1,141 @@
+So here we are.
+Here we're looking at the, uh, the results of our deployment.
+And the question is, is this just going to work?
+First time we just did a Terraform apply.
+So I am going to this is where it's saying that that it is deployed CloudFront distribution.
+And I am going to launch this right now I'm going to say open.
+And here bam this is running on the internet.
+Everybody on the internet on CloudFront.
+This is our financial advisor.
+This is the landing page.
+And this is the same as before of course.
+So first of all there's the sign in button.
+Let's give it a try.
+Sign in with Google.
+And I'm authorizing my Google account.
+Continue.
+And here we are.
+We're signed in and it's got my my avatar at the top there.
+It knows who I am.
+And we'll now go to dashboard.
+And this is of course running.
+This is, you know, for real running out there.
+This is now no longer I've I've closed my local server.
+This is all running using the deployed Lambda API and going through API gateway, of course.
+So it's, uh, let's let's go to our accounts.
+You can see it's got a nice loading pulse there.
+Here we go.
+Uh, and I'm going to just show you I'm going to reset all my accounts like this, and then I'm going
+to populate my test data.
+So we create test data from scratch.
+Here it is.
+And, uh, yeah.
+Let's come on into the brokerage account.
+Let's edit that brokerage account.
+Lovely.
+And let's add a position.
+I'm going to add a position in my, uh, uh, older friend, uh, JP Morgan.
+And we will give that a quantity of ten.
+Add the position.
+There it is.
+It's ten.
+And none of these have a price yet.
+It doesn't know the price of these, uh, positions.
+Uh, okay.
+So now let's go to the next tab along which says advisor team.
+And this this is the new one.
+And what we're going to want to do now is press this Start new analysis button.
+Let's see what happens.
+Uh, when we do that.
+Okay.
+Here we go.
+I pressed the button and you'll see right away that something happens that this this line comes across.
+It's showing something going on.
+What happened?
+It put a message on the queue on SQS.
+That message was picked up by financial planner, by by our planner Lambda service that that spun up,
+that then called to bedrock that used Nova Pro and armed it with three tools, equipped it with tools
+that it could use.
+It decided to use those tools.
+And so as a result, uh, all three of the other Lambda services were called and started working.
+That includes reporter, which is the Lambda service that again uses Nova to write reports on our,
+uh, on, on our retirement, uh, on our on our financial planning.
+The chart specialist, which is the Lambda service that uses Nova to come up with some JSON that could
+describe different charts, that it can come up with any charts that it thinks would be good to visualize
+about my investments, and then retirement planner, which looks at my portfolio and predicts longer
+term implications, things that we could move back to, to, to, to come to.
+And it just completed and it turns immediately to the results.
+And here we are seeing the results of the run.
+And so you get a portfolio analysis report.
+This is the report from the reporter.
+This is the retirement projections.
+Uh and it has this this test portfolio isn't a very impressive portfolio.
+So it's very concerned about it insufficient to meet target.
+So which which makes sense I think uh, the target was uh, yeah.
+Much more than, than we currently have invested.
+So it's quite right to be quite cross about that.
+Uh, so these two reports were indeed produced by Nova, and they look great.
+Uh, and presumably the the main report.
+This one here also involved looking into some of its research that our researcher agent has been busy
+putting in there.
+And then last but not least, let's look at charts.
+We turn over here.
+And these charts were they were they were invented.
+They were created by the charter agent.
+It decided how to to what?
+I wanted to show us the top five holdings.
+There they are.
+The account distribution, the tax efficiency, how the asset classes are distributed.
+Equity is most of it, uh, and commodities and some cash and some fixed income and how it's distributed
+globally and then how it's distributed by sectors.
+All of these charts were described in JSON by charter.
+And then the front end just displayed them as they are.
+Uh, and it's all come up looking great.
+And, uh, yeah.
+So this this is the results of the analysis.
+If we go back to accounts, one of the things that we'll notice is that, uh, the, the because the
+tagger was at play, uh, and because also we were using the polygon API.
+You'll see now that whilst before it was saying Na for some of the prices, if we go into our brokerage
+account now and edit this, you'll see that we do now have prices for these different instruments,
+including JP Morgan, the one that I added in that has a share price as well.
+This has all come from polygon.
+And so we have real share prices associated with our account and real values of our portfolio.
+And that's been used to give us the total value of this test portfolio as of right now.
+And so that that really is a wrap to this demo of this product.
+And I hope you're you're blown away as I am about how comprehensively how well this fits together.
+But of course, the thing to bear in mind is that this has all been running in production out there.
+This has been multiple AWS services collaborating whilst working on this, with many calls to LMS that
+have come together to make this possible and to give us the kinds of results that we have.
+So look, I'm not gonna lie, I found this very satisfying indeed.
+And I hope that you did, too.
+But there is still one hole for me.
+There is one thing that perhaps doesn't feel as satisfying as it could do, and that is a sense that
+I didn't really get a feel for what was going on behind the scenes when we were running this.
+I mean, it looked really cool, like this animation when the different agents flashed up, looked great,
+and it was fun.
+And it was, of course, great to see the analysis that we can now do every time just by pressing this
+view button and come in and look at it again.
+So it's fantastic to see it all here presented.
+And I know that behind the scenes our five agents were communicating.
+The planet agent was making calls that were going out across AWS and that were making multiple calls
+to LMS.
+But I feel like we don't have much visibility into that.
+And obviously a massive part of delivering AI to production is having great monitoring and great observability.
+And that's why that is perhaps still the gap in what we've built so far.
+And that's a gap that we will be addressing tomorrow.
+And I hope you have a big old smile on your face, because today was fun and look great.
+And it's so cool to have this, this production app on on CloudFront.
+And of course as well, if you want to take it one step further, you remember from week two how we
+actually can give that a domain name and deploy it properly.
+And you also remember from week one how we can add subscription plans so that this functionality may
+be kicking off.
+The agent run is only available to subscribers, so it would be very easy to actually roll this out
+to a proper domain and have it be something which people have to pay to have access to.
+These would all be trivial changes to make to to actually have a real commercial production application
+at your fingertips, and you should certainly look into that.
+But before you do so can I please, please ask that you take a serious moment to congratulate yourself
+in a big way?
+We've got so much done.
+We've got past those two big days of building our capstone project, and it has brought us to a 90%,
+the 90% mark.
+We've got 10% left to go.

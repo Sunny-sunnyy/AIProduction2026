@@ -1,0 +1,102 @@
+Next up, it's time to build our Lambda package and upload it all of our new code so that the bedrock
+code so that it's ready to run in our Lambda function.
+And this is actually quite easy.
+It's a repeat of what we did before.
+Bring up a new terminal.
+We go to the backend directory and now we just we don't really need to do this, but we could do a UV,
+add requirements.txt to make sure we've got the up to date code and then UV run deploy.py, which is
+our uh, our script for deploying and off it goes.
+And this is now building a directory Lambda package, which contains a bunch of files that are being
+built by installing them in actually in a Docker container to do that.
+So it's, it's a super reliable way of doing it.
+And then when it did that, it zipped it all up to Lambda deployment zip.
+And that includes all of these files here.
+It includes our data directory and it includes the relevant Python packages.
+They're all together in that zip file.
+You can look at the contents by going into Lambda package.
+And that's, uh, ready now for us to upload to Lambda.
+So the instructions here are for uploading via S3, which is the safer way for slower connections.
+But we're going to be be brave and try and do it this way through the UI.
+So I'm going to go into Lambda.
+I'm going to find the twin API and then going to go into code.
+We're already in code upload from a zip file.
+And you see the zip file that I'm now going to select is the one that I selected the first time, uh,
+by mistake.
+So, so uh, it's already had this in it, but this is the right directory now.
+So I go into back end, I pick lambda deployment, I say open and save.
+And it's now uploading this new zip file that includes the bedrock code.
+And that is what we're going to have uploaded to our server.
+So we'll give it a second.
+While it does that, let's go back to the instructions.
+And these instructions guide you through the the way to do it if if your connection is too slow.
+Um, with uh, Mac and PC instructions.
+Um, and you can also run this, this code here instead if you've got a fast connection as well.
+Okay.
+So it's now time to test it again.
+If it's run successfully and we can use the same health check as before.
+And, uh, this time you should see, like me, it has completed.
+You see, this green successfully updated the function.
+So we now go to test.
+We see that health check three, which for you should just be health check should be there.
+And when I run this test I press the test button executing function.
+Hopefully it has permissions to do everything.
+It's successful.
+Open this up.
+It's healthy and it says bedrock model and hopefully yours says Bedrock Model two.
+This time mine did last time as well because I uploaded the wrong step.
+But uh, now everything is good.
+We're at the same point and we both get the bedrock model right here.
+Amazon Nova Light is the one I picked.
+You might have picked micro, but either way that that is the one that will be used when we run our
+twin.
+Excellent.
+So far so good.
+So it's now time to test our twin.
+And there's.
+You can test it with curl to go straight to the API gateway should you wish.
+But I think we're just going to jump straight to testing the twin through CloudFront.
+So you probably have your CloudFront distribution saved somewhere.
+Oh of course.
+I've just got it already open over here haven't I?
+There it is.
+That is our CloudFront distribution in a new page.
+And let's say hi there.
+And this is the first time it's sir.
+And I noticed that Nova is quite wordy.
+So there's quite a lot to it.
+Uh, lots of stuff there.
+So what would you like to talk about today?
+Got any questions about my career, my courses on Udemy, or perhaps the tech stack we use at Nebula?
+Feel free to ask me anything.
+I'm all ears.
+Uh, so it's, like, perky.
+Like me.
+Uh, so, uh, let's say.
+Do you like cheese?
+Uh.
+Let's see.
+Ah, the age old question.
+I must admit, I'm not a big fan of most cheeses.
+Uh, so, uh.
+But, hey, everyone has their preference, right?
+What about you?
+Uh, maybe it's a little bit too much of the sunniness.
+Uh, okay, so that is working.
+It's going against, uh, it's now going to bedrock, and this is using the Nova models as, as our
+LM connection.
+And now you might be wondering.
+Hang on.
+But we didn't we didn't give it an API key anywhere.
+We didn't give it a secret key.
+When we looked in the secrets, I was sharing my screen with you.
+You saw everything.
+So how does that work exactly?
+How are we using paid models but without a key?
+And of course, the answer is because we're doing it through AWS.
+We're in the AWS ecosystem.
+So it's it's going against our existing AWS account.
+It's being billed to us.
+And we will see these costs in the custom billing center in AWS when we sign in, uh, as uh, as with
+the root permissions.
+And if that goes above our thresholds, we'll get a bunch of emails telling us, so, uh, that that
+is all it's all built in, baked in to the AWS cloud environment.

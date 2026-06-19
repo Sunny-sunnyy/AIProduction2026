@@ -1,0 +1,138 @@
+Welcome everyone to an epic day.
+Let's get straight into it.
+Today is the first of our two days looking at the capstone project in anger, and we are going to be
+building ourselves some agents, a reminder of what it is we're building.
+We're building Alex, the name of our Agentic Learning Equities explainer, a financial planner, a
+SaaS commercial application.
+What we've done, you know, last week we did our research agent.
+And this week yesterday we built out our database with the schema that we went through.
+User has many accounts, account has many positions.
+And each position is in an instrument.
+And we also have jobs which are things that can run to to orchestrate all of our agent activity.
+So today is the day that we build out the five agents at the heart of our Agentic AI platform.
+And as a reminder of the architecture, this was the quite busy diagram that I showed you.
+And it's not the whole story.
+It's not showing things like the Secrets manager and API gateways and stuff like that.
+But this is showing the big building blocks.
+The blue squares are our agents running on Lambda.
+That's what we're going to be building this time.
+And then tomorrow we're going to build out the yellow squares on the top left, the front end and back
+end API part of the puzzle.
+But for right now, we're going to be building out those blue squares.
+And of course we're going to need to to connect it to bedrock and to the Aurora serverless database
+that we built yesterday.
+All right.
+With that, let's get to the lab right away.
+And most of today is going to be in the lab.
+And the first thing I'm going to do is talk a bit about something, a new concept that's become so important
+in the last couple of months, which is the idea of context engineering, which is fundamentally what
+drives our agent architecture.
+Let's go to cursor and let's talk about context engineering.
+And so here we are back in cursor back in the Alex folder I'm going to open up guides.
+I'm going to go to six agents and open the guide in preview mode.
+The AI Agent orchestra.
+The most exciting part of building Alex a multi-agent AI system five agents.
+We're going to be building a planner, tagger, uh, reporter, charter and retirement.
+As I explained last time in this diagram here shows them all together.
+The planner, the tagger, writer, reporter, charter and retirement.
+Um.
+And, uh, yeah, make sure that you cover all of the prerequisites.
+So before we get into this, I want to say a few words about this idea.
+Context engineering, which was originally made famous by a few people.
+But but the the amazing Andrej Karpathy tweeted plus one for context engineering which got got people
+most excited about it.
+But this is a a new way of thinking.
+Um, and a Google DeepMind engineer called Philip Schmidt wrote a seminal post about it that really
+did the rounds.
+Uh, he's part of their Devrel team, so he's responsible for, for, uh, working with developers on
+AI research.
+And let's read his blog post and learn a bit more about what it means, uh, to work on context engineering.
+So a year ago, the term of the moment was prompt engineering.
+And everyone wanted to be a prompt engineer.
+And that became old hat when people discovered that prompt engineering was just saying things like,
+please explain, please think step by step in your prompts.
+And there were various acronyms that came up.
+And then it turned out it didn't make all that much difference.
+And you just have to write prompts clearly.
+Uh, but the the new the new skill, as it says right here in this blog post, make it a little bit
+bigger.
+The new skill is not prompting it's context engineering.
+And what this this blog lays out is that what matters when you're working with Agentic systems is what
+you put in the prompt, or more and more particularly, what context you give the agent with which to
+solve its problem with which to carry out its task.
+And that can be a combination of a system prompt instructions.
+It can be what we call long term memory, which is basically Rag.
+It's giving it access to search in a vector data store and find information that that it's put there
+in the past, which of course we've done through the researcher agent.
+It's using tools.
+It's also using a short term memory which can be just the history of the conversation.
+or it can be something about the different agent interactions it's had.
+Uh, it can be a number of, of tools that you equip your agent to have, and then the task itself,
+the user prompt.
+Um, and so all of this together in aggregate, forms the context that an agent has.
+And you really want to think about organizing your agent activities to maximize the context that you're
+giving each agent to perform a task.
+And that's the right mindset to have in.
+And it's explained really very well here.
+And it's not important to get hung up on these different terms like long term memory and and short term
+memory.
+It's really comes back again to thinking about what what performance what is the task you're assigning
+to this LM call?
+How will you measure success and what's the best way to shape the the context, the information and
+the tooling to make sure that it's most likely to deliver an outcome that performs well, that meets
+your criteria.
+So it covers here are some examples.
+And and really let me just read this out.
+Uh, building agents is less about the code you write or the framework you use.
+I love that he says this because the number of people that ask me which framework should I use?
+And and this is so key.
+It's not important.
+The difference between a cheap demo and a magical agent is about the quality of the context you provide.
+And then he works through some examples and an example of a magical agent that's given the right kind
+of context and tools to be able to do well.
+Uh, and then this section from prompt to context engineering, uh, which, which really takes you
+on that journey of we're no longer just focusing on crafting the perfect set of instructions.
+This is a much broader kind of task.
+And let's read his definition.
+Context engineering is the discipline of designing and building dynamic systems that provides the right
+information and tools in the right format, at the right time, to give an LM everything it needs to
+accomplish a task that's finally put.
+And I would very much encourage you to to read through all of this.
+Uh, and uh, also you can, you can Google search to see some, some other posts about context engineering
+that have been popular.
+But this, this one I think is, is the gem.
+And so do study this carefully.
+And while we're here, I actually just noticed that today, uh, Phil posted another blog post that
+looks very interesting and and topical for us.
+Uh, for me, today is September the 15th.
+Uh, and, uh, Rise of Subagents is the name of this, this post.
+And he says there's increasing use of subagents to reliably handle specific user goals.
+So and he mentions Claude Cove, which we talked about a minute ago.
+Uh, and yeah.
+So Subagents is what some people are calling when you have a multi-agent system and an agent with a
+single loop, and you're equipping that agent with a single loop with smaller agents to carry out different
+tasks.
+And so he gives an example of this.
+He gives a nice little diagram, uh, and he talks about the pros and cons, which, uh, yeah, definitely.
+There's a trade off there.
+It's not clear that it's always a good idea to do it.
+And he's got a really nice thing in the, um, in the conclusion.
+But even with the Subagent architecture, reliability is still a challenge for agentic systems.
+Breaking down a complex task into smaller subagent functions can make them simpler.
+But then he ends with saying don't overengineer a solution today that are simpler or better model can
+solve tomorrow.
+Sage advice.
+So not only read the the the context engineering blog post, but I would just take a look at this one
+two and maybe even bookmark this page because he's full of useful stuff.
+And since I mentioned looking online for more about this, I will just say Simon Willison is a wonderful
+writer to follow.
+His blog is another It's gold.
+Uh, and he mentions here context engineering and he says it's starting to gain traction and he likes
+it.
+And he gives the tweets from Andrej Karpathy right here.
+Plus one for context engineering over prompt engineering.
+Um, but generally look at Simon's blog.
+Lots of interesting stuff.
+He's famous for getting llms to draw pictures of pelicans on bikes.
+Uh, it's like it's almost like an in-joke of reading his blog.
+And I recommend it because it's wonderful.

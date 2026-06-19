@@ -1,0 +1,171 @@
+And so I welcome you to the final topic of the final day of the final week of the AI and production
+course, the grand Finale.
+Let me introduce to you the new topic of an agent platform.
+What is an agent platform?
+Are you saying?
+Why haven't I mentioned it before?
+So I probably have because it comes up a lot and a lot of people ask about it.
+But an agent platform is one of these integrated end to end solutions that lets you build and deploy
+complete AI agent solutions in managed infrastructure, where everything is set up and organized for
+you.
+And you might be thinking, okay, wow, that sounds great.
+And why didn't you tell us about that right back at the beginning?
+That might have been helpful.
+Uh, so so the answer is because it has pros and cons, and in some ways, actually vassal that we used
+is is a sort of it's not a full agent platform, although they do have agent templates.
+Uh, but it's certainly along those lines.
+It's a similar concept, but typically agent platforms are very much oriented around a straight up agent
+deployment.
+Okay, so you're thinking you have examples for me.
+I do indeed.
+So people who took my agent course, we talked about some of these as we went through.
+So there's platforms like crew, AI, enterprise.
+If you work with with crew, then they they frequently do mention that whilst crew AI is an open source
+platform, they do have a paid offering called crew AI enterprise and sometimes branded a bit differently,
+but mostly Crew Enterprise, which is their their complete managed infrastructure for when you've built
+your crew, you can then deploy it and have it running on their platforms.
+The same thing happened with Landgraf when when I taught Landgraf in the Agentic course, I showed you
+that there was also Landgraf platform, which is their paid product for deploying and running your Landgraf
+agents on the cloud.
+And people that work in the Google ecosystem are probably quite familiar with vertex AI agents.
+And this has quite a terminology confusion.
+There is vertex AI agent builder and there's vertex AI agent engine, and there's some other variations
+as well.
+So there's there's a, there's a whole vocabulary around this.
+But basically vertex AI has agent capabilities.
+And this previously I believe was actually quite tied to long chain.
+And recently they've varied it a bit so that now it's got its own kind of branding.
+So and it's the one that's been around the longest I think vertex was one of the very first, uh, into
+this game.
+Uh, others have taken a bit longer.
+Um, but, but that is some of the landscape.
+These are some of the agent platforms that you might have heard of.
+But wait, I hear you say there is another ah, yes, there is indeed another.
+So about a month ago, I think for me, very recently Amazon announced and released Amazon Bedrock Agent
+Core.
+It's quite a mouthful.
+Amazon Bedrock agent Core.
+It's like a tongue twister.
+Uh, so so that was released recently and it is currently for me in preview.
+It is Amazon Bedrock agent core preview just rolls off the tongue.
+Uh, and uh, but but but they and so they say it may it may change.
+But they're hoping to bring it out of preview quite soon.
+And this is AWS Managed Agent platform, their agent platform, uh, offering.
+And it's got quite a lot of excitement and it's relatively new and it's got a lot of reasons to like
+it.
+So what exactly is it?
+Well, actually, that's a good question.
+Uh, it turns out that that that it is, is, uh, a combination of different things.
+It's several different things that are sort of packaged together under the Amazon Bedrock Agent Core
+branding.
+And it's super confusing.
+It's actually even worse than vertex AI because they've got a number of different products with very
+similar names that are easy to get muddled up.
+And even when you're talking to someone and say, Bedrock Agent Core, you might be referring to different
+things.
+So in just a minute, I'm going to come back and very clearly define the different building blocks that
+make up Amazon Bedrock Agent core.
+But for the time being, just believe me that it is another of these agent platforms and integrated
+product for building and then deploying AI agents in a way that is that is managed, which means that
+you're relying on the cloud provider to take care of the details, and they charge you a bit extra than
+you having to take care of the details in return for making it fast and streamlined and easy.
+Okay, so with that, this is a good time for me to tell you what what are what are the pros and cons
+of adopting something like an agent platform instead of rolling your own?
+Instead of doing what we've been doing for the last few days?
+Because it would be quite a bore if that was all a complete waste of time.
+And you should always use an agent platform.
+And the answer is you shouldn't always use an agent platform.
+There are pros and cons and let's cover them now.
+And I imagine this is going to be pretty obvious stuff that you're expecting me to say.
+But the pros obviously, first of all, compared to what we've been working on, the time to market
+is just amazing.
+Like, you can build something and deploy it and have agents running in a few minutes.
+It's a bit like the Versaille experience.
+There's a huge parallels with Versaille.
+It's really quick to get something out there.
+It's it's very much simplified.
+There's much less to worry about.
+Fewer decisions.
+And as part of that, it's these all of these frameworks are very much what one would call batteries
+included.
+I originally think I used that back when, when in the Agentic course, when we were working with crew
+to describe crew as a batteries included framework, meaning that you get a lot in the box.
+It comes, it comes with a lot of stuff built in, so you don't have to go out and buy the batteries
+separately.
+It's just it's just all there in it, which is great.
+So that sounds like some, some, some perfect prose.
+What can there possibly not be to love?
+And I know you're all old hands at this, so you know perfectly well what the cons are, but just to
+go through them anyway.
+The cons, of course.
+Uh, actually, this first one's a bit different that you probably know this too, but.
+But the agent platforms themselves are.
+They're all relatively new to the field.
+Uh, perhaps with the exception of vertex, uh, which is sort of reinvented itself.
+But they're relatively new, and they're clearly kind of looking to define their space and muscling
+in on their space.
+And I think in a lot of cases, these are about products trying to find a monetization strategy.
+So platforms like like Crew and Landgraf, they're incredibly popular open source frameworks.
+But seeing the path to monetization might be harder.
+So trying to to follow this, this route and say, look, since you built using a fabulous open source
+framework, you can also press a button and have that be running in production for a small fee, that
+that is a natural monetization path.
+And so I do think a lot of this is about people trying to find that path.
+Now, obviously AWS doesn't doesn't exactly have a monetization issue.
+And I suspect for them it's different.
+It's more about making sure that they they get their turf.
+They don't want to lose business to other people, because if other people use something like vertex
+AI, then that will of course be being deployed to Google's infrastructure.
+So Amazon wants to make sure that they've got a big player in this bag of new agent platforms.
+So that's one con, but I think the other two cons are the ones you're expecting me to say.
+One of them, of course, is just the flip side.
+It's hugely simplified and as a result you get less flexibility.
+Uh, you press the buttons, it gets deployed, and you don't have the same kind of granular control
+over what's happening.
+You're just going along with with the way that it got deployed and that's it.
+And a very similar point, uh, is that the flip side of the batteries included is that you're kind
+of locked into that way of doing things.
+So so if you don't like that kind of battery, you can't you can't swap it out for a different brand.
+That's what it came with.
+Uh, so you're sort of locked in in the case of Amazon Bedrock agent core, uh, you're locked in to
+to the Amazon infrastructure.
+Of course, that's where it's getting deployed.
+You're going to be, uh, pretty much locked in to the different choices around things like observability
+and stuff like that.
+Now, that's not fully true because, for example, as you'll see, Amazon Bedrock Agent Core is actually
+very flexible about the underlying agent platform that you use.
+You don't have to use Amazon's one.
+You can switch in any of them.
+And they and they make a big point about saying that a lot.
+So they've actually gone out of their way to try and give you some flexibility.
+But still, the deployment itself is very much, uh, sort of all packaged up in the way that Agent
+Core works.
+Your the great benefit is you don't have to worry about things like Lambda and IEM and, and, and app
+Runner and so on.
+It just all just happens.
+But the downside is you don't get that kind of of detail of figuring out, all right, I want to be
+able to scale this independently from this.
+I want to have these in secrets.
+I want to do this, that, that just all gets taken care of for you.
+And so as a result of that, at least as of today, in my experience, these agent platforms are not
+very common for production deployments.
+Certainly for enterprise production deployments, it is much more common to do it the way that I've
+taught it on this course.
+You'll be pleased.
+You'll be relieved to hear it wasn't a complete waste of time.
+That is the way people build enterprise systems.
+It is by building out AWS services, by using Terraform or doing that on on GCP or Azure, and having
+the fine grained control over everything that's going on.
+That's how large scale systems are deployed.
+These new agent platforms are vying for for their place in the world.
+I think startups are using them.
+So so people do it for particularly for, for newer products and for trying things out.
+But but it's it's not particularly the way that you would roll out a full spec, scalable production
+platform, which is why I've left it to more of the teaser at the end for us to go play with it now,
+get some experience with it.
+But it's not necessarily a core ingredient, but it's definitely worth watching to see what happens
+with these agent platforms in the future.
+I might compare it to something like a Heroku.
+For people that have used Heroku, like a sort of packaged app, or again, to Vercel, it's very much
+a kind of easy, streamlined, simplified build and deploy.
+Don't need to worry about all of the plumbing it's taken care of for you.

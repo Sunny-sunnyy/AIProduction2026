@@ -1,0 +1,101 @@
+Okay, so my secrets have now been saved.
+They're just up there.
+Just off of off the top there.
+And, uh, this here is very important where it says port, you need to change this to 8000, because
+that is the port that it's listening on.
+Uh, auto scaling right here.
+You need to come in here and you need to say create new ASC.
+Give it a name like I'm going to call this like basic, uh, how many, uh, requests can be running
+concurrently at any one time?
+Let's say no more than ten.
+Let's say the minimum number of instances is one, but the maximum is also one.
+So we're not going to have more than one of these running ever.
+But this is where you can have it.
+So that it could scale up a lot if you were building a platform that needed to be highly scalable.
+And now we add that that is how this this the scaling configuration for this.
+And then we add health check information.
+I've actually already filled this in.
+But you choose a protocol which you should choose HTTP.
+Give it a path which in our case should be slash health.
+Say that we want timeout out of five and an interval of 20.
+That's saying that it will wait up to five seconds before it decides that this isn't healthy.
+And every 20s it will do this, uh, if it does them five in a row that fail, then that's considered
+trouble.
+If a couple are successful, then that's considered healthy.
+And that is our health checks that run and this is it.
+And then you press next.
+You get to review everything one more time.
+And that shows my secrets.
+So I'm not going to do that.
+But you do that.
+You'll see everything.
+Make sure it looks good.
+It's a quarter of a CPU.
+Make sure you're comfortable with everything that's going on.
+You have a sense we are ready to deploy our container to App Runner and then press the button to do
+this, and I will see you in a second.
+It will take a few minutes to run.
+So hopefully you found it was in fact a create and deploy.
+That was the button to press after you were reviewing the details.
+And once you press that, you should be looking at a screen like this, except yours should say consultation
+app service, not consultation App service two because I did already test that.
+That works.
+Uh, but here you see it here it's it's it's it's working.
+It's working to deploy this consultation app service.
+So this is going to be AWS App Runner, which is able to take the Docker container that we had built,
+the Docker image that we built that was working when we ran it locally.
+And we uploaded it to the container registry.
+And we are now running an app runner service that will use that Docker image that we built and that
+we know works.
+So this is still deploying.
+I'll just point out a couple of things about this screen that you're seeing here.
+You'll see one of these arns.
+Remember I mentioned that before.
+Everything in Amazon has an Arn.
+Uh and this is no exception.
+This this app runner is has this Arn.
+You can see within it.
+It has app runner.
+It has the name of the region where it's running.
+It has the account ID in there too.
+And then all of the other details about it.
+Um, and this source here is pointing to the container, the image really in the Elastic Container Registry,
+uh, which this is being built from, that is the source, the image that is sourced for this particular
+app runner instance.
+All right.
+With that, I will leave this to finish off running.
+Oh, and as if by magic as I finish this, it has now run.
+And so this is where it is running.
+It's running on this domain this Https right here.
+So this is the moment of truth.
+I'm going to click on this and see what happens.
+This is on the internet.
+This is AWS App Runner.
+This is our app everybody.
+This is our app running on AWS deployed live to AWS.
+I'm going to sign in.
+I'm going to sign in as my user ID.
+Here we go.
+Continue.
+We're now signed in.
+We just we just authenticated through Clark.
+And now I'm going to press the open consultation assistant.
+This is running on Amazon Web Services.
+Uh, okay.
+So, uh, editor Donna was the patient.
+Well, might as well stick with the try I've got.
+I've definitely got a headache after all this AWS stuff, uh, complained Of a headache.
+I told him to take Tylenol.
+All right.
+And generate a summary.
+So now everything is whirring in the cloud.
+Um, and with any luck, our client, our static client, our client here is now calling the server
+running in AWS App Runner.
+And, uh, this is now going to be calling OpenAI.
+And lo and behold, back comes our summary with the doctor's, uh, summary, the next steps for the
+doctor and the draft of the email to go to the patient.
+Me, uh, with the headache.
+And so I present to you a deployed application along with its subscription and authentication.
+It is running it's in a Docker container deployed on AWS using AWS App Runner.
+And you should be looking at this yourself.
+And may I be the first to congratulate you on a live AWS deployment.

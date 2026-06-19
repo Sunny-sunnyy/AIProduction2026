@@ -1,0 +1,141 @@
+Okay.
+So within scripts deployed we've got this line, the Terraform init line that uh that that runs the
+sets up the, the Terraform status.
+We need to update this.
+So, uh, I'm going to, to copy these new lines.
+This replaces terraform init.
+Let's put it in there and then say what it does.
+And PC people you need to do this as well even though you're not going to run this script.
+Uh, and so I come on in here, let's find where is the Terraform init command.
+Can you see it?
+Here it is right here.
+The script goes into terraform directory and it runs terraform init.
+I paste this in and this is the new terraform init command.
+And what are we doing.
+Well we're just passing in some extra configuration with this command.
+We're configuring it just to let it know that we've got these special buckets set up for Terraform state
+files and for the lock files.
+So it's it's configuring our Terraform init to know about this special shared drive that we set up just
+for it's purpose Okay.
+Back here again.
+Uh, and, uh, we should also update the PowerShell version of it for completeness.
+Uh, and, uh.
+Yeah.
+Uh, Mac, people, you don't need to do this, but you can if you wish to have, like, a complete
+repo.
+But.
+So I'm going to find the terraform init command in the deploy one.
+Don't confuse, deploy and destroy.
+Um, and here it is Terraform init.
+Copy it.
+Paste in the new version.
+Save.
+And that's done.
+Back to the instructions.
+We also have to update the destroy scripts as well in the same way.
+This time I've actually got the entire script to replace.
+So this is the new destroy file.
+Copy all of that.
+There it goes.
+And copy that into the destroy sh.
+Select all paste save, and do the same for the windows version.
+Back to preview.
+Scroll down.
+Here it is.
+Doesn't it look different?
+Uh.
+Copy all of this.
+And there we go.
+Copy it in the final file to be changed, destroy PowerShell, paste the new version.
+Save it.
+And that is a go.
+Uh, and you can see right here the change.
+Ha.
+Okay, so back to the guide.
+Uh, so we've now we've now updated our scripts so that our deploy scripts are referring to these,
+these shared drives where we have our Terraform state.
+It's now time for us to go back to GitHub.
+And the first thing that we're going to do is going to be about setting up the way that the kind of
+access that GitHub has to AWS.
+So it's all part of the biology of working with these cloud providers that there's there's just so much
+stuff to do.
+Uh, there's not too much for GitHub actions, but there's still some stuff.
+And one of them is that remember that you have this whole thing about permissions in AWS, like permissions
+for IAM user.
+If Hub is going to have the ability to set up infrastructure running Terraform, then it has to have
+the right permissions to do this.
+An IAM role that GitHub actions can use.
+And so we might have to go in and set up a whole lot of stuff with our, um, with our configuration
+that set up stuff with AWS.
+But again, we can use this trick of just writing a temporary piece of Terraform to do it for us and
+run the Terraform to get around us having to do all this ourselves.
+So this is a Terraform script to create an IAM role that, that, uh, so that GitHub actions can,
+can have the powers that it needs.
+Um, and so I'm not going to talk in a lot of detail about what kinds of actions all these IAM role
+policies and everything else.
+And this is the whole list of policies we're giving it.
+The great thing about these Terraform scripts is that you can trust if this works once it should work
+nicely.
+So we're going to go to Terraform directory and set up a temporary file which is called GitHub dash.
+o DC, the type of authentication, the type of IAM setup that we're doing here.
+Do that and paste in the infrastructure we want, which contains all of the policies that we need to
+attach to this user.
+And now go back to the guide.
+So we've done all of this.
+And now we just have to one more time actually run this.
+Okay.
+So first of all we bring up a command line.
+We go to terraform directory.
+Don't forget to go to terraform directory.
+We make sure we're in the default workspace.
+So we're not in dev test or prod.
+And then we just run this quick command to see whether we already have this particular, uh, policies
+already set up.
+In my case I do because I've run this before.
+And depending on your situation, you probably won't, but you just might do, uh, so do this, this
+test.
+If you see an Arn, an AWS resource number like this, then you do have one already.
+And if that is true, if you do have one already, then we need to import it.
+So I'm going to do this quickly.
+I first of all this is just a quick hack to retrieve my AWS account ID, um, which is also in my clipboard.
+I could have got it from there, but it's nice to have this on hand.
+So if I echo it, you'll see that that is my account ID.
+And then this is commented out because you should only run this if you already have the provider.
+But this is importing that.
+Uh, and I then have to type in my GitHub repo in the form owner me slash repo twin like that.
+And it's done imported successfully.
+Now you won't need to have done that unless you already had one.
+Okay.
+Time to apply the resources.
+So for applying the resources there are two scenarios.
+One of them scenario A is what is almost certainly applying to you, which is that the Oidc provider
+did not exist.
+It's your first time doing this and you just have to run this big apply command here.
+There's one version for Mac, one version for windows, and the only thing you need to do be careful
+about is replace this here with your GitHub username and the name of the repo, like slash, uh, or
+whatever you are using, whatever is your username and your, your, uh, repo name.
+And this should run nicely.
+Uh, in my case, it already existed and I imported it.
+Uh, and so, um, this is what I need to run.
+I need to run this Terraform apply command right here, which just does the same, but it does not create
+this provider.
+Uh, so I'm going to paste in this command, and I'm just going to replace this part here, which is
+what you should have just done yourself with my name, my, my GitHub name and twin.
+And that should be it.
+I run this command.
+Terraform does its magic.
+It needs to be to type the word yes.
+And it's now creating what needs to be created.
+And it's done.
+So that has set up the, uh, necessary, um, backend so that GitHub now has permissions to be operating
+the GitHub actions, to be setting up our infrastructure.
+And just to confirm that all has gone well, we can now run this Terraform output command like so.
+And it tells us the name of the Amazon resource which is the the GitHub actions, uh, resource that
+it's going to be able to use to log in that GitHub actions will be able to use to have the right permissions.
+And you need to keep note of this because we will use it in just a second.
+So so I'm going to copy it to my clipboard and hope I don't accidentally copy anything else.
+Uh, maybe I'll take it, take a note of it somewhere.
+Um, and then we can remove this GitHub file right here, because this was only a temporary terraform
+file that we just used to avoid having to go around the various different screens in the AWS console,
+delete, move to trash.
+Keep a record of this right here, and I'll see you back in a.

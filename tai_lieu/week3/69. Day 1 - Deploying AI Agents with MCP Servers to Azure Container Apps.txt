@@ -1,0 +1,168 @@
+And welcome to the other side.
+Here we are.
+The Terraform apply has completed and an Azure Container app has been deployed.
+And here is its URL.
+Let's command and click into here and open and up comes a cyber Security analyst.
+It looks very familiar to us, but this time the only big change is the URL, which of course is showing
+Azure Container apps.
+All right open Python file and select airline.py and open.
+And there it is.
+And now press Analyze code.
+So again this is this is running on the cloud.
+This is deployed to Azure.
+The container that this is running in is now spawning an MCP server.
+So it's, it's uh running uh Semgroup MCP container over standard IO on that box in this container.
+And that is then going to connect to Semgroup using our token.
+And it's then going to run analysis on this code, bring back results.
+And our agent is going to use that to come up with its analysis of our code, potentially adding in
+some of its own thoughts as well.
+And I tried to drag along that sentence so that it would be done by the time I finished and I wasn't
+successful.
+It's taking a bit of time, but hopefully fingers crossed this is there we go.
+It's a sem grep found for issues and I identified one issue.
+That's great.
+Let's expand this a little bit and have a look.
+And we see the familiar issues.
+There they are.
+This is working.
+We have deployed successfully to Microsoft Azure.
+And you'll see nicely here that we have one running on my local box as just a front end back end.
+We have one running on my local box in a container in a Docker container.
+And this is when that Docker container has been deployed to Azure and is running the same way, including
+running the MCP server.
+That is success.
+And I hope that you are looking at this too.
+And so now back in cursor.
+We're just going to finish off the instructions by going back to the Azure portal to see what's being
+created.
+Go into the Azure portal.
+Here we go.
+I'm already logged in, I think, so it'll take me straight through to the dashboard screen that you
+get.
+I'm going to go to resource groups.
+I'm going to click on my only resource group, Cyber Analyzer.
+And here are the new Azure objects that we've created.
+The resources we've got cyber analyzer itself a container app container apps environment and the registry.
+If we go into logs, you get into this very advanced component where you can set up different ways of
+monitoring the, the app.
+And, and you have to build it like a query.
+Not not in classic, but you go into activity log and there's a lot of advanced tooling around searching
+for queries.
+That's not how we'll do it.
+There is a simpler way to do it.
+Go back to resource groups.
+Back in here again, we'll look actually at our cyber analyzer itself the container app.
+Click on that.
+Up it comes.
+Here it is.
+It's running.
+It's in East us under this subscription.
+That's the URL.
+If we want to bring it back up again the environment.
+And that's the link to where we just were.
+What we're going to do is we're going to come down to the left here under monitoring there's a option
+log stream.
+We come up with this.
+And for the display we're going to go historical.
+And we get to see the logs coming out of our application in the last hour in this case.
+And you'll see that it's run something.
+You can see the log messages as it calls Semgroup Semgroup CLI.
+This is the spawned MCP server within our app container, within our Docker container, running Semgroup
+and finding, uh, the vulnerabilities that it wants to, to respond to.
+Uh, and uh, back comes the results and it finishes the server process and back comes the results,
+uh, to our agent.
+So it's pretty cool to go in here and see these log messages happening within Azure.
+And you can also see them real time and then run your agent and see it happening, uh, while while
+it runs.
+And that that is us looking on the portal at, at the results of our deployment.
+And when we're talking about logs, there's a completely different place we can go that's also very
+useful indeed.
+And it's got nothing to do with Azure.
+You may remember that when we were writing the code for the agent, I wrapped it in a context manager
+with trace so that logging information is reported.
+The OpenAI agents SDK framework.
+For people familiar with this, maybe it comes with an observability framework called traces, and it
+also allows you to to hook that up to popular observability frameworks like MLflow and Lang views.
+But we can just use the one that comes out of the box with OpenAI agents SDK that's built into the OpenAI
+platform called traces.
+And here it is.
+And you can see the security researchers that have been running, whether it's on my local box at a
+couple of different configurations or whether it's deployed to Azure.
+And if we click into this, we can see the traces, the observability we get from running this on the
+cloud.
+And you'll see, lo and behold, the Semgroup scan was run.
+This is the MCP server.
+And we'll see the input that went into it.
+And we can see the output, the results from Semgroup giving us the information that we wanted.
+And that was then used by our agent to come up with the response that we were expecting.
+Uh, that we that we got back, uh, and so this this is a super important activity.
+This is this is where observability meets cloud deployment, using tooling like OpenAI's traces.
+That gives you that deeper insight into what's happening in your agent workflow, along with the logs
+coming from your container environment.
+And finally, it's important to come into the Azure portal and go and look at costs.
+So cost management again up comes cost management.
+You can also type cost management in the search bar up here.
+Uh here we are in the cost management section of Azure.
+One quick thing to do is to click on budgets to look at the budgets we set up earlier.
+You only set up one.
+I've got a few that are all I think the same thing.
+But you see a little progress bar that shows you how far you are going towards that budget.
+You might have set yourself maybe $10 like me, or maybe $2, uh, and you can look into the spend there.
+If you go into cost analysis under Reporting and Analytics, there's much more detailed screens here.
+There's things that you can look at an accumulated cost, um, a, uh, subscriptions.
+Visualize your cost and daily costs.
+Let's go into daily costs.
+And this is going to show me charts of day by day how much I am spending on my Azure infrastructure.
+And you can see that each day I'm spending $0.17.
+And this has been running for all of this month because I kicked off the cyber analyzer a month ago
+and I left it running, which is, uh, since I didn't use it that time is probably not a smart idea.
+Uh, but, uh, there it's been running and I had stopped it, and now it's running again.
+And this gives you a sense of your costs, which are probably all going towards your free credits that
+you've already got as part of your new account.
+But anyway, keep an eye on them, make sure they're what you expect.
+And if you've spent a few cents today, then now would be a good time for us to talk about bringing
+down the environment, which we will do next.
+And so here we are back in Casa again.
+And now we're going to destroy our Terraform environment by running the same command.
+And obviously in the same, uh, command prompt where I've loaded my environment variables and I have
+the Azure workspace selected.
+Or you can just repeat those commands from earlier and I run, Terraform, destroy to bring down the
+environment and free up the resources or let it do its thing and see you in a second.
+And of course, I had to press yes, type it out or all three letters for it to start the destruction.
+And it then actually took quite a long time.
+I think it took about 8 or 9 minutes to destroy all this.
+So.
+So don't worry if it takes a long time.
+It it appears to destroy, but it has destroyed.
+That has been successful.
+And now, one more time, let's go back to the portal to check.
+And here I am back in the Azure portal.
+I'm going to go to resource groups up here.
+And there is an a cyber analyzer resource group there.
+But when we open it up, we are pleased to see that it's completely empty.
+We didn't.
+We created the resource group before we even started the the Terraform stuff.
+So that that was just the sort of outer framework, but there's no resources within it.
+They got destroyed properly and so we won't be spending anything.
+Uh, hopefully you have the same experience.
+And this just goes to show how easy it is to use Terraform to bring up and bring down environments like
+that.
+Remember how hard it was through the AWS console?
+We haven't even had to do that with Azure.
+And that's a wrap to the day one of week three.
+We got an awful lot done.
+We we built a cyber security app, or at least it was pre-built.
+But we did a quick tour through it and hopefully a lot of it made sense to you because it's quite similar
+to the other apps we built.
+We ran it locally, we ran it in a container locally, and then we use Terraform to deploy it to Azure.
+After setting up an Azure account and going through all of that, and it uses an MCP server, and just
+as an extra bonus, we even went into the observability framework that traces framework in OpenAI to
+see that the MCP server was called.
+And we also saw that in the log messages, both in the Docker container locally and when it was deployed
+to Azure as well.
+So that's a lot to get done on day one of week three.
+Congratulations.
+That means you are 55% on the way through the journey.
+More than halfway.
+We are well on our way towards production expertise.
+See you tomorrow for Google Cloud Platform.

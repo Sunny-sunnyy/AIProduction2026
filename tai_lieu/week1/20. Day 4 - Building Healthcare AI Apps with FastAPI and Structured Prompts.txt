@@ -1,0 +1,138 @@
+And welcome back to cursor.
+And here we are in the Sass project I open up the week one guides.
+These will be in the production repo as well.
+And I'm going to open the preview on day four.
+So we get to see what we're doing here.
+We're building a healthcare consultation assistant.
+As I told you, it's going to take the doctor's consultation notes as input, generate professional
+summaries, create actionable next steps, uh, draft patient friendly emails.
+All right.
+So let's start then with step one.
+We've got some new front end dependencies to install and we use npm install for that.
+Let me take this first one here I'll copy that.
+I'm going to bring up a new terminal.
+Here it is.
+And now I'm going to paste that in.
+There it goes and it installs.
+And now we'll do the second one here which is the associated types.
+And I paste that there.
+And I run and that installs two okay.
+Now let's hide the terminal.
+It's time for us to update the backend API.
+So basically it's the same backend API.
+Except now we're going to have some more detailed prompting.
+So let me copy this and paste it in and then we'll talk it through.
+There it is.
+Okay.
+So over we go to the API.
+And this is something which is going to replace the the index dot pi which is right here.
+So I select all and I paste.
+And let me quickly explain this to you.
+So it's it's very similar to before.
+We're still using OpenAI.
+Uh and the main difference here is that we have a bigger system prompt.
+You're provided with notes written by a doctor from a patient's visit.
+Your job is to summarize the visit for the doctor and provide an email reply with exactly three sections
+with the headings.
+And here are the three sections.
+Now, uh, the people from, say the, the uh, my agent of course, will know well that a nicer way
+of doing this will be to have it reply with structured outputs, and then take that JSON and return
+it to the front end.
+But I want to take things a step at a time.
+If you if you want to update this to use structured outputs and to respond with JSON, that would be
+a much better implementation and I would encourage you to do so.
+But for now we're just going to have it respond in markdown with these headings.
+Um, and uh, so then otherwise things are very similar.
+We've changed it from being a get to being a post endpoint.
+So this is now a post to API.
+Uh, and uh, also that we've got in addition to the, the creds that we had before, which is the credentials
+coming from Clark, we have another argument here, visit which is an object of type visit and visit.
+Here is a pedantic object.
+That means that it is a subclass of base model.
+Pedantic base model.
+Just got to the top.
+Show you.
+There we go.
+There's.
+It's imported from pedantic import base model.
+And that means that this is one of these pedantic classes that's used to describe the schema of a Python
+object.
+Its purpose is to describe what a Python object which fields it should have.
+It's similar to a dictionary, except you're using real attributes that have a type.
+So we've got, in this case a patient name, a date of visit, and notes as the three bits of information
+here that form this visit object.
+And we've got that here as the first argument for this endpoint.
+And the magic of fast API is that when you do it this way, fast API just builds the right route and
+expects the right JSON object to be provided in this post, and it will automatically populate this
+Pydantic object.
+Visit with all of the right fields, so you don't need to worry about how this JSON object comes in
+the request, and how to pluck out the values and put them into a Python object.
+Fast API handles all of that for you, and that's why people love it.
+Okay, so with that out we can just use visit in our code.
+This user prompt for populates the the information um and the the patient's name date of visit and their
+notes.
+And that is what we will send to uh, to to GPT five nano.
+The system prompt that we wrote above the user prompt, which has got all these details that were passed
+in in the visit object, and then we stream back results exactly as we did before.
+Nothing else has changed.
+Okay.
+And now we're on to changing the front end.
+First of all, before we change the the actual pages themselves, we're going to update those two front
+end files and documents to to reflect some of the changes here.
+So start with app TSX.
+Let's go to find app TSX and pages.
+There it is.
+And replace here.
+And all we've done is added in this import.
+We're importing something called React Date picker which is something that we just npm installed which
+is going to give us a date picker, a calendar.
+And it just this is a great example of how easy it is to get off the shelf react components to add something
+like a date picker to your web page.
+In the days before react, it would be a chore to have a date picker.
+There would be a lot of JavaScript involved in that.
+And now it's it's it's just so easy.
+All right.
+Back here again.
+And now we're going to go to the document TSX.
+And we're going to use that change the page title and heading.
+Here's document dot TSX.
+Let's paste.
+There we go.
+AI powered medical consultation summaries.
+Healthcare consultation assistant.
+Okay.
+And now back to the instructions.
+And now the meat of the front end changes.
+We're going to update the products with our new product.
+And I will take all of this.
+And now there's a fair bit more uh, front end code can look quite unwieldy sometimes.
+There's a, there's a there's a lot to it.
+Uh, but much of this is boilerplate.
+Go over to product TSX and replace everything with our new product.
+Let's just take a look at a few things, but this is an exercise for you to look through it.
+So there's this idea of of of state which are the variables which are front end.
+Depends on that.
+React will automatically refresh the relevant parts of the UI as state changes.
+And we've got a patient name, a visit date and notes.
+Um, and then we've got stuff to do with the streaming, which as much as we had it before, uh, and,
+uh, this is how we're handling the streaming back.
+And then this is where we have these forms for the patient name, the date of visit, the consultation
+notes.
+You can see this is you can see how how very easy to read these react components are.
+It's a text area.
+It's called notes.
+It's required.
+It's got eight rows.
+Um, and uh, it's got, got all of the information here.
+I also want to show you the date picker.
+The date picker.
+This is the react component that we've taken off the shelf for picking dates.
+And you just say you want a date picker and you, you give it the, the information that you need.
+Um, okay.
+And, and this is the, the, the main part of it, this is where it has the title, the heading, the
+pricing table as this is sorry, this is the fallback if we're not, uh, signed in and this is the
+form if we are.
+Okay.
+So that is the front end code updated.
+We're closing in.
+We've got one step to go.

@@ -1,0 +1,217 @@
+Well, this is a big moment in the course, and I want to I want to welcome you and get you excited
+about what is to come.
+It feels like it's just any old day.
+It's week three.
+Day three.
+It doesn't sound like it's a major exciting moment, but it is for a few reasons.
+One is that we are returning to AWS.
+One is that we are starting back with purple again.
+We are going back to AI related activities, and one is that we are about to embark on the beginnings
+of the capstone project, which will take us through most of the next week and a half of activity.
+And it is called Alex.
+Now, the observant amongst you already were expecting something called Alex, because you probably
+saw it in some of the resources.
+When we were looking through some of the console screens, you knew that I'd been working on this thing,
+and now you're eager to find out what it is.
+So Alex slightly forced acronym as they sometimes are.
+It's a financial planner.
+Alex is going to be a commercial platform which is able to be, uh, a retirement advisor, a financial
+planning advisor through a genetic AI.
+So it is it stands for it's an acronym.
+It stands for the Agentic Learning Equities explainer, the X in explainer being Alex.
+So it's a bit forced.
+But Alex I thought was a good name for it.
+And the idea is that it is a SaaS commercial application that we will build that is ready for scale,
+that is deployed to production.
+It's going to act as a financial advisor.
+It's going to be able to review an equity portfolio, assess it for things like how how diverse is your
+portfolio, how much are you thinking about the future?
+How are you planning for retirement?
+And it will make recommendations.
+Um, the first step that we're all about to go through now is about getting you set up.
+It's going to be cloning a new repo.
+We're going to be cloning a repo.
+A lot of the code is going to be baked already for you, because this course is not so much about building
+the code.
+Although of course, again, we'll review it.
+It's more about deploying the code.
+And for what we're going to do today, we're going to be doing some investigation on how the code looks.
+And we're going to be setting up permissions.
+Uh, and first, before we do any of that, we are, of course, going to be looking at our costs to
+make sure everything is as we expected.
+So let's go and do that now.
+And welcome back to the AWS console.
+Did you miss it?
+Here it is I'm signed in.
+Of course it's my root user which you should do because we do that when we're looking at costs and and
+IAM stuff.
+You'll see that I'm here logged in where it has my name as my root user.
+And the first thing we'll do is go to billing and cost management, billing and cost management, something
+that you should do a lot and come in here make sure.
+No doubt you see that I've had my, uh, big month last month and now I'm spending rather less this
+month.
+You should look at your costs.
+Make sure they're what you expect.
+If you've got any anomalies, you should look at them and make sure you're happy with them and do this
+regularly.
+And this might be a good time for me to remind you to go back in and have a look at the same kind of
+thing that we saw in Azure and in GCP to make sure that you're not spending anything anymore.
+Everything is closed down.
+You're not even consuming your free credits.
+Unless of course, you decided to keep things running.
+Uh, so a good chance to do all of that.
+When you're done with that, it's time for us to switch over to look at our new repo for this week.
+And actually, the best way to show you the repo is to start by going back to the production repo.
+If you remember that the one where it all began, uh, and we're in week three, so we should look in
+the week three.
+There is a readme, and if we open the preview you'll see that this is for days one and two.
+Go to the cyber repo which is what we did.
+And now we're on day three.
+Please move over to the repo.
+So from our projects directory there's something to get clone.
+So we first bring up a new terminal window.
+We're inside the production directory so we want to go up one.
+Now we're inside the projects directory which has production amongst the others.
+And you now run this git clone command right here.
+And I'm not going to run it because I've already git cloned.
+Of course, it's already in the folder called Alex.
+If I do myself a CD Alex as you can do, and I have a look, there is some stuff for Alex.
+And now within cursor I'm going to go to file and New window and I'm going to select Alex.
+You can press Open Project.
+We can do that right now.
+Open project go into production.
+Sorry no go into projects.
+And then there's projects and then into Alex.
+There's Alex and then press open and it opens Alex.
+We'll make that a bit bigger.
+And let's talk through the repo that we're looking at here.
+So, look, I'm not gonna lie, there's a lot going on in the repo, and that's why we're going to spend
+a week and a half on it.
+So you're going to have plenty of time to get super familiar with this.
+So don't worry if it seems a little bit overwhelming at first.
+It's nicely organized, nicely structured.
+And we will definitely we will dig in.
+So I just want to start by telling you about the top level folder structure and a little bit about what's
+there, and then something about what's not there as well, just so that it's very clear to you.
+So at the top level you'll see that we have a folder called backend, which is going to contain all
+of the backend code, a folder called frontend.
+Shockingly, with front end code guides is where we will spend a lot of our time.
+This is where all of the recipes are for doing all the deployment we're going to be doing.
+The code is mostly already written.
+Terraform is a directory which contains within it a number of subdirectories.
+Each one is a different, Front, uh, Terraform setup that will go through in a second.
+Uh, and then we have a number of, uh, of other files that will become important later on.
+So let's just quickly look at two of these back end and Terraform to talk a bit more about what's involved.
+So the back end folder quite simply contains subdirectories for each of the different back end components
+that we'll be building.
+And many of these will map either to a Lambda function or a app runner.
+If you remember that app runner is what we did in the first week with our healthcare app.
+And similar to what we did with GCP and Azure, uh, whilst the Lambda function is serverless, architecture
+is what we did in the second week with the twin.
+So there are a bunch of these, each one of these directories, not all of them, but most of them are
+themselves like uh, their own UV project with their own pyproject.toml or in Python version, their
+own virtual environment, a whole setup with a bunch of Python files in most of these subdirectories,
+each one like a little independent project in its own right that is backend.
+And then I also wanted to talk a bit about Terraform.
+Terraform contains our different Terraform deployments.
+And the way I've structured it is I've actually broken it down into separate directories.
+And in each directory we'll be doing a separate Terraform init to set up its own terraform state within
+that directory.
+And that is a fairly common practice.
+It's quite common to do it this way.
+If you have multiple components in a in a component architecture, you might deploy each one with a
+separate Terraform kind of deployment in its own.
+You can also just do them all in one.
+But in our case, because we want to be able to step methodically through this process, I wanted to
+deploy each one independently of the other, and that's why everything is set up as an independent deployment,
+not as kind of one massive deployment that builds all of Alex in one script, but you can merge it that
+way should you wish you could create one big, uh, Alex Terraform if you wanted to?
+So you'll see within each one, like within this, this one SageMaker that we'll be doing today.
+If you open it up, you'll see that there is uh, the private the dot terraform folder.
+You'll see there is a main.tf with the definition of the terraform deployment and outputs.
+And some of them have have variables as well.
+So each one a separate Terraform deployment.
+And in all there are a bunch of them all in the Terraform directory.
+And then the other directory that we're going to live in really is guides.
+Guides has the kind of recipes for everything that we're going to do.
+There's a guides one through to five right here.
+And you will probably have a bunch more guides, uh, by the time I'm through with this.
+Uh, so it's not on some days we're going to do multiple guides on the same day.
+Like today, we're planning to do guides one and two.
+Uh, some days will just be devoted to a single guide.
+Each guide may map to a separate terraform directory.
+You can see that guy number two on SageMaker maps to the two SageMaker Terraform directory.
+Because as we're going through that guide, we'll be installing that infrastructure while we go.
+So you will see that nice tie in in, in both directories.
+Uh, and uh, so that's, that's the structure of the repo.
+Uh, and now let me finish with a couple of things that, that are there and are not there.
+So one of the things that is here that may interest you, that you might have seen from, from some
+of the others as well, is the existence of these dot clawed files and a few other hints that I have
+been using clawed code for a lot of this, and that's something which I personally addicted to clawed
+code.
+I don't know if you've tried it or not, it's certainly not something that is required for this course,
+but if you have it and if you have a subscription, it can be incredibly helpful, as can the agents
+that are built in to cursor.
+Um, but what I tend to do is heavily use files to help me, and so that it can be used for either Claude
+code or for cursors agents.
+I've made a file in guides called gameplan that really lists out in in a in a way that will make most
+sense to a model, what's going on in this whole project and what what what plan of attack we have for
+building this infrastructure.
+And what I do whenever I start Claude code is I begin.
+So if I, if I show you, you're probably familiar with this, but for those that don't know, you start
+Claude code by typing.
+Claude, if you've installed it, uh, and it says welcome.
+And then I'll say something like, please start by reading the file gameplan.md in the directory guides
+and let me know when you're ready.
+And when I do this, this means that, uh, that Claude is now going to educate itself on everything
+about what's going on.
+And what I'll then do is tell it to read.
+Uh, and it's talking about something which is an error that's now fixed, which was the last time I
+had it work on this.
+Uh, what it's going to do is it's going to read that whole game plan and be fully briefed on everything
+about this project, and you can then tell it to read a specific guide, and it will then be briefed
+on that guide in particular.
+So when you have problems with the infrastructure, then that's the way I recommend approaching it.
+And you can do exactly the same with the cursor agent.
+Tell it to read game plan, tell it to read the guide, and once it's read the game plan, it will understand
+the repo structure.
+It will know about how we're approaching this and our objectives of the project, and it will be able
+to help you immediately with any problem.
+And that leads me to to to the other thing, which is that you are going to have problems with this.
+Uh, I built all of this, and then I went back a second time to install it, and already I had problems
+because things had changed.
+It turns out that the the model I used the first time around has some problem in bedrock at the moment.
+That means that it's throwing some some error.
+That turns out to be a bedrock temporary problem, a known problem.
+Uh, and it took me it took me several hours to figure out that's what it was and to find a workaround.
+So this stuff is hard, and there are a lot of moving parts out there.
+There's a lot of variables like what region you're in and lots of other factors that might affect what
+happens when you do this.
+So you are going to have problems.
+But that's a good thing.
+That's that's where you will learn.
+You'll learn by tracking down the problems, by figuring out what they are and by solving them.
+And Claude code can help.
+I'm going to say one more time.
+I know I've said it several times that you shouldn't trust Claude code.
+It will often jump to a conclusions.
+I've got stuff in the game plan telling it not to jump to conclusions, but it still does.
+It often repeats the same mistake.
+It can be pretty frustrating, but as a net it is very much a value add.
+There is no question that I'm able to to work more productively hand in hand with Claude code, but
+I check everything carefully as we go.
+So, so that's that's an instruction for you.
+Finally, I wanted to mention something that's not here.
+I have not built Alex to have different environments like development, test and production.
+There is only one environment and it is our test or production environment, which is going to be building
+and deploying straight to production.
+And I'm also not using GitHub actions.
+The reason is because I just wanted to keep things simple and focus on a multi-agent production deployment.
+But now that you've got those skills from week two, you absolutely can incorporate that in this and
+it's a great step to make.
+Just remember I'm storing terraform state locally and you'll want to move that to be deployed in in
+AWS on an S3 bucket, just as we did in week two.
+But if you would like to do this with multiple environments and have it deployed through GitHub actions,
+then you should absolutely do that as we go.
+But I'm going to keep it simple for now.
+And we're just going to be using, uh, the one environment, no GitHub actions and deploying direct.

@@ -1,0 +1,63 @@
+and now let me introduce myself to convince you I'm actually qualified to talk to you about this
+with apologies to those that have heard my intro about three times before. It's going to be exactly
+the same. I'm going to make the same exact jokes. Put me on 2x. Zoom through this, please. But for
+those new to me, I'm Ed Donner. I am the co-founder, CTO of an AI startup called Nebula.io.
+Go check us out. Before that, most of my career, I was at JP Morgan where I ended up as an MD
+leading a team of about 300 technologists. I started out in London, which is where I'm from
+originally, as you can probably tell from my accent. I spent a few great months in Tokyo
+where I had an amazing time and then ended up in NYC, which is where I live now. Before Nebula,
+where I work now, I founded an AI startup called Untapped and it was acquired a few years ago.
+This here is the picture from Times Square of our acquisition being announced. This is a magical
+moment for me. In fact, if you squint, if you look really carefully and you squint,
+then what you can see right here, that is a picture of me. You don't need to take my word
+for it. You can look at the few pixels that are there. Okay, a bit of a leap of faith,
+but that is in fact me right there on the Times Square billboard at that moment.
+And the other reason I show you this photo, not just to show off at that moment,
+also because in fact, I do live right there. I live about one block from Times Square,
+that away. I live kind of behind that guitar. So I'm actually not in New York right now,
+I'm in London, but when I am in New York, you will find me right there looking out at you.
+So that's a little bit about me. And it's customary with these things to show some sort
+of personal picture of a hobby or something. So here's a picture of me in front of a plane that
+I just flew. And you might think that this is my attempt to tell you that this is something I'm
+very skilled at, but quite the contrary. My great skills when it comes to LLMs is only surpassed
+by my complete inability to do anything requiring hand-eye coordination. And so in fact,
+I'd suggest to you, if you're getting on a plane and you're going perhaps to a conference or
+perhaps on holiday, and you look in the cockpit and the flight deck, and you see that it's me
+standing and sitting there with the stick, the yoke there about to control your jet,
+then you want to be looking for a parachute very quickly. If however, you've turned up on a course
+to take a course about building and deploying LLMs, gen AI and agentic AI in production,
+then luckily you've come to the right place. That is in fact, my skill set. Let's get on
+with the course. So I just want to set your expectations about something that you might
+not be expecting. So a lot of people have asked for this course. It's by far the most requested
+topic for me. And I ran a survey and more than the majority asked for this course. But I think
+that people might be under a bit of a misconception. I think that when people think about
+deploying AI software to production, people are expecting a course which is say about 80%
+is going to be deep in the weeds of artificial intelligence concerns, what it takes to deploy
+agentic apps into production with agents connecting and talking and stuff. And they
+people I think are aware that there's going to be some DevOps work, some cloud deployment work
+and dealing with AWS security dealing with with scaling different componentry. And so people are
+expecting that that work as well in the mix. But I think the reality is a bit different from that.
+I think that the reality is more like this. Sure, there's some AI concerns, we're going to be
+talking about deploying AI. But I got to tell you, 80%, maybe 70% of what we're going to be doing
+is going to be about platform engineering, it's going to be DevOps, it's going to be configuring
+these different cloud providers, it's going to be as we just saw from Vercel, not that it was an AI
+app. But a lot of it was about configuring and setting up deployments in production. And whether
+the Python code you're deploying is saying, welcome to production, hello from production,
+or whether it's calling an LLM and doing something related to generative or agentic AI,
+turns out to not be a major factor in what you're doing. Now, for sure, throughout this course,
+we'll have the AI lens on, we won't be working with any old database in production, we'll be
+working with vector databases. And we won't be working with any old API, we'll be working
+with things like Bedrock and SageMaker, looking at LLM APIs. But nonetheless, it's important to
+take note that you are signing up for a lot of DevOps over the next four weeks. That's a big part
+of deploying AI to production. So as I say, there's going to be a lot of AI related concerns, we'll be
+talking about things like observability, which is super important. We'll be deploying MCP servers,
+which is a very hot area. But the bulk of what we're going to be doing is traditional cloud
+platform engineering, and you better believe it. But that's quite interesting, too.
+All right, one of the points to make about the course is that I've tried to structure this
+to follow what people talk of as the T shape, which is that we're going to cover a lot of breadth,
+we're going to cover lots of different providers, we're going to cover things like CICD and GitHub
+Actions. And we're going to go deep in one particular stripe, which is I've picked AWS. So
+whilst I do plan to give you exposure to all the major cloud providers, to AWS and to Google Cloud
+Platform, and to Microsoft Azure, we're going to be focusing most of our attention on Amazon AWS,
+because that is the most common of the providers used in industry, and I want to prep you
+best for industry. But I'll talk about the parallels between them as we go as well.

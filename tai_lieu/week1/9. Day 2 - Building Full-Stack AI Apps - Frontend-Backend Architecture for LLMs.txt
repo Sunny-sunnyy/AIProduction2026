@@ -1,0 +1,115 @@
+Well, if you're still here, that means you haven't been completely put off by day one, which was
+quite a marathon day.
+And you're here back for day two of Genii and Agentic AI in production.
+So what do I have in store for you today?
+We're going to be talking about the front end and the back end, putting them together to make a full
+stack application.
+And I gotta tell you, we are hardly going to scrape the surface of what it takes to write a front end.
+I imagine some of you are actually front end engineers on this course, looking to get more well rounded.
+And for you, the next few slides are going to be kind of easy for some of you.
+You might be completely new to front end engineering.
+I'm just going to cover the basics to give you a framework, to give you the intuition for what it is
+that goes on when you build the front end side of a web application.
+I'm going to ask you to review the code to look at what I'm doing, get an LLM to explain it if you
+don't understand it.
+They're also amazing at generating front end code.
+Use this to give you the foundation of what's going on.
+When you build a front end and a back end to work together.
+And just to start with some definitions.
+So obviously when we say front end, we're referring to the code that runs in the user's browser, a
+combination of HTML for the structure of the page, CSS, the stylesheets for the appearance of the
+page, and then JavaScript which is used, for example, for what happens when a button is clicked,
+or for making animations move.
+It's the interactivity of the page, and then the back end is the business logic running on the server.
+It includes database access, calling LMS, potentially calling other APIs, storing your secrets and
+the like.
+And so your typical web application, of course has a front end and a back end.
+The front end makes API calls to the back end by hitting a particular URL, which we call a web endpoint,
+hits that URL that calls the backend code.
+The backend generates some content, and it returns it to the front end, typically in the form of a
+JSON object, and the front end collects that JSON object and uses that to make some changes to the
+UI.
+There is another way.
+The back end is sometimes called, which is that it can be called to to create an entire web page,
+to serve up a whole web page to the front end.
+So the front end might call my home page.
+And when when that that URL is called, the server generates the entire home page front end code and
+passes that back to the browser.
+So that's a second way that servers back end code is used.
+And we'll be doing both of them in our labs.
+And now you may be wondering how does Gradio fit into this?
+If you've taken my other courses, you'll know that I'm a huge fan of Gradio.
+I use it a lot to build quick UIs that look great, uh, in my opinion.
+And you might be wondering, okay, so so where does the front end back end of gradio?
+Well, here's the answer.
+So Gradio is a back end framework, but confusingly, Gradio is able to generate front end code, and
+that's kind of kept kept behind the scenes for us.
+We write, we describe a UI with Python, and Gradio generates the front end for us when it's serving
+up that user interface.
+So that's why when you're using Gradio, it's a kind of front end, back end in one, because the back
+end code is able to generate the front end code.
+We won't be using Gradio in this course because we're doing stuff for reals.
+We're going to be building real front ends and back ends.
+So I just want to talk about the progression of different technologies that have happened over time.
+When it comes when it comes to front end code, the front end landscape, it started off some time ago
+that we would all be writing vanilla HTML web pages, and still some people do.
+There's something very satisfying about doing this, but this is where you just have basic HTML code
+to describe a web page.
+You write your own CSS to do the styling, and you have JavaScript.
+And typically people use lightweight, low level frameworks, libraries like like jQuery.
+That just simplifies some of the stuff that you have to write with JavaScript.
+And a lot of what you're doing when you write JavaScript at this level is playing around with something
+called the Dom stands for Document Object Model, and this is the kind of JavaScript model that represents
+the web page that's being rendered in the browser, so that you can do things like navigate around in
+the code to find a button, and then do something like change its color or with JavaScript code so that
+that model of what the web page looks like in the browser's screen is known as the Dom.
+And next came the JavaScript front end frameworks, an abstraction layer to make it quicker and more
+reusable to build sophisticated web pages.
+And there's a zoo of these frameworks.
+The most popular by far is react that I'm sure you've heard of.
+There's also Vue and Angular and Svelte.
+And there's a bunch of others, and they're all about building UIs from reusable components that you
+can kind of plug and play together so that you can construct quite sophisticated UIs quite quickly.
+And most of the time when you're working with a framework like react, you're building what's known
+as a single page application spa.
+And that's referring to the fact that typically, even though as a user, it feels like you're clicking
+around lots of different web pages, the whole of that react application, as it's called, all of the
+the content, the front end code behind it is loaded up once when you first hit the first URL, and
+then from that point onwards, when you're clicking around the application, you're typically making
+a series of API calls to the server, but it's all running effectively the same web page, even though
+it appears to redraw itself in different ways and it feels like you're navigating around, it's all
+just the same client code that's running there.
+The react application.
+And so that's that's what Spa means.
+And you do hear that a lot.
+Now react and the others come in two flavors.
+There's a JavaScript flavor a JavaScript variant which which it began with.
+And then there's a more modern TypeScript variant which is react using the language TypeScript, the
+sister language to JavaScript, which is a strongly typed version of JavaScript.
+And if you're not sure what that means, then then ask ChatGPT.
+It will explain it brilliantly.
+All right.
+And the final step in this progression is to explain the application frameworks which which came next
+and which are the the most recent part of this story.
+And they are things like Next.js, which is what we will be using.
+Uh, and this is really because when you're using something like react, react is super flexible and
+it's quite bare bones.
+It doesn't come with a lot of the stuff, like the code to to handle validations of forms on a web page,
+and the code to do things like routing between different sections of your app.
+And the assumption is if you're using react, that you pick and choose which framework you want to add
+together.
+And that's that's really that's great.
+It means you can have a lot of flexibility in what kind of app you want to build, but it also means
+there's a lot of different options.
+And people have built react apps in lots of different ways.
+And next is an example of a higher level framework built on top of react that bundles together a bunch
+of useful frameworks so that you don't need to make lots of different decisions.
+You can just use next and go.
+So it has routing and data fetching.
+It also has this this idea called server side rendering that we'll talk more about later.
+Uh, and and others.
+It comes with a bunch of tools built into it.
+Uh, and it's very quick to get started.
+So that is Next.js.
+And that completes the narrative of the kind of three tiers of technology that have formed modern front
+end development.

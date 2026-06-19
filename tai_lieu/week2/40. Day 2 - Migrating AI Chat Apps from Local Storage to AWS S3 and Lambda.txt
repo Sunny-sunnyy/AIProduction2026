@@ -1,0 +1,189 @@
+Now it's time to update our backend server, starting by updating the requirements.txt with the packages
+we need.
+Just a few additions here.
+Select this, go to requirements.txt, select everything and paste in the new one.
+We've got a couple of AWS packages and we've got py pdf so that we can in parse PDF files.
+All right back to the preview.
+We have a new version of Server.py our backend code.
+Let's just copy and paste it in and then I'll tell you what's changed here.
+It all is lots of stuff there.
+Copy that.
+Go over to server.py, select everything, paste on top and save.
+What are we doing here?
+This code is all the same.
+We're still using the OpenAI client and you should use your one if you're using something different.
+Uh, and then we've got a few new environment variables.
+Use S3 uh, which is true or false S3 bucket, which is going to be the name of an S3 bucket to use
+for the memory, uh, or memory directories if we're running locally.
+Uh, and then uh, so Boto3 is the Python library that AWS provides for accessing AWS APIs.
+And we're using that to get our, uh, S3 client library, uh, which we will be using to access S3.
+And load conversation has been updated so that if you use S3 is true, then it gets an object from S3.
+You provide in a bucket name and a key, which is going to be our, our, uh, session ID as before.
+And that will allow us to bring back that object with that key in this bucket.
+That is how it works.
+So, um, we've also got a save conversation which, which, uh, basically calls S3 client Putobject
+before we called S3 client dot get object.
+objects.
+Now we put an object, we pass in the bucket name and we pass in the key, which is the as as before
+the the session ID um, but that's that session ID is we're putting it into get memory path which is
+basically session ID, JSON, which is the key, the name of this file.
+Okay.
+Uh, otherwise things are pretty similar.
+Uh, if you look through, nothing much has changed.
+The only real difference here.
+Should we make this back to GPT 4.1 mini?
+Uh, the only difference here is this way of getting the conversation history, using the get object
+and put object from an S3 bucket instead of us.
+Uh, just looking in the local file system, if the environment variable use S3 is set to true, that's
+the change that we've made.
+So again in the last step we updated our server code so that it would use Boto3 AWS Python client library
+to access S3 buckets so that it could retrieve our conversation history from S3 buckets.
+The next step is about changing our server function so it can be used as a lambda function.
+And there's this library we need to use called Mangum, which is a library which uh, which which wraps
+a fast API server and allows that to be used in the lambda context, which is slightly different.
+So this is it's just an open source library.
+I think it's named after, uh, the the movie The Lawnmower Man.
+It's, uh, apparently what the library author named it after because it's about translating.
+Uh, but, uh, so this is, this is what we do.
+Uh, within back end, we have a Python module called Lambda handler dot pi.
+And this is what we will set up to be the actual function called by lambda.
+So uh, let's do that now.
+So this is going to be called lambda underscore handler.
+Uh within here new file.
+Handler dot pi.
+And if you're not familiar with the word lambda it's spelled with a B in the middle of it, which catches
+people out sometimes.
+I sometimes do lambda, but it's lambda.
+Uh, the Greek letter.
+The letter looks like that.
+Um, so, uh, lambda handler.
+Uh, so we we import this this, uh, Mangum object and we use that.
+We, we, we import our fast API app and we wrap it like so, and we assign that to a variable called
+handler and later keep, keep hold of that thought because later we're going to be telling Lambda we
+want you to take this handler.
+That's the object in this module, which is going to be the thing responsible for servicing the lambda
+function request.
+So keep keep keep an eye out for handler and lambda handler.
+And now back to our instructions.
+So we're just going to to update the dependencies and just make sure everything is working locally.
+Uh before we go ahead and deploy.
+Let's do that now.
+Okay.
+So I'm just going to bring up a terminal.
+I'm in the backend directory Tree here and I'm going to do a uv add minus r requirements.txt to install
+those extra packages, although it won't actually use the AWS one, but it should use the pypdf2.
+And now we will do.
+We will run the command to start our server.
+You can just take this from the guide.
+Off goes our server.
+Our server is now running.
+It seems to be successful.
+Let's go over to our client CD frontend and npm run dev.
+Let's see what happens.
+Now we will bring this up.
+Here it comes AI in production.
+That's great.
+Uh, so far so good.
+Let's say hi there.
+Hi, Ed.
+Here.
+What's on your mind today?
+Uh, my name's Alex.
+Sorry, my name's Alex.
+Nice to meet you.
+And what's my name?
+You just mentioned Alex.
+Nice and straightforward, I like that.
+Ha!
+Well, my name is Ed.
+It's even more straightforward, but I feel like I can't tell my digital twin I'm me, or I get super
+confused.
+Uh.
+All right.
+So far, so good.
+So that's working.
+And of course, because I use S3 is set to false by by.
+It's not set at all in the environment variable.
+So it will assume it's not using S3.
+And as a result it's just following the same code path as before.
+We haven't broken anything.
+Nothing's regressed.
+But we are now all ready for AWS.
+So again I'm going to stop this server.
+I'm going to stop the backend.
+I'm going to close the terminal, go back to our our preview.
+And we are now launching into part two, set up the AWS environment.
+So the first thing is to uh it says create env.
+We already have a env.
+But we're going to add in a few more things to it.
+We're going to add in.
+We've already actually got open AI API key, but we're going to add in project name is twin.
+And we're going to add AWS account ID and then default AWS region.
+So you remember this from last time.
+This needs to match the region that you get on the top right.
+When you log in that you can you can always change.
+So that region needs to be the region which is closest to you, the main region that makes most sense
+for where you are.
+Uh, the usually that's I think EU West one if you're in most of Europe, unless you're closer to another
+big one.
+It's uh, the Mumbai one in Asia Pacific in India is a very common one, and US West one and West two.
+And of course, for me, it's US East one.
+Uh, even though I'm in London at the moment, but still US East one is the one that I will pick.
+And, uh, I'm gonna set that up right now.
+My EMV file, as should you.
+And I will see you back here in one second.
+Don't overwrite the existing things in your env.
+Just just add the new ones in.
+See you in a second.
+And hopefully you've followed all the rules.
+You save the env file.
+You didn't let that white blob stay there.
+You were careful with the names of your keys.
+You spelt your AWS region correctly with the right hyphens and everything else.
+Otherwise there'll be trouble.
+Uh.
+So now we will do what we always start these things by doing, which is beginning with setting up the
+IAM permissions.
+Most Amazon projects start with IAM.
+So we're going to begin by logging in as root, which requires us to go to the AWS console as before
+and sign in as our root user.
+So press the uh let me resize that screen and press the sign into console button.
+And I've already signed in as the root user.
+And the way I know is it has my name there.
+It doesn't say AI engineer, it says editor.
+And that is why we're in the right place for setting up permissions.
+So begin by going to IAM and open up your IAM resources.
+And then go to User Groups.
+And I want you to press, create Group and create a new group that you're going to call Twin Access
+I've already set up.
+So it's here when you press that you hopefully you remember that there's two parts to it.
+You first assign it to a user, and you should check the box by AI engineer so that this user group
+applies to AI engineer.
+And then in the next box down, you get to set the permissions.
+And you should set a bunch of permissions.
+And I've got the permissions listed down here.
+And you will have to add these permissions in.
+And they are listed in the guide.
+And you remember you type in the search box each one.
+And then you check the box.
+And it's a bit janky because you feel like you should press an okay button.
+But no, you just type out something else to search for and check that box, and you do it for each
+of them.
+You'll see in the list API Gateway Administrator.
+So we can use the API gateway, S3 Full Access Lambda full access.
+Actually there are two CloudFront ones, and I don't think it matters, but I put them both in CloudFront
+and CloudFront access to.
+I think the instructions only send the first one.
+I don't think it matters, but you might as well put both in and then I'll read only access as well.
+You need that one too.
+So all of these permissions again, you'll see that I've gone with the full access for these.
+The real best practice with Amazon is to limit this to the precise permissions that you need for your
+IAM user, but that's probably like a super advanced.
+Like if you're if you're actually setting up a real corporate project and it's a headache.
+And since we're doing this as part of learning, I don't want to get bogged down in that as long as
+you get the idea, we're at least restricting what our IAM user can do to these things.
+And then when you create that user group, it will automatically be connected with the AI engineer user.
+And you can come back in by going to user groups and click on Twin Access and double check that it comes
+up just like mine here with the user.
+And with all of the permissions listed out just as they are here.
+And then congratulations, you've given your IAM user AI engineer the powers that it needs.

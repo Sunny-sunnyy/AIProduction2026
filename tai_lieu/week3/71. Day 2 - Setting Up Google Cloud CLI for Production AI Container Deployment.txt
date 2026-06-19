@@ -1,0 +1,59 @@
+We're now going to install the Google Cloud CLI command line interface, much as we did for Azure and
+for AWS before that.
+So there's install instructions for windows, Mac and Linux.
+It's the usual stuff.
+Hopefully you'll quickly be able to do that.
+And then we bring up a new terminal and we're going to run gcloud init.
+Let's do that new terminal g cloud init.
+And off it goes.
+Welcome.
+This will take you through the process of installing configuring gcloud.
+Do we want to reinitialize the current configuration.
+Yep.
+We might as well do that.
+Uh, okay.
+Um, so we want to select an account.
+Now it shows me here, um, those two accounts, but I find I think it's easier to do option three.
+Sign in with a Google account.
+So it opens this up.
+That way I can just go through my Google credentials in my browser and not have to do anything.
+So I'm going to type out my password and I'll be right back when I've done that.
+Okay.
+Now press next and it comes and say allow.
+And we're now authenticated.
+Go back here and this is done.
+So, uh, it now says pick a cloud project to use.
+And obviously we want to use project number one, the cyber analyzer.
+Uh, so that is now set up.
+We have done Google init.
+We are logged in to the uh, the, the uh cyber analyzer project, which is set.
+And uh, also if you're prompted for a default region, then follow these instructions to okay, okay.
+Next let's just go through some typical CLI commands.
+This first one will explain our current configuration.
+Let's try that.
+Uh so we are account is my account.
+That's good.
+And the project is the project and we're in US central one.
+Excellent.
+Let's list all available projects.
+List them out.
+There they are.
+I've got some other things that I messed around with in the past, but Cyber Analyzer is right there,
+which is great.
+The current project, presumably this is going to work as well and just give us Cyber Analyzer, we
+hope.
+Let's see.
+It does just give us cyber analyzer.
+Jolly good.
+And now this one just to test the API.
+Uh, a bunch of different services that are enabled.
+Uh, very good.
+And now we're just going to ask to enable specific APIs that we may use.
+So we're just going to run this here.
+And importantly, of course this is running something called uh, run Google APIs, which is cloud run,
+our ability to run containers and container registry.
+Uh, and that's something which, uh, is also, uh, should, should sound familiar to you.
+And then something called cloud build, uh, which, which is, as it says, there will, will allow
+us to build containers.
+And so we have now got our account set up and ready, and we are ready to move forwards with actually
+building our container.

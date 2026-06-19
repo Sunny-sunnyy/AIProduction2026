@@ -1,0 +1,122 @@
+Okay, so just before we deploy to production, I've gone back into Vercel.
+I'm going into the SaaS production project, and you see, it gives you a little preview of our production
+deployment right here.
+And I just wanted to show you I want to go to settings over here.
+And I want to go to Deployment Protection.
+We're in Vercel.
+So so we want to use Clark's protection.
+We don't want vassal to also add in its protection.
+So I go into deployment protection and I turn off vassal authentication and save.
+So we're no longer using that.
+Our SaaS app is exposed to the internet, but Clark will be protecting us.
+Okay.
+And with that we go here and we run vassal dash, dash, prod, which I already did a few seconds ago.
+So that ran and it deployed it to production.
+You could also do, uh, vassal Dot to deploy it first to the preview environment before you deploy
+it to production.
+But with that in mind, we can now launch it and see what it looks like.
+So we will open that.
+Here it comes.
+generate your new business idea.
+We'll sign in.
+We'll come in as, uh, me with because I've already set up an account.
+Here I am in, I come, uh, say continue.
+I am now logged in.
+This is logged in on the internet, logged in to my vassal app.
+Uh, I can now say generate business idea.
+It's now calling my back end the route that we've protected so that it knows that I'm logged in.
+And that handshake, we saw that trace being printed there.
+Uh, before we know that it does this handshaking between the front end and the back end, and here
+comes the results.
+Uh, it's printing it nicely.
+We're seeing streaming coming back.
+Uh, and, uh, we've got our results.
+This is a front end and back end secured app running, deployed in production.
+Um, and we can run it again to get another one.
+Uh, just you could simply refresh the page.
+At the moment, it's a very simple app, I admit.
+But nonetheless, I imagine the users will come flooding in when you release your business idea generator
+and get these different ideas.
+Okay, so with that, that wraps up the first part.
+If we go back to our instructions, uh, this is now, uh, finished up the first part with our security
+architecture, and we will now be moving to the second part, where we're going to allow people to be
+able to subscribe to this app.
+Okay.
+So in cursor, I'm opening up the week one folder, and I'm now going to day three part two to open
+the preview.
+It's a two parter today.
+Uh, now we're going to transform our SaaS application with subscription management will require a paid
+subscription to access the idea generator.
+This will allow you to take your own business idea and rapidly deploy it online for people to subscribe
+to your product.
+So the way we're going to do it is still through Clark.
+Clark not only offers this user management feature with social login, but also a billing platform as
+well, and brilliantly, it's hooked up.
+If you wish to stripe so that if you have a stripe account or you want to use stripe to collect payments,
+then you can use that via Clark, which is fabulous.
+So we're going to go back to the Clark dashboard.
+First of all, where we're going to go to configure and go to subscription plans.
+Uh, and if it's the first time, as it says, we'll have to press get started.
+So let's go and do that now.
+Okay.
+So the first step to enabling Clark billing is we go back to the Clark dashboard.
+Here we have it.
+You'll see your overview screen for the SaaS app.
+And you will also now have the message congratulations.
+Your application has users because you will have signed in yourself.
+And you'll see your own sign up where I see my two Gmail accounts here and go to configure.
+And on the left here, scroll down and you'll see there's like a billing settings and subscription plans.
+And when you go to settings I've already set mine up.
+So you'll.
+You should have a button that's like, uh, set up or create or something like that.
+I think it says in the instructions, but it will say.
+And you press that, uh, and in you come, there are these two different options.
+There's the one that comes out of the box with clerk called the clerk payment gateway, which is very
+simple, and we'll be using it.
+Um, and there's also, uh, more sophisticated is to connect it to stripe.
+If you use stripe to collect payments.
+And this would be an exercise for you should you wish to do so, should you actually have an idea that
+you do want to monetize right now on the internet?
+But that is all where you set it up.
+Um, so this is this is enabling it to start with, uh, and then you go to subscription plans here,
+and this is where you set up your plans, and you can see that, that I've got a free plan and a premium
+subscription plan.
+And you will be able to press the create plan button.
+You give your plan a name and a key, which should be something like a subscription hyphen plan.
+Uh, and uh oh, it can't have a hyphen in it.
+So, uh, like that, uh, give it a name, a description, a monthly base fee.
+And we're going to be using this only for test payments, and no actual money will take place.
+So you can you can do whatever you wish for our testing purposes.
+Uh, and uh, I think I put in 100 a month.
+And then if you wish, you can turn on the annual discount, which is saying if someone wants to, to
+pay for an entire year and commit for the year and pay upfront for the year, then this would be, um,
+the, the discounted monthly price that would apply for, uh, the year and, uh, leave publicly available
+on so that people get access to it.
+And that is all you need to do.
+Let me just go back to look at the one that I set up, so that you can make sure that yours matches
+mine.
+Exactly.
+Um, so, uh, um, hang on.
+Sorry.
+So, um, we're we're in configure and subscription plans.
+There we go.
+I lost it for one second in premium subscription, so I call mine The Key.
+I gave it was premium underscore subscription.
+I was doing a hyphen.
+It takes underscores.
+Called it premium subscription.
+I have it being $100 a month and a $90 a month is the discount if people choose to commit annually.
+So that's what you could put in if you want to match what I've got.
+Exactly.
+And I've got that turned on.
+Um, and features, you may imagine this, this is where you can configure different features that the
+user subscribes to.
+And then you can imagine that in our back end route where we've got those, those creds, we could use
+that to figure out which features the user has access to.
+If that's how you take this a step further, uh, and that can be an exercise for you should you wish.
+Okay.
+And once you've done that, come back here.
+And this has the instructions for doing it.
+Look, it even says premium underscore subscription.
+So, uh, follow all of this and keep a note of what plan ID that you used.
+Um, and, uh, I'll break for a second for you to do that and see you in a minute.

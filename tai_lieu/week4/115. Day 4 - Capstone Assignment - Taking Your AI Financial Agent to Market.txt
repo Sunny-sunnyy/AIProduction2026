@@ -1,0 +1,114 @@
+Okay.
+And so to wrap up our capstone project, it's time for you to take some homework.
+Your assignment please.
+Uh, I would like you to take Alex forwards in one of three different directions.
+Again, as we did last week, uh, and one of them is, again, to go deeper on data engineering, if
+that is your thing.
+You remember that when we built the data pipes last week, it's just basically searching online for
+something interesting.
+But we did give it the ability to take an input about what it should search for.
+But but at the moment it's just searching for any, any news related to financial planning.
+Uh, and that's a bit random.
+It would be a lot better if it actually got information from the agents about what it should look for
+related to the user's portfolios, and it researched topics relevant to them and stored that in the
+knowledge base.
+And so making the data pipes be relevant to portfolios, connecting the dots between what we did this
+week and what we did last week, that would be really cool.
+That would be a big improvement to Alex, and it would be great if you were able to make that and a
+second direction you could take.
+It is going deeper on MLOps, so building in the more substantive monitoring that I showed you in the
+guide.
+Putting in more monitoring and developing your own monitoring approach.
+Putting in the the cloud, the CloudWatch alerts so you get alerts.
+Everything goes down.
+Putting in better guardrails, both some hard coded guardrails and Python and maybe some llms as a judge.
+Guardrails, maybe using Lang Views tool to do that, and then tracking model drift.
+So record some some values, uh, record some metrics, get them in lang views and then track them over
+time and record what happens to them.
+So if the model performance is gradually going downwards, you'll get that kind of reporting.
+You'll get an early head start to improve it.
+So this is all sleeves rolled up.
+MLOps really understanding the performance of your models in production.
+And last and definitely not least, and the one that I hope that some of you sign up for is working
+on the Agentic AI.
+It's about improving the financial planner in all the things we did this week.
+Maybe the thing we didn't look at very much was the actual results that you get.
+If you look on those pages, what actually came back from Nova.
+And I got to tell you that of all of the really amazing things I showed you, that is possibly right
+now the least amazing that the quality of the financial advice it gives is kind of, uh, I think maybe
+the Monte Carlo simulation part is a bit dodgy, and I think maybe it's interpretation of it is just
+sort of so-so, and it could be so much better.
+We should work on the context engineering to equip it with real information about what a financial planner
+needs to know.
+There should be interactions between the agents.
+The three agents are working in isolation, but really the retirement one should be taking in the information
+from the report.
+And so, so should the charter.
+So there should be some some dependency between the agents.
+And maybe they should be able to do deep research where one of them comes up with some topics and then
+the others work on it.
+There's so much that could be done here so that the agent interactions go deeper, get more content,
+use more tools, maybe have access to to real financial planning tools in order to be able to improve
+the quality of the results.
+And I got to tell you something, and I mean this.
+So seriously, I feel like Alex really is a true commercial platform.
+Like this is something that could be monetized.
+Now, obviously there is that disclaimer on the front of it.
+It's clearly not a qualified financial planner.
+And that disclaimer is very important to bear in mind to understand what you could realistically charge
+for this.
+But nonetheless, you could take this, this, this kernel, this seed, this seed, this starting point,
+and build on top of this and build something that has deep intelligence.
+It's able to research, it's able to use tools, it's able to add value and come up with comprehensive
+financial analysis based on your portfolio.
+Looking up stock prices in polygon and researching companies using its expertise and building charts
+that project your retirement earnings.
+So there's a lot that could be done here if you work on the AI.
+I believe that this is a is a product that can actually sell.
+And so you could emerge from this homework assignment with something which is actually able to earn
+revenue.
+And that would be a thing.
+So I'm very excited.
+I'm very hopeful that people do this AI part and make, make, make the whole Alex platform more rich.
+And whilst you're doing that, you could also touch on the data engineering side and the MLOps side
+as well, and do do a good trifecta, uh, to, to counterbalance the evil trifecta from before.
+Uh, that would be fantastic.
+And that would give us a real product actually in production and actually earning revenue.
+And please remember, with whatever you build, we would love to see it.
+We need to share it.
+Please do post uh, document a markdown file or a Jupyter notebook.
+In the community contributions folder of the production repo, not the repo, but the production repo.
+So we have it all in one place.
+Uh, and give a link to your product out there.
+If it's a product that you've monetized, then I suggest you don't give us the code, but you send us
+a link to the actual product so I can come in, and as long as it's cheap enough, I'll subscribe to
+it.
+I'll bring you in some revenue.
+Uh, and, uh, if it, if it will manage my accounts and, uh, that that would be great.
+Uh, but and of course, you can use Clark's functionality to set up subscription tiers, but this would
+be a really good way to to share what you've done.
+If you haven't built a full on commercial product, don't worry, I'd still love to see it.
+Please do whatever changes you've got and, uh, share a link with your writeup of what you've done.
+This is going to be the most satisfying part of all of this course will be seeing what people make,
+how you're able to take this, this seed of a product and take it forwards and make it richer, more
+powerful.
+Financial planner A financial planner deployed to production.
+Oh my goodness, it's been a huge day.
+That concludes the capstone project.
+It's an enterprise strength capstone project.
+We've done so much and I yeah, I feel like I talked a lot today, but this this was this was absolutely
+the the important material that we needed to cover.
+It's all been building up to that.
+Uh, and I hope that, that you really feel knowledgeable now that you've built this expertise.
+And so you should because the number is 95.
+We are 95% of the way through.
+You've you've really imagined what we've got done in, uh, not even four weeks.
+Uh, it's been huge.
+And you're probably thinking, wow, this feels like, so conclusive.
+Like it really feels like we've we've reached a finale.
+This has felt epic today.
+It's felt just legendary.
+What more could there possibly be?
+Well, I tell you what more there could possibly be, but I'm not going to tell you.
+You're going to have to wait until tomorrow.
+I'll see you then.

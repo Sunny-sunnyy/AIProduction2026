@@ -1,0 +1,100 @@
+And the fourth term, you, uh, sign up for the fact that if you post issues on Udemy, I will.
+I will always try and help.
+Uh, but it's going to be not I'm not going to be as good as I've been with my other courses because
+it's much harder.
+My other course is typically when people post problems, it's about the code and I can reproduce it,
+I can recreate it, and I can fix problems pretty quickly.
+But if I'm not able to reproduce, if you have some problem which is pertains to your environment and
+your setup and your accounts, then I won't be able to recreate it in the same way.
+And I can maybe give some pointers and some hints, but it's going to be much harder for me to say you
+need to do x, Y, and Z.
+It's not going to be that easy.
+Uh, so the the definitely do post to me and I will do my best, but recognize that it's going to be
+much harder for me to help you than usual, and so you will need to stick at it for longer than before.
+Uh, and uh, there might come a point when you when you decide, all right, I've invested enough in
+this, you know, if it's if it's Azure, you might think I don't I don't care that much about this.
+We're only spending a day on Azure.
+I'm just going to go onto GCP and do that.
+So that's always a possibility.
+You can listen to the videos and take it in if if you really hit a roadblock.
+But but do try and stick at it as long as possible.
+Um, and do post as much as you can on Udemy, including when you find a resolution for other people.
+And on that note, please do also look out for other things that other students have posted on Udemy.
+There's a huge benefit of crowds in this.
+We each have slightly different systems.
+We might hit different problems, and if you've hit one and found a solution to it, post it on Udemy
+in the Q&amp;A.
+And also look out for anyone else that's struggling with that that you might be able to help with.
+That would be so valuable.
+More, more than ever before.
+More than more than any of my other courses.
+This is one where the community can really count.
+So please do do think about that.
+Do do keep an eye on the Udemy Q&amp;A A and see if you can't help out other people who are stuck.
+So at this point, I'm very excited to pilot a new feature in Udemy.
+A new feature which allows allows for more interaction between you and the course.
+Um, what I'd like to do is I'd like you to review these five terms, and I'm now going to activate
+this feature.
+And what I need to ask you to do is actually your computer is now now has audio activated.
+And I need you to say out loud I agree.
+Once you've read this to confirm that you sign up for these terms and that you are agreeing to do this.
+So if you can now just just say say out loud, I agree.
+Uh, so so if you said it then then then you didn't say it loudly enough.
+If you wouldn't mind saying it again.
+But but a bit louder and say I agree so that this advances to the next step.
+I don't suppose anyone fell for that.
+But, but but the idea was, the idea was that maybe someone says I agree out loud and that's great.
+That's what I want.
+That's what I want to hear.
+You've just agreed to the fact that you will do these five things on this list, and that's all I ask
+for.
+Uh, so whether or not you actually said it out loud, uh, and, uh, I'm sure.
+Sure.
+You saw I was heading with that.
+Uh.
+Thank you.
+Uh, thank you for agreeing to the terms.
+It's so important.
+That's what it will take for this course to be successful.
+And I'm very grateful.
+And enough of this nonsense.
+Uh, let's let's let's wrap up and to wrap up, finally, just just to point out that I'm available
+to to help and to connect with you if you're not thoroughly fed up with me for my silly joking around,
+uh, you can reach me on Udemy in the Q&amp;A.
+And as I say, I will always reply and I'll always reply quickly, but it might be harder for me to
+help you with this course, but I'll do my best.
+You can reach me by email, which is another great way to reach me.
+There's my email address right there.
+And I'm on LinkedIn.
+And if you could forgive me for for my silliness, uh, then please do LinkedIn with me.
+I love connecting with people.
+Uh, some people are very coy about connecting with them and say, if you connect with me, then say
+how you know me or something.
+I'm not like that at all.
+If you connect with me, I'll connect back happily.
+And if you say hi, I'll say hi back.
+And, uh.
+So for sure, please do connect with me if you're willing.
+And I love I love building this community and being part of it and having lots of data scientists and
+engineers connected with me.
+And so you can use LinkedIn to connect, of course, to ask questions.
+But also, importantly, you can post the projects that we build on this course and your assignments,
+uh, on LinkedIn to, to the people that you're connected with.
+And then tag me if you wish.
+Uh, and say something about about, uh, make some comment about it and then I will weigh in and add
+to that.
+And that's a great way to share the progress that you're making with all the other people on the course
+that are also connected with me, that get to see it, and also by by adding some comments, I can help
+to amplify the projects that you're building and it showcases your expertise to larger audiences.
+And that's something that might draw the attention of a future, uh, future client of yours, or perhaps
+even a future employer.
+Let me bring back up the curriculum, the four week curriculum.
+Now, with the first day highlighted to show that it's been completed, you have finished day one.
+We have deployed our first rather simple AI app.
+Uh, but it's nice and I hope you're proud of it.
+We have many, many more to come.
+And with that, that means that you are now 5% complete, 5% on this journey to being able to deploy
+generative AI and Agentic AI into production.
+And I tell you, I could not be more excited to be on this journey with you.
+We have so much great stuff ahead of us and that all begins with day two tomorrow.
+I'll see you then.

@@ -1,0 +1,154 @@
+Okay.
+Next up we're going to take this bit of code right here in step five.
+And we're going to overwrite our underscore app dot TSX in pages our front end code.
+So go in here and paste this in.
+And what is this doing exactly.
+It's importing a react component called clerk provider.
+And it's wrapping our entire application in this clerk provider.
+And this is a way that you can have all of your react components be able to have a sort of shared the
+the ability to access the functionality in this clerk provider.
+Um, and I've garbled that a little bit in front end.
+People that know all about react would be like, well, that's that's slightly oversimplified, but
+you get the general idea.
+We've wrapped everything in the clerk provider.
+Okay, back we go.
+Next we're going to create a new page, uh, called product TSX.
+And this is going to be a protected route, which means it's going to be a page which is only available
+to people that are logged in.
+and that's going to be called product TSX.
+And it's going to be in pages.
+And we have used client at the top there.
+And it's quite a long page.
+But it is it's really got the whole content of our business idea generator.
+So in pages new file, uh, and it's called product TSX.
+This format that combines TypeScript and HTML.
+You'll, you'll see that it's got that same markdown component.
+It's got the same code to stream back events, uh, and uh, save that.
+Otherwise it is the same.
+All right.
+Back we go.
+Uh, and now we're going to change index TSX to be a new landing page with sign in.
+A whole thing to do with, with, with signing in.
+Uh, so let me just take this.
+And for people that have built this the, the original way before, there were things like Clark, like
+this was a lot of work.
+Like this would be like a week's worth of work to build your own sign in page, maybe several weeks
+worth of work, especially with social auth that that could be like a months worth of work.
+Uh, but, uh, it's not going to be month's worth of work.
+Uh, we're going to go to index TSX, which used to be the the whole page.
+We've moved most of this to products.
+And now putting in this page, it's relatively short.
+And really all of the the meat of this page are in these components like sign in button and signed in
+this component signed in means this is what will show if um, if this is uh, if we've selected if the
+user is signed in, then this is the part that will be displayed.
+If the user is not signed in, then the signed out part will show.
+And automatically Clark is going to handle which parts of this react tree gets shown.
+And I can see I'm using something which is deprecated there.
+I don't think it matters, but you can feel free to delete that so that we don't have deprecated code
+in there.
+And that all looks good.
+Okay, so back to the instructions.
+All of this is done, and now it's time for us to collect that JDBC URL that I showed you a second ago
+and add it to EMV local.
+So I'm going to go and do that right now.
+You remember where to collect it from the configure and the API keys.
+And then it's over on the right hand side.
+Collect that and then put it in env local looking exactly like that.
+You have to get these things identical.
+No mistakes or you will be pulling your hair out later.
+Uh all right I'll go do that and see you in a second.
+Okay.
+Now it's time to update our dependencies for the back end code, which is in this file requirements.txt.
+We've just got to add one more in here, the fast API clerk auth, which is the back end code to make
+sure that only logged in users can access our root.
+Uh, so we go to requirements.txt and paste it in there.
+I realized I used the British word root where where the Americans here will be saying root.
+I can't bring myself to say root.
+I've lived in New York for a long time, but I still say root and router and the routing from, uh,
+from from next year's.
+Uh, okay.
+So, um, back to the preview.
+Um, and now we're going to change our index.py.
+Our backend route.
+Uh oh.
+Go away.
+I don't want to have an update tonight.
+Uh, we'll have, uh, the backend routes that is going to, um, uh, check that the user is logged
+in, but otherwise it will be the same.
+So let's go back to the index.py.
+Here it is.
+And replace all of that.
+Okay.
+So let me just quickly talk through this.
+So what's happened here from uh fast API clerk auth, which is the library that handles making sure
+that we are only logged in.
+Users use it.
+We're importing a bunch of things here.
+And then when we define our route API, we're asking to be passed in some credentials.
+And we're using this way of making sure that only people who are logged in are able to access this route.
+Um, and other than that, this is all exactly the same.
+There is this line here that's not used anywhere.
+I've got this in here so you can see how you could actually get the user ID out of these credentials.
+So if you had some logic that depended on who's logged in, this is where you could do it.
+And it includes you'll find out later on we have subscription plans.
+You could actually find out what subscription plan they're on and use that to give them access to some
+functionality and not to others.
+Okay.
+Now the very people who are very alert will notice there is a little tiny change here as well, which
+is I've slightly improved the way this streams back to fix a bug.
+That meant that sometimes the formatting wasn't all coming through properly.
+If your formatting wasn't coming through, then with this bug fix, it's going to look a bit better.
+We will see.
+Uh, otherwise this is identical.
+Uh, and so save that, go back to our instructions, see where we are.
+Um, okay.
+We've now got to add these three keys that we already saved in a EMV file.
+We've got to add them to Vercel.
+cell.
+So we're going to run each of these three commands.
+And then we're going to paste in the key as it is in the EMV file.
+And then select all environments to set it each time which you remember.
+You press A and enter.
+Or you can press space and enter lots of times and have to do that for all three.
+And you mustn't make mistakes here.
+The key needs to be the key name has to be this name, and the value needs to be the value from EMV.
+And if you get that wrong, then there's going to be trouble.
+So don't get it wrong.
+Uh, and, uh, I will see you in a minute when I've done that myself.
+Okay.
+Hopefully you've done that and you did it flawlessly.
+So all will be well.
+Hopefully I did too, because if I made a mistake, then you're not going to let me forget it.
+Uh, but I think I got it right.
+Okay.
+Uh, and now we're going to, to run it locally by typing vercel dev.
+And we've actually not done this before because when you run this locally, it's only going to be able
+to run the JavaScript part locally.
+It's not going to run the Python code locally.
+Uh, so we can't test like the LM part of it, but we will be able to test whether we're connecting
+to Vercel or not.
+So here we go.
+We've deployed it.
+It's running on localhost on port 3000.
+So I should be able to command click on this and up it comes.
+And here we go.
+Here it is.
+So first of all check out how neat this looks.
+Uh, generate your next big business idea.
+Harness the power of AI to discover innovative business opportunities tailored for the AI agent economy.
+Uh, so, um, here we go.
+Now, I'm already logged in.
+Uh, it knows me already.
+Hang on.
+Let me sign out.
+Uh, this is what you should see.
+Uh, this is the logged out page.
+Uh, there's a get started free and a sign in button which do the same thing.
+They bring you to this sign in to SaaS name of our application, and they don't have an account.
+Sign up.
+And what you can now do is experiment with this.
+Create an account, and you'll be able to see that account appearing on your Clark page like you saw.
+I already had two set up from my couple of my Gmail accounts, but I could come in now using my my Gmail
+account.
+It will log in.
+Here I am.

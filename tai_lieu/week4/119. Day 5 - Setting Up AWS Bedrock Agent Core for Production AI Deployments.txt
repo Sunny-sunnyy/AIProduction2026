@@ -1,0 +1,143 @@
+Well, here we are back in our old friend cursor for the final time.
+But I have an even bigger surprise for you.
+We're back in the production repo where we began.
+We're in the repo called production that hopefully you get cloned.
+It's on your local drive.
+You can open it up.
+And here we are in production.
+The only difference you have, I hope, is that you have a community contributions folder that is brimming
+with submissions from students that I can't wait to see.
+Uh, but there is something else here.
+That is where we are going right now, which is that there is a directory called finale.
+Uh, hopefully you didn't see it before now.
+And now you're seeing it and you're like, oh, there's a finale.
+Open up the directory called finale.
+And there is a readme, not to be confused with the readme, a readme in finale that you should right
+click on and say Open Preview so that you are looking at this, the finale, the AWS Bedrock Agent core
+finale of the course.
+And uh, as always, if you're looking at it in cursor, which you should be, you need to right click
+and say Open Preview if you don't see it looking like this.
+Okay, welcome.
+Let's get started.
+The first thing we're going to do is IAM.
+I know I said that Agent Core doesn't have iam.
+There's some.
+There's a one step IAM we have to do at the very beginning of you using Agent Core.
+And then we won't need to touch IAM again.
+So, uh, since since you were so experienced with this.
+Now I don't need to give detailed instructions.
+I can give pro level instructions.
+We're going to sign in to the AWS console as the root user.
+Go to IAM, go to user groups.
+Create a new user group called Agent Access.
+Make sure that it's applied to the AI engineer user and attach these three policies Amazon Bedrock Full
+Access, AWS Code Builder Admin Access, and Bedrock Agent Core Full Access.
+Let's go do that right now.
+And here we are signed into AWS.
+Check up on the top right that you're in as your root.
+Take a quick look at the costs.
+Make sure there's no surprises.
+And then start by going to IAM are old.
+So we know it so well.
+So we're now going to go to user groups over here and you can see I've already set up agent access.
+You'll be pressing create Group to do this.
+If I open this up, you'll see that I've assigned it to the username AI engineer.
+And it has permissions.
+And here they are.
+It is the three that I just told you.
+Amazon bedrock Full Access, AWS Codebuild Admin Access, and Bedrock Agent Core full Access.
+So you attach the policies.
+You've gone something similar to this.
+Attach policies.
+You've done the three checkboxes for those three a bit janky.
+And then and then press the button to apply it.
+So with that there is then a couple more little bits of of IAM admin.
+Uh, the first of them is that uh, well you do you do also actually potentially need to access have
+request access to Claude sonnet form model in your region.
+Um and maybe in US west two depending exactly on how things pan out.
+So keep a keep aware of this.
+It depends on a few things.
+And this may be just a temporary thing right now with the preview version.
+But I had to request access and get access to Claude Sonnet for model, and you might do as well.
+And you know how to do that, right?
+You go to bedrock.
+You press that button on the near the bottom left to request access to models.
+Although the screen claims they're going to be improving that user interface very soon, I hope so.
+All right.
+And once you've done that, uh, the the final thing to do is to come in as your IAM user and let's
+go and do that right now.
+All right.
+So here we are.
+I'm in now as AI engineer.
+I come over here and I'm going to do Amazon Bedrock Agent Core.
+There it is.
+Amazon bedrock agent core rolls off the tongue.
+Here we are in Agent Core.
+That's what it looks like.
+You remember I told you about the, uh, the memory gateways, identity, runtime and observability
+and then built in tools.
+They've grouped them together.
+It's a bit confusing.
+Whatever.
+Uh, I want you to click on observability down here, and I'm not going to click on it right now because
+I don't want to spoil the show.
+But you're going to click on that.
+And the first screen you're going to see is, is probably going to tell you that you don't yet have
+access to observability.
+Do you want to turn it on?
+And it tells you that it won't be effective for a few minutes after you turn it on.
+But you should do that.
+You should activate it.
+There is a note about costs there.
+It says to me that it's free as long as I keep.
+I keep a box checked about only taking 1% of traces or something.
+So I did leave that box checked.
+So I believe it is free.
+You should do the same.
+You should double check that you're comfortable with any costs associated with observability, particularly
+as this is a changing space.
+So once you've done that, you've requested access to observability.
+That is the end of our IAM and configuration stuff.
+For now, we can get started.
+First thing I'm gonna ask you to do is do a bit of reading, just so that you're well prepared for this.
+This is optional.
+You can come back to it later, but I've got some useful links for you.
+There is the main, like the marketing page for Amazon which is this, this page right here, which
+is like the, uh, all about what it is and things.
+And you can see if you look down here, something I noticed is that as of now, their customers, it's
+not as if they have like I guess.
+Yeah, I suppose these are quite large, but it's not as prominent as many of AWS customers, you often
+see big high street names, uh, which is a sign, I think, again, that this is still an immature
+framework.
+It's not it's not got the kind of traction that others may have.
+Uh, then this is the user guide.
+This is very useful.
+This is this is really where you can you can live this has, uh, the user guide with all the information.
+It has examples and an API reference.
+The terminology is confusing because whilst this describes itself as the Amazon bedrock agent core,
+uh, this this user guide is really about the starter kit.
+Uh, so there is some in fact, you can even see the Bedrock Agent core Starter Toolkit is in the URL.
+We're in that section of their docs.
+So again they don't use their own terminology consistently.
+So it's not always clear, uh, what context you're in.
+It's like like an LLM we need better context.
+Uh, so you have to sort of figure it out from the information you're given.
+Again, just like Llms do.
+All right.
+Uh, so then, uh, there's a couple more links that we've got here.
+There's the Python SDK and the toolkit, uh, CLI write up itself, so I will let you browse around
+that should you wish to.
+Uh, and I'm then I also want to introduce you to the UV project.
+So I've set up a UV project in this folder.
+So you already have that.
+Uh, it's got I only added these four dependencies bedrock agent core, uh, which is the Python client
+library, again with the name of the whole thing, uh, strands agents, that is the AWS Agent Framework
+library.
+So we're going to play with that right now and see it.
+And it's really simple bedrock agent core starter toolkit that is the CLI.
+Those are the commands to stand things up and down and pedantic needs no introduction.
+Uh, so if we, uh, bring up a new terminal and we start in production, if we CD into finale, here
+we are.
+Uh, in here, you should be able to do a UV sync.
+And when you do that, mine's already synced, so it doesn't do anything but for you, that will then
+load in the dependencies and bam, you've got yourself an environment already set up.

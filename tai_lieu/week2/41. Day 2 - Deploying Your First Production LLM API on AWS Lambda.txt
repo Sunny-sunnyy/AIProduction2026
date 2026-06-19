@@ -1,0 +1,183 @@
+So what we want to do now is take our server code and upload that to AWS Lambda so that it can run our
+server code as a Lambda function.
+Now, the thing is that our server code isn't ideally placed to be to be uploaded to Lambda.
+We really want it to be, uh, basically a zip file that we could, we can upload with everything packaged
+together nicely.
+And so there are a number of commands that we can run, uh, to, to build that zip file.
+And it's pretty common to package those kinds of commands into a script.
+And I've done that.
+And this is a pretty common practice.
+It's called deploy py.
+And we're going to put that script in the back end.
+Now I've made this script to be something that will work on all systems, which means it's a little
+bit more long winded than perhaps you might need for your system, because you could put something that's
+specifically for a PC or something.
+But this, this is something that will work across the board.
+Um, and so what I do within back end is I do new file and I'm going to create this thing called deploy
+py.
+It's a Python script.
+Paste that in.
+Here it is.
+So just to quickly explain what it does, the first thing it does is within the backend folder it creates
+a new subdirectory called lambda package.
+Should we should expect to see that appearing.
+Um and then into that it does a few things.
+First of all, and this is perhaps, uh, more, um, more careful, more, more robust than is always
+needed.
+But I create a Docker container in order to build all the right packages.
+And this makes absolutely sure that it's right for the AWS platform.
+And this is actually particularly needed for people who have Macs that are running Apple Silicon.
+You need to do it this way.
+For others, there are simpler ways of doing it, but this works on everything.
+So we run a Docker Docker run.
+It means that you need to have Docker desktop running.
+Uh, and it's going to package up, uh, using a Docker container designed for AWS.
+Um, and we pip install all the, all of the packages that we need.
+We then copy in files server, lambda handler, handle a context and resources in.
+We copy in the whole data directory and we zip it up into a zip file, which is called lambda deployment.
+So we'll expect to see that being created.
+We should see a whole folder being created and then lambda deployment zip being created.
+And that is what this script does.
+And as I say you could just run it line by line at the command line.
+But it's much nicer to package it up into a script.
+Let's go and run it.
+So to run it, I bring up a terminal.
+I go into back end.
+If I'm not there already, I keep an eye on this folder because I want you to see the things being created.
+And I'm going to go UV deploy dot pi.
+That should be it.
+And it's telling me that it's creating a folder.
+And there you can see it's created a folder called Lambda Package.
+It's currently running the pip installs and I'm doing that in a Docker container.
+You could just do it directly.
+If you have an architecture that's that's consistent with AWS, but doing it in Docker means that it
+will definitely work.
+It's created a zip lambda deployment.
+ZIP.
+And that all completed fine.
+So that's a nice deployment script.
+It's packaged everything up, it's made a zip, and we're now ready for Lambda.
+Okay, it's time to create our first Lambda function.
+And we do that by going into AWS as our IAM user this time and creating a function called twin API.
+So let's go and do that.
+We bring up a browser and here we are at the AWS Amazon.com.
+On the console I go to sign in to the console, uh, use my account ID, my AI engineer, IAM user and
+sign in and a double check that everything is good because up at the top right it should say AI engineer.
+It does.
+And now over here search for lambda and bring up lambda.
+And now for the first time you are looking at lambda.
+Now you might not see this.
+You're going to see a Welcome to Lambda screen because you've never seen it before.
+I think it's on the top right is where you can create a function for the first time.
+Otherwise, if you have ever created before, it's just here to create a Lambda function and we're choosing
+author from scratch.
+We're making a lambda function from the basics, and we're going to call it twin hyphen API.
+Call it twin API.
+The runtime for this we're going to have a Python 3.12.
+Python 312 will be our runtime.
+Select that there, leave the architecture as x86.
+And this is all we need to do.
+Everything else is the defaults.
+Press create function and you will be the owner of your first lambda function.
+Not doing very much, but it exists.
+Any second now I will, uh, there we go.
+All right.
+And this gives you some information about how to get started successfully created.
+Let's actually make it do something.
+So what you do next depends on whether you have a fast internet connection or not I do I'm going to
+go with option A.
+If not there's option B which takes you through a slightly slower route to do it in a more robust way.
+But try option A first and see if it works.
+It does on on most systems.
+Uh, so we're going to to go to the lambda function for the one we just created.
+We're going to look under the code source and upload our zip file.
+Uh so let's go and do that right now.
+So go back to my browser.
+Where are you?
+There it is.
+Uh, so, um, here here is the new Twitter API that we just created.
+We go here.
+We've already got code sources already selected.
+And on the right here is this upload from drop down.
+We click here and we're going to say a zip file.
+Uh if you had the slower connection you'll have upload it to S3 and you'll be going there.
+But we're going here.
+We're going to we're going to be be uh, be brave.
+Um, and uh, we're going to, uh, press the upload button and we come here and let's see where abouts
+we are.
+Are we in the right?
+We are indeed in twin.
+We're going to back end again and we pick lambda deployment and we press open and it tells us it's going
+to overwrite the existing code.
+And we're going to press save and it's going to load it in.
+And the first thing that we might see might, might be an error.
+But it shouldn't worry us.
+We will let it upload that up.
+And I guess it's going to certainly take a little bit of time because it's got 20MB to upload.
+Uh, as long as it does it before it times out, we won't need to do option B, we have.
+It's done updating the function twin API.
+Here it comes.
+This is the error that I told you we would see.
+And we're good with that.
+We expect it as you will see.
+Um, and um everything is looking great okay.
+So now we have to configure this lambda function so that it knows what it's meant to do.
+We have to look at the runtime settings and press edit.
+And we need to change the handler to this so that it knows where to find the code to run.
+You remember I told you to to make a mental note of lambda handler.
+The module and handler was the name of the variable in that module.
+So lambda handler handler is telling it, uh, where it goes to actually run this function.
+So we need to go to runtime settings and edit back to the browser.
+Here we go.
+Runtime settings.
+You have to scroll down to find runtime settings.
+It can catch you out.
+It's just here runtime settings edit.
+And now we come here.
+And the default is lambda function lambda handler.
+So we're going to replace that with this and press save.
+And when we do that and come back here the error has gone away.
+Hopefully there we go.
+And it's showing us a little preview of our code.
+This is like a little miniature VS code running in here which is kind of cool.
+Look at this.
+We could look at like uh, context and uh, resources.
+This is all the code that, uh, that even should have our data directory.
+It's called our Python packages.
+And, uh, well, you can satisfy yourself, but I'm pretty sure we'll find that our data directory
+will be there.
+It is data directory with facts and style and so on.
+So we zipped up everything on our box.
+We uploaded that zip to Amazon.
+We unzipped it.
+It automatically unzipped it into this lambda.
+So this is our code uploaded right here.
+And we've told it what it needs to call to be able to actually use this lambda.
+That's that's big progress.
+Who said this stuff was hard.
+It's easy.
+So the next thing we have to do is set some environment variables on our lambda function because it
+doesn't know things like our OpenAI API key that we just got set locally on our box.
+So there are in fact four variables we need to do OpenAI API key cause origins, which we need to set
+to a star, and we'll come back later and set that.
+Use S3 should be true and S3 bucket should be twin memory.
+And actually it's going to need to be something a bit longer than that.
+But we're going to come back and change it later.
+So let's do this step by step.
+So back we go back to, uh, to to this screen to the, uh, to the Lambda function in AWS.
+And the next thing we need to do is go to configuration and go to on the left hand side here to environment
+variables.
+And this is where you add environment variables.
+And you do it by pressing edit right here.
+And you press Add environment variable.
+And you do a key and a value.
+So like I'm going to say uh open AI API key.
+And here I'm going to put my API key which I'll take from my S3 file.
+And I'm going to go and do this now.
+And I'm going to have to trust you that you are going to put in your four environment variables and
+you're going to be super careful.
+Make sure that they're spelt right.
+Make sure you copy and paste faithfully, and you have the four ones we need to have.
+It's cause not cross.
+Uh, make sure you get everything right and I will see you in a second with perfect, pristine environment
+variables.

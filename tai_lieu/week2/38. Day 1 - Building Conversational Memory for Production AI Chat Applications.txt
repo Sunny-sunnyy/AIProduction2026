@@ -1,0 +1,99 @@
+Okay.
+And it's time to add memory to our back end.
+This is a new version of backend server.py for you to take.
+Copy all of this and paste it in.
+And if you're thinking why isn't he coding all this?
+We want to be coding.
+The answer is this is a deployment course.
+Production.
+Deployment.
+Look at my other ones for the coding.
+But I will talk it through of course.
+Let's go over to server.
+In backend.
+Select all the server.
+Delete it fully replace it with this new improved version.
+What have we changed.
+Save that.
+Um, so we have a new function load conversation which just loads in stuff from the disk from, from
+uh, from uh, slash memory, uh, on, on the local drive and save conversation.
+Just saves something to the local drive.
+Okay.
+Uh, if we now look at the slash chat route, this has been changed.
+It first looks for a session ID in the request object, or it just comes up with a new random one.
+If it doesn't exist.
+Then it loads any conversation that we've already saved with that session ID.
+It then builds the messages object, the list of dicts that gets sent to OpenAI.
+It starts with the system prompt.
+Uh, here we go with your personality.
+And then it iterates through the prior conversation and adds that into the messages.
+And finally it adds in the user's latest message at the end.
+And we then call OpenAI.
+It's calling GPT four mini.
+Let's make that GPT 4.1 mini slightly pricier, but really good.
+But you can leave it on 4.0 or make it four one nano if you wish.
+Um, which is super cheap.
+Um, you could use GPT five, but I find that GPT five is a bit slower, even when it's on its fastest
+mode.
+The minimal mode.
+Still a bit slower.
+So I prefer GPT four on mini myself.
+But you should experiment.
+And, uh, we get back the response, we add that response into our conversation along with our current
+message, and we save that to disk.
+So that's all saved.
+And we return the response.
+That's all there is to it.
+And next up in the guide it will tell us we need to to stop and start our back end server and then give
+it a whirl.
+So we bring back up the terminal.
+We go back to back end.
+We stop with control C and start it again.
+Uh, that might not be necessary actually.
+It might auto reload.
+You should see.
+But but just in case, stop it and start it.
+Go back to our front end, uh, server so that we can just click the link right here and bring back
+up the digital twin running in production and say hi there.
+Hi.
+Nice to meet you.
+My name's Alex.
+Uh, you may notice there's this annoying thing you have to click back in that field every time, which
+is irritating.
+And we will fix that later.
+Never fear.
+Let that irritate you, because it's going to be satisfying when we fix it.
+My name's Alex.
+Great to meet you, Alex.
+How can I assist you?
+What's my name again?
+What's my name?
+You mentioned your name's Alex.
+How can I help you today, Alex?
+So that hopefully proves that it does manage to maintain the context of the conversation.
+It means that it's working.
+It's happening.
+And indeed, if we now go back to cursor, if you open up, you see this memory folder we've got locally.
+If you open that up, you'll see that there is a file in there.
+There's a file which has like a long name which is a Uuid.
+And it's got within it the conversation that we're having so far, it's being saved to disk.
+We've built our simple memory implementation with a front end and back end running locally on our computer.
+And you'll see in that guide a few more things for you to think about and look at in terms of what we've
+built.
+But basically we have spent today laying the foundation for what's ahead.
+We've talked about AWS architecture.
+We've got a few acronyms and different, different styles, different archetypes of production architecture.
+And then we've gone to the digital twin, and we've built out a local running app with a front end,
+an XJS app router frontend, a back end with fast API.
+We've pulled them together, brought them together in the browser, which is able to to call the backend
+API and has the core stuff set up right.
+Always a headache and it's working nicely because it's using memory.
+It's storing a flat file locally.
+The server is keeping a history of each conversation in JSON files that it's storing locally in a memory
+folder, and we are ready.
+We are poised to take all of this and deploy it all to AWS.
+And that's what we're going to do tomorrow.
+And it's going to be great.
+And I can't wait.
+That brings us to this point, 30% complete of your way through the journey to production expertise.
+Uh, but tomorrow's going to be a big day and I can't wait.

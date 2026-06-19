@@ -1,0 +1,97 @@
+Okay, I have done that and I hope you have too.
+And remember, every time that you do this deploy in step three, it is going to recreate another API
+key.
+So you would have to do that again with the latest endpoint and API key.
+But now it is time for us to test test what's happened and make sure that this works by running some
+test scripts.
+And the test scripts are in the back end folder in ingest.
+There's a there's a couple of scripts we'll use test ingest S3 vectors is going to run a test for us
+and then test search S3 vectors is going to search to see what's in there.
+And there is also another little one here that might be useful called cleanup S3 vectors that will delete
+anything that's there if you want to start absolutely fresh.
+Uh, so uh, I am going to begin now.
+And actually it suggests that you start by doing an ingest.
+But I suggest that we start by doing a search to make absolutely sure that it's going to be empty to
+start with, and then it's going to be populated.
+So before I do anything, I'm going to begin by running UV run test search S3 vectors just to show you
+what we get.
+If we run this, it's found no results at all.
+You can see if we just look at this.
+It lists all vectors.
+It's found none.
+And then it does some searches for a few to see what's closest to electric vehicles and sustainable
+transportation.
+And it finds no results, nothing for any of these topics.
+Uh, and it found nothing here, which is what we'd expect, because it's all just been freshly created.
+Okay.
+So now we're going to run this UV run test, ingest S3 vectors.
+Let's just look at what this test does.
+Look at it here.
+So it is going to uh call call our uh our endpoint and ingest a document.
+And uh, let's just see what it's going to ingest.
+It's going to ingest some text about Tesla Inc, Ink, some text about Amazon, a multinational technology
+company, and some text about Nvidia.
+So those three documents are going to be pumped through our Lambda endpoint to see whether or not those
+end up in our S3 vectors data store.
+So with that, it's time for us to do UV run test ingest S3 vectors.
+Let's give this a shot.
+Well something happened.
+It appeared to run.
+Now we see whether it's actually there.
+Okay, so now we're going to run test search S3 vectors again and see if we find any information about
+any of those topics.
+Well we do.
+You can see right away.
+That's cool.
+So uh, when we got back results, it found three results.
+Uh, it found the Amazon.com stuff, the Nvidia corporation and the Tesla.
+Uh, and you can see, since we only had three vectors in there that it found That for?
+For each of them.
+So, uh, that's that's great.
+Uh, uh.
+Test worked.
+We have successfully deployed now a lambda function.
+That's our ingest lambda function that can be called with text.
+And when it's called with text, it will then go off to our SageMaker endpoints.
+It will turn the text into vectors.
+And it will store those vectors in a vector data store in S3 vectors a bucket that we have there.
+And on top of this we have this API, this this gateway that has an API key.
+And it has various scalability constraints to make sure that we we use the right amount of resources.
+So this has been deployed in a bulletproof way.
+It's been automatically deployed using Terraform.
+And our test scripts have worked well.
+So so far we're in great shape.
+And if you scroll a little bit down in the guide, in the setup guide you'll see there's also an architecture
+diagram.
+That's again a slightly more detailed version than the simplistic one on.
+On the slides you can see that we've got our client, which in this case is just a test script, is
+calling the API gateway using a key that we've set up, a secret key, which is our way of adding security
+to this process.
+And that is then calling a lambda function that we deployed.
+We created a zip locally and uploaded that zip.
+That lambda function is able to call a SageMaker endpoint that we configured.
+That's using the all mini lm, l6 v2 model, which then creates 384 dimensional vectors representing
+the text that it's called with, and that that vector is then stored in S3 vectors in our Alex bucket.
+Uh, and uh, that is our data ingest pipeline put together.
+Well, this is great.
+It's all coming together.
+That is day four complete.
+Uh, week three, day four.
+We have just built our ingest pipeline with, uh, being able to call a lambda function that we use
+to get some data in and vectorize it by calling SageMaker endpoint, and then putting that vector into
+S3 vectors data store.
+And tomorrow we take it a step further by adding in the source of our data, an agent that's able to
+gather data.
+It will be using an MCP server to do that.
+Playwright MCP server getting data.
+It will be then sending that data to our ingest lambda function.
+And that's really going to put together this kind of end to end data pipes.
+And the data engineers amongst you will be thinking of all sorts of ways you could add to that with
+things like ETL tooling that hopefully we'll talk about briefly.
+So tomorrow's a big day.
+I can't wait for it.
+But first we should celebrate that we are 70% of the way through 70% on the way to production expertise.
+I felt like just the other day we were like 20% and now it's it's we're somehow soon be approaching
+the end game.
+So but but not before a really meaty day.
+I have in store for you tomorrow and I'll see you then.

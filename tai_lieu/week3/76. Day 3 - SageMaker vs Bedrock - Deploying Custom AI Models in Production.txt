@@ -1,0 +1,116 @@
+So Amazon SageMaker is one of AWS core services for AI projects.
+And in particular, it's for end to end machine learning model deployment from building to training
+to implementing and rolling out models into production.
+And it's there both, as I say, for the training side and for the hosting side.
+It's both running the sort of fine tuning jobs and then deploying them in a way that is scalable production
+grade.
+Uh, and we're not going to be covering training directly on this course.
+We're going to be using this for deploying open source models in inference mode.
+But if you've taken my companion LLM engineering course so that you are familiar with fine tuning models,
+then for sure you could experiment with that side of it too and actually deploy a fine tuned model.
+It should the the courses should connect nicely there.
+And it's very much SageMaker is designed for MLOps.
+MLOps, which we'll talk more about in just a minute, is is about the whole sort of process of being
+a DevOps person from a machine learning point of view.
+So it's all about things like tracking different experiments, versioning your data and your models,
+automated retraining of models and monitoring models in production, making sure that the full ML process
+is repeatable and bulletproof.
+That's what SageMaker is all about.
+So you're probably thinking right about now, okay, but what's what's bedrock then?
+But wasn't bedrock all about deploying models?
+What's the difference between bedrock and SageMaker?
+Well, let me let me clarify.
+So bedrock versus SageMaker give you the the side by side comparison.
+So the objective of bedrock is to allow you to take foundation models, frontier models, models like
+Claude's Anthropic or the Nova range from AWS and be able to use them through an API.
+It's like a sort of, uh, router for frontier models that will be billed to your AWS account with a
+well-known, scalable API.
+SageMaker is much more low level.
+Detailed.
+SageMaker is about building and training, tuning and deploying your own ML models or open source models.
+So what are these models?
+Again, in Bedrock's case, these are pre-trained models from Amazon itself and from partners like anthropic.
+Limited selection of major model providers SageMaker is really it's very it's very much like hugging
+face.
+And it lets you use any hugging face model.
+But it's about either building your own model or training your own model, or using a prebuilt model
+like a like a hugging face model.
+Open source model and using that in your ML pipelines.
+And in terms of what the work involved, typically bedrock is super simple.
+It's just a sort of configuration thing and you're off.
+You're using an endpoint for for Claude or whatever.
+Uh, as we discovered in week two, SageMaker, it's definitely it's more involved.
+We're not going to go that deep with it.
+We're going to use it to run an open source model.
+but I'm going to give you a good feel for how much there is to learn about SageMaker.
+Should you wish.
+And in terms of the deployment approach with bedrock, you just simply get access to managed endpoints
+that you just use, as we did in week two with SageMaker.
+You create your own customized endpoints.
+We just listed them a second ago, and there were none of them empty square brackets.
+But we will have an endpoint that we will build ourselves and it will be scalable and something that
+we have very tight control over.
+And so so when do you typically use it.
+So you use bedrock if you are building using frontier models and for, for scaled inference, just as
+we did with the twin.
+But SageMaker is is much more about having your own model that you are.
+It's a custom model or an open source model that you want to deploy, potentially train and scale.
+It is a more of a of a hands on experience working directly with the models.
+So hopefully that gives you some kind of feel for for the pretty different use cases between the two.
+Are you?
+Maybe this is oversimplifying, but maybe you could think of bedrock as using, like the OpenAI Python
+client library.
+And SageMaker is more like using hugging face code when you're lifting up the bonnet and looking at
+it under the hood, at the actual engine itself and being able to configure it and deploy it.
+That's what we'll be doing with SageMaker.
+As I say, we'll be barely scratching the surface.
+It is a wonderful rabbit hole to explore more should you wish.
+And now I use the term MLOps before.
+And let me let me just quickly drill down, peel back the onion a bit on that term.
+MLOps.
+So first off, I should say that it is one of these ambiguous terms that's used in different contexts.
+Sometimes people would refer to this entire course, everything we're doing on this course as being
+MLOps, because it's all about sort of operationalizing agentic AI and generative AI, deploying to
+AWS, deploying to GCP and Azure and Vercel.
+These are all practices related to platform engineering for AI projects.
+So in a way, sometimes people do use it as an umbrella term to refer to everything that we're doing,
+but it's probably more common for it to be used specifically in the context of managing model deployments
+themselves.
+It's like DevOps for machine learning, managing the lifecycle of a model.
+So it's about things like tracking the versions of data, the different model versions, the different
+configurations that you've used for your training so that you can you can always go back if you need
+to, to a different, different cut to a different experiment.
+It's about monitoring how your models perform in production.
+And there's something known as model drift, which is the effect that over time, as as the world changes,
+as something happens, like like, say, Covid happened a few years ago, models that were trained prior
+to Covid didn't have like Covid as as an important word in the vocabulary.
+And so of course, that's an example of something which which fine tuning afterwards with the latest
+data will make a big difference.
+And the model's performance will sort of degrade after Covid if it wasn't already aware of the pandemic.
+Uh, so that's an example of of model drift happening.
+As models age and detecting that, seeing your performance drop and correcting for it is a is an important
+DevOps MLOps activity.
+And SageMaker itself very much is is the platform for MLOps.
+It lets you track experiments.
+It has a model registry which is where you can version your different models.
+It has endpoints with with different monitoring for endpoints and automations for retraining.
+So so that is the SageMaker is like the MLOps suite.
+And with that introduction we're going to go back to our lab and start working in earnest on Alex.
+And now I should say that next week is going to be when we actually build out the Agentic platform behind
+Alex and deploy it to AWS.
+What we'll be doing this week is the data side of Alex.
+So this is a time when I'm going to cover both SageMaker and also data engineering a little bit.
+So the data engineers amongst you are going to enjoy this.
+We're going to be talking about data ingest.
+We want Alex to be a platform that is constantly learning about the latest developments in financial
+markets, in the field of retirement planning and financial planning generally.
+And we want it to be always, always learning.
+And so we want to build data pipes so that Alex is always able to to to get new information and be able
+to store it in a vector data store so that those are the building blocks we're going to be creating
+this week.
+And we're going to start today with just being able to to call a model to take some text, some information
+and turn it into a vector and store that vector in something called S3 vectors, which is a place to
+store this kind of information.
+So, so the first step we have, the SageMaker part of the puzzle is going to be all about turning text
+into vectors, using an open source model that we all have deployed to a SageMaker endpoint.
+With that, let's go and do it.

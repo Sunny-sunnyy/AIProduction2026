@@ -1,0 +1,110 @@
+Welcome to the biggest week of the biggest course I've ever made.
+I don't use the word humongous often, but it's very fitting.
+Now this is a humongous week with a humongous project and I can't wait to get started.
+Let's get going!
+And the three big words for this week are agents, scale, and enterprise.
+We're going to be doing a fair bit of all three.
+This is what I have in store for you for the five days.
+You'll see plenty of purple here because we're going to be doing a lot of AI.
+We've also got some blue because we're going to be doing a lot of capstone project build today is going
+to be about talking about the multi-agent architecture.
+Then we're going to work on the capstone projects.
+Most of the Atlantic part of it and then the front end.
+Then we're going to talk about enterprise characteristics like observability, monitoring, security,
+scalability, APIs.
+And then we're going to end by talking about agentic AI platforms and comparing them with what we've
+already done.
+So much to do.
+And I'm going to start by talking about architectures for genetic projects.
+Now, one of the things I often push back on is when people jump too quickly to architecture, which
+I find very common in, particularly in the field of genetic AI.
+It's very important always when working on business problems, to start by focusing on the commercial
+problem, understand the problem you're working on, understand how you will measure success and think
+about agents first and foremost.
+As Lem calls with prompts that you will engineer and use that as your way to determine what kind of
+agent architecture you will use.
+But let's assume that you've done that.
+You've worked on your problem.
+You know what kind of solution you need to build.
+And you're wondering, now, how do I build the right kind of agent architecture to solve that problem
+effectively?
+And let's talk about that.
+So to start with, I want to to remind you for, for for those that already know it or to explain some
+of the terminology around agent architectures, and this is something which it's it's ambiguous out
+there.
+There aren't necessarily standards.
+A lot of Agentic AI is new and evolving, and so there are emerging terms that people use in different
+ways.
+But anthropic wrote a phenomenal blog post, a seminal blog post which laid out some different terms.
+And they distinguish between workflows systems where models and tools are orchestrated through strict
+code paths that you code up.
+You say, call this LLM and then call this LLM.
+That would be a workflow.
+And they distinguish that from agents, which are systems where the LLM itself decides which processes
+should be called, when and how to orchestrate the flow.
+And in that seminal anthropic post they cover different common agent design patterns.
+But since then, something new has emerged since Anthropic's post came out.
+Which is that even when you're talking about agents, even when you're talking about systems where llms
+control the flow, you do see these two different kinds of design.
+Let's talk about them.
+One of them, one of the common patterns is multi-agent architectures.
+And this is where you have an agent, an LM core that's often called the planner or the orchestrator.
+And that itself is responsible for deciding which agents, which other LMS or other sets of prompts
+get called in different circumstances.
+It orchestrates making each of those different calls, and you build out separate agents with context,
+with prompts that frame exactly the problem that that agent is solving.
+And that kind of architecture is known as multi-agent architecture.
+And then there is a different architecture which goes by different names.
+But but if you say single agent with an agent loop Agentic loop, then people know what you mean.
+And this is one where you only have one LM and one usually quite long, quite meaty context prompt.
+And in that prompt it's able to do things like managing a to do list and then ticking off the to do
+items one by one.
+And there's simply a loop where it comes back to itself repeatedly until it's convinced itself that
+it has completed the task at hand.
+And that is is sometimes known as a single agent with loop, for obvious reasons.
+And if you've if you've had experience working with Claude Code and I hope you have, it's amazing.
+Uh, you you will have felt this firsthand.
+You really have felt that experience of one agent that you're interacting with that is able to manage
+its own to do list and work through a task calling itself repeatedly in a loop while it figures out
+what what kind of workflow to follow.
+And it's interesting that I would give Claude code as my example there, because you're probably thinking,
+aha, hang on a second, Ed, you missed something there because in Claude code, you can actually configure
+different agents that the main agent in a loop can call out to.
+And so yes, this is yet another example of where I'm giving you two different extremes.
+But the reality is often somewhere in the middle, you can have a single agent with a loop that's still
+able to call out to different agents, and you can have the architecture on the left, but have the
+planner agent still have a lot of autonomy over which worker it calls when, and potentially calling
+the same worker multiple times.
+So it can also have a kind of a loop as well.
+So it's not as binary as there being multi-agent or single agent with loop, because multi-agent architecture
+can have loops, and the single agent with loop can have other agents, it's in between the two.
+But it does give you a sense of these two different styles, these two different design patterns that
+you can incorporate in your solutions.
+And I know what you're thinking.
+You're thinking, okay, fair enough.
+So there are these two different patterns and there's stuff in between the two.
+But how do we know which one to pick for our particular problem at hand?
+To which of course, my answer, as it often is, is that there are no fixed answers to this, just
+as I as I put in guide 12 in the guides folder, I believe in the production repo.
+This.
+This is something which you need to experiment with.
+You need to try out different approaches and see which performs best for your problem at hand.
+When you have your business problem, you have your potential solution.
+You need a metric.
+How will you measure the performance of your solution?
+And then try different agent architectures to find out experimentally which one solves the problem best.
+And key to doing that successfully is to start simple.
+Start with a very simplest approach you can.
+Typically that is one agent, not even in a loop.
+Start with one.
+In other words, one LM call.
+Start by calling an LM and start breaking out other agents and adding in more business functionality,
+separating concerns and considering loops only when you need to solve a problem to do so.
+So you start simple.
+You start with one agent.
+You find that the performance isn't where you wanted it to be.
+You're not.
+You're not meeting the bar that you set yourself your criteria.
+And so then you explore slightly more complex configurations of breaking out some agent responsibility
+to see how it affects performance.
+That is always the trick.

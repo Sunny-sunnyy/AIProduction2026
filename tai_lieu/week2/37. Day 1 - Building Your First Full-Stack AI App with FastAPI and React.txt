@@ -1,0 +1,222 @@
+Okay, now it's time to write some code or copy and paste some code.
+Uh, so first up we're going to make a file called me dot txt, which is going to be a little description
+of who who you are.
+And so back end it's in the back end directory a new file dot txt.
+And you should replace this.
+Don't don't spend too much time on this because we're going to do it differently tomorrow.
+So just make this uh obviously representing Ed Donner on Ed's website.
+So make this your name, your website.
+Your goal is to answer questions acting as ed to the best of your knowledge.
+Ed is a what am I?
+I guess I'm an I'm an AI engineer, uh, a leader and AI speaker.
+That gets it right.
+There we go.
+Add two, three sentences.
+I'll let you do that right now.
+Don't fumble with it while you're watching.
+Okay, back we go.
+That was me in in, uh, back end.
+All right.
+Now.
+Step four create a fast API server.
+But there's going to be no memory.
+So here we go.
+We're going to take all of this code right here.
+We'll talk about it in a second.
+Take this code.
+Take this code.
+There it is.
+Copy.
+And where are we going to put this.
+We are going to put this into a file called server.py in the backend directory.
+New file server.py in the backend directory paste it in there.
+Let's take a quick peek.
+It's a fast API server.
+Don't worry about the uh, these linting yellow squigglies.
+That's it's because it doesn't know what what environment we're in.
+So it's unhappy with them.
+Doesn't matter though.
+Uh, so as we're going to load in environment variables using load env, if you're not familiar with
+that from people from any of my other courses will be then Google it to find out more.
+We start the fast API server just as before.
+This stuff is about this cause business, uh, which I will scoot over, but you can look it up too.
+And at some point we'll talk about.
+Cause, uh, but this is setting things up, right?
+So that our front end knows that this is, uh, that all is good and that we can our front end can talk
+to this back end.
+Okay, then we're going to create an OpenAI Python client library.
+You can replace this with your own if you want to use something other than OpenAI.
+Uh, load personality is simply where we, uh, open the, uh, text and we'll return the contents of
+me and we'll set that to a global variable called personality.
+Okay.
+And then we're going to have a chat request and a chat response as two pydantic objects.
+We're going to have a route that just a slash API that is just going to say AI digital twin.
+We're going to have slash health, which is going to return healthy, just status of healthy so that
+we know that all is well.
+You remember this something like this from from App Runner.
+And then we're going to have slash chat, which is where it's going to to respond to a message.
+And we use this pedantic object to describe the format of object that comes in.
+And we're going to to, uh, process that and return a response, uh, chat response back again.
+So and this is where we say the response model is of type chat response.
+So, uh, what we do is we collect the messages.
+We're not going to do any message history.
+We call client chat, create a very well-known API.
+And then we build a chat response object from response dot choices, zero dot message content.
+The same old thing that you use a million times to get back a response from an LM.
+And, uh, that is really it.
+We then return that and then at the bottom here we just have something that starts the backend server.
+I you see that white blob there.
+What does that white blob tells you?
+I haven't pressed save yet.
+I press save.
+And we've just built our server dot Pi.
+And now back to our instructions.
+Let's see where we got to.
+We're now going to create the front end.
+So we're going to create a component called twin dot TSX.
+And this is going to be twin TSX.
+Fair amount of stuff there.
+Tra la la.
+Copy all of this.
+Lots of front end code.
+Front end is often very verbose.
+So where does twin TSX go exactly?
+Let's have a look.
+It's going into a new folder called components.
+So we're going to go to the front end.
+We're going to create a new folder.
+And we're going to call the folder components.
+So this is actually not within our app router at all.
+It's going to be connected from there.
+Within that, we're going to create this new file called twin dot TSX, twin dot TSX, TypeScript file
+and paste in our twin.
+And this causes not about front end.
+So I'm not going to go through this with you.
+But you will see, for example, this important, incredibly important line here is when we do the fetch,
+we're going to connect to port 8000 on localhost and call chat port 8000.
+You might have noticed was where we ran uvicorn the server.
+So it's going to connect locally and it's going to call chat.
+And some of this is stuff that you've seen before.
+Um, what else should I point out to you.
+Um, I do want to point out you'll see a red squiggly at the top here with this thing here lucide react.
+So it means that red squiggly means there's something we still need to install because we are reusing
+a react component off the shelf.
+That's going to help us here.
+And cursors even highlighted some things in red right now.
+It's unhappy with us.
+Let's try and rectify that.
+Uh, back to the instructions on the twin component.
+Uh, so, uh, after the twin component, we are indeed going to rectify that problem.
+We are going to need to do this npm install, which remember, is the front end equivalent of a pip
+install.
+So we come here we go into front end.
+You need to install from your next app.
+And now we're going to do npm install and install this uh lucid react component.
+And once we've done that any second now this should should realize.
+There we go.
+Realize.
+And the red is gone.
+And it's all looking very promising.
+Okay.
+Get rid of the terminal.
+It's time for us to finish off the actual files we're going to put within slash app so that we have
+a running front end.
+So first up within app we're going to create pages and pages within the app folder is what will get
+served when someone goes to our root.
+Uh, just to our URL.
+So new file page dot TSX.
+It's like the modern index dot TSX.
+Oh, it already exists there because there's a default one there.
+So we just overwrite it, paste it in there.
+This is our new version.
+Okay.
+That is done.
+Back to the instructions.
+And now we need to, uh, make a little fix to, uh, the front end postcss config.
+Let's just make sure that we are using the modern, correct approach for the latest tailwind CSS.
+Just something to do uh, and back here again and then update the global styles.
+So we need to replace the global CSS.
+You remember we had the globals before.
+Uh we're going to do a complete replace of app globals.
+There it is.
+Select all paste on the new one.
+Save that and that is done.
+Back we go to the um instructions and it's going to be time to test it.
+Uh, so, uh, let's let's get to that okay.
+Time to test.
+We'll bring up a terminal in cursor.
+Uh, we're in front end right now.
+Let's go back up to twin, go into backend.
+So we're going to create a new um, project.
+And the right command here is UV init dash dash bear.
+That stops it creating a whole bunch of files we don't need.
+If you forget the bear then we're going to have problems later.
+So don't forget the bear.
+It's initialized it and it's created like a pyproject.toml.
+Uh, Python 3.12 means that it will be using Python 312 and it will install one.
+If you don't already have it, you've add requirements.txt is the modern equivalent of pip install.
+Uh, sorry, you've add r requirements.txt.
+Subtext, uh, is the modern equivalent of pip install r requirements.txt.
+Everything gets installed.
+Look how fast that was.
+It's crazy.
+And now we just run this command here to run our server.
+And our app server is running.
+It's off.
+It's off and running.
+All right.
+It's time.
+Uh, it tells us what we should see.
+And we do indeed see that.
+Okay, we now need to open another terminal, which is control shift and the backtick.
+Here's another terminal.
+And you see both terminals here.
+Over here we can now CD to front end.
+And we can run our front end by doing npm run dev.
+Is it going to work first time.
+Is it going to work first time.
+Looks like it seems to be working first time.
+Uh, you should see.
+Yes.
+Okay.
+Now we're going to open up our local host.
+Here we go.
+Drumroll.
+Look at that.
+AI in production.
+Deploy your digital twins.
+The cloud.
+Look how fancy it looks.
+Very nice.
+Looks a bit like radio.
+Just better.
+Okay, let's say hi there.
+Let's see if it can connect to OpenAI.
+Let's take a drumroll.
+Hello.
+I'm Madonna's digital twin.
+How can I assist you today?
+It works.
+Hi.
+Oops.
+Hi.
+My name's all right.
+A name other than Ed.
+I'm going to be Alex.
+My name is Alex.
+Hi, Alex.
+It's great to meet you.
+How can I assist you today?
+Oh, what's my name?
+What's my name?
+I'm sorry, but I don't have access to that information.
+Hopefully you're expecting that.
+Uh, so this is to show you that we've set something up.
+We're able to have a chat, we've got a cool front end.
+We've got a front end and back end coming together in the browser.
+They're both running on our local machines on localhost.
+The front end is being served on localhost 3000.
+The back end is on localhost, 8000 being called by the front end.
+It's all working, but there's no memory.
+Every call is a separate stateless call and it can't hold a conversation that's hopeless.
+Let's fix it.

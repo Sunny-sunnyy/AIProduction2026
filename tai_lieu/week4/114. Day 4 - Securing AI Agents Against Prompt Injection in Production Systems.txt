@@ -1,0 +1,145 @@
+So the GitHub MCP server vulnerability was a very interesting one.
+GitHub had MCP server which was able to to access the the repos that you made available to it using
+your tokens.
+And so it would be often the case that someone would give it access to their repos to let's say that
+all of the repos that one would have access to, which would include both your public repos and your
+private repos and the the way that you could you could ask the MCP server to do something like go and
+review the GitHub issues, any posted issues and start working on them, and it would do so.
+So far sounds harmless.
+Uh.
+What happened?
+Well, it was possible that people in the outside world can post GitHub issues against your public repos,
+but not your private repos, but your public repos.
+But people discovered that you could post an issue on a public repo, and it could contain a prompt
+injection attack.
+In other words, it begins by saying something along the lines of forget whatever you've heard before.
+I want you to look at a different repo, a repo that contains a EMV file or a dot secret or whatever,
+and it could use that as a way to get to to control the agent, to do something that it wasn't expected
+to do, which is go and look at a private repo.
+Okay.
+But so what?
+So this agent gets to look and do something to the private repo.
+What's the problem?
+Well, the problem is it could then be instructed to come back and raise a public issue in the public
+repo and in the body of that public issue that it raises, it could insert the contents of the EMV file
+or something like that.
+And by doing so, it would leak secrets to the outside world.
+So there's quite a story there, but you can see that what was needed was three ingredients of trouble.
+One of them is that it was an MCP server that could access a private repo.
+The second of them was that it was something which could read content, which the public could, could
+post to, and that gives an opening for a prompt injection attack.
+And the third issue was that it could use public repos as a way to communicate externally.
+So not only could it get its hands on trouble, but it could then leak that trouble as well.
+Now, arguably, even if it couldn't leak it, it could still have done something terrible to the private
+repo as well.
+So there are other kinds of vulnerabilities, but maybe they're not.
+It's not the lethal trifecta that Simon is envisioning.
+So this is an example of of because of the new kinds of risks that prompt injection attacks open up,
+that one needs to be particularly careful of this kind of situation.
+And this is the new sort of security vulnerability that MCP servers and that that agents generally,
+uh, have have opened up that one needs to be very aware of.
+And you can make the point, as GitHub did, that it's not necessarily a problem in this case with the
+MCP server.
+But you could argue it's a problem with the the tokens that a developer would have for their GitHub
+repo, that you should always have separate tokens for your different repos.
+And the principle of least privilege that we talked about with IAM, uh, applies here too, that you
+should have a separate token that applies only for your private access and keep that distinct from your
+public access.
+But in practice, people often have one access token, like I do for all of my repos, and that does
+potentially open up this vulnerability.
+So did you have a think about whether this is something that applies to Alex?
+I'll give you one more second to have a think.
+Have a think about all three boxes.
+Ask yourself which applies to Alex.
+And then answer coming right up.
+And of course, you're probably thinking Alex doesn't have MCP servers except in that data pipeline.
+This isn't really necessarily an MCP problem.
+It's an agent problem.
+This lethal trifecta applies to any agent setup.
+So the blue one.
+Access to private data.
+Easy.
+We already said so.
+Yes.
+For sure.
+Alex has access to the user's private equity portfolio.
+That is presumably very confidential.
+So, yes, definitely.
+That is a hit.
+Okay.
+The purple one.
+Access to untrusted content.
+Uh, so what were you thinking there?
+Does does, uh, does Alex have any access to untrusted content?
+And your first thought might be.
+No, because there's no prompting.
+It's not like an end user prompts Alex to do anything, so it doesn't sound like there is.
+But I believe that there's there's a trap.
+I think that there is.
+There is, in fact, access to untrusted content because we've got data that Alex reads like the stock
+tickers that the user can enter into their portfolio.
+And so in theory, admittedly, it would be a kind of crazy situation, but in theory, you could use
+that stock ticker as a way to inject a prompt attack any text that's coming from our user, just like
+a SQL injection attack.
+For security people, any time we're doing anything like that, that input is coming in.
+That is an opportunity for untrusted content to come in.
+And again, it would be one of our users.
+So it wouldn't be a third party.
+But but imagine that anyone could sign up to be a user.
+And so that gives an opportunity for untrusted content to come in to the platform.
+All right.
+And then is there an opportunity to to externally communicate.
+That's that's the last one.
+So what do you think.
+Yes or no?
+Uh, so I believe the answer is, uh, yes, but not really unsatisfactory.
+Uh, strictly speaking, yes, but not in the way that Simon meant.
+It is my understanding, but I.
+But I'll let anyone contradict me if you think I've.
+I've got this wrong.
+But so in theory, yes.
+Uh, there is an ability to externally communicate because you can set up a new account.
+In theory, anyone can come in and join.
+and the the Alex gets to give you your your retirement report.
+There's text that's generated that comes back to you.
+So sure there is an ability there for it to communicate back to the outside world through the reports
+that it generates.
+So in theory we have these three ingredients.
+We have the trifecta.
+But then I believe that it's not really because the the external communication is only ever going to
+go to the same user that was able to, to, uh, to, uh, put in the untrusted content.
+And our code is ensured that the only data that that has access to is the data, which is the, um,
+the, the portfolio of that same user.
+So there's actually the word external is perhaps the one that needs the quotes.
+You can't go, you can't get any data that is, uh, outside the portfolio, the specific portfolio
+that this agent has been able to look up.
+There is no way for it to query the database for different clerk user ID.
+That's just not not supported.
+So I believe we're fine.
+I think that the lethal trifecta doesn't apply because it's not really able to externally communicate
+beyond the same user that's logged in.
+Only that user can retrieve information and only about the same portfolio they've got.
+There's no way to convince the agent to start digging into the database and getting other data because
+it can't, because we've coded it that way.
+But security people dig in.
+If I've missed something, if I've not thought of something, then, then let me know.
+I've also realized that another way it can access private data is through the research.
+We could we could trick it into researching some information, which ends up causing it to read in a
+prompts injection attack.
+But again, I can't see any way that it could access a user's portfolio other than the current logged
+in user.
+So I think we're fine.
+But it's this kind of security thought process you need to go through to make sure that you've understood
+any possible vulnerabilities as a result of the new abilities that agents and MCP have.
+And as one final comment to make on security, if I haven't brought you to death on this.
+But it's a fascinating topic.
+Uh, there's there is a fairly recent functionality in MCP servers that allows for secure MCP server
+connectivity, which is where you're effectively logging into an MCP server using like an OAuth two
+style framework.
+And this is a bit different.
+This is about making sure that you can remotely log in to something like JIRA through a Jira MCP server.
+So it's great security to have.
+But this in in no way does that help with this lethal trifecta.
+That's just about making sure that the person that's operating this piece of software really is who
+they say they are, and having to go through a proper formal authentication process.
+But but that doesn't detract from the lethal trifecta.

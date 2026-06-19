@@ -1,0 +1,139 @@
+And we're back in cursor and we're back in Project Alex.
+And we're going into the guides folder, and we're going to the fourth guide to get this show on the
+road.
+So before starting make sure we've done guides 1 to 3.
+We certainly have.
+And what we're doing today is we're going to be building the Researcher service, an app runner app
+that is going to use OpenAI agents SDK to orchestrate agents.
+It's going to use AWS bedrock, and we're going to be using an MCP server, a playwright MCP server
+to search the internet for a given topic.
+And we will then ingest that topic.
+We will convert it to a vector, store it in S3 vectors using our ingest service.
+Uh, that is what I have in store for you.
+But first we have to request access to the right bedrock models.
+Remember when we did this before?
+We're going to do it again to get some new models.
+And here's the thing.
+So the model that we're going to use is going to be exciting.
+It's going to be the new ish open source model from OpenAI called OSS 120, but there's a few catches
+with this.
+One of them is that that model, at least as of today, is only available on US West two, a particular
+region.
+So we're going to have to set it up in that region to have access to it.
+But there is a second catch, which is a slightly more tiresome one, which is that I had this whole
+thing working two weeks ago beautifully.
+But just in the last few days, there's been a bug introduced in bedrock.
+That means that it won't work with this model.
+Uh, it doesn't allow tool calling on the OSS 120 model, which is very tiresome.
+Now, I'm rather hoping that by the time you take this, that will have been fixed and the code will
+show OSS 120 B, so I'm still going to show you how to set it up.
+But for now, for when I show it to you, I'm going to be using the Nova model because that one is working.
+And I'll have code which allows us to switch between the two so you can pick whichever one works best.
+And of course, you've already requested access to Nova in the twin weeks, so you already have that
+one set up anyway.
+All right.
+But for now, we're going to go back to the AWS console.
+I'm going to go in as root, and we're going to go and request access to the this model OSS 120.
+And I'll also show you the Nova model as well, which I'll keep in in US East one for me.
+Uh, but and you should keep that in your region.
+Let's let's go right now to the AWS console as root.
+And here I am signed in to the AWS console.
+And you can check out that I'm in there as root.
+And since you're in those root this would be another one of those moments to why not go and check out
+the cost and the billing and cost management to make sure your budget is just as you expect it.
+But we won't do that again now because I've done that enough.
+Instead, we will go to bedrock.
+Let's go straight to bedrock.
+Here it is Amazon bedrock.
+And the first thing I want to show you, you can see up there it's already showing the region is us
+East.
+Let's change the region to be US West two, which is where the largest number of models are available.
+I do believe here they are.
+So this is showing all of the models.
+It's even mentioning to us that that, uh, GPT OS one, TB and TB are available in Amazon bedrock.
+It's not mentioning that there are these problems with it right now.
+Uh, but, uh, there we go.
+Hopefully they'll they'll have gone, as I say.
+So put this to to Oregon to us West two, come down here to model access on the bottom left.
+Click here.
+And then you press Modify Model Access.
+And these checkboxes appear here.
+And this is where you can scroll down and find somewhere down here OpenAI OS 120 b.
+And you might as well request access to 20 B as well.
+Request access by ticking both of those boxes, and then you would press the button on the bottom right
+I believe there it is next.
+And then you would you would request that.
+And in my experience, the OS model was was approved almost instantly.
+And at the same time, just in case you skipped this before, go to your region, which for me is US
+East one and make sure you press Modify Model Access.
+Find the Amazon models.
+Here they are.
+Nova Pro, light and Micro.
+Make sure these three are checked unless it already says Access granted.
+Then check those boxes.
+Go back down to the bottom and next and request that access.
+And that should definitely be instant.
+And at the end of that you will now have access to Amazon's Nova models in US East one.
+Hopefully you don't need them.
+And also the OSS one, A-20b and A-20b open source models available in US West two.
+And when you have that access, I will give you a second to do that and then we will reconvene.
+All right.
+So hopefully now the proud owner of Approved Model Access don't let the power go to your head.
+So some quick notes about this.
+Uh, the OSS models only available at least as of now in US West two.
+Your app runner service can be in any region.
+Mine will be in US East one and it will connect across US West two.
+That is not a problem.
+And if you're using the the Nova models in the same region, that's great too.
+Uh, this is not the same as as as like GPT models.
+These are these are free open source and bedrock handles the key.
+Okay.
+Next up we're going to make a quick change to the dot env file.
+The dot env file already has the API endpoint and the API key that we set back.
+In part three we're going to add in the OpenAI API key your own OpenAI API key uh, which which you
+should take from another env file that you have somewhere and put it in here.
+Replace the src dot dot dot with your true OpenAI API key.
+And you might be wondering why on earth do we need to do that?
+We're going through bedrock.
+Bedrock already handles this sort of key stuff.
+Well.
+The reason is because we're still going to be we're going to be using the OpenAI agents SDK in order
+to connect to bedrock, because we want to use that agent power.
+Uh, and OpenAI agents SDK comes with that tracing functionality, you remember out of the box.
+But to be able to see those traces in the platform, you do have to have a key set.
+I don't believe you need to spend any money at all, you can have zero balance.
+But in order to be able to log in and see your traces, you need to have your OpenAI API key set.
+And so that's the only reason we're doing it.
+No, no money will be spent.
+It's only there to allow us to trace.
+So with that we are ready to start building our Terraform infrastructure.
+Okay.
+And the first step is let's open a terminal window.
+We're going to navigate to the Terraform for researcher directory.
+So Terraform for researcher okay.
+And now in this directory there's going to be this Terraform.tf example I can show you this here too.
+Let's go into the Terraform directory into four.
+And you'll see that there is this Terraform.tf example.
+And I also already have this file that you will not yet have.
+And when you run this copy command, it's going to copy the example file into your TF vars okay.
+And into this file you are going to set these five fields here.
+So first of all you're going to set your AWS region.
+This is not yet your bedrock the one you're using for OSS.
+We will come back to that.
+We're going to code that somewhere specifically.
+This is just your default AWS region that you use.
+Next up your OpenAI API key.
+You just put that in your env file.
+You need to put it here as well.
+Next up your API endpoint and your API key.
+Take them from the env file and put them in here in this format.
+In this Terraform format with quotes with with exactly as it is here.
+And then finally the last one here.
+Leave it as it already is in the file scheduler enabled equals false.
+This is where we're going to to build infrastructure to wake up every two hours and kick this process
+off.
+But we're going to start with it off, and we're going to turn it on at the end and see it in all its
+glory.
+All right.
+So go ahead and do all of that and I will do it with mine.
+And I'll see you in a second.

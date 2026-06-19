@@ -1,0 +1,145 @@
+And now the last piece of the puzzle is we just have to have one more Terraform file change here.
+Going to make a new Terraform configuration file called backend.
+Remember this could also just go in main.tf.
+There's no significance to having different file names.
+But the reason we're having this is we want to tell Terraform that for its backend it should be using
+S3.
+And so we go into our Terraform directory.
+We'll make a new file call it backend dot.
+There it is.
+Paste that in and save.
+And that's there.
+So and this this is not a temporary file.
+This is for reals.
+This Terraform needs this to tell it to use S3 as its backend.
+So we set up a couple of temporary Terraform files, one of them to allow us to build some useful S3
+buckets and Dynamo S3 bucket and Dynamo databases for lock.
+And then we created one for to to set up the appropriate permissions, the role and policies.
+We ran both of them to one time to set up all that infrastructure.
+We deleted those Terraform files.
+We're done.
+We've set that up.
+And now we've just created this backend, uh, Terraform configuration right here, and we're almost
+ready for prime time.
+Uh, this is all, of course, just one time setup.
+You wouldn't ever have to do this again once.
+Uh, for any repo, you do it once for a repo so that it's then properly hooked up to GitHub actions.
+All right, back we go to the instructions.
+The next step is it's time to add some secrets to GitHub.
+GitHub has to know the secrets that we're going to use.
+Let's go and do that right now okay.
+So we're back in GitHub.
+We have gone to our twin repo.
+Here it is.
+We go to settings in this top nav scroll down here Secrets and variables.
+We go to actions.
+Here we go.
+These are the secrets of variables that apply to GitHub actions.
+And we want to repository secret.
+Secret that applies to the whole repo and press new repository secret.
+All right.
+What secrets do we want?
+The first one is AWS role Arn.
+AWS role Arn AWS role Arn.
+It is telling GitHub what role should it have in AWS?
+And there in my clipboard is the secret, the one that we we just took from running that Terraform thing
+once.
+This is the the value of the A around Arn that it should use for GitHub actions to deploy the twin add
+secret, everything has to be exactly right.
+Don't forget that.
+Uh, okay.
+Now what's the next secret?
+The next secret?
+Default AWS region.
+Well, that's a Perfectly.
+No mistakes.
+It's got to be your default region.
+It's got to be copy and paste it from somewhere rather than typing it like I did to make absolutely
+sure.
+Double check, because if you get something wrong, it's really hard to find out what's gone wrong.
+Later you may get some obscure error.
+All right.
+And then the oars account it.
+That's the final secret we need to add here.
+So back we go here and we go to new repository secret and oars account éd.
+And I can cheat.
+I can paste in the arn from before because my account ID is in there.
+Look at that.
+There we go.
+A nice little pro hack, that is.
+The oars accounted for me, and you should put in yours and press Add secret.
+And now we have three secrets oars, account éd.
+Oars role arn and default oars region.
+And they should all be good.
+And that has set us up for success.
+Now it's time to create the workflows.
+Okay, so as it says at this point, GitHub now has the ability, it has the power to log into our AWS
+account with the credentials that we set up for it.
+It's all ready to actually do something.
+So in over here in twin let's collapse some of these folders so it looks nice and clean.
+We need to create a new top level folder called dot GitHub GitHub.
+And within GitHub we're going to have a subfolder called workflows new folder workflows.
+There we go.
+And somewhat confusingly cursor shows it this way when there's nothing else but workflows.
+But you can actually turn that off if you wish.
+Uh, anyways, we're now going to create our first workflow and it's going to be called deploy YAML.
+So here we right click New File deploy dot YAML without the A just just like that.
+And now we're going back to the guide to get our deployment Script.
+So this is what a GitHub actions deployment script looks like.
+And I'm going to take all of this.
+You can see there's quite a lot to it.
+Copy that.
+And now I'm going to go back to deploy YAML and paste it in.
+Here it is.
+This is our first look at GitHub actions deployment script.
+We finally got to the point.
+We've we've set everything up.
+We've set up the backend S3 buckets and DynamoDB.
+We've set up the policy to log in.
+And this is now what will be run.
+So what does it look like?
+What does the script do?
+Well it begins with a name deploy digital twin.
+It says on and this has a description of the the the vent.
+What will cause this to be triggered.
+And it's on push.
+It says which branch and it says what to do about it.
+Um, it gives, uh, various stuff about the permissions.
+And then we've got the jobs.
+Remember, jobs was the sort of key ingredient.
+A job has a number of steps.
+We've got several jobs.
+One is, uh, we haven't got jobs.
+We've got one job.
+It's called deploy.
+And that one job has several steps.
+And the steps is check out the code set up Python install.
+You've set up Terraform, setup NodeJS and then look at this step here.
+Run the deployment script.
+It sets some environment variables the account ID and the default AWS region which it gets from its
+secrets.
+It makes the deploy script executable the same deploy script that is already in our scripts.
+The Mac version, because it's a mac and Linux version.
+And this is why PC people, I told you that you had to keep the Mac version, the deployment scripts,
+because even though you only run the PC version locally for you, when GitHub the the the oars roll
+Arne, so that it has the right roll.
+And we then get get the outputs from that.
+Um, and uh, so you can see everything that's going on in the script by looking through these steps,
+spend some time on it.
+YAML means that that it's, it's very human readable.
+So it's very clear and easy to see what's going on.
+And you can understand the script.
+One more thing I have to do though, I can see from that white blob there that I haven't saved it yet,
+so I need to make sure I save it before we go on our first GitHub workflow.
+But we have a second one to talk about too.
+We've got one called destroy.
+We're going to set up a destroy YAML which will destroy an environment.
+Let me just drag all of this.
+Select that.
+Copy it in this directory here.
+New file destroy dot.
+Yes there it is.
+Paste in the contents.
+Remember to save.
+And let's have a look at it.
+Uh, it uh doesn't have any, any automated reasons.

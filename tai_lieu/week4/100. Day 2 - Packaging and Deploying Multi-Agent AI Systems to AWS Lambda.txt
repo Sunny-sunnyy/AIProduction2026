@@ -1,0 +1,205 @@
+And now we've reached step four of the guide.
+And the big thing to do now is to be packaging everything up for Lambda.
+And this time, we're not going to do them one by one, because it's just a nice little script in the
+parent directory in backend.
+So CD backend.
+There we are.
+And now I'm going to do UV run package_docker.py.
+And off it goes.
+Packaging packaging packaging.
+So let's just quickly explain what this is doing.
+It's going to use Docker to do the packaging process.
+We're not building a Docker container.
+I know it's a bit confusing.
+We're we're using Docker in order to make sure that the things that we package up are ready for Linux.
+For Lambda, it's a common technique.
+We're packaging up each agent together with its dependencies.
+We're going to be creating different zip files for deploying to Lambda.
+And it's going to take several minutes.
+What we're expecting to come out of this is that in each subdirectory there'll be a new fresh zip file
+created, which if we if we go into each each of these directories look at charter.
+You'll see there was already one there from before charter zip.
+But each of these is being recreated right now.
+Uh, and they will be happening and it will take a few minutes to run.
+But when it's done, we'll be the proud owners of packaged zip files for each one.
+There we go.
+You can see what I've been yammering away.
+The first one's been done, and in a moment, they'll all be done.
+And I will see you then.
+And you'll see that this has run successfully.
+Everything has been marked success.
+Five out of five packaged.
+We now have five new zip files in each of those subdirectories.
+Okay.
+It's time to deploy.
+So we're going to go back to to terraform.
+The terraform directory has a six underscore agents directory with our Terraform set up for our agents.
+And first of all we're going to again copy Terraform to make that into our official Terraform files.
+So you can just right click on here and do a copy and paste and rename it to look like this.
+Now in here we'll need to set the the Lambda function the region as US East one for me.
+And wherever your region is for you, you can leave these two blank.
+This was the Aurora cluster.
+Uh, Arn and secret.
+Um, because it's going to be able Terraform is gonna be able to look that up, uh, from the existing
+infrastructure.
+But you will need to populate the S3 bucket name.
+Uh, Alex vectors.
+It should be Alex Vectors.
+And then the your account ID, it's whatever we did back in all the way back in part three.
+Uh, and the bedrock model ID will be using, uh, I suggest Nova Pro, the bedrock region, which I
+suggest us West two, and also the SageMaker endpoint name, because our agent needs to be able to vectorize
+questions to be able to look up research of.
+And then finally the polygon API key and the polygon plan just the word free or paid.
+So there's quite a lot in there to fill in.
+If we go into the example, you'll see that that in this example file it's all here for you.
+Fill in the region.
+You can you can just delete that and leave it blank.
+Um, you can also paste in your actual credentials and uh, key if you wish.
+I think I did do that.
+So maybe you should do that.
+But I believe if you leave it blank it will automatically populate it anyway.
+Then your Alex vectors your bedrock model ID and the SageMaker endpoint, your polygon plan that, uh,
+it can be.
+I should probably make it default to free, uh, your key and your plan and then leave this commented
+out.
+This is something we will come back to.
+Lang views is a joy for another day.
+Uh, so, um, save save this as Terraform.tf vars and then come, come back here and it's time for
+us to to do this.
+That's all there is.
+Uh, of course it's worth taking a look at main.tf.
+Let's look at what infrastructure.
+There's a lot of it.
+We're about to kick off.
+There's going to be the, uh, the SQS queue.
+This is how we we will be delivering tasks to our agents.
+So there is this SQS queue.
+SQS simple queue service is the AWS service that allows you to have managed tasks that go on a queue
+and they get picked up and run.
+Um, and then we have some IAM stuff.
+There's always IAM stuff, lots of policy stuff here.
+And uh, you can read through all of these policies.
+We have S3 objects for our Lambda packages.
+Uh, so each of our, each of our Lambda deployment packages gets a S3 object and then the Lambda itself,
+AWS Lambda function.
+This is planners Lambda function.
+And you can see where we specify the zip file for it to collect.
+Uh, and this is where we specify the environment variables that it needs to have.
+Uh from, from the file.
+Then this is the, uh, planner, uh, and the tagger and reporter and, uh, charter.
+So here you see them all.
+And retirement.
+That's our final agent.
+Those are all of our different, uh, setups.
+And then we have here.
+Which one is this?
+Sorry, that that is the retirement lambda function.
+Uh, then we have some CloudWatch log groups, and that is it.
+That is our full set of Terraform, uh, code to describe our infrastructure that we're building.
+And now we're going to do a Terraform init and then Terraform apply.
+And it shouldn't be required.
+But just to be extra safe, I did just copy from my env file those two aurora secrets into that terraform
+tf vars file.
+So so I'm in good shape.
+You should do the same.
+And then we're going to go into the upper directory into Terraform.
+And now we're going to go into the sixth agents directory.
+And we're going to go ahead and run terraform init.
+This should be a quick for me, but it might take a little bit longer for you.
+And then terraform apply.
+This is the big one.
+It's going to tell me what it's about to do.
+And I'll have to type the word yes I'll type yes and off it goes doing its stuff.
+It's now deploying five different agents to five different Lambda functions.
+It's uploading those zip files that have been packaged up.
+They first go to S3 and then they get uploaded to the Lambda function.
+It's also setting up the SQS, the simple queue service, so that eventually our user interface will
+be able to put something on a queue and then let everything run.
+And all of that has been built along with things like CloudWatch stuff and the IAM stuff.
+And I'll come back when it's finished and we'll be ready to give this a try.
+And it completed.
+There we go.
+It finished up and it says that that uh, everything is deployed and it gives us the model, the region
+where SQS is.
+And it also tells us about the CloudWatch logs that were created.
+So lots of good information there.
+The next step isn't strictly necessary in this case, but a good practice to do it is to redeploy all
+of our lambdas.
+You would want to do this anytime you change any code.
+So we'll go back.
+We have of course just deployed the lambdas.
+So they are all all up to date.
+But we go into backend and we do UV run deploy all lambdas.py and off that goes.
+And that is now going to first.
+That's what's called tainting, which is marking each of these different deployments as needing to be
+redeployed.
+And it's going off and deploying them right now updating the five Lambda functions with our packaged
+code.
+And we will let that run.
+And I'll be back in a minute.
+All right.
+And that has been deployed successfully.
+And you know, I you know, I don't use the expression moment of truth lightly.
+It's been a while since I've set it apart.
+Here we have it.
+Here we have surely a moment of truth.
+Let's go into.
+We're now going to test.
+Test each of our agents remotely.
+We're going to start with a simple one, the tagger.
+So we're going to go into tagger uh and we're going to do UV run test full uh test underscore full dot
+pi.
+And so the difference between this and test simple is that what this is doing is making a lambda call
+to tag three instruments.
+So it's calling out to our serverless function running in the cloud.
+And it's doing it in the same way as the planner.
+The the lambda function itself will call the others.
+So off it's going to lambda to tag these instruments right now.
+Uh, and once we're done with that, we're going to come through and test each of them in turn.
+Uh, and the first time, of course, that lambda function has to spin up, so it might take a bit longer
+and it's then going to go through and tag each of those.
+Uh, and with any luck, there we go.
+It's finished.
+Uh, and we've got back some, some tagging that happened.
+Uh, and uh, yeah, all of these three got, uh, got tagged and there were no errors.
+So that is a success.
+And now let's go up and go to reporter and UV run test full dot pi.
+And we're now running the reporter again also running it as a lambda function.
+And while we're doing that let's just look back what we're seeing here.
+Checking database for tagged instruments Arc was tagged successfully, Sophie was tagged successfully.
+And Tesla was taxed successfully as a North American equity.
+That sounds good.
+Uh, some of this looks a little bit odd.
+Uh, 98% equity and 2% cash.
+I guess that that might well be true.
+Uh, I have to say, I don't know.
+So, uh, the, uh, the tagging does appear to have been successful.
+Um, the, uh, reporter Lambda is now running, and there we go.
+We can see that it came back with a bunch of reports.
+Report generated successfully.
+Uh, and, uh, that all sounds great.
+I don't know what this is, but I think we can safely ignore it because this is clearly generated successfully,
+and everything worked.
+And now we'll go and try the charter.
+Uh, UV run test full.
+Off it goes.
+And you know what?
+We can we can be, uh, we can show how lambda is nice and asynchronous because we can open another
+terminal at the same time and run retirement and planner in parallel.
+Uh c backend, uh, and, uh, we can go into, um, retirement and UV run, test full pi and kick that
+one off and then open another terminal and CD, uh, back end and CD planner.
+This is the big one, of course.
+And you've run test.py.
+And this is the, uh, the the.
+Yeah, we'll let that run as well.
+So, so, um, each of these is now running.
+Let's go back up to charter and see how that's doing that already completed.
+It created a bunch of different charts, just as we would hope.
+It looks rather similar to the one that was running locally.
+But this has of course run on Lambda.
+And here we go.
+We see that the retirement one also completed successfully.
+And now if we come over here, uh, you can see that this is, uh, running at the moment, uh, and
+it's monitoring the job progress right here, which is, which is great.
+And this one might take a bit longer, the planner, since it's got to do all of the others.
+So I will come back in a second when planner, which is the last of this set of tests, uh, has completed.

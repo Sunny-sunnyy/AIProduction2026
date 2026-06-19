@@ -1,0 +1,191 @@
+And here we are back in cursor, back in the Alex repo project.
+And I'm going to go into guides.
+And we're going to find the final guide enterprise up in the preview.
+This is where we get to look at being enterprise grade in this in this Readme.
+So uh, what I'm going to do is step through each of those different six categories.
+Some of these are more going to be about exercises for you to go in and dig around the Terraform code
+and the AWS console to look at some of our settings and to understand what it really means, that there's
+a best way is for you to do it.
+But a couple of them we will drill down on together and go through in much more detail.
+Uh, but we're going to start with the, the, some of the simple ones and the really easy one.
+We're going to be doing scalability, security monitoring, guarding, explainability and observability.
+But we're going to start with scalability.
+The obvious one.
+And the wonderful thing about our serverless architecture is that it's all baked in.
+It's automatically scalable.
+It's.
+Elastic.
+It scales up and it scales down.
+If you were to use Amazon EC2 compute instances, that would not be the case.
+You would need to provision each one separately.
+That would be a traditional server infrastructure.
+If you were using something like um or App Runner, then it is largely it's a bit of a different setup.
+Um, but but it is also a serverless, scalable setup.
+Um, and if you're using ECS or EKS, which is the container orchestration, then it is also horizontally
+scalable.
+But again, unless there are sort of minimum sizes but it will scale up.
+But that is more the kind of industrial strength approach.
+But this lambda super common works particularly well in the Agentic case when you have these multiple
+agents, because you'd be able to sort of expand one agent, uh, if one agent suddenly becomes in demand,
+it will be able to sort of spin up lots of lots of Lambda services so easily.
+So Lambda functions scale automatically.
+Aurora.
+Serverless v2 are database scales automatically.
+The API gateway handles lots of requests, and I think we'll talk about this later.
+But but it's got things like throttling and and the ability to support bursts if they come through.
+Uh, and that allows us to, to manage make sure that we're scalable.
+But at the same time control against various security risks.
+And then we've got a SQS simple queue service, which gives us, uh, as it says, unlimited throughput.
+We can stack up things on the queue should we need to, uh, and if you wanted to, you could increase
+the capacity so that we could support more scale.
+And what I'm going to suggest you do is you come through and do this yourself.
+So come take, take this as an opportunity to go into the Terraform directory.
+And as it says here, go into five database and look through Main.tf and find the examples for how you
+would dial up the database if you needed to, and do the same for for the agents.
+Like look at how you could make the planet agents have bigger memory size.
+Uh, how you could have, uh, more concurrent executions if you wanted to.
+So you can look at all of these things and see how you could dial it up.
+Um, and that will be that will be an important, uh, thing.
+Thing to practice.
+So do go now and have a look at that and I'll see you in a second.
+And it would be traditional to do some volume testing of your application if you wanted to make sure
+that it was ready for this.
+I'm not going to actually do the volume testing myself, because that that is definitely going beyond
+the sort of the AI territory into core platform ops, but it would be normal to run some some scripts
+to volume test.
+And here's an example stuff you could do on a mac and Linux or on windows.
+Uh, typical scripts that you might use to volume test having lots of API calls being made and allowing
+your your agent system to respond.
+Uh, and of course, when you're looking to scale up, it's incredibly important to be thinking about
+costs.
+One of the reasons that one would want to set some of these limits is to make sure that there isn't
+like a runaway process that goes crazy and takes your costs out of control.
+But you can also set up and you have set up, and you should always set up the billing and cost alerts
+to make sure that you'd be notified if anything did go crazy.
+Uh, and then there are some we're using CloudFront, which means that automatically our assets are
+cached, uh, right at the sort of the edge of where people might request them.
+It's pushed out, distributed out all over the world.
+Um, but you can improve performance by, by doing things like setting longer, uh, times that, that
+your pages will be out there before they expire from the caches.
+So you could you could Google any of this if you're interested, and look at some of the settings in
+CloudFront.
+Okay.
+And that's all we're covering for scalability because I think you get this.
+The really juicy stuff is coming up.
+So when it comes to information security, we've been doing a great job already.
+So we will congratulate ourselves on a few things we've done well and just point to a few others.
+So I mean, it's been quite a dance, but I know you're sick of I am, I know it.
+Uh, it's something which Amazon does do very well.
+It's, uh, but it's quite, quite something.
+So the, the, the, the general practice people talk about is iam least privileged access, which is
+making sure that you give the minimum required permissions to each of your different, uh, people or
+processes, uh, because AWS treats things like a Lambda server serverless function as, as, as if
+it's something that needs permissions as, as well, you know, so we've been pretty careful to give
+our different lambda services the minimal permissions that they need in order to do their jobs.
+So you can look around different parts of Terraform to convince yourself that we've done a decent job
+of this, and we've tried to make sure it's only allowed to do what it needs to be able to do, and
+that prevents something going haywire and something having the wrong access, or it limits the damage
+that can be done, um, in various adverse situations.
+Now, one place where we haven't been great is in our own IAM user.
+You probably remember that we set up those policies just to say like full S3 access and so on, and
+that's pretty common when you're doing things like this, because it's such a bore to go back again
+and again into IAM for like an educational program like this.
+But if you were doing if when you were doing this in production yourself with your engineering team,
+then of course you would set more limited permissions for each of the people on the team that reflects
+their role.
+And indeed, you would have different sets of permissions for people that have access to your development
+infrastructure, from your test infrastructure, from your production, your staging, and your production
+infrastructure so that everyone just has access, has this this minimal required permissions for the
+things that they need to be able to do.
+So that is IAM.
+So we use industry best practices in this application to make sure that user credentials are trusted.
+We use JWT, JSON, web tokens.
+I think I mentioned before it's an enormous rabbit hole, should you wish to learn everything there
+is to learn about it.
+But we have.
+We follow all the things you should do.
+Our tokens expire every hour.
+We use this endpoint.
+If you remember coding in that endpoint that allows Clark to rotate our keys, and we validate that
+the user is who they say they are with every single API request.
+So it's it's a proper bulletproof credentials system.
+And as you know, we use AWS API gateway as our sort of entry point to our back end.
+And that gives us a number of protections, throttles the requests, and that can protect us against
+what they call DDoS distributed denial of service.
+When an attacker, uh, hits your website with with tons and tons of different requests from different
+places around the world to try and bring down your infrastructure, but throttling protects you against
+that.
+Uh, and there are some more protections that you could pay more for that we will come to later that
+we didn't we didn't implement yet.
+And then I feel like the less said about cores, the better.
+You're fed up of cores by now, I'm sure.
+But cause of course, is the control that makes sure that the only thing that's allowed to hit our Lambda
+services, our API servers, is something that originated from the web pages that we served up from
+CloudFront.
+So it really connects those dots to make sure that no one else is able to build a front end and then
+start calling our API, bypassing any other controls.
+So it, uh, that origin validation is the formal name for what I just said then, uh, which is, uh,
+definite best practice security control that we have in place.
+And another one is cross site scripting, which which is a vulnerability when an attacker tries to inject
+malicious scripts into our web page so that there's some JavaScript that executes in a user's browser
+and, and masquerades as if it is our front end.
+And we can use these kinds of policies to make sure that that, uh, what what it what is trusted and
+what is not trusted.
+Preventing any unauthorized scripts from being able to run.
+So these are all good security controls that you're probably familiar with.
+Uh, and, uh, yeah, there's just a couple more to go.
+And then we're moving on to monitoring.
+So obviously we always used environment variables for secrets.
+We never hardcoded secrets anywhere.
+Uh, which would be a terrible practice, but an even better practice than using environment variables
+and using them just sort of stored and set as environment variables and things like lambda, if you
+remember, which I think we did in week two, uh, is using the AWS Secrets Manager, and that's a place
+where you can go, you pay a very small amount for each secret that you put there, which I always feel
+is a bit sneaky.
+Uh, but it's very, very small.
+And there are some secrets that we set up.
+We use the AWS Secrets Manager in a few places.
+We didn't use it universally.
+Sometimes we just use environment keys, but in several places we did.
+And you can go to the secrets manager and have a look yourself and check that out and make sure that
+we have secrets in there.
+And here you can see my one.
+It's Alex Aurora credentials in AWS Secrets Manager secrets.
+There it is.
+Go in.
+And so there you see I didn't make it up.
+We do indeed have a secret in there.
+And you can use AWS Secrets Manager more broadly for some of the other environment variables too, if
+you wished.
+All right.
+And then there are some other advanced features that we have not included that you can include, should
+you wish, and experiment with them.
+But they come at a price.
+So this is all like a this is the sort of upsell from AWS.
+And when you use the console, it tries to sell these things to you.
+So the web application firewall is extra filtering of malicious web traffic to prevent, uh, common
+attacks.
+And uh, but but it does.
+It costs something you'd have to look up.
+You could automatically add it in Terraform.
+You can also go through the AWS console and turn it on.
+You can have uh VPC endpoints, uh, which is, which is giving like a sort of virtual network so that
+network traffic never leaves AWS.
+For our Lambda functions to communicate with, with other services and with each other.
+Uh, GuardDuty is something which is like a detection service that constantly monitors and, uh, informs
+us if if something is looks up, uh, and, uh, but yes, it is a paid service as it mentions right
+here.
+So be aware of that.
+This is the kind of thing that at an enterprise, you might well be willing to pay for.
+Uh, read what it says on the tin to understand if that's something you'd like.
+But this is quite, quite a common kind of practice.
+And then it's also good to put in place something which validates that lambda functions have what you
+expect them to have.
+And, uh, is always raising raising errors.
+If it isn't, that's the kind of sensible security, uh, best practice to, to add to your code as
+well.
+All right.
+And that wraps up security.
+You probably knew most of this already, but it's good to good to go through it.
+Uh, but it's going to get a bit more juicy as we get to monitoring next.
+And then we get to, to the really fun stuff, uh, when we, we eventually get to observability.

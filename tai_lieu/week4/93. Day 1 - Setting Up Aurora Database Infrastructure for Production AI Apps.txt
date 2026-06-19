@@ -1,0 +1,107 @@
+And welcome back.
+It actually it took seven minutes to create for me and it might take like 15 minutes.
+So you might be waiting for a bit there, but you should now be the proud owner of your own Aurora database
+cluster.
+And now there's a super important step.
+And you have to pay attention here because you messed this up.
+Then it could be trouble.
+So don't.
+Uh, so what we have to do is we have to add a couple of of variables from this into our env file.
+And we're going to be using these in various places.
+So so you need to be careful about this.
+So what I'm showing here I'm going to make this a bit larger.
+This is the output of the Terraform.
+It completed.
+Apply complete resources 11 added.
+And here are the outputs.
+And you can see it's got the various outputs which includes the cluster Arn, the Amazon resource number,
+the endpoint and a secret Arn Secrets Manager location of a secret.
+And if you keep going down you'll see here that there it says add the following to your EMV file.
+And there's two rows here that includes a secret to be added with your Amazon account number in it,
+and a sort of credentials detail here.
+And what you have to do is you're going to need to take these two rows here exactly as they are here,
+and copy that and paste it into the dot EMV file in your project root, which is of course over here.
+It's there.
+I'm not going to click on it or you'll see on my secrets.
+Wouldn't want that, but you should click on it.
+You should copy these two lines, paste it in your EMV file.
+Be sure to save.
+You have to press command S or control S to save it.
+And as it says, copy them carefully.
+Be sure about that and then we will move on.
+So the next thing we're going to do is now test our new database.
+So I'm going to bring up a new terminal window.
+You can use the one you've already got if you wish.
+You just have to be sure to go back to the directory to your root directory.
+And then you're going to go CD backend.
+Let's go into the backend end folder.
+We're going to this folder right here.
+And we're going to go into the database subdirectory.
+CD database.
+Here we are.
+We're in database.
+And what we're going to do now is you've run because this is a UV directory.
+This is a UV project in here.
+So we can do UV run test underscore data underscore API which is going to try connecting to a new aurora
+database to see if it's there.
+And it is there and it's uh, apparently no tables found.
+It's empty.
+It's seven megabytes long in its emptiness, apparently.
+Uh, so there we do indeed have an aurora database that we have connected to through the UV run Test
+Data API.
+Now, I hear what you're thinking.
+You're thinking, hang on a second.
+So what does Test Data API actually do?
+And if we're just about to, as it tells us to, to set up a database, what tables are we going to
+be creating.
+And herein lies something which which again I'm going to have to to to suggest that you take a bit of
+a leap of faith with me during the next few days.
+We've got a lot to do, and I'm going to be focusing most of what I discuss on the deployment aspects
+and what it takes to deploy this to production.
+The code itself, this is going to be less about actually writing the software, because that's some
+stuff we cover in other courses.
+And besides, I'm I'm imagining that this is a part that you can do or that's just general database
+coding should you wish.
+You can, of course, come in to the database directory and you can look at things like the Test Data
+API class.
+Let me give it a bit more space.
+And you can see that it is basically just a sort of script that goes through and does various tests
+and creates.
+It goes to RDS client described DB clusters, which we had tried ourselves before.
+Uh, and you can see everything that it does in code here and see how you can call typical AWS functions
+through code.
+And then more importantly, you can see that there's a source, an src directory here where I've put
+in the actual database code we're going to be using which includes schemas.
+And this is where it actually describes the data model that we're going to be using.
+And you can see that it's got the different different data types we'll be using.
+And you can see how it sets up the different schema that we'll be using.
+So this is all quite boilerplate Python code.
+And I should mention that a large amount of this was written by Claude code under my direction I'd write
+a document, I get it to write it, I come back and check it.
+And it's the kind of thing when it comes to things like defining database tables, that it's very quick,
+very good at doing.
+So.
+You could also generate this by by asking either the cursor agent or Claude code to do it.
+Or if you're already proficient at building database schemas, then you could do it yourself and take
+a look through what I've got here.
+It's probably like 60% Claude code, 40% me.
+But it's not the purpose of the course.
+The purpose of the course is now about deploying it.
+So what we're now going to do is run the script, which is going to set up all of our data in our Aurora
+database, and then we'll look at it.
+So here we are.
+Uh, it's now going to be time to run the database migration, which sets everything up.
+And as I say, you can go and read this class and see what it does.
+So we are now going to do UV run.
+Run migrations.py and off it goes and you'll see it's going to do a lot of different setup and migration.
+Complete 17 successful zero errors, all migrations completed successfully.
+So that has set up the data.
+And now we're going to populate our tables.
+In particular there's an instruments table which we want to populate with lots of popular ETFs which
+are finance people like like exchange traded funds like like spy that a lot of people have in their
+retirement funds.
+So we'll set up all of this reference data by doing UV run seed data dot pi.
+And you can look through this, look at it going as it sets up 22 instruments, seed data loaded successfully.
+And that has happened.
+And uh, finally we're going to set up some test data that we'll be using over the next few days, which
+will set up like a fake user and some fake data that that user will have in their account.

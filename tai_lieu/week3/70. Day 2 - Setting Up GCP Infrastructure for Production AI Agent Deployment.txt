@@ -1,0 +1,165 @@
+Well, a fabulous welcome to week three, day two, which is a continuation of week three, day one
+before we change topics.
+But this time of course, we are talking about GCP, Google Cloud Platform, and we are going to be
+doing the same as before, the cyber security project that will be deploying on GCP with its own MCP
+server.
+And uh, that's hopefully, hopefully maybe famous last words.
+It's going to be a quicker day than yesterday because we've done all the groundwork already this week.
+Since we've got a container and it's running, this should just be a matter of deploying.
+Uh, so again, just to recap on this is this is day two of the two days.
+Uh, it's got something for everyone.
+We've got the, the the cloud engineering part of it, which for today is going to be about GCP deployment.
+It's we're not using GitHub actions, but by all means you could add that in as a little extra.
+We are going to be using our cyber analyst project that we work with yesterday that you now know well.
+And the AI again we're going to be using OpenAI agents SDK.
+We're going to be using an MCP server for the Cyberskills.
+And also as we saw yesterday, we can just take a look at the observability framework traces to be able
+to monitor our agent activity in production.
+All right.
+Let's get to it.
+It all starts with me again showing you the little slide about cloud services.
+You remember the five different types server traditional server infrastructure as a service, the platform
+container, container orchestration and then serverless.
+And of course AWS.
+That's EC2, Beanstalk, app runner, ECS or EKS and Lambda.
+And you're now somewhat familiar with Azure because we work with Azure Container Apps ACA.
+But also these are the other equivalent components services, virtual machines, App Service and then
+AKS and Azure Functions.
+So what's it like in GCP land.
+Here we go.
+So the server side is known as GCE or Google Compute Engine.
+The platform side is called Google App Engine or just App Engine.
+The, uh, the container piece is called Google Cloud Run.
+Cloud run.
+Kubernetes one.
+The container orchestration is called GKE, Google Kubernetes Engine.
+And then the the functions are called cloud functions.
+And as you probably remember well, what we're doing today is all about the container deployment, which
+is often the simplest way to start.
+It works particularly well when you have MCP servers because they can be spawned within the container.
+And it's really great for quick deployments because once you've got the container working locally,
+it should just be a matter of Terraform apply to push that out to the cloud.
+So with that let's go back to cursor and talk GCP.
+And so here we are in the cyber repo again in cursor.
+Hopefully you have that cloned and open.
+And we're going to expand the week three folder.
+And we're going now to day two, part one.
+There are only our two parts today setting up GCP and then actually going and running it.
+So again we're going to be going through much a similar process to Azure.
+We're going to set up an account if you don't already have a GCP account.
+And you can get a free trial hopefully by going to Google Cloud.google.com.
+That's where you begin all of this.
+And uh, this link Cloud.google.com might work for you.
+Let's go there now.
+So I'm going to go to that Cloud.google.com free.
+It comes up, uh, it gives you this, this sort of screen to give you information about their free
+tier.
+It's, uh, $300 of free credit is what it's showing me here.
+Hopefully you get the same deal.
+Uh, press start Free, and it's going to have you start by signing up to Google Cloud, and you'll
+then go through a few screens.
+And that includes needing to enter in a credit card number, I believe, just to set it up.
+Uh, but it won't charge you as it will inform you.
+And be sure to to give it the information you need and take the cues.
+Uh.
+I had a bit of difficulty when I signed up for this free account, because I had an existing Google
+Workspace account already, like for email that I was using, and so I had to jump through a couple
+of hoops and needed an LLM to help me.
+Hopefully that doesn't happen to you.
+I think that's that's a that's probably rare because of my specific setup.
+I think you'll find it'll be quite easy to sign up for a new Google Cloud account and get in, but once
+you've done so, you should arrive at a at like the console landing page, which is console.cloud.google.com.
+And that is where we will go next.
+So actually just before we go to Console.cloud.google.com, which is where you will have been redirected
+to, let me just take a moment to walk you through Gcp's structure.
+It's similar to Azure, but it is a bit more deeply nested.
+So it's important to understand the terminology.
+The different the different levels and GCP can be quite complicated.
+I gotta tell you.
+Uh, okay.
+So, uh, gcp's hierarchy has these, like five levels to it.
+The top is your Google account, which is like like your Gmail, your Google Workspace.
+Some people call it that.
+That is your Google account at the top.
+Then there is a potentially something called organization under that which you may have if you're if
+you're doing this as part of a of a company with, with a Google setup, then you have a billing account.
+And that is one particular payment method.
+And then there are projects associated with that billing account and resources associated with the projects.
+So in some ways project is quite similar to a resource group in Azure.
+And billing account uh is is obviously somewhat similar to a subscription.
+So there's definitely parallels here.
+Uh, and uh, there's a little bit more to it explained just there.
+So what we're now going to do is go to the console and go to the, uh, project drop down to create
+a new project, which is going to be Cyber Analyzer with everything else as default.
+Let's go do that now.
+So up here is the projects tab.
+You can see I already have a project called Cyber Analyzer of course because I already created it.
+But when you click on here it brings up the projects and there's a new project button at the top here.
+This is where you give it the name Cyber Analyzer, which you already saw there.
+Keep it in your organization and location and then press create to set that up.
+I won't do it again.
+I won't set up a second cyber analyzer.
+But that's of course what I did to get to this point.
+All right.
+Next up we have to associate billing with this project.
+So with the project selected in this project selector up here, you go to the hamburger menu on the
+left.
+And you choose billing.
+And this is where you associate the project with a billing account, which is a little bit confusing
+the first time you do it and you do it there.
+I already have a billing account called Free Trial Account.
+It has like a name and so on.
+But you as following the instructions here, uh, as you were prompted on that screen the first time
+you come in, it should be clear how you're prompted to link this, to link this project to this billing
+account, so that when you're set up, you then see, uh, my billing account here.
+And it's very clear that the billing account that you're set up to is your free trial account.
+Um, and, uh, so you should get to this point, which is I've got lots of zeros on it, which I like
+to see.
+Uh, and it shows that I have my $300 credit with now 62 days remaining on it, I better I better spend
+them.
+And, uh, you've got many of the, the familiar kinds of settings right here.
+But let's now set up some budgets.
+So setting up budgets is particularly easy in GCP.
+And it's going to be very easy for you because it's similar to Azure.
+So as I said we've gone to to the hamburger menu.
+We've gone to billing and we've selected the billing account which is the only billing account that
+we've got set up, which is the one that we did in associated with our project.
+And here it is.
+And at the overview tab, you get an immediate view on what you've spent.
+Towards in this case, our $300 free trial.
+I haven't spent very much of it, it seems.
+Uh, but this is where you go to keep a healthy eye on your costs.
+We're going to go to Budgets and alerts.
+And you can see here this is where you set up alerts.
+You should have budgets.
+You will have nothing here.
+But you will after you press Create Budget and we give it a name and we'll call it monthly budget three.
+But you don't need to call it three.
+It's just I've made a few of them.
+Uh, time range, we'll say monthly.
+Uh, we will apply it to everything.
+All projects, all services, all organizations.
+Next we press the next button to give it an amount.
+The amount that we'll give, we'll say it's a specified amount of $10.
+And it appears right there.
+Next.
+And now we can set up what triggers an email alert.
+We're going to say 50% of actual, 90% of actual and 100% of actual any of those situations.
+We want to get an email.
+We'll also add another threshold, which will be 100% of the forecast when our forecast is showing that
+we will spend that amount.
+Let's get an email there.
+Let's have that email billing admins and users and press finish to create that.
+We've just created that in there as well.
+And let's just check we have everything set up right on this left here.
+Come down to account management for your billing management.
+And here you can see that I've got a my first project and the cyber analyzer project that we're about
+to set up together.
+And if I come over here to the right, this is where I can see the the billing account administrator.
+It is indeed my email.
+Uh, and, uh, you can come on in here and edit this should you need to, to make absolutely sure you've
+got the right email address, the right contact.
+Your budgets are set up.
+You'll be able to be emailed if you ever spend anything material.
+And you can also always come to overview, as you should regularly, to keep a close eye on the costs
+associated with your account.

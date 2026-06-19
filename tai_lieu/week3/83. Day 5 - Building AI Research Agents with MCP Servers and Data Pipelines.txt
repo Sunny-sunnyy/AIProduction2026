@@ -1,0 +1,84 @@
+Well, I don't understand where all the time has gone.
+How can we already be at day five of week three?
+Well, we're at a crucial moment.
+We've got tons to do today.
+It is our third purple day in a row full of AI.
+We are completing the data pipeline side of our Alex Capstone project, and this time we're going to
+be using an agent.
+We're using OpenAI agents SDK, and we're going to be having it have an MCP server.
+Let's get into it.
+And like you need a reminder of what Alex is.
+You know well that Alex is our financial planner.
+That can be a SaaS product one day.
+And what we built so far, we built a SageMaker endpoint that can take text and turn it into vectors.
+And we built an ingest lambda function, lambda function called ingest that can vectorize text using
+that endpoint and store it in S3 vectors.
+And what we're going to do today is create an agent called researcher that's able to carry out some
+research.
+It's going to use OpenAI agents SDK, as I say, and MCP server to with playwright to to browse the
+internet, do some research and then call our ingest lambda function.
+And the way we're going to do it is similar to the way that we had MCP servers on days one and two of
+this week when when we built things in Azure and GCP, we used the container.
+We used their equivalent of App Runner uh, to have uh, something which could spawn an MCP server inside
+that container.
+And we're going to use the same approach today and say a few words about data engineering.
+It's another topic that I'm really only scratching the surface of.
+Data engineering itself could be an entire course or a series of courses, as could front end, as could
+Docker, as could so many things that we touch on Terraform, for sure.
+Uh, so what is data engineering?
+Well, it's really a whole discipline around building data pipes that, that are, that are bulletproof
+and that can scale.
+Uh, and it's probably a lot more than that.
+Data engineer is probably saying, but it's also, uh, so, so some of the things it involves is what's
+known as ETL, extract, transform and load, which is about really bringing a data source, mapping
+it to being in a target representation and then loading it into the the the the place where models will
+be able to use it.
+Uh, it's also about using many of the scalable data processing frameworks that you hear about.
+So Spark and Beam are some of them.
+You may have heard of that allow you to make use of distributed compute to to do things like ETL, massive
+data sets very quickly and in a way that can be repeated and the things that fail will be retried and
+so on.
+Uh, often real time as data flows in, it goes through these frameworks and gets transformed, or some
+of them run in batch mode.
+And then another thing which which data engineers might work on is known as the medallion architecture.
+This is an example of a real sort of enterprise grade data architecture, where you bring in data and
+you transform it and store it in three different versions of it.
+Bronze is the kind of source data as it came in in its raw form.
+Silver is after you've normalized it and mapped it, transformed it into a consistent format right,
+for your systems.
+And then gold is the final versions in data stores that are ready to be consumed.
+So this kind of staging area approach is an example of a real enterprise scale data engineering architecture.
+So this gives you a sort of a slight sense of data engineering.
+The pipes that we're building are relatively straightforward.
+We've got an agent that is a sort of source of data.
+We've got the the ingest that's then responsible for vectorizing it, which is a bit of a transform.
+And then we are storing that in S3 vectors.
+But you can imagine you could have these different lambda functions handing over to each other and having
+like a, like a pipeline of different steps in which the data is cleansed and perhaps brought through
+this kind of bronze, silver, gold staging before it's put in the final database, ready for our model.
+So that gives you just just a feel for data engineering.
+But by all means, do some more research.
+If this interests you and you'd like to know more about it.
+And if you are a data engineer and you've got lots more to say, then by all means add to the Q&amp;A on
+Udemy and share anything else that you consider part of the of the data engineering profession.
+And then just to bring you back to the architecture we built last time, this is the simplified architecture
+of what we're doing here.
+The ingest function we built that cause SageMaker and stores in the vectors.
+It's that part at the top there that I just brought to the surface, which is what we'll be working
+on today.
+We're actually going to have the scheduler, something that wakes up every two hours and it is going
+to kick off.
+It's actually going to call the lambda function.
+That is going to kick off.
+Our researcher in App Runner.
+And our researcher in App Runner will use a frontier model in bedrock, which it's going to use to then
+call our ingest function.
+So this is how it's all going to fit together.
+That researcher we're going to use OpenAI agents SDK.
+It's going to have an MCP server that's going to be the playwright MCP server that people on my course
+will remember fondly.
+That's going to be running all within a container.
+We will build the container locally and then deploy it, and we'll use Terraform to do it.
+And that's enough chit chat.
+Let's let's go to the lab.
+Let's go and build this.

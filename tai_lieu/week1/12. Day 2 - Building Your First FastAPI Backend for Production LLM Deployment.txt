@@ -1,0 +1,154 @@
+And so now I'm going to go in cursor to file and new window.
+And up it comes.
+And I go to open project I go into my projects directory.
+There is sass, I press open and here is our new Sass project.
+Let me make this bigger for you.
+Let's look at our pride and joy.
+Um, so we've got a directory called pages because we're using the pages router got a directory called
+Public Style and then a bunch of different, uh, configuration files.
+So these this is going to be our new home for the rest of this week.
+I'm going to start by bringing up a terminal like that with control and backtick.
+If you remember that I also closed down like an AI thing that was here.
+You can keep it and ask it questions as you wish.
+Now before we go on.
+So so we've got this other project, uh, called production, which I have running in another window,
+and that's got our recipe for what we're going to do today.
+And you can click between the two.
+But that might be a bit awkward.
+So I'm actually going to copy across all of the the files for the markdown files for the instructions
+for what we're going to do this week.
+You don't need to do this.
+You can just refer back to the other window.
+You can also just bring up a File Explorer, just a Windows Explorer or Mac Finder, and just copy in
+the folder as you wish.
+This is only for convenience, but I'm going to create a new folder.
+I'm going to call it week one.
+And here I'm going to do this.
+This is now like a mac command.
+And as I say you can just do this through the user interface.
+You don't need to do it through a command up a directory.
+Go to production and go to week one and take all those files and copy them into the week one folder
+that I've got right here.
+And that's happened.
+And now when I go here, you'll see that we've got all of these files.
+And I just do this for convenience so we don't have to flip between the two different windows.
+You can do this as you wish, but I'm now going to open the preview of day two.
+I'll close this screen here for now.
+And we are back here.
+We're still in step one, creating your Next.js project.
+Uh, but.
+And we've now just opened the project, and you can now see a little description of what we've got here.
+We have indeed got the, uh, the, the pages subdirectory, just as it's described here.
+And within this we have an underscore app dot TSX.
+Remember I said that the TSX these are the special files which kind of combine TypeScript and HTML into
+one type of file.
+And we've got a document TSX, uh, an index TSX.
+And then we've uh, we've got various other things.
+Okay.
+Uh, and there's also this API folder here with hello TS as well.
+But we are going to be removing this just as it tells you.
+All right.
+So as it says we're going to be using a Python backend.
+We're not going to be using next for our backend.
+Not going to be using a JavaScript backend.
+So this API folder, which is designed if you wanted next to be your backend, this is this is a waste
+of space.
+We want to get rid of this.
+So right click here and delete.
+And it's going to say are you sure you want to.
+And I say yes and off it goes.
+We've got rid of that file.
+Great.
+Then just just a bit of a more introduction on tailwind.
+Just because I didn't talk about it earlier.
+It is a CSS framework.
+In the old days we used to have to write lots of this styling.
+You get very good at writing styling, but it's a strange dark art getting styling right as your front
+end people know only too well.
+Um, but tailwind gives you this sort of canned set of styles that you can use with all sorts of of
+very easy to understand descriptions of what each one means.
+Here's some examples.
+You're going to get used to this.
+It's something to just just mimic, copy and paste the styles that you like.
+You're going to see how easy this makes styling.
+All right, onwards.
+Let's get to step two.
+So I should say the rest of this is going to be similar for all of weeks one and two.
+We're going to basically be following instructions and setting things up and pasting in code, which
+is a slightly weird.
+It's like the whole thing is environment set up because that's what production deployment is all about.
+It's basically set up.
+So you're going to get kind of used to this mode of working.
+Uh, but but you'll see what I mean.
+Now the first thing we want to do is we want to create a new folder called API.
+And you might say we just deleted a folder called API.
+We deleted a folder called API that was inside pages.
+Instead we're going to make a folder by right click in this area here and go new folder.
+It's going to be called API here.
+It's created at the top here.
+And it is a top level folder.
+It's a it's in the project root directory in sass called API.
+And within that uh sorry not not yet within that we're going to put things in there in a minute.
+First another top level file.
+And this one is going to be a file, not a folder.
+And it's called requirements dot txt which I need to spell properly.
+Requirements dot txt and you will know this well as being the file which lists Python packages that
+need to get pip installed automatically.
+Uh, and in fact you probably saw we've got three packages to take.
+We've got fast API, Uvicorn and open AI.
+There they are.
+We're installing the them um, and looking forward to using fast API.
+Okay.
+So within this API folder that I told you, I promised you we were going to populate it.
+We are now we're going to make a new file called index dot.
+And it needs to be called exactly index dot pi.
+There's many things in this set of instructions that need to be exactly as I say them.
+Or something is going to go bump, uh, and this is really one of them.
+So I'm going to take this copy it and I'm going to make a new file new file index dot pi.
+And just you see the way this file is in the API directory.
+If I click that swizzle there you'll see how it comes and goes.
+And I click here and I paste in this text.
+All right.
+So what is this doing.
+Okay.
+So this is fast API code.
+Uh and you start by by creating an app called uh instantiating a new object fast API.
+And this is the way in fast API you describe the different backend routes.
+When when something comes to you, uh, comes to to the web address that this app is running.
+If it goes to slash API, then this Python function is going to get called.
+And whatever this comes up with is going to be returned in the response.
+And we're describing it here.
+We're telling it it's going to be a plain text type of response okay.
+And so what is this function actually going to do.
+Well here comes some AI code.
+And side note this is going to be the only AI code we're going to do today.
+So so so milk this, enjoy some AI code.
+Everything else is about deployment.
+Uh, so we're going to this is going to be very familiar to everyone who's used OpenAI's API.
+We're going to create a new instance of the OpenAI Python client library again.
+So this is something which is a simple wrapper around making a web call itself.
+On the back end.
+We're going to have a prompt.
+It's going to be a user message.
+The content will be come up with a new business idea for AI agents.
+And this is going to be what our app is going to do to start with until they fall.
+And feel free to change this.
+As you wish.
+Uh, be creative.
+Come up with a more interesting thing than this if you wish, or come back and do it later.
+Remember this point.
+And then this is the only two familiar OpenAI API responses client completions dot create.
+We pass in the name of the model, we'll use the nano, the ultra cheap variant of GPT five.
+We pass in our prompt and we return response dot choices zero.
+Let me actually type this out.
+So I'm doing some work with response dot choices, zero dot message content, which is the way that
+we get back the response from OpenAI.
+Now if you're using if you don't want to use OpenAI, you don't perhaps like that $5 upfront payment.
+This will only this will cost such a tiny amount each call.
+But there is that $5 upfront.
+You can of course use any of the alternatives that are in the guides.
+Gemini at the moment has a free plan.
+I don't know if it still still will do when you when you hear this, but obviously Open Router has lots
+of free models and you can run, uh, things, uh, lots of different options in the guides.
+Uh, so this then is our back end route at slash API described in index dot pi.
+It makes a call to an LLM and it returns the results and the prompt it sends the LLM.

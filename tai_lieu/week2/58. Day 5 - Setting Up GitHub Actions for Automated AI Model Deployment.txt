@@ -1,0 +1,182 @@
+And so here I am in GitHub.
+I'm on github.com.
+Donna, you should be not on this, but in your github.com your username.
+Presumably you have an account with GitHub.
+If not, create one.
+And then be there.
+And here I am.
+And one thing you'll notice right away is that I do most of my work on Saturdays, uh, which is probably
+not super healthy.
+Uh, that's because I have a day job.
+Uh, so, uh, that's when, uh, when you'll see me most active.
+Okay.
+And, uh, I have repositories.
+Let's go to repositories over here.
+And, uh, you can see the production one that you hopefully know well.
+And now I'm going to press the new button.
+You need to press the new button.
+So now over here you start with your repo name and I suggest you call it twin.
+Uh, twin is available.
+And you give it a description like a digital twin, uh, version of me.
+Let's call it an AI digital twin version of me.
+So choose visibility.
+You can make it public or private.
+This, of course, is not related to whether your actual twin is public or private.
+This is whether the code is public or private.
+I suggest you make it public because you want people to see the work you've done you.
+And of course, in the assignment, I'm going to be asking you to make this much more rich functionality
+for yourself.
+And so you're going to want to show this off.
+And when you have your digital twin running, remember to tag me and tell me about it so I can come
+in and talk to it.
+And I want to be wowed by how much functionality you have.
+Uh, but we will come to that later.
+Uh, I make mine private for now.
+Uh, now, here's the thing.
+You need to make sure that you have the readme and.
+Gitignore, and license all off because we've put that we've been building things in our repo, so,
+so we don't want, uh, this to create stuff or we're going to have like, merging nonsense.
+So, so if you do this by mistake, it's going to be trouble.
+So don't do it.
+Make sure Adeyemi is off.
+No.
+Gitignore and no license.
+And then press create repository.
+Uh.
+All right.
+Uh, and here we are.
+We are in, uh, the, the our new repository called twin.
+It is empty.
+And, uh, it tells you how to create a new repo on the command line, and you'll see that a lot of
+this is what we've already done.
+So we're looking in great shape.
+Uh, and these two commands here is what we're just about to run.
+Uh, so I might just just copy that right now into my clipboard so that it's, uh, convenient.
+And let's see now what else I want to show you.
+Um, I think that's probably it.
+I think we should go to the command line now and get get this on the road.
+Get this show on the road, is what I mean.
+Of course.
+So now here we are.
+Uh, we're going to push to GitHub.
+The first step is to add this repo to is to set the remote for this local repo to be pointing to GitHub
+in the cloud, to that repo that we just set up in GitHub.
+So we go git remote add origin.
+So I'm just typing this this line right here.
+And actually I'd already pasted this I'd already pasted this command in from the other screen.
+So just paste it in there.
+You can see there's actually a different ways that you can refer to a GitHub repo.
+This way the https, then github.com, then your username which would be Donna for me and then digital
+twin.
+Or we can do it this way I press enter.
+That's done.
+And now this is the git push command git push u origin main.
+All right here we go.
+Bam.
+Done.
+All happened.
+Looks good.
+Now let's go and check that out in GitHub.
+Here I am back at GitHub again.
+It looks much the same as it looked a second ago.
+Let's just click here on code and look at that.
+We've got our whole thing in here.
+We've got the back end, front end scripts.
+Terraform week two.
+We didn't need I guess, but but it's there.
+The env example and.
+Gitignore.
+And so our repo is there.
+And we can go in for example to backend.
+We can check that in here.
+We don't have that folder the the the package.
+And we don't have the zip file.
+We just have all of our Python code including the, the this this deploy which is about deploying the
+Lambda package.
+Um, and similarly in scripts we have our actual deployment script here, which is the one that actually
+builds the Terraform environment and deploys an environment.
+And here are our Terraform scripts checked in to source code control.
+All is looking great.
+And that brings us to part three.
+And part three is a little bit of a head scratcher.
+So so bear with me here.
+This is the one fiddly part of setting up our GitHub actions.
+So remember when we're running Terraform locally on our computers.
+We've got these Terraform state variables that describe the real infrastructure out there.
+The state is um, in this whole like like TF state folder and it controls, um, Terraform's view of
+what's actually out there.
+So we're about to do all of our Terraform script running on GitHub.
+And that means that GitHub needs to have somewhere where it can maintain all of the, the state to,
+um, so it needs like a sort of like a, like a shared drive where it can have all of this information.
+So every time we run it, it's got a permanent record of what the state is.
+And well, GitHub doesn't, doesn't necessarily come with that easily.
+And so we need to like make a shared drive.
+And it happens that we we know how to make shared drives because that's what an S3 bucket is.
+So we can use an S3 bucket as our way to describe Terraform state.
+That's very convenient, very easy and very common practice.
+Um, and so, uh, we could go into the console and futz around with the console to create a new S3
+bucket.
+Uh, but but that we don't like the console anymore, so we might as well actually use Terraform to
+create the, the, the S3 bucket that we will then be using in GitHub actions, uh, in order to maintain
+state.
+So that's a little bit of a muddle there.
+We're going to run Terraform locally in order to create, uh, something which will be used by our GitHub
+actions.
+I hope you followed that.
+Uh, I think you probably did.
+Otherwise it's going to become clear when I actually do it.
+So we're going to temporarily set up a TF file, uh, in order to create this, this S3 bucket and also
+a DynamoDB, I should say we also need a database table.
+We're going to create that as well using DynamoDB, which is another AWS component that I'm not going
+to talk about in any detail, aside from the fact that we're creating this database component for our
+Terraform state, and we're going to run it.
+So this is the Terraform resource description.
+Let me just go through it.
+This sets up everything that we need in order to have the DynamoDB and the S3 bucket.
+And we're going to to create something called uh, back end dash setup, uh, which is the S3 bucket
+and dynamo table for our Terraform state.
+So, uh, here we go into Terraform.
+We do new file, we're going to call it backend setup.
+And you need to have the mental model.
+This is just temporary.
+We're going to create this run it and then delete it later when we're done with it.
+So that's been created.
+Take a look through and you can see the different things that we're using here.
+Uh a store and a lock uh, which is something that is going to be basically, uh, reflecting the store
+and the lock that we have here.
+Uh, and, um, back we go.
+Okay.
+And that's, that's the, uh, that set up the configuration and the next step will be to run it.
+Okay.
+So we bring up a terminal in cursor.
+The first thing we need to do is to go into the terraform directory.
+Don't forget to do that.
+Then it's important that we make sure that we're not in a workspace like dev test or prod.
+So we go to select the default workspace.
+We run terraform init.
+The terraform commands are terraform init followed by terraform apply.
+Now when we do terraform apply normally.
+If you do terraform apply, it just goes out there and creates everything described in Main.tf or in
+any of your TF files.
+We don't want to do that.
+In this case, we only want to create the specific resources that we listed out in that extra backend
+setup file.
+So we're just going to run this command which is only going to run Terraform.
+Apply for some specific resources.
+It asks us to type the word yes to absolutely confirm we know what we're doing.
+Uh, because it would hate to create the wrong resources.
+It goes out there and it creates it all and it's been done.
+We have just created a bunch of we've created an S3 bucket and some dynamo tables for locks, which
+are all set up.
+So these are like shared resources that GitHub can use for running its actions onwards.
+And so we can just type Terraform output which displays the outputs, uh, to tell us what happened.
+And it tells us that we created a DynamoDB table, uh, for our locks.
+And we created a state bucket name twin terraform state.
+And these are things that will be used by our, uh, GitHub actions in just a moment.
+But before we do that, we should remove this temporary Terraform file right here that we only had it
+there in order to create this, this back end.
+So we just delete, move to trash.
+There we go.
+It's gone.
+It was only temporary anyway.
+Okay, it's now time for us to update our scripts to use this new back end.

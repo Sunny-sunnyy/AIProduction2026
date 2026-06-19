@@ -1,0 +1,130 @@
+And welcome to the day two part two point in the week three directory in the cyber repo.
+I'm going to open the preview of day two, part two, which is when we actually make our Docker container
+and deploy it.
+And by the magic that is Terraform, this should be very straightforward.
+So we'll just bring up a new, uh, terminal.
+We will check that Terraform is in good shape, but I'm sure it is because we just used it.
+Uh, we're just going to get the projects list from gcloud.
+We're going to, uh, make sure that we understand, uh, the which project we're using.
+Cyber dash analyzer.
+There is both a project ID and a project name, and the name is like free form text.
+And the ID has to be unique, and the ID is the one that matters.
+We'll be using cyber Dash analyzer, which is probably what your one is called.
+Uh, but if not then then just use use whatever it is called.
+Uh, okay.
+So first of all we're going to run something that will just bring the dot env file and make it environment
+variables.
+And for this to work, by the way, I should mention you do need to be in the project root directory
+like that I run this.
+That's a mac command.
+There's a PC command in the next cell.
+And we're also going to set an environment variable called TF for Terraform variable project ID.
+And what we're going to do is we're going to call this exactly the ID cyber analyzer.
+Copy that letter for letter.
+You know there's no room for error with these IDs.
+There we go.
+So that's setting that ID.
+Now my Terraform var project ID is set to Cyber Analyzer.
+And you can run these checks to make sure they're loaded.
+But I'm sure they are.
+And the same for windows.
+You should run the checks though.
+Um and then we're going to go into our Terraform directory Terraform and then into GCP this time.
+Uh, when last time we of course went into the Azure subdirectory.
+We look over here in Terraform there's a GCP and an Azure directory.
+Oh and something hung over there from a test I did which we can delete.
+There we go.
+That's what you should see just Azure and GCP.
+Very nice.
+Uh, okay.
+So now we're going to do terraform init to set up Terraform.
+There it is.
+And then you'll need to run Terraform workspace new GCP.
+But I've already done that before.
+So all I need to do is Terraform workspace select GCP.
+It's done.
+And now Terraform workspace show because we like being double careful that we're doing everything right.
+There it is GCP is the workspace.
+We're in good shape.
+It's time to authenticate okay.
+So first of all we're going to log in to gcloud.
+This is probably not necessary since you've already logged in recently.
+But we'll just do it just to make sure.
+In we go allow.
+And we are authenticated okay.
+Now we're now going to make sure that we're looking at the project called uh Cyber Analyzer by running
+this uh, and we actually we already were in Cyber Analyzer, but whatever, we'll we'll run this and
+that is done.
+Uh, now what we now want to do is log in using something called the application default credentials,
+because that is the the simple login which Terraform will be using in order to make changes to GCP.
+Uh, and again this is quite similar to Azure.
+And it's just a very much simpler strategy than than AWS where everything has to be very explicit when
+it comes to to IAM.
+So this is allowing this application default account to be logged in.
+Continue.
+In we go.
+And what we're now going to be doing.
+And so these credentials will be used by any library that requests application default credentials ADC
+which is what Terraform is going to be doing.
+Uh, you have to tell, uh, Google Cloud that we want to associate this application default account
+with the quota, uh, with the billing for this project.
+So a little bit fiddly.
+Um, but that is saying that, that that is how to associate that, that is basically which billing
+account Terraform Terraforms actions are going to be associated with.
+So run that and it says quota project Cyber analyzer was added to ADC.
+The application default credentials, which can be used by Google client libraries for billing and quota.
+Uh.
+And now we run this command so that we can Docker can use these gcloud credentials.
+So we can push images and we get some message there.
+And let's just make sure that the application is there we go.
+We just want to make absolutely sure project is cyber analyzer.
+There it is.
+We're in good shape.
+Everything is authorized properly okay.
+It's time to run a Terraform command.
+First let's just look in Terraform folder.
+You'll see that there is of course an Azure and GCP directory.
+We are now in GCP land and there is a Main.tf.
+And the main.tf here is going to look hopefully quite nicely parallel with Azure.
+And should all be stuff that makes sense to you.
+Uh, we've got um the, the Google setups.
+We've got the Docker setup.
+That's much as before.
+We've got the Docker image that's built in the same way using the right platform that that is important
+for Mac people.
+And this is the cloud run service that's set up.
+And here are the details of it.
+It's worth looking at the CPU and the memory.
+It turns out in fact, and I don't think I mentioned this with the Azure deployment, that the Semgroup
+MCP server consumes quite a lot of memory and configuring itself.
+And if you leave it with default resources for cloud run, it doesn't work.
+There's not enough resources to run the Semgroup MCP server.
+And that caught me off guard to start with.
+Uh, so it took me a while to get to the bottom of that, but that's something that's needed here.
+Um, we're passing in our keys as before.
+Um, we've got some scaling settings, and then there is some IAM stuff and the, the project ID and
+region, uh, as, as output, sorry, service URL, project ID and region.
+Uh, so that is our Terraform setup.
+And what we can now do is run the plan command so that we can see what will happen when we call Terraform
+run, Terraform, apply.
+So here is the Terraform plan command.
+Uh, and uh this is what we get.
+So these are the resources that will be created when we run Terraform apply.
+And uh, it includes everything that we just looked at in that file, including this, this one here,
+which is, of course, the, the, uh, cloud run itself, the Google cloud run that will be created.
+So we are all ready to go with Terraform apply command.
+Okay.
+Here we go.
+Copy this.
+Terraform apply copy.
+Come here.
+Paste.
+And now we have to do the, uh the famous typing.
+Yes.
+And off it goes to create infrastructure on Google Cloud.
+We're hoping for a nice smooth run.
+Docker image is creating like before.
+I will, uh, stay glued to the screen, but I will spare you.
+Me?
+Uh yabbering away for a few minutes.
+I will see you in a second.

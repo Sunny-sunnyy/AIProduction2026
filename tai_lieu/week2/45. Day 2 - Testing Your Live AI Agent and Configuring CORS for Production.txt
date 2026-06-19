@@ -1,0 +1,128 @@
+I was going to say, are you excited?
+But you're probably not excited.
+You're probably exhausted.
+So we're almost there.
+We're almost, almost at the bitter end.
+Uh, we have to update these cores settings.
+Here's the thing.
+We now have our final front end.
+We've built and deployed the thing we're about to test our real distribution, our CloudFront distribution
+that's happening while we speak.
+It's in the middle of deploying.
+The final thing we have to do is we have to tell our backend, this is where you should expect to receive
+requests from.
+And that's called the Cors origin.
+That's telling the backend what is an acceptable place.
+That could be the origin of this HTTP request.
+Um, and we've got this Cors origins, which is currently a star in our backend Lambda function.
+And that's not good.
+That means that anyone could come in and start using our API wherever they're from.
+So we need to restrict it.
+So what we do is we're going to go to the CloudFront, which is probably still busy doing its thing,
+or it may have finished for you.
+But this is then if it's, uh, for me, uh, let me see whether it's, uh, it's actually a diploid.
+It has, it has successfully deployed now for me.
+So this is the distribution right here.
+I'm going to copy that.
+And now I have to go back to my lambda function.
+Here it is I have to go to to twin API right here.
+Uh which, which uh where I had accidentally previously uploaded uh, the wrong zip package and more,
+more up to date zip package with later days.
+Uh, with the bedrock thing, which I've now put back to being the proper zip package for anyone that
+saw what happened there.
+Uh, but it's now got the right zip in it.
+Everything is good for us.
+I'm going to go to configuration.
+I'm not going to click on that because you'll see my API keys.
+You need to go in there.
+You need to click on environment variables and update that cause environment variable so that it contains
+that URL that it's allowed to access.
+So I'll let you go and do that now and then.
+Everything should be ready to test.
+So hopefully you added that cause variable and be sure to include the Https on the front of it.
+It needs to be the full URL for this to work or you'll get horrible cause errors.
+So look, this I feel is another of these moments of truth.
+And I know I say that expression a lot, but I feel like as they go, this is perhaps the trickiest
+of the moments of truth that we have had so far.
+An exciting moment for us.
+We start by going to the CloudFront, uh, page, uh, CloudFront service to look at our CloudFront
+distribution.
+There it is.
+We look at the URL right here.
+This is where our website is running on the internet.
+Open a new tab and I go in and we are now going to be talking to our digital twin on the internet.
+Hi there.
+And let's see what it has to say.
+Hello.
+Glad you stopped by.
+What's on your mind today?
+Um, my name's Alex.
+See if it can.
+Can.
+Remember that.
+Nice to meet you, Alex.
+What brings you to my site?
+What's my name?
+You just told me it's Alex.
+Got it locked in.
+What can I do for you, Alex?
+I love it.
+I think this digital twin could take over from me any day.
+Uh.
+All right, let's say, uh.
+Do you like cheese?
+See what it has to say.
+Ah, the cheese question.
+I can't stand most cheese.
+No allergy.
+Just don't like the taste.
+It's horrible.
+It's off milk.
+Uh, so the digital twin obviously does know all about me, which is great.
+Uh, it's working wonderfully.
+It's live.
+It's on the internet.
+It's on this URL.
+It's it's because it's CloudFront distribution.
+This is all over the world.
+It will go instantly.
+And whenever you ask a question that is calling a back end API that hits Amazon API gateway that then
+forwarded on to Lambda, it starts up our server if there isn't already a hot lambda waiting for us.
+And then that calls into our code and it all just works.
+And one more thing for us to see is to come in here and type S3.
+Let's go into S3 and let's find ourselves the memory bucket.
+Remember two S3 buckets.
+One of them has our front end site, our static site, one of them we're using for memory.
+We go in here and lo and behold, there's a JSON object in here waiting for us.
+Let's go and have a look at this JSON object.
+Okay, it's a JSON object.
+Let's press this open right here and check this out.
+Here is the question.
+Uh ah, the cheese question.
+Actually, I can't stand most cheeses, no allergies, blah blah blah.
+You can see the JSON form of the conversation that we just had sitting there on S3.
+This is working.
+Our architecture is live.
+Congratulations for pulling off your your first enterprise strength AWS Deployment.
+Well, I promised you a big day, and I think I delivered.
+A lot got done.
+We got a production app deployed to AWS through CloudFront distribution around the world.
+And congratulations on getting there.
+If you're feeling a bit frazzled, don't worry about it.
+That is normal.
+That is AWS frazzle.
+We got through a lot.
+It's gonna sink in.
+We're gonna we're gonna go through it again.
+You're going to get to a point where it becomes second nature, and in the meantime, go with it, get
+the intuition and and keep on going.
+We've got still lots to do.
+Uh, but on that topic, this is a moment to say you are now 35% of the way through building your expertise
+to be, uh, brilliant at deploying AI apps to production 35% of the way through.
+Massive.
+Congratulations.
+This is a big moment.
+This is definitely the hardest core so far.
+Uh, and tomorrow we're going to move to to looking at the AI side of it again, thank goodness.
+We're going to be talking about Amazon bedrock and using bedrock to call Llms.
+I can't wait and I'll see you then.
