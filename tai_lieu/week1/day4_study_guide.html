@@ -1,0 +1,1514 @@
+<!doctype html>
+<html lang="vi">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Day 4: Healthcare Consultation Assistant - Study Guide</title>
+  <!-- Google Fonts: Inter, Cormorant Garamond, and JetBrains Mono -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  
+  <style>
+    :root {
+      --canvas: #faf9f5;
+      --surface-soft: #f5f0e8;
+      --surface-card: #efe9de;
+      --surface-strong: #e8e0d2;
+      --surface-dark: #181715;
+      --surface-dark-elevated: #252320;
+      --surface-dark-soft: #1f1e1b;
+      --hairline: #e6dfd8;
+      --hairline-soft: #ebe6df;
+      --ink: #141413;
+      --body: #3d3d3a;
+      --body-strong: #252523;
+      --muted: #6c6a64;
+      --muted-soft: #8e8b82;
+      --primary: #cc785c;
+      --primary-active: #a9583e;
+      --accent-teal: #5db8a6;
+      --accent-amber: #e8a55a;
+      --success: #5db872;
+      --warning: #d4a017;
+      --error: #c64545;
+      --on-dark: #faf9f5;
+      --on-dark-soft: #a09d96;
+      --radius-md: 8px;
+      --radius-lg: 12px;
+      --radius-xl: 16px;
+      --content: 1200px;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      margin: 0;
+      background: var(--canvas);
+      color: var(--body);
+      font-family: "Inter", "Segoe UI", Arial, sans-serif;
+      line-height: 1.62;
+    }
+
+    h1,
+    h2,
+    .editorial-title {
+      color: var(--ink);
+      font-family: "Cormorant Garamond", Cambria, Georgia, serif;
+      font-weight: 500;
+      letter-spacing: -0.5px;
+      line-height: 1.15;
+      margin: 0;
+    }
+
+    h1 {
+      font-size: clamp(2.2rem, 4.5vw, 3.8rem);
+      max-width: 20ch;
+      font-weight: 400;
+    }
+
+    h2 {
+      font-size: clamp(1.6rem, 2.5vw, 2.2rem);
+    }
+
+    h3 {
+      color: var(--ink);
+      font-size: 1.1rem;
+      font-weight: 600;
+      line-height: 1.4;
+      margin: 0;
+    }
+
+    p,
+    li {
+      margin: 0;
+    }
+
+    code {
+      border-radius: 6px;
+      background: var(--surface-strong);
+      color: var(--body-strong);
+      font-family: "JetBrains Mono", Consolas, monospace;
+      font-size: 0.9em;
+      padding: 2px 6px;
+    }
+
+    pre {
+      margin: 0;
+      overflow-x: auto;
+      border-radius: var(--radius-lg);
+      background: var(--surface-dark-soft);
+      color: var(--on-dark);
+      padding: 20px;
+      font-family: "JetBrains Mono", Consolas, monospace;
+      font-size: 13px;
+      line-height: 1.6;
+      white-space: pre;
+    }
+
+    pre code {
+      background: transparent;
+      color: inherit;
+      padding: 0;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.95rem;
+      margin-top: 14px;
+    }
+
+    th,
+    td {
+      border-bottom: 1px solid var(--hairline);
+      padding: 14px;
+      text-align: left;
+      vertical-align: top;
+    }
+
+    th {
+      color: var(--ink);
+      font-weight: 700;
+      background: var(--surface-soft);
+    }
+
+    .page {
+      max-width: var(--content);
+      margin: 0 auto;
+      padding: 30px 20px 64px;
+    }
+
+    .hero {
+      display: grid;
+      grid-template-columns: minmax(0, 1.2fr) minmax(320px, 0.8fr);
+      gap: 28px;
+      align-items: stretch;
+      padding: 44px;
+      border: 1px solid var(--hairline);
+      border-radius: var(--radius-xl);
+      background: var(--surface-soft);
+    }
+
+    .hero-copy {
+      display: grid;
+      gap: 18px;
+      align-content: start;
+    }
+
+    .eyebrow {
+      width: fit-content;
+      border-radius: 999px;
+      background: var(--primary);
+      color: white;
+      font-size: 0.72rem;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      padding: 6px 14px;
+      text-transform: uppercase;
+    }
+
+    .lead {
+      max-width: 72ch;
+      color: var(--body-strong);
+      font-size: 1.1rem;
+    }
+
+    .tag-row,
+    .source-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .tag,
+    .source {
+      display: inline-flex;
+      align-items: center;
+      border-radius: 999px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      padding: 5px 12px;
+    }
+
+    .tag {
+      background: var(--surface-card);
+      color: var(--ink);
+    }
+
+    .source {
+      border: 1px solid var(--hairline);
+      background: var(--canvas);
+      color: var(--muted);
+    }
+
+    .source.extended {
+      border-color: rgba(204, 120, 92, 0.38);
+      background: rgba(204, 120, 92, 0.1);
+      color: var(--primary-active);
+    }
+
+    .hero-panel,
+    .code-panel {
+      border-radius: var(--radius-lg);
+      background: var(--surface-dark);
+      color: var(--on-dark);
+      padding: 28px;
+    }
+
+    .hero-panel {
+      display: grid;
+      gap: 18px;
+      align-content: start;
+    }
+
+    .hero-panel h2,
+    .hero-panel h3,
+    .code-panel h3 {
+      color: var(--on-dark);
+      font-family: "Inter", sans-serif;
+      font-weight: 600;
+      letter-spacing: 0;
+    }
+
+    .hero-panel h2 {
+      font-size: 1.4rem;
+    }
+
+    .hero-panel p,
+    .hero-panel li,
+    .code-panel p,
+    .code-panel li {
+      color: var(--on-dark-soft);
+    }
+
+    .progress-track {
+      height: 6px;
+      overflow: hidden;
+      border-radius: 999px;
+      background: var(--surface-dark-elevated);
+      margin-top: 6px;
+    }
+
+    .progress-bar {
+      width: 0;
+      height: 100%;
+      background: var(--primary);
+      transition: width 0.1s ease;
+    }
+
+    .layout {
+      display: grid;
+      grid-template-columns: 280px minmax(0, 1fr);
+      gap: 24px;
+      align-items: start;
+      margin-top: 26px;
+    }
+
+    .toc {
+      position: sticky;
+      top: 20px;
+      border: 1px solid var(--hairline);
+      border-radius: var(--radius-lg);
+      background: var(--canvas);
+      padding: 20px;
+    }
+
+    .toc h2 {
+      font-family: "Inter", "Segoe UI", Arial, sans-serif;
+      font-size: 1.05rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--muted);
+      margin-bottom: 12px;
+    }
+
+    .toc nav {
+      display: grid;
+      gap: 4px;
+    }
+
+    .toc a {
+      border-radius: var(--radius-md);
+      color: var(--muted);
+      padding: 8px 12px;
+      text-decoration: none;
+      font-size: 0.92rem;
+      font-weight: 500;
+      transition: all 0.2s ease;
+    }
+
+    .toc a:hover,
+    .toc a.active {
+      background: var(--surface-card);
+      color: var(--ink);
+      font-weight: 600;
+    }
+
+    .toc-tools {
+      display: grid;
+      gap: 8px;
+      margin-top: 16px;
+      padding-top: 16px;
+      border-top: 1px solid var(--hairline);
+    }
+
+    .button {
+      min-height: 40px;
+      border: 1px solid var(--hairline);
+      border-radius: var(--radius-md);
+      background: var(--canvas);
+      color: var(--ink);
+      cursor: pointer;
+      font: inherit;
+      font-size: 0.88rem;
+      font-weight: 600;
+      padding: 10px 16px;
+      transition: all 0.2s ease;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .button:hover {
+      background: var(--surface-card);
+    }
+
+    .button.primary {
+      border-color: var(--primary);
+      background: var(--primary);
+      color: white;
+    }
+
+    .button.primary:hover {
+      background: var(--primary-active);
+    }
+
+    .content {
+      display: grid;
+      gap: 24px;
+    }
+
+    .section {
+      border: 1px solid var(--hairline);
+      border-radius: var(--radius-lg);
+      background: var(--canvas);
+      padding: 32px;
+      scroll-margin-top: 20px;
+    }
+
+    .section-title {
+      display: flex;
+      justify-content: space-between;
+      gap: 16px;
+      align-items: start;
+      margin-bottom: 20px;
+      border-bottom: 1px solid var(--hairline-soft);
+      padding-bottom: 16px;
+    }
+
+    .kicker {
+      color: var(--primary);
+      font-size: 0.78rem;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      margin-bottom: 6px;
+      text-transform: uppercase;
+    }
+
+    .grid-2,
+    .grid-3 {
+      display: grid;
+      gap: 16px;
+    }
+
+    .grid-2 {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .grid-3 {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+
+    .card,
+    details {
+      border: 1px solid var(--hairline);
+      border-radius: var(--radius-lg);
+      background: var(--surface-card);
+      padding: 20px;
+    }
+
+    .card p,
+    .card ul,
+    .card ol,
+    details p,
+    details ul,
+    details ol {
+      margin-top: 10px;
+    }
+
+    .list {
+      padding-left: 20px;
+    }
+
+    .list li + li {
+      margin-top: 8px;
+    }
+
+    details {
+      margin-top: 16px;
+      transition: all 0.3s ease;
+    }
+
+    summary {
+      color: var(--ink);
+      cursor: pointer;
+      font-weight: 700;
+      outline: none;
+    }
+
+    .callout {
+      border-left: 4px solid var(--primary);
+      border-radius: var(--radius-md);
+      background: var(--surface-soft);
+      padding: 16px 20px;
+      margin-top: 14px;
+    }
+
+    .code-panel {
+      display: grid;
+      gap: 14px;
+      margin-top: 16px;
+    }
+
+    .code-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      color: var(--on-dark-soft);
+      font-size: 0.85rem;
+      border-bottom: 1px solid var(--surface-dark-elevated);
+      padding-bottom: 8px;
+    }
+
+    .flashcard {
+      display: grid;
+      gap: 12px;
+      align-content: start;
+    }
+
+    .flash-answer {
+      display: none;
+      border-top: 1px solid var(--hairline);
+      padding-top: 12px;
+      color: var(--body-strong);
+    }
+
+    .flashcard.revealed .flash-answer {
+      display: block;
+    }
+
+    .quiz-option {
+      display: block;
+      width: 100%;
+      margin-top: 8px;
+      text-align: left;
+      justify-content: flex-start;
+    }
+
+    .quiz-result {
+      min-height: 24px;
+      margin-top: 12px;
+      color: var(--primary-active);
+      font-weight: 700;
+      padding: 8px 12px;
+      border-radius: var(--radius-md);
+    }
+
+    .diagram-container {
+      background: var(--surface-soft);
+      border: 1px solid var(--hairline);
+      border-radius: var(--radius-lg);
+      padding: 20px;
+      margin-top: 14px;
+      overflow-x: auto;
+      display: flex;
+      justify-content: center;
+    }
+
+    .footer {
+      border-radius: var(--radius-lg);
+      background: var(--surface-dark);
+      color: var(--on-dark-soft);
+      padding: 32px;
+      margin-top: 32px;
+      text-align: center;
+      font-size: 0.9rem;
+    }
+
+    .footer strong {
+      color: var(--on-dark);
+    }
+
+    .badge-pill {
+      background: var(--primary);
+      color: white;
+      font-size: 0.75rem;
+      padding: 2px 8px;
+      border-radius: 999px;
+      font-weight: 700;
+      margin-left: 6px;
+    }
+
+    @media (max-width: 900px) {
+      .hero,
+      .layout,
+      .grid-2,
+      .grid-3 {
+        grid-template-columns: 1fr;
+      }
+
+      .toc {
+        position: static;
+        margin-bottom: 20px;
+      }
+    }
+  </style>
+
+  <!-- Include Mermaid.js from CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+  <script>
+    mermaid.initialize({
+      startOnLoad: true,
+      theme: 'base',
+      themeVariables: {
+        background: '#f5f0e8',
+        primaryColor: '#efe9de',
+        primaryTextColor: '#141413',
+        primaryBorderColor: '#e6dfd8',
+        lineColor: '#cc785c',
+        secondaryColor: '#faf9f5',
+        tertiaryColor: '#181715'
+      }
+    });
+  </script>
+</head>
+
+<body>
+  <div class="page">
+    <!-- Hero Header -->
+    <header class="hero">
+      <div class="hero-copy">
+        <span class="eyebrow">Study Guide</span>
+        <h1>Day 4: Healthcare Consultation Assistant</h1>
+        <p class="lead">Xây dựng ứng dụng AI thương mại thực tế đầu tiên phục vụ lĩnh vực Y tế: MediNotes Pro giúp bác sĩ tự động hóa việc tóm tắt bệnh án, đề xuất hành động lâm sàng và soạn email giao tiếp bệnh nhân thân thiện từ các ghi chú thô.</p>
+        <div class="tag-row">
+          <span class="tag">AI Engineer Production Track</span>
+          <span class="tag">Week 1 Day 4</span>
+          <span class="tag">Pydantic Validation & Structured Prompts</span>
+        </div>
+        <div class="source-row">
+          <span class="source">Transcript</span>
+          <span class="source">Slide</span>
+          <span class="source">Code Guide</span>
+          <span class="source extended">Knowledge Extension</span>
+        </div>
+      </div>
+      <aside class="hero-panel">
+        <h2>Quick Focus</h2>
+        <ul class="list">
+          <li><strong>Pydantic BaseModel</strong>: Khai báo class định kiểu y khoa an toàn và tự động validate dữ liệu đầu vào.</li>
+          <li><strong>Structured Prompts</strong>: Phân tách System/User prompts để hướng LLM trả về đầu ra đúng định dạng y tế.</li>
+          <li><strong>FastAPI POST Route</strong>: Chuyển đổi endpoint nhận payload JSON phức tạp từ client Next.js.</li>
+          <li><strong>PaaS to IaaS Checkpoint</strong>: Nhìn lại kiến trúc Vercel và chuẩn bị chuyển tiếp sang hạ tầng AWS công nghiệp.</li>
+        </ul>
+        <div>
+          <p style="margin-bottom: 4px; font-weight: 600;">Reading Progress</p>
+          <div class="progress-track" aria-label="Reading progress">
+            <div class="progress-bar" id="progressBar"></div>
+          </div>
+        </div>
+      </aside>
+    </header>
+
+    <!-- Layout Container -->
+    <div class="layout">
+      <!-- Navigation Sidebar (Sticky TOC) -->
+      <aside class="toc">
+        <h2>Navigation</h2>
+        <nav>
+          <a href="#source-map">1. Source Map</a>
+          <a href="#cheat-sheet">2. Cheat Sheet</a>
+          <a href="#previous-context">3. Previous Context</a>
+          <a href="#core-theory">4. Core Theory</a>
+          <a href="#workflow">5. Workflow / Pipeline</a>
+          <a href="#techniques">6. Techniques</a>
+          <a href="#code-walkthrough">7. Code Walkthrough</a>
+          <a href="#options">8. Options & Trade-offs</a>
+          <a href="#pitfalls">9. Pitfalls</a>
+          <a href="#flashcards">10. Flashcards / Quiz</a>
+          <a href="#memory">11. Quick Memory</a>
+        </nav>
+      </aside>
+
+      <!-- Main Study Guide Content -->
+      <main class="content">
+        
+        <!-- Section 1: Source Map -->
+        <section id="source-map" class="section">
+          <div class="section-title">
+            <div>
+              <div class="kicker">Section 1</div>
+              <h2>Source Map - Bản đồ nguồn</h2>
+            </div>
+          </div>
+          <div class="grid-2">
+            <article class="card">
+              <h3>Sources Used - Nguồn đã dùng</h3>
+              <ul class="list">
+                <li><strong>Transcript:</strong> Đọc kỹ các bài giảng 19, 20, 21, 22 để nắm bắt mục tiêu y tế của buổi học và chiến lược Cloud DevOps tiếp theo.</li>
+                <li><strong>Slide:</strong> Tham chiếu sơ đồ API Route POST, luồng dữ liệu y khoa và so sánh Vercel vs AWS trong file <code>Production W1D4.pdf</code>.</li>
+                <li><strong>Code:</strong> Phân tích file <code>day4.md</code> hướng dẫn thay đổi code trên file <code>api/index.py</code>, <code>pages/product.tsx</code>, và <code>pages/index.tsx</code>.</li>
+              </ul>
+            </article>
+            <article class="card">
+              <h3>Grounding Notes - Ghi chú căn cứ</h3>
+              <p>Mã nguồn thực tế và lý thuyết trong transcript thống nhất cao độ về mặt nghiệp vụ y khoa lâm sàng. Các hướng dẫn tích hợp datepicker ngoài và Pydantic validation được giải thích cặn kẽ trên cả môi trường localhost lẫn production Vercel.</p>
+            </article>
+          </div>
+          <div class="callout">
+            <strong>Terminology Rule - Quy tắc thuật ngữ:</strong> Các thuật ngữ kỹ thuật được biểu diễn dạng: Cụm từ kỹ thuật viết dưới dạng <code>English - nghĩa tiếng Việt</code>; từ đơn phổ biến viết dưới dạng <code>cost (chi phí)</code>.
+            <br><em>Ví dụ:</em> <code>Structured Prompt - gợi ý có cấu trúc</code>, <code>data validation - xác thực dữ liệu</code>.
+          </div>
+        </section>
+
+        <!-- Section 2: Cheat Sheet -->
+        <section id="cheat-sheet" class="section">
+          <div class="section-title">
+            <div>
+              <div class="kicker">Section 2</div>
+              <h2>Cheat Sheet - Tóm tắt một trang</h2>
+            </div>
+          </div>
+          <div class="grid-3">
+            <article class="card">
+              <h3>Core Idea - Ý chính</h3>
+              <p>Day 4 biến ứng dụng SaaS AI từ dạng sinh ý tưởng tổng quát thành một trợ lý y khoa chuyên nghiệp <strong>MediNotes Pro</strong>. Ứng dụng nhận thông tin bệnh nhân, ngày khám và các ghi chú thô của bác sĩ để sinh ra bệnh án chuyên môn y khoa, các hành động tiếp theo và thư điện tử giải thích thân thiện cho bệnh nhân.</p>
+            </article>
+            <article class="card">
+              <h3>Must Know - Cần nhớ</h3>
+              <ul class="list">
+                <li>FastAPI chuyển từ <code>GET</code> sang <code>POST</code> để tiếp nhận JSON payload phức tạp.</li>
+                <li>Pydantic <code>BaseModel</code> kiểm duyệt (validate) cấu trúc dữ liệu đầu vào tự động ở backend.</li>
+                <li>Sử dụng cấu trúc <code>system_prompt</code> tách biệt để LLM phân chia đầu ra làm 3 phần cố định.</li>
+                <li> requirements.txt phải thêm <code>pydantic</code> để Vercel serverless function biên dịch thành công.</li>
+              </ul>
+            </article>
+            <article class="card">
+              <h3>Use in Practice - Thực hành</h3>
+              <p>Ứng dụng trực tiếp cho các dự án AI cần xử lý form biểu mẫu lớn, yêu cầu cấu trúc dữ liệu chặt chẽ và muốn định hướng định dạng LLM đầu ra chuyên nghiệp. Đồng thời đóng vai trò tổng kết tuần 1 trước khi đối mặt với thử thách đóng gói Docker và hạ tầng AWS công nghiệp ở Day 5.</p>
+            </article>
+          </div>
+        </section>
+
+        <!-- Section 3: Previous Context -->
+        <section id="previous-context" class="section">
+          <div class="section-title">
+            <div>
+              <div class="kicker">Section 3</div>
+              <h2>Previous Context - Liên hệ với bài trước</h2>
+            </div>
+          </div>
+          <div class="callout">
+            Day 4 là mảnh ghép nghiệp vụ thương mại đầu tiên lấp đầy vào bộ khung hạ tầng kỹ thuật đã hoàn tất ở Day 3. Sau khi đã thiết lập xác thực (Clerk Auth) và cổng thanh toán (Clerk Billing/Stripe), dự án đã sẵn sàng để triển khai các tính năng chuyên môn lâm sàng. Thay vì sinh ý tưởng AI mở như Day 2 và 3, ứng dụng chuyển hẳn sang xử lý nghiệp vụ y tế mang giá trị cao.
+          </div>
+        </section>
+
+        <!-- Section 4: Core Theory -->
+        <section id="core-theory" class="section">
+          <div class="section-title">
+            <div>
+              <div class="kicker">Section 4</div>
+              <h2>Core Theory - Lý thuyết cốt lõi</h2>
+            </div>
+            <div class="source-row">
+              <span class="source">Slide</span>
+              <span class="source">Transcript</span>
+            </div>
+          </div>
+          <div class="grid-2">
+            <article class="card">
+              <h3>Key Concepts - Khái niệm chính</h3>
+              <ul class="list">
+                <li><strong>Pydantic BaseModel - mô hình cơ sở Pydantic:</strong> Một class của thư viện Pydantic trong Python, đóng vai trò định hình lược đồ (schema) dữ liệu và tự động kiểm chứng kiểu (type checking) của request body.</li>
+                <li><strong>Structured Prompt - gợi ý có cấu trúc:</strong> Kỹ thuật phân tách rõ nhiệm vụ hệ thống (System Prompt) và dữ liệu lâm sàng cụ thể (User Prompt) để điều khiển hành vi của LLM, giúp định dạng đầu ra của AI đồng bộ và ổn định.</li>
+                <li><strong>Electronic Health Record (EHR) - hồ sơ bệnh án điện tử:</strong> Hệ thống phần mềm y khoa lưu trữ lịch sử sức khỏe bệnh nhân dạng số hóa. Đây là đích đến cuối cùng của các tài liệu lâm sàng do bác sĩ tạo ra.</li>
+                <li><strong>Platform as a Service (PaaS) - nền tảng như một dịch vụ:</strong> Mô hình cloud cung cấp sẵn runtime và cơ chế build tự động (ví dụ: Vercel). Giúp lập trình viên chỉ cần đẩy code mà không cần cấu hình máy chủ.</li>
+                <li><strong>Infrastructure as a Service (IaaS) - hạ tầng như một dịch vụ:</strong> Mô hình cloud cung cấp phần cứng thô (ví dụ: AWS). Đòi hỏi tự cài đặt Docker containerization, quản lý phân quyền IAM và hạ tầng mạng tự động co giãn.</li>
+              </ul>
+            </article>
+            <article class="card">
+              <h3>PaaS vs IaaS Checkpoint</h3>
+              <p>Bài giảng số 22 chỉ ra một triết lý thiết kế SaaS AI quan trọng: <strong>Bản thân việc gọi API LLM chỉ là một tính năng phụ (side note)</strong>. Phần lớn công sức nằm ở kỹ nghệ hạ tầng (Platform Engineering) và DevOps: làm thế nào để đóng gói Docker, phân quyền cổng mạng bảo mật và co giãn tự động trên AWS.</p>
+              <p style="margin-top: 10px;">Chuyển từ Vercel (PaaS) sang AWS (IaaS) ở Day 5 mang lại cho ứng dụng SaaS khả năng tùy biến vô hạn, bảo mật cấp doanh nghiệp và kiểm soát chi phí tối ưu khi phục vụ hàng triệu bác sĩ khám bệnh hàng ngày.</p>
+            </article>
+          </div>
+
+          <div class="diagram-container">
+            <div class="mermaid">
+              graph TD
+                subgraph Vercel PaaS (Week 1 Day 1-4)
+                  A[Next.js Client] -->|vercel --prod| B[Vercel Serverless Platform]
+                  B -->|Tự động cấu hình| C[SSL / CDN / Routing]
+                  B -->|Chạy API| D[Python Serverless Functions]
+                end
+                subgraph AWS IaaS (Starting Day 5)
+                  E[Next.js / FastAPI App] -->|Đóng gói| F[Docker Image]
+                  F -->|Đẩy lên| G[AWS ECR - Container Registry]
+                  G -->|Triển khai| H[AWS App Runner]
+                  I[AWS IAM - Identity Access] -->|Phân quyền bảo mật| H
+                  H -->|Chạy trên| J[AWS Cloud Infrastructure]
+                end
+                style B fill:#efe9de,stroke:#cc785c,stroke-width:2px;
+                style H fill:#efe9de,stroke:#cc785c,stroke-width:2px;
+                style I fill:#efe9de,stroke:#5db8a6,stroke-width:2px;
+            </div>
+          </div>
+
+          <details>
+            <summary>Deep Explanation - Tại sao Pydantic Validation lại là "Tường lửa" của API?</summary>
+            <p>Trong lập trình API truyền thống bằng Python, việc tiếp nhận dữ liệu JSON yêu cầu lập trình viên phải viết rất nhiều dòng code thủ công để kiểm tra khóa tồn tại: <code>if 'patient_name' not in data: raise ValueError</code> và ép kiểu dữ liệu. Điều này dẫn đến code rườm rà, dễ bỏ sót lỗi và khó bảo trì.</p>
+            <p>FastAPI giải quyết triệt để vấn đề này bằng cách tích hợp sâu thư viện <strong>Pydantic</strong>. Khi bạn khai báo một class kế thừa từ <code>BaseModel</code>:</p>
+            <ul>
+              <li>FastAPI sẽ tự động phân tích cú pháp (parse) JSON payload gửi lên trong request body.</li>
+              <li>Kiểm tra xem dữ liệu có thiếu các trường bắt buộc hay sai kiểu dữ liệu (như gửi số thay vì chuỗi) không.</li>
+              <li>Nếu phát hiện sai lệch, FastAPI lập tức chặn đứng request ở ngay "cửa ngõ" API và trả về mã lỗi <strong>HTTP 422 Unprocessable Entity</strong> kèm thông tin chi tiết lỗi, bảo vệ mã nguồn nghiệp vụ y khoa phía sau không bị crash do thiếu tham số.</li>
+            </ul>
+          </details>
+        </section>
+
+        <!-- Section 5: Workflow -->
+        <section id="workflow" class="section">
+          <div class="section-title">
+            <div>
+              <div class="kicker">Section 5</div>
+              <h2>Workflow / Pipeline - Quy trình hoạt động đầu-cuối</h2>
+            </div>
+            <div class="source-row">
+              <span class="source">Code</span>
+              <span class="source">Slide</span>
+            </div>
+          </div>
+          
+          <div class="grid-2">
+            <article class="card">
+              <h3>High-level Flow - Luồng tổng quát</h3>
+              <ol class="list">
+                <li><strong>Nhập liệu:</strong> Bác sĩ nhập tên bệnh nhân, chọn ngày khám quaDatepicker, và nhập ghi chú khám lâm sàng thô.</li>
+                <li><strong>Đóng gói & Gửi POST:</strong> Frontend chuyển dữ liệu thành đối tượng JSON và gọi phương thức <code>POST</code> qua <code>fetchEventSource('/api')</code> đính kèm token JWT.</li>
+                <li><strong>Validate Backend:</strong> FastAPI nhận payload, gán vào model Pydantic <code>Visit</code> để validate kiểu dữ liệu.</li>
+                <li><strong>Tạo prompt cấu trúc:</strong> Backend ghép dữ liệu lâm sàng của <code>Visit</code> vào template prompt chia rõ vai trò System/User.</li>
+                <li><strong>Stream OpenAI:</strong> Gọi API OpenAI với <code>stream=True</code> và dùng hàm <code>event_stream()</code> để yield dữ liệu SSE trả về.</li>
+              </ol>
+            </article>
+            <article class="card">
+              <h3>Data & Control Flow - Luồng dữ liệu / điều khiển</h3>
+              <p>Mô hình y khoa này chuyển từ kết nối <code>GET</code> sang <code>POST</code> để có thể truyền tải các khối văn bản ghi chú lâm sàng cực lớn của bác sĩ một cách an toàn và không bị giới hạn độ dài ký tự của URL. Đầu ra của OpenAI được cấu trúc hóa định hướng chặt chẽ bằng System Prompt để luôn trả về 3 phần phân định rõ ràng bằng thẻ Markdown.</p>
+            </article>
+          </div>
+
+          <div class="diagram-container">
+            <div class="mermaid">
+              sequenceDiagram
+                autonumber
+                actor Doctor as Bác sĩ
+                participant FE as Next.js Client (/product)
+                participant BE as FastAPI Backend (/api)
+                participant OpenAI as OpenAI API
+
+                Doctor->>FE: Nhập tên bệnh nhân, Ngày khám & Ghi chú thô
+                Doctor->>FE: Click "Generate Summary"
+                FE->>FE: Lấy JWT Token từ Clerk Auth
+                FE->>BE: POST request /api (JWT + JSON payload)
+                Note over BE: Pydantic validate cấu trúc JSON đầu vào:<br/>patient_name (str)<br/>date_of_visit (str)<br/>notes (str)
+                alt Dữ liệu không hợp lệ (Ví dụ: thiếu tên bệnh nhân)
+                  BE-->>FE: HTTP 422 Unprocessable Entity
+                  FE->>Doctor: Hiển thị lỗi form nhập liệu
+                end
+                BE->>BE: Kết hợp System Prompt & User Prompt y tế
+                BE->>OpenAI: Gọi completions API (stream=True)
+                loop Streaming SSE
+                  OpenAI-->>BE: Trả về chunk văn bản
+                  BE->>FE: yield f"data: {text}\n\n"
+                  FE->>Doctor: Render kết quả Markdown (Tóm tắt, Next steps, Draft Email)
+                end
+            </div>
+          </div>
+
+          <h3 style="margin-top:20px; margin-bottom:10px;">End-to-End Detailed Workflow Walkthrough (Chi tiết cấp hàm)</h3>
+          <p>Dưới đây là chi tiết quy trình khởi chạy, gọi hàm và trao đổi dữ liệu giữa các file y khoa trong hệ thống:</p>
+          
+          <div class="grid-2" style="margin-top:10px;">
+            <article class="card">
+              <h4>Giai đoạn 1: Khởi chạy và Render Form (Frontend Next.js)</h4>
+              <ul class="list">
+                <li><strong>Bước 1.1:</strong> <code>pages/_app.tsx</code> khởi chạy đầu tiên, thực hiện nạp stylesheet CSS của DatePicker: <code>import 'react-datepicker/dist/react-datepicker.css';</code> để đảm bảo linh kiện lịch hiển thị đúng định dạng.</li>
+                <li><strong>Bước 1.2:</strong> Bác sĩ truy cập trang <code>/product</code>. Hàm default export <code>Product</code> chạy và bọc giao diện trong component <code>&lt;Protect plan="premium_subscription"&gt;</code>.</li>
+                <li><strong>Bước 1.3:</strong> Nếu người dùng đã sở hữu gói cước, React tiến hành render component <code>&lt;ConsultationForm /&gt;</code>.</li>
+                <li><strong>Bước 1.4:</strong> Component <code>ConsultationForm</code> khởi tạo các state theo dõi input: <code>patientName</code> (chuỗi rỗng), <code>visitDate</code> (mặc định lấy ngày hôm nay <code>new Date()</code>), và <code>notes</code> (ghi chú lâm sàng thô).</li>
+              </ul>
+            </article>
+
+            <article class="card">
+              <h4>Giai đoạn 2: Gọi POST API kết nối SSE (Frontend Next.js)</h4>
+              <ul class="list">
+                <li><strong>Bước 2.1:</strong> Bác sĩ nhấn nút Submit biểu mẫu. Sự kiện kích hoạt hàm <code>handleSubmit(e)</code>.</li>
+                <li><strong>Bước 2.2:</strong> Hàm <code>handleSubmit</code> thực hiện:
+                  <ul>
+                    <li>Ngăn chặn tải lại trang mặc định của HTML bằng <code>e.preventDefault()</code>.</li>
+                    <li>Đặt trạng thái loading <code>setLoading(true)</code> và xóa trắng kết quả cũ <code>setOutput('')</code>.</li>
+                    <li>Gọi hàm bất đồng bộ <code>getToken()</code> để lấy mã xác thực JWT từ Clerk.</li>
+                    <li>Khởi tạo một <code>AbortController</code> mới để quản lý kết nối streaming dài.</li>
+                    <li>Gọi hàm <code>fetchEventSource('/api', { method: 'POST', ... })</code> để thiết lập kết nối Server-Sent Events.</li>
+                  </ul>
+                </li>
+                <li><strong>Bước 2.3:</strong> Dữ liệu body được chuyển đổi sang chuỗi JSON và gửi đi, trong đó ngày khám được định dạng thành chuỗi rút gọn <code>yyyy-mm-dd</code> bằng hàm: <code>visitDate?.toISOString().slice(0, 10)</code>.</li>
+              </ul>
+            </article>
+          </div>
+
+          <div class="grid-2" style="margin-top:14px;">
+            <article class="card">
+              <h4>Giai đoạn 3: Xác thực, Validate và Sinh Báo Cáo (Backend FastAPI)</h4>
+              <ul class="list">
+                <li><strong>Bước 3.1:</strong> Request POST gửi đến backend FastAPI tại file <code>api/index.py</code>. FastAPI nhận JSON payload và map tự động các trường vào đối tượng <code>visit</code> kiểu class Pydantic <code>Visit</code>.</li>
+                <li><strong>Bước 3.2:</strong> Đối tượng <code>clerk_guard</code> thực thi để kiểm tra chữ ký số của token JWT đính kèm trong header.</li>
+                <li><strong>Bước 3.3:</strong> Hàm nghiệp vụ <code>consultation_summary</code> thực thi:
+                  <ul>
+                    <li>Lấy thông tin User ID của bác sĩ qua <code>creds.decoded["sub"]</code> để phục vụ mục đích kiểm toán (audit).</li>
+                    <li>Gọi hàm định dạng prompt <code>user_prompt_for(visit)</code> để lấy chuỗi prompt chứa tên bệnh nhân, ngày khám và ghi chú thô đã được format đẹp mắt.</li>
+                    <li>Đóng gói prompts thành mảng gồm <code>system_prompt</code> (hướng dẫn chia 3 section) và <code>user_prompt</code>.</li>
+                    <li>Gọi OpenAI completions API tạo stream kết quả: <code>client.chat.completions.create(..., stream=True)</code>.</li>
+                  </ul>
+                </li>
+                <li><strong>Bước 3.4:</strong> Hàm generator <code>event_stream()</code> đọc từng chunk dữ liệu sinh ra từ OpenAI, tách dòng và yield dữ liệu theo cấu trúc <code>data: {line}\n\n</code>.</li>
+                <li><strong>Bước 3.5:</strong> FastAPI phản hồi về client Next.js dưới dạng <code>StreamingResponse</code> y tế.</li>
+              </ul>
+            </article>
+
+            <article class="card">
+              <h4>Giai đoạn 4: Hiển thị và Đóng luồng (Frontend Next.js)</h4>
+              <ul class="list">
+                <li><strong>Bước 4.1:</strong> Phía client, callback <code>onmessage(ev)</code> của hàm <code>fetchEventSource</code> tiếp nhận luồng SSE, ghép chuỗi liên tục vào buffer và cập nhật giao diện hiển thị <code>setOutput(buffer)</code>.</li>
+                <li><strong>Bước 4.2:</strong> Trình duyệt sử dụng thư viện <code>ReactMarkdown</code> để tự động chuyển chuỗi Markdown thô thu được thành các thẻ HTML hiển thị bệnh án y khoa chuyên nghiệp và thư điện tử cho bệnh nhân.</li>
+                <li><strong>Bước 4.3:</strong> Khi kết nối stream hoàn tất, callback <code>onclose()</code> được gọi để tắt trạng thái loading <code>setLoading(false)</code>, đóng kết nối an toàn.</li>
+              </ul>
+            </article>
+          </div>
+        </section>
+
+        <!-- Section 6: Techniques -->
+        <section id="techniques" class="section">
+          <div class="section-title">
+            <div>
+              <div class="kicker">Section 6</div>
+              <h2>Techniques - Kỹ thuật sử dụng</h2>
+            </div>
+          </div>
+          <div class="grid-2">
+            <article class="card">
+              <h3>1. Pydantic Data Validation</h3>
+              <p><strong>Purpose - Mục đích:</strong> Tự động xác thực và ép kiểu dữ liệu JSON payload gửi từ Next.js lên backend FastAPI, đảm bảo code nghiệp vụ không bị crash vì thiếu tham số.</p>
+              <p><strong>When to use - Dùng khi nào:</strong> Dùng cho tất cả các API nhận dữ liệu đầu vào phức tạp từ biểu mẫu form.</p>
+              <p><strong>Trade-off - Đánh đổi:</strong> Phải viết thêm class Pydantic định nghĩa cấu trúc dữ liệu tĩnh rõ ràng, làm giảm tính tùy biến dữ liệu động linh hoạt.</p>
+            </article>
+            <article class="card">
+              <h3>2. Structured Prompts</h3>
+              <p><strong>Purpose - Mục đích:</strong> Hướng LLM phân chia đầu ra y khoa thành chính xác 3 phần (Tóm tắt bệnh án, Hành động của bác sĩ, Email bệnh nhân) để nâng cao trải nghiệm ứng dụng.</p>
+              <p><strong>When to use - Dùng khi nào:</strong> Khi đầu ra của mô hình AI cần được định dạng chính xác để hiển thị hoặc xử lý tiếp theo.</p>
+              <p><strong>Trade-off - Đánh đổi:</strong> Phụ thuộc vào chất lượng hiểu chỉ thị của mô hình LLM. Với các mô hình nhỏ, có thể đôi khi AI sinh sai số lượng đề mục.</p>
+            </article>
+            <article class="card">
+              <h3>3. local validation before deploy</h3>
+              <p><strong>Purpose - Mục đích:</strong> Rà soát và cập nhật đầy đủ các file cấu hình thư viện y khoa (như file <code>requirements.txt</code> chứa pydantic) trước khi chạy lệnh deploy của Vercel.</p>
+              <p><strong>When to use - Dùng khi nào:</strong> Thực hiện trước mỗi lần cập nhật sản phẩm lên môi trường live production.</p>
+              <p><strong>Trade-off - Đánh đổi:</strong> Tốn thêm thời gian kiểm tra thủ công môi trường ảo (virtualenv) và file cấu hình trước khi deploy.</p>
+            </article>
+            <article class="card">
+              <h3>4. Demo Sandbox Labeling</h3>
+              <p><strong>Purpose - Mục đích:</strong> Hiển thị rõ ràng dòng chữ "For demonstration purposes only" trên giao diện để hạn chế tối đa các rủi ro pháp lý y tế ngoài ý muốn.</p>
+              <p><strong>When to use - Dùng khi nào:</strong> Triển khai các ứng dụng y khoa, tài chính ở giai đoạn demo công cộng.</p>
+              <p><strong>Trade-off - Đánh đổi:</strong> Làm giảm bớt độ "thực tế" của sản phẩm trong mắt khách hàng trải nghiệm thử.</p>
+            </article>
+          </div>
+        </section>
+
+        <!-- Section 7: Code Walkthrough -->
+        <section id="code-walkthrough" class="section">
+          <div class="section-title">
+            <div>
+              <div class="kicker">Section 7</div>
+              <h2>Code Walkthrough - Phân tích mã nguồn</h2>
+            </div>
+            <div class="source-row">
+              <span class="source">Code</span>
+            </div>
+          </div>
+
+          <!-- File 1: api/index.py -->
+          <article class="code-panel">
+            <div>
+              <h3>File: <code>api/index.py</code></h3>
+              <p>Backend FastAPI POST endpoint nhận và validate dữ liệu y tế qua Pydantic, sử dụng prompt có cấu trúc để sinh bệnh án.</p>
+            </div>
+            <div class="code-meta">
+              <span>FastAPI Backend</span>
+              <span>Pydantic Model</span>
+              <span>Structured Prompts</span>
+            </div>
+            <pre><code>import os
+from fastapi import FastAPI, Depends  # type: ignore
+from fastapi.responses import StreamingResponse  # type: ignore
+from pydantic import BaseModel  # type: ignore
+from fastapi_clerk_auth import ClerkConfig, ClerkHTTPBearer, HTTPAuthorizationCredentials  # type: ignore
+from openai import OpenAI  # type: ignore
+
+app = FastAPI()
+clerk_config = ClerkConfig(jwks_url=os.getenv("CLERK_JWKS_URL"))
+clerk_guard = ClerkHTTPBearer(clerk_config)
+
+# Bước 1: Khai báo cấu trúc dữ liệu y khoa bằng Pydantic model
+class Visit(BaseModel):
+    patient_name: str
+    date_of_visit: str
+    notes: str
+
+# Bước 2: Dựng system prompt cố định cấu trúc đầu ra gồm 3 phần
+system_prompt = """
+You are provided with notes written by a doctor from a patient's visit.
+Your job is to summarize the visit for the doctor and provide an email.
+Reply with exactly three sections with the headings:
+### Summary of visit for the doctor's records
+### Next steps for the doctor
+### Draft of email to patient in patient-friendly language
+"""
+
+# Bước 3: Định dạng user prompt động từ đối tượng Visit
+def user_prompt_for(visit: Visit) -> str:
+    return f"""Create the summary, next steps and draft email for:
+Patient Name: {visit.patient_name}
+Date of Visit: {visit.date_of_visit}
+Notes:
+{visit.notes}"""
+
+@app.post("/api") # Đổi sang POST để nhận JSON payload
+def consultation_summary(
+    visit: Visit, # FastAPI tự động ép kiểu và validate JSON nhận được thành đối tượng Visit
+    creds: HTTPAuthorizationCredentials = Depends(clerk_guard),
+):
+    user_id = creds.decoded["sub"]  # Lấy ID của bác sĩ đăng nhập phục vụ audit log
+    client = OpenAI()
+
+    user_prompt = user_prompt_for(visit)
+
+    prompt = [
+        {"role": "system", "content": system_prompt},
+        {"role": "user", "content": user_prompt},
+    ]
+
+    stream = client.chat.completions.create(
+        model="gpt-5-nano",
+        messages=prompt,
+        stream=True,
+    )
+
+    # Đóng gói luồng SSE gửi về client Next.js
+    def event_stream():
+        for chunk in stream:
+            text = chunk.choices[0].delta.content
+            if text:
+                lines = text.split("\n")
+                for line in lines[:-1]:
+                    yield f"data: {line}\n\n"
+                    yield "data:  \n"
+                yield f"data: {lines[-1]}\n\n"
+
+    return StreamingResponse(event_stream(), media_type="text/event-stream")</code></pre>
+          </article>
+
+          <!-- File 2: pages/product.tsx -->
+          <article class="code-panel" style="margin-top: 24px;">
+            <div>
+              <h3>File: <code>pages/product.tsx</code></h3>
+              <p>Giao diện form nhập liệu y khoa chứa Datepicker chọn ngày khám, gửi POST request kèm JWT để stream bệnh án.</p>
+            </div>
+            <div class="code-meta">
+              <span>Next.js Client Component</span>
+              <span>React Datepicker</span>
+              <span>POST fetchEventSource</span>
+            </div>
+            <pre><code>"use client"
+
+import { useState, FormEvent } from 'react';
+import { useAuth } from '@clerk/nextjs';
+import DatePicker from 'react-datepicker';
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
+import remarkBreaks from 'remark-breaks';
+import { fetchEventSource } from '@microsoft/fetch-event-source';
+import { Protect, PricingTable, UserButton } from '@clerk/nextjs';
+
+function ConsultationForm() {
+    const { getToken } = useAuth();
+
+    // Khởi tạo trạng thái form nhập liệu y khoa
+    const [patientName, setPatientName] = useState('');
+    const [visitDate, setVisitDate] = useState&lt;Date | null&gt;(new Date());
+    const [notes, setNotes] = useState('');
+
+    const [output, setOutput] = useState('');
+    const [loading, setLoading] = useState(false);
+
+    async function handleSubmit(e: FormEvent) {
+        e.preventDefault(); // Chặn hành động reload trang của form HTML mặc định
+        setOutput('');
+        setLoading(true);
+
+        const jwt = await getToken();
+        if (!jwt) {
+            setOutput('Authentication required');
+            setLoading(false);
+            return;
+        }
+
+        const controller = new AbortController();
+        let buffer = '';
+
+        // Thực hiện cuộc gọi API POST truyền dữ liệu JSON
+        await fetchEventSource('/api', {
+            signal: controller.signal,
+            method: 'POST', // Ép phương thức gửi thành POST
+            headers: {
+                'Content-Type': 'application/json',
+                Authorization: `Bearer ${jwt}`,
+            },
+            body: JSON.stringify({
+                patient_name: patientName,
+                // Định dạng ngày khám thành chuỗi yyyy-mm-dd
+                date_of_visit: visitDate?.toISOString().slice(0, 10),
+                notes,
+            }),
+            onmessage(ev) {
+                buffer += ev.data;
+                setOutput(buffer); // Nối chuỗi cập nhật Markdown liên tục
+            },
+            onclose() { 
+                setLoading(false); 
+            },
+            onerror(err) {
+                console.error('SSE error:', err);
+                controller.abort();
+                setLoading(false);
+            },
+        });
+    }
+
+    return (
+        &lt;div className="container mx-auto px-4 py-12 max-w-3xl"&gt;
+            &lt;h1 className="text-4xl font-bold text-gray-900 dark:text-gray-100 mb-8"&gt;
+                Consultation Notes
+            &lt;/h1&gt;
+
+            &lt;form onSubmit={handleSubmit} className="space-y-6 bg-white dark:bg-gray-800 rounded-xl shadow-lg p-8"&gt;
+                {/* Trường nhập tên bệnh nhân */}
+                &lt;div className="space-y-2"&gt;
+                    &lt;label htmlFor="patient" className="block text-sm font-medium text-gray-700 dark:text-gray-300"&gt;
+                        Patient Name
+                    &lt;/label&gt;
+                    &lt;input
+                        id="patient"
+                        type="text"
+                        required
+                        value={patientName}
+                        onChange={(e) => setPatientName(e.target.value)}
+                        className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg dark:bg-gray-700 dark:text-white"
+                        placeholder="Enter patient's full name"
+                    /&gt;
+                &lt;/div&gt;
+
+                {/* Linh kiện chọn ngày khám */}
+                &lt;div className="space-y-2"&gt;
+                    &lt;label htmlFor="date" className="block text-sm font-medium text-gray-700 dark:text-gray-300"&gt;
+                        Date of Visit
+                    &lt;/label&gt;
+                    &lt;DatePicker
+                        id="date"
+                        selected={visitDate}
+                        onChange={(d: Date | null) => setVisitDate(d)}
+                        dateFormat="yyyy-MM-dd"
+                        placeholderText="Select date"
+                        required
+                        className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg dark:bg-gray-700 dark:text-white"
+                    /&gt;
+                &lt;/div&gt;
+
+                {/* Trường ghi chú khám lâm sàng thô */}
+                &lt;div className="space-y-2"&gt;
+                    &lt;label htmlFor="notes" className="block text-sm font-medium text-gray-700 dark:text-gray-300"&gt;
+                        Consultation Notes
+                    &lt;/label&gt;
+                    &lt;textarea
+                        id="notes"
+                        required
+                        rows={8}
+                        value={notes}
+                        onChange={(e) => setNotes(e.target.value)}
+                        className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg dark:bg-gray-700 dark:text-white"
+                        placeholder="Enter detailed consultation notes..."
+                    /&gt;
+                &lt;/div&gt;
+
+                &lt;button 
+                    type="submit" 
+                    disabled={loading}
+                    className="w-full bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white font-semibold py-3 px-6 rounded-lg transition-colors"
+                &gt;
+                    {loading ? 'Generating Summary...' : 'Generate Summary'}
+                &lt;/button&gt;
+            &lt;/form&gt;
+
+            {/* Khu vực hiển thị kết quả bệnh án AI */}
+            {output && (
+                &lt;section className="mt-8 bg-gray-50 dark:bg-gray-800 rounded-xl shadow-lg p-8"&gt;
+                    &lt;div className="markdown-content prose prose-blue dark:prose-invert max-w-none"&gt;
+                        &lt;ReactMarkdown remarkPlugins={[remarkGfm, remarkBreaks]}&gt;
+                            {output}
+                        &lt;/ReactMarkdown&gt;
+                    &lt;/div&gt;
+                &lt;/section&gt;
+            )}
+        &lt;/div&gt;
+    );
+}
+
+export default function Product() {
+    return (
+        &lt;main className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800"&gt;
+            &lt;div className="absolute top-4 right-4"&gt;
+                &lt;UserButton showName={true} /&gt;
+            &lt;/div&gt;
+
+            &lt;Protect
+                plan="premium_subscription"
+                fallback={
+                    &lt;div className="container mx-auto px-4 py-12"&gt;
+                        &lt;header className="text-center mb-12"&gt;
+                            &lt;h1 className="text-5xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent mb-4"&gt;
+                                Healthcare Professional Plan
+                            &lt;/h1&gt;
+                            &lt;p className="text-gray-600 dark:text-gray-400 text-lg mb-8"&gt;
+                                Streamline your patient consultations with AI-powered summaries
+                            &lt;/p&gt;
+                        &lt;/header&gt;
+                        &lt;div className="max-w-4xl mx-auto"&gt;
+                            &lt;PricingTable /&gt;
+                        &lt;/div&gt;
+                    &lt;/div&gt;
+                }
+            &gt;
+                &lt;ConsultationForm /&gt;
+            &lt;/Protect&gt;
+        &lt;/main&gt;
+    );
+}</code></pre>
+          </article>
+
+          <!-- File 3: pages/index.tsx -->
+          <article class="code-panel" style="margin-top: 24px;">
+            <div>
+              <h3>File: <code>pages/index.tsx</code></h3>
+              <p>Landing Page thương mại y tế MediNotes Pro, hiển thị các nút điều hướng thông minh dựa vào trạng thái xác thực.</p>
+            </div>
+            <div class="code-meta">
+              <span>Next.js Client Component</span>
+              <span>Conditional Auth UI</span>
+            </div>
+            <pre><code>"use client"
+
+import Link from 'next/link';
+import { SignInButton, SignedIn, SignedOut, UserButton } from '@clerk/nextjs';
+
+export default function Home() {
+  return (
+    &lt;main className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800"&gt;
+      &lt;div className="container mx-auto px-4 py-12"&gt;
+        {/* Navigation Bar */}
+        &lt;nav className="flex justify-between items-center mb-12"&gt;
+          &lt;h1 className="text-2xl font-bold text-gray-800 dark:text-gray-200"&gt;
+            MediNotes Pro
+          &lt;/h1&gt;
+          &lt;div&gt;
+            {/* Ẩn hiện nút login theo trạng thái session */}
+            &lt;SignedOut&gt;
+              &lt;SignInButton mode="modal"&gt;
+                &lt;button className="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-6 rounded-lg transition-colors"&gt;
+                  Sign In
+                &lt;/button&gt;
+              &lt;/SignInButton&gt;
+            &lt;/SignedOut&gt;
+            &lt;SignedIn&gt;
+              &lt;div className="flex items-center gap-4"&gt;
+                &lt;Link 
+                  href="/product" 
+                  className="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-6 rounded-lg transition-colors"
+                &gt;
+                  Go to App
+                &lt;/Link&gt;
+                &lt;UserButton showName={true} /&gt;
+              &lt;/div&gt;
+            &lt;/SignedIn&gt;
+          &lt;/div&gt;
+        &lt;/nav&gt;
+
+        {/* Hero Section y tế */}
+        &lt;div className="text-center py-16"&gt;
+          &lt;h2 className="text-6xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent mb-6"&gt;
+            Transform Your
+            &lt;br /&gt;
+            Consultation Notes
+          &lt;/h2&gt;
+          &lt;p className="text-xl text-gray-600 dark:text-gray-400 mb-12 max-w-2xl mx-auto"&gt;
+            AI-powered assistant that generates professional summaries, action items, and patient communications from your consultation notes
+          &lt;/p&gt;
+
+          {/* Hộp tính năng y khoa */}
+          &lt;div className="grid md:grid-cols-3 gap-8 max-w-4xl mx-auto mb-12"&gt;
+            &lt;div className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700"&gt;
+              &lt;div className="text-3xl mb-4"&gt;📋&lt;/div&gt;
+              &lt;h3 className="text-lg font-semibold mb-2 text-gray-900 dark:text-gray-100"&gt;Professional Summaries&lt;/h3&gt;
+              &lt;p className="text-gray-600 dark:text-gray-400 text-sm"&gt;
+                Generate comprehensive medical record summaries from your notes
+              &lt;/p&gt;
+            &lt;/div&gt;
+            &lt;div className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700"&gt;
+              &lt;div className="text-3xl mb-4"&gt;✅&lt;/div&gt;
+              &lt;h3 className="text-lg font-semibold mb-2 text-gray-900 dark:text-gray-100"&gt;Action Items&lt;/h3&gt;
+              &lt;p className="text-gray-600 dark:text-gray-400 text-sm"&gt;
+                Clear next steps and follow-up actions for every consultation
+              &lt;/p&gt;
+            &lt;/div&gt;
+            &lt;div className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700"&gt;
+              &lt;div className="text-3xl mb-4"&gt;📧&lt;/div&gt;
+              &lt;h3 className="text-lg font-semibold mb-2 text-gray-900 dark:text-gray-100"&gt;Patient Emails&lt;/h3&gt;
+              &lt;p className="text-gray-600 dark:text-gray-400 text-sm"&gt;
+                Draft clear, patient-friendly email communications automatically
+              &lt;/p&gt;
+            &lt;/div&gt;
+          &lt;/div&gt;
+          
+          &lt;SignedOut&gt;
+            &lt;SignInButton mode="modal"&gt;
+              &lt;button className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-bold py-4 px-8 rounded-xl text-lg transition-all transform hover:scale-105"&gt;
+                Start Free Trial
+              &lt;/button&gt;
+            &lt;/SignInButton&gt;
+          &lt;/SignedOut&gt;
+          &lt;SignedIn&gt;
+            &lt;Link href="/product"&gt;
+              &lt;button className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-bold py-4 px-8 rounded-xl text-lg transition-all transform hover:scale-105"&gt;
+                Open Consultation Assistant
+              &lt;/button&gt;
+            &lt;/Link&gt;
+          &lt;/SignedIn&gt;
+        &lt;/div&gt;
+
+        &lt;div className="text-center text-sm text-gray-500 dark:text-gray-400"&gt;
+          &lt;p&gt;For demonstration purposes only&lt;/p&gt;
+        &lt;/div&gt;
+      &lt;/div&gt;
+    &lt;/main&gt;
+  );
+}</code></pre>
+          </article>
+        </section>
+
+        <!-- Section 8: Options -->
+        <section id="options" class="section">
+          <div class="section-title">
+            <div>
+              <div class="kicker">Section 8</div>
+              <h2>Options / Trade-offs - Bản đồ lựa chọn</h2>
+            </div>
+          </div>
+          <table>
+            <thead>
+              <tr>
+                <th>Lựa chọn kỹ thuật</th>
+                <th>Phù hợp nhất khi</th>
+                <th>Đánh đổi (Trade-off)</th>
+                <th>Rủi ro chính (Risk)</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>Kết quả dạng Markdown thô (chọn trong bài học)</strong></td>
+                <td>Giai đoạn thử nghiệm MVP để kiểm chứng nhanh độ hữu ích của bệnh án AI.</td>
+                <td>Khó bóc tách tự động các trường dữ liệu để đưa vào database.</td>
+                <td>LLM có thể định dạng sai lệch hoặc thiếu đề mục nếu prompt bị nhiễu.</td>
+              </tr>
+              <tr>
+                <td><strong>JSON Schema (Structured Outputs)</strong></td>
+                <td>Khi cần tích hợp sâu dữ liệu bệnh án vào hệ thống EHR của bệnh viện lớn.</td>
+                <td>Phải lập trình thêm phần xử lý JSON stream phức tạp hơn ở cả frontend và backend.</td>
+                <td>Mô hình LLM có thể từ chối phản hồi nếu cấu hình schema quá phức tạp.</td>
+              </tr>
+              <tr>
+                <td><strong>Triển khai trên Vercel PaaS</strong></td>
+                <td>Ứng dụng MVP, dự án cá nhân, cần triển khai nhanh gọn để giới thiệu sản phẩm.</td>
+                <td>Giới hạn thời gian chạy Serverless Function và chi phí tăng nhanh khi scale.</td>
+                <td>Bị ràng buộc bởi cấu hình mặc định của Vercel (ví dụ: timeout tối đa 60 giây).</td>
+              </tr>
+              <tr>
+                <td><strong>Triển khai trên AWS IaaS (Day 5)</strong></td>
+                <td>Sản phẩm SaaS đi vào hoạt động chính thức, bắt đầu có khách hàng trả phí lớn (B2B SaaS).</td>
+                <td>Tốn rất nhiều công sức thiết lập hạ tầng mạng, IAM, Docker container lúc đầu.</td>
+                <td>Chi phí phát sinh lớn nếu cấu hình sai tài nguyên cloud chạy không tải.</td>
+              </tr>
+            </tbody>
+          </table>
+        </section>
+
+        <!-- Section 9: Pitfalls -->
+        <section id="pitfalls" class="section">
+          <div class="section-title">
+            <div>
+              <div class="kicker">Section 9</div>
+              <h2>Pitfalls - Lỗi / bẫy thường gặp</h2>
+            </div>
+          </div>
+          <div class="grid-2">
+            <article class="card">
+              <h3>Failure Modes - Các trường hợp lỗi</h3>
+              <ul class="list">
+                <li><strong>Lỗi HTTP 405 Method Not Allowed:</strong> Console báo lỗi đỏ và API ngắt kết nối ngay khi bấm Generate. Lý do: Frontend Next.js gửi request dạng GET trong khi backend FastAPI đã đổi sang decorator POST (hoặc ngược lại).</li>
+                <li><strong>Datepicker bị vỡ giao diện:</strong> Giao diện chọn ngày tháng của Datepicker hiển thị dạng text thô kéo dài, đè nát bố cục trang. Lý do: Quên import file CSS giao diện của Datepicker.</li>
+                <li><strong>Lỗi Server Error (HTTP 500) khi live:</strong> Ứng dụng chạy tốt ở localhost nhưng khi deploy lên Vercel live thì gọi API lỗi 500. Lý do: Quên khai báo thư viện <code>pydantic</code> trong file <code>requirements.txt</code>.</li>
+              </ul>
+            </article>
+            <article class="card">
+              <h3>Fix / Prevention - Cách sửa đổi</h3>
+              <ul class="list">
+                <li><strong>Khắc phục lỗi 405:</strong> Đảm bảo cấu hình <code>method: 'POST'</code> trong <code>fetchEventSource</code> đồng bộ với decorator <code>@app.post("/api")</code> của FastAPI.</li>
+                <li><strong>Khắc phục Datepicker vỡ layout:</strong> Thêm dòng <code>import 'react-datepicker/dist/react-datepicker.css';</code> vào file cấu hình gốc <code>pages/_app.tsx</code>.</li>
+                <li><strong>Khắc phục lỗi 500 Vercel:</strong> Luôn rà soát và ghi đầy đủ mọi dependencies mới (fastapi, pydantic, openai) vào file <code>requirements.txt</code> trước khi chạy lệnh <code>vercel --prod</code>.</li>
+              </ul>
+            </article>
+          </div>
+        </section>
+
+        <!-- Section 10: Flashcards -->
+        <section id="flashcards" class="section">
+          <div class="section-title">
+            <div>
+              <div class="kicker">Section 10</div>
+              <h2>Flashcards & Quiz - Thẻ ôn tập tương tác</h2>
+            </div>
+          </div>
+          <div class="grid-2">
+            <!-- Flashcard 1 -->
+            <article class="card flashcard" id="card1">
+              <h3>Q: Tại sao phải chuyển API từ GET sang POST khi tích hợp ứng dụng y tế?</h3>
+              <button class="button primary" type="button" data-reveal>Reveal Answer</button>
+              <p class="flash-answer"><strong>A:</strong> Để chuyển tải payload JSON chứa dữ liệu khám bệnh phức tạp. Giao thức GET chỉ hỗ trợ truyền tham số qua URL query parameter (bị giới hạn độ dài ký tự và không an toàn cho thông tin bệnh nhân). POST hỗ trợ truyền tải nội dung văn bản lớn trong request body một cách bảo mật.</p>
+            </article>
+
+            <!-- Flashcard 2 -->
+            <article class="card flashcard" id="card2">
+              <h3>Q: Sự khác biệt cơ bản giữa Vercel (PaaS) và AWS (IaaS) là gì?</h3>
+              <button class="button primary" type="button" data-reveal>Reveal Answer</button>
+              <p class="flash-answer"><strong>A:</strong> Vercel (PaaS) tự động hóa hoàn toàn việc build và deploy, lập trình viên không cần biết hệ điều hành phía sau là gì. AWS (IaaS) cung cấp hạ tầng thô, lập trình viên phải tự cấu hình phân quyền mạng (VPC), máy chủ ảo, ECR, và Docker container nhưng đổi lại có sự kiểm soát tuyệt đối về bảo mật và chi phí.</p>
+            </article>
+
+            <!-- Quiz Card -->
+            <article class="card">
+              <h3>Quick Quiz - Câu hỏi nhanh</h3>
+              <p>Khi dữ liệu gửi từ Next.js lên bị thiếu trường thông tin bắt buộc <code>patient_name</code> so với khai báo BaseModel của Pydantic, FastAPI sẽ phản hồi mã lỗi HTTP nào?</p>
+              <button class="button quiz-option" type="button" data-correct="false">A. HTTP 405 Method Not Allowed</button>
+              <button class="button quiz-option" type="button" data-correct="true">B. HTTP 422 Unprocessable Entity</button>
+              <button class="button quiz-option" type="button" data-correct="false">C. HTTP 500 Internal Server Error</button>
+              <div class="quiz-result" aria-live="polite"></div>
+            </article>
+          </div>
+        </section>
+
+        <!-- Section 11: Quick Memory -->
+        <section id="memory" class="section">
+          <div class="section-title">
+            <div>
+              <div class="kicker">Section 11</div>
+              <h2>Quick Memory - Ôn nhanh cuối bài</h2>
+            </div>
+          </div>
+          <div class="grid-2">
+            <article class="card">
+              <h3>Must Remember - Phải nhớ</h3>
+              <ol class="list">
+                <li>Luôn đồng bộ dependencies trong <code>requirements.txt</code> để tránh lỗi biên dịch serverless function trên Vercel.</li>
+                <li>AI chỉ đóng vai trò một phần phụ trong ứng dụng SaaS; Platform Engineering và DevOps mới là hạ tầng cốt lõi giữ chân khách hàng.</li>
+                <li>Sử dụng Datepicker để định dạng ngày tháng y khoa chuẩn hóa ISO <code>yyyy-mm-dd</code> trước khi gửi lên API.</li>
+                <li>Đặt cảnh báo "For demonstration purposes only" cho các bản demo y tế công cộng để giảm thiểu rủi ro pháp lý.</li>
+              </ol>
+            </article>
+            <article class="card">
+              <h3>Self-check - Tự kiểm tra</h3>
+              <ul class="list">
+                <li>Bạn có thể giải thích cơ chế validation tự động của Pydantic BaseModel ở backend FastAPI không?</li>
+                <li>Bạn có thể so sánh sự khác nhau về độ phức tạp khi deploy trên Vercel PaaS so với AWS IaaS Docker container không?</li>
+                <li>Bạn có thể mô tả luồng dữ liệu y khoa đi từ form Next.js đến OpenAI rồi stream ngược lại client dạng Markdown không?</li>
+              </ul>
+            </article>
+          </div>
+        </section>
+
+        <!-- Footer -->
+        <footer class="footer">
+          <strong>Sunny-sunnyy/AIProduction2026</strong> · Tài liệu học tập cá nhân ôn tập Day 4 · Thiết kế bám sát Claude Design System.
+        </footer>
+      </main>
+    </div>
+  </div>
+
+  <!-- Interactive JavaScript for UI elements -->
+  <script>
+    const links = Array.from(document.querySelectorAll(".toc a"));
+    const sections = links.map((link) => document.querySelector(link.getAttribute("href"))).filter(Boolean);
+    const progressBar = document.getElementById("progressBar");
+    const detailsNodes = Array.from(document.querySelectorAll("details"));
+
+    // Scroll active link highlight
+    function setActiveLink() {
+      let current = sections[0]?.id;
+      const offset = window.scrollY + 180;
+      for (const section of sections) {
+        if (section.offsetTop <= offset) {
+          current = section.id;
+        }
+      }
+      links.forEach((link) => {
+        link.classList.toggle("active", link.getAttribute("href") === `#${current}`);
+      });
+    }
+
+    // Scroll progress bar indicator
+    function updateProgress() {
+      const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+      const progress = docHeight > 0 ? Math.min((window.scrollY / docHeight) * 100, 100) : 0;
+      progressBar.style.width = `${progress}%`;
+    }
+
+    // Reveal flashcard answers
+    document.querySelectorAll("[data-reveal]").forEach((button) => {
+      button.addEventListener("click", () => {
+        const card = button.closest(".flashcard");
+        card.classList.toggle("revealed");
+        button.innerText = card.classList.contains("revealed") ? "Hide Answer" : "Reveal Answer";
+      });
+    });
+
+    // Quiz answer check and description response
+    document.querySelectorAll(".quiz-option").forEach((button) => {
+      button.addEventListener("click", () => {
+        const result = button.parentElement.querySelector(".quiz-result");
+        const isCorrect = button.dataset.correct === "true";
+        if (isCorrect) {
+          result.style.background = "rgba(93, 184, 114, 0.15)";
+          result.style.color = "var(--success)";
+          result.innerText = "Chính xác! Khi Pydantic BaseModel phát hiện cấu trúc payload gửi lên bị sai lệch hoặc thiếu thông tin bắt buộc, FastAPI lập tức chặn đứng request ở cổng vào và phản hồi lỗi HTTP 422 Unprocessable Entity kèm mô tả các trường bị lỗi.";
+        } else {
+          result.style.background = "rgba(198, 69, 69, 0.15)";
+          result.style.color = "var(--error)";
+          result.innerText = "Chưa chính xác. Lỗi 422 Unprocessable Entity là mã phản hồi chuẩn hóa của FastAPI kết hợp Pydantic khi dữ liệu request payload không hợp lệ.";
+        }
+      });
+    });
+
+    window.addEventListener("scroll", () => {
+      setActiveLink();
+      updateProgress();
+    }, { passive: true });
+
+    // Initial load calls
+    setActiveLink();
+    updateProgress();
+  </script>
+</body>
+
+</html>

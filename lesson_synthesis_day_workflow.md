@@ -71,9 +71,9 @@ Dừng lại trao đổi với tôi, tôi xác nhận mới tạo file
 Hãy thực hiện luôn, không chỉ lập kế hoạch, trừ khi thiếu thông tin nghiêm trọng khiến không thể xác định day hoặc nơi ghi output.
 
 transcript: 
+Nội dung các bài trước: 
 code:
 slide: 
-Nội dung các bài trước: 
 
 Bạn có thể tự khám phá các file, folder chứa code khác để hiểu rõ thêm về bài học nếu thấy cần thiết hoặc nếu tôi cung cấp thiếu ngữ cảnh
 ```

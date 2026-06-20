@@ -498,11 +498,11 @@
                 
                 <div class="mermaid">
                 graph TD
-                    Client[Client Request - Yêu cầu từ máy khách] -->|HTTP / ASGI| Uvicorn[Uvicorn ASGI Server - Máy chủ ASGI Uvicorn]
-                    Uvicorn -->|Forward (Chuyển tiếp)| FastAPI[FastAPI Framework - Khung công việc FastAPI]
-                    subgraph FastAPI Core [Lõi FastAPI]
-                        Starlette[Starlette: Routing &amp; Web Core - Định tuyến &amp; Lõi Web]
-                        Pydantic[Pydantic: Data Validation &amp; Serialization - Xác thực &amp; Tuần tự hóa dữ liệu]
+                    Client["Client Request - Yêu cầu từ máy khách"] -->|HTTP / ASGI| Uvicorn["Uvicorn ASGI Server - Máy chủ ASGI Uvicorn"]
+                    Uvicorn -->|"Forward (Chuyển tiếp)"| FastAPI["FastAPI Framework - Khung công việc FastAPI"]
+                    subgraph FastAPICore ["Lõi FastAPI"]
+                        Starlette["Starlette: Routing &amp; Web Core - Định tuyến &amp; Lõi Web"]
+                        Pydantic["Pydantic: Data Validation &amp; Serialization - Xác thực &amp; Tuần tự hóa dữ liệu"]
                     end
                     FastAPI --> Starlette
                     FastAPI --> Pydantic

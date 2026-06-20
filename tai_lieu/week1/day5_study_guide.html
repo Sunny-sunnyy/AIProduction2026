@@ -1,0 +1,1355 @@
+<!doctype html>
+<html lang="vi">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Day 5: AWS Setup, Docker & Serverless Lambda Container Deployment - Study Guide</title>
+  <!-- Google Fonts: Inter, Cormorant Garamond, and JetBrains Mono -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  
+  <style>
+    :root {
+      --canvas: #faf9f5;
+      --surface-soft: #f5f0e8;
+      --surface-card: #efe9de;
+      --surface-strong: #e8e0d2;
+      --surface-dark: #181715;
+      --surface-dark-elevated: #252320;
+      --surface-dark-soft: #1f1e1b;
+      --hairline: #e6dfd8;
+      --hairline-soft: #ebe6df;
+      --ink: #141413;
+      --body: #3d3d3a;
+      --body-strong: #252523;
+      --muted: #6c6a64;
+      --muted-soft: #8e8b82;
+      --primary: #cc785c;
+      --primary-active: #a9583e;
+      --accent-teal: #5db8a6;
+      --accent-amber: #e8a55a;
+      --success: #5db872;
+      --warning: #d4a017;
+      --error: #c64545;
+      --on-dark: #faf9f5;
+      --on-dark-soft: #a09d96;
+      --radius-md: 8px;
+      --radius-lg: 12px;
+      --radius-xl: 16px;
+      --content: 1240px;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      margin: 0;
+      background: var(--canvas);
+      color: var(--body);
+      font-family: "Inter", "Segoe UI", Arial, sans-serif;
+      line-height: 1.62;
+    }
+
+    h1,
+    h2,
+    .editorial-title {
+      color: var(--ink);
+      font-family: "Cormorant Garamond", Cambria, Georgia, serif;
+      font-weight: 500;
+      letter-spacing: -0.5px;
+      line-height: 1.15;
+      margin: 0;
+    }
+
+    h1 {
+      font-size: clamp(2.2rem, 4.5vw, 3.8rem);
+      max-width: 20ch;
+      font-weight: 400;
+    }
+
+    h2 {
+      font-size: clamp(1.6rem, 2.5vw, 2.2rem);
+      margin-top: 8px;
+    }
+
+    h3 {
+      color: var(--ink);
+      font-size: 1.15rem;
+      font-weight: 600;
+      line-height: 1.4;
+      margin: 0;
+    }
+
+    p,
+    li {
+      margin: 0;
+    }
+
+    code {
+      border-radius: 6px;
+      background: var(--surface-strong);
+      color: var(--body-strong);
+      font-family: "JetBrains Mono", Consolas, monospace;
+      font-size: 0.9em;
+      padding: 2px 6px;
+    }
+
+    pre {
+      margin: 0;
+      overflow-x: auto;
+      border-radius: var(--radius-lg);
+      background: var(--surface-dark-soft);
+      color: var(--on-dark);
+      padding: 20px;
+      font-family: "JetBrains Mono", Consolas, monospace;
+      font-size: 13px;
+      line-height: 1.6;
+      white-space: pre;
+    }
+
+    pre code {
+      background: transparent;
+      color: inherit;
+      padding: 0;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.95rem;
+      margin-top: 14px;
+    }
+
+    th,
+    td {
+      border-bottom: 1px solid var(--hairline);
+      padding: 14px;
+      text-align: left;
+      vertical-align: top;
+    }
+
+    th {
+      color: var(--ink);
+      font-weight: 700;
+      background: var(--surface-soft);
+    }
+
+    .page {
+      max-width: var(--content);
+      margin: 0 auto;
+      padding: 30px 20px 64px;
+    }
+
+    .hero {
+      display: grid;
+      grid-template-columns: minmax(0, 1.2fr) minmax(320px, 0.8fr);
+      gap: 28px;
+      align-items: stretch;
+      padding: 44px;
+      border: 1px solid var(--hairline);
+      border-radius: var(--radius-xl);
+      background: var(--surface-soft);
+    }
+
+    .hero-copy {
+      display: grid;
+      gap: 18px;
+      align-content: start;
+    }
+
+    .eyebrow {
+      width: fit-content;
+      border-radius: 999px;
+      background: var(--primary);
+      color: white;
+      font-size: 0.72rem;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      padding: 6px 14px;
+      text-transform: uppercase;
+    }
+
+    .lead {
+      max-width: 72ch;
+      color: var(--body-strong);
+      font-size: 1.1rem;
+    }
+
+    .tag-row,
+    .source-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .tag,
+    .source {
+      display: inline-flex;
+      align-items: center;
+      border-radius: 999px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      padding: 5px 12px;
+    }
+
+    .tag {
+      background: var(--surface-card);
+      color: var(--ink);
+    }
+
+    .source {
+      border: 1px solid var(--hairline);
+      background: var(--canvas);
+      color: var(--muted);
+    }
+
+    .source.extended {
+      border-color: rgba(204, 120, 92, 0.38);
+      background: rgba(204, 120, 92, 0.1);
+      color: var(--primary-active);
+    }
+
+    .hero-panel,
+    .code-panel {
+      border-radius: var(--radius-lg);
+      background: var(--surface-dark);
+      color: var(--on-dark);
+      padding: 28px;
+    }
+
+    .hero-panel {
+      display: grid;
+      gap: 18px;
+      align-content: start;
+    }
+
+    .hero-panel h2,
+    .hero-panel h3,
+    .code-panel h3 {
+      color: var(--on-dark);
+      font-family: "Inter", sans-serif;
+      font-weight: 600;
+      letter-spacing: 0;
+    }
+
+    .hero-panel h2 {
+      font-size: 1.4rem;
+    }
+
+    .hero-panel p,
+    .hero-panel li,
+    .code-panel p,
+    .code-panel li {
+      color: var(--on-dark-soft);
+    }
+
+    .progress-track {
+      height: 6px;
+      overflow: hidden;
+      border-radius: 999px;
+      background: var(--surface-dark-elevated);
+      margin-top: 6px;
+    }
+
+    .progress-bar {
+      width: 0;
+      height: 100%;
+      background: var(--primary);
+      transition: width 0.1s ease;
+    }
+
+    .layout {
+      display: grid;
+      grid-template-columns: 280px minmax(0, 1fr);
+      gap: 24px;
+      align-items: start;
+      margin-top: 26px;
+    }
+
+    .toc {
+      position: sticky;
+      top: 20px;
+      border: 1px solid var(--hairline);
+      border-radius: var(--radius-lg);
+      background: var(--canvas);
+      padding: 20px;
+    }
+
+    .toc h2 {
+      font-family: "Inter", "Segoe UI", Arial, sans-serif;
+      font-size: 1.05rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--muted);
+      margin-bottom: 12px;
+    }
+
+    .toc nav {
+      display: grid;
+      gap: 4px;
+    }
+
+    .toc a {
+      border-radius: var(--radius-md);
+      color: var(--muted);
+      padding: 8px 12px;
+      text-decoration: none;
+      font-size: 0.92rem;
+      font-weight: 500;
+      transition: all 0.2s ease;
+    }
+
+    .toc a:hover,
+    .toc a.active {
+      background: var(--surface-card);
+      color: var(--ink);
+      font-weight: 600;
+    }
+
+    .toc-tools {
+      display: grid;
+      gap: 8px;
+      margin-top: 16px;
+      padding-top: 16px;
+      border-top: 1px solid var(--hairline);
+    }
+
+    .button {
+      min-height: 40px;
+      border: 1px solid var(--hairline);
+      border-radius: var(--radius-md);
+      background: var(--canvas);
+      color: var(--ink);
+      cursor: pointer;
+      font: inherit;
+      font-size: 0.88rem;
+      font-weight: 600;
+      padding: 10px 16px;
+      transition: all 0.2s ease;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .button:hover {
+      background: var(--surface-card);
+    }
+
+    .button.primary {
+      border-color: var(--primary);
+      background: var(--primary);
+      color: white;
+    }
+
+    .button.primary:hover {
+      background: var(--primary-active);
+    }
+
+    .content {
+      display: grid;
+      gap: 24px;
+    }
+
+    .section {
+      border: 1px solid var(--hairline);
+      border-radius: var(--radius-lg);
+      background: var(--canvas);
+      padding: 32px;
+      scroll-margin-top: 20px;
+    }
+
+    .section-title {
+      display: flex;
+      justify-content: space-between;
+      gap: 16px;
+      align-items: start;
+      margin-bottom: 20px;
+      border-bottom: 1px solid var(--hairline-soft);
+      padding-bottom: 16px;
+    }
+
+    .kicker {
+      color: var(--primary);
+      font-size: 0.78rem;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      margin-bottom: 6px;
+      text-transform: uppercase;
+    }
+
+    .grid-2,
+    .grid-3 {
+      display: grid;
+      gap: 16px;
+    }
+
+    .grid-2 {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .grid-3 {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+
+    .card,
+    details {
+      border: 1px solid var(--hairline);
+      border-radius: var(--radius-lg);
+      background: var(--surface-card);
+      padding: 20px;
+    }
+
+    .card p,
+    .card ul,
+    .card ol,
+    details p,
+    details ul,
+    details ol {
+      margin-top: 10px;
+    }
+
+    .list {
+      padding-left: 20px;
+    }
+
+    .list li + li {
+      margin-top: 8px;
+    }
+
+    details {
+      margin-top: 16px;
+      transition: all 0.3s ease;
+    }
+
+    summary {
+      color: var(--ink);
+      cursor: pointer;
+      font-weight: 700;
+      outline: none;
+    }
+
+    .callout {
+      border-left: 4px solid var(--primary);
+      border-radius: var(--radius-md);
+      background: var(--surface-soft);
+      padding: 16px 20px;
+      margin-top: 14px;
+    }
+
+    .code-panel {
+      display: grid;
+      gap: 14px;
+      margin-top: 16px;
+    }
+
+    .code-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      color: var(--on-dark-soft);
+      font-size: 0.85rem;
+      border-bottom: 1px solid var(--surface-dark-elevated);
+      padding-bottom: 8px;
+    }
+
+    .flashcard {
+      display: grid;
+      gap: 12px;
+      align-content: start;
+    }
+
+    .flash-answer {
+      display: none;
+      border-top: 1px solid var(--hairline);
+      padding-top: 12px;
+      color: var(--body-strong);
+    }
+
+    .flashcard.revealed .flash-answer {
+      display: block;
+    }
+
+    .quiz-option {
+      display: block;
+      width: 100%;
+      margin-top: 8px;
+      text-align: left;
+      justify-content: flex-start;
+    }
+
+    .quiz-result {
+      min-height: 24px;
+      margin-top: 12px;
+      color: var(--primary-active);
+      font-weight: 700;
+      padding: 8px 12px;
+      border-radius: var(--radius-md);
+    }
+
+    .diagram-container {
+      background: var(--surface-soft);
+      border: 1px solid var(--hairline);
+      border-radius: var(--radius-lg);
+      padding: 20px;
+      margin-top: 14px;
+      overflow-x: auto;
+      display: flex;
+      justify-content: center;
+    }
+
+    .footer {
+      border-radius: var(--radius-lg);
+      background: var(--surface-dark);
+      color: var(--on-dark-soft);
+      padding: 32px;
+      margin-top: 32px;
+      text-align: center;
+      font-size: 0.9rem;
+    }
+
+    .footer strong {
+      color: var(--on-dark);
+    }
+
+    .badge-pill {
+      background: var(--primary);
+      color: white;
+      font-size: 0.75rem;
+      padding: 2px 8px;
+      border-radius: 999px;
+      font-weight: 700;
+      margin-left: 6px;
+    }
+
+    @media (max-width: 900px) {
+      .hero,
+      .layout,
+      .grid-2,
+      .grid-3 {
+        grid-template-columns: 1fr;
+      }
+
+      .toc {
+        position: static;
+        margin-bottom: 20px;
+      }
+    }
+  </style>
+
+  <!-- Include Mermaid.js from CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+  <script>
+    mermaid.initialize({
+      startOnLoad: true,
+      theme: 'base',
+      themeVariables: {
+        background: '#f5f0e8',
+        primaryColor: '#efe9de',
+        primaryTextColor: '#141413',
+        primaryBorderColor: '#e6dfd8',
+        lineColor: '#cc785c',
+        secondaryColor: '#faf9f5',
+        tertiaryColor: '#181715'
+      }
+    });
+  </script>
+</head>
+
+<body>
+  <div class="page">
+    <!-- Hero Header -->
+    <header class="hero">
+      <div class="hero-copy">
+        <span class="eyebrow">Study Guide</span>
+        <h1>Day 5: AWS Setup, Docker & Serverless Lambda Container Deployment</h1>
+        <p class="lead">Cẩm nang hướng dẫn chuyên sâu: Đóng gói ứng dụng Full-Stack AI y tế bằng Docker, triển khai serverless tối ưu chi phí trên AWS Lambda kết hợp AWS Lambda Web Adapter hỗ trợ truyền phản hồi Server-Sent Events (SSE) streaming theo thời gian thực.</p>
+        <div class="tag-row">
+          <span class="tag">AI Engineer Production Track</span>
+          <span class="tag">Week 1 Day 5</span>
+          <span class="tag">AWS Lambda Container</span>
+          <span class="tag">AWS Lambda Web Adapter</span>
+        </div>
+        <div class="source-row">
+          <span class="source">Transcript</span>
+          <span class="source">Slide</span>
+          <span class="source">Code Guide</span>
+          <span class="source extended">AWS April 2026 Update</span>
+        </div>
+      </div>
+      <aside class="hero-panel">
+        <h2>Quick Focus</h2>
+        <ul class="list">
+          <li><strong>AWS Security & Budgets</strong>: Cấu hình Root User MFA, tạo nhóm IAM User BroadAIEngineerAccess, thiết lập Zero Spend và Monthly Cost Budgets làm lưới an toàn tài chính.</li>
+          <li><strong>AWS Lambda Container (2026 Shift)</strong>: Lý giải bối cảnh AWS đưa App Runner vào chế độ bảo trì và tại sao Lambda Container + LWA là giải pháp thay thế hoàn hảo nhất.</li>
+          <li><strong>AWS Lambda Web Adapter (LWA)</strong>: Cơ chế hoạt động dịch chuyển gói tin ngầm từ Lambda Event JSON sang HTTP Request port 8000 của FastAPI.</li>
+          <li><strong>Docker Multi-stage Builds</strong>: Quy trình tối ưu hóa build cache, biên dịch tĩnh React/Next.js và nhúng vào container runtime Python host trên uvicorn.</li>
+        </ul>
+        <div>
+          <p style="margin-bottom: 4px; font-weight: 600;">Reading Progress</p>
+          <div class="progress-track" aria-label="Reading progress">
+            <div class="progress-bar" id="progressBar"></div>
+          </div>
+        </div>
+      </aside>
+    </header>
+
+    <div class="layout">
+      <!-- Sidebar Navigation -->
+      <aside class="toc" aria-label="Table of contents">
+        <h2>Nội dung ôn tập</h2>
+        <nav>
+          <a href="#source-goals">1. Source Map & Goals</a>
+          <a href="#previous-context">2. Previous Context</a>
+          <a href="#core-theory">3. Core Theory</a>
+          <a href="#architectures">4. Architectures & Pipelines</a>
+          <a href="#workflows">5. Detailed Workflows</a>
+          <a href="#code-walkthrough">6. Code Walkthrough</a>
+          <a href="#options">7. Options & Trade-offs</a>
+          <a href="#pitfalls">8. Pitfalls & Fixes</a>
+          <a href="#knowledge-extension">9. Knowledge Extension</a>
+          <a href="#study-pack">10. Study Pack</a>
+        </nav>
+        <div class="toc-tools">
+          <button class="button primary" onclick="window.print()">In tài liệu</button>
+        </div>
+      </aside>
+
+      <!-- Main Content -->
+      <main class="content">
+        <!-- Section 1: Source Map & Goals -->
+        <section id="source-goals" class="section">
+          <div class="section-title">
+            <div>
+              <div class="kicker">Section 1</div>
+              <h2>Source Map & Lesson Goals</h2>
+            </div>
+          </div>
+          <div class="grid-2">
+            <article class="card">
+              <h3>Bản đồ học liệu (Source Map)</h3>
+              <p>Tài liệu này tổng hợp và đối chiếu nội dung từ các nguồn tài nguyên chính thức sau:</p>
+              <ul class="list" style="margin-top: 8px;">
+                <li><strong>Video Lessons:</strong> Chuỗi bài giảng lý thuyết và thực hành từ Bài 23 đến Bài 31 của tuần học thứ nhất.</li>
+                <li><strong>Mã nguồn thực tế:</strong> File cấu hình dự án mới nhất tại [day5.md](file:///G:/AIProduction_t6_2026/production/week1/day5.md) và kịch bản App Runner cũ tại [prior_day5_app_runner.md](file:///G:/AIProduction_t6_2026/production/week1/prior_day5_app_runner.md).</li>
+                <li><strong>AWS Update Note (April 2026):</strong> Cập nhật quan trọng về việc thay thế hạ tầng AWS App Runner (ngừng tiếp nhận khách hàng mới từ 30/04/2026) bằng <strong>AWS Lambda Container</strong> sử dụng <strong>AWS Lambda Web Adapter</strong> và <strong>Lambda Function URL RESPONSE_STREAM</strong>.</li>
+              </ul>
+            </article>
+            <article class="card">
+              <h3>Mục tiêu học tập (Lesson Goals)</h3>
+              <p>Sau khi hoàn thành buổi học này, người học cần đạt được các mục tiêu sau:</p>
+              <ul class="list" style="margin-top: 8px;">
+                <li><strong>Về mặt lý thuyết:</strong> Giải thích rõ sự khác biệt giữa Root User và IAM User; Triết lý tính phí không giới hạn cứng (no hard cap) của AWS; Ưu và nhược điểm của ảo hóa Container so với Máy ảo (Virtual Machines); Hiện tượng Cold Start và cách thức hoạt động của Lambda Web Adapter.</li>
+                <li><strong>Về mặt thực hành:</strong> Tự cấu hình bảo mật MFA, thiết lập Budget Alerts ngăn chặn rủi ro tài chính đám mây; Tạo nhóm IAM User với 5 chính sách phân quyền bắt buộc; Viết Dockerfile tối ưu Multi-Stage build tĩnh Next.js và host bằng FastAPI; Sử dụng AWS CLI để push image lên ECR và cập nhật trực tiếp mã nguồn của Lambda Function.</li>
+              </ul>
+            </article>
+          </div>
+        </section>
+
+        <!-- Section 2: Previous Context -->
+        <section id="previous-context" class="section">
+          <div class="section-title">
+            <div>
+              <div class="kicker">Section 2</div>
+              <h2>Previous Context - Bối cảnh dịch chuyển hạ tầng</h2>
+            </div>
+          </div>
+          <div class="card">
+            <p>Trong các buổi học Day 3 và Day 4, ứng dụng hỗ trợ bác sĩ tóm tắt bệnh án <strong>MediNotes Pro</strong> (Next.js Pages Router kết hợp backend FastAPI và bảo mật Clerk Auth) đã được triển khai thành công lên môi trường PaaS đám mây của <strong>Vercel</strong>. Trên Vercel, ứng dụng hoạt động theo cơ chế serverless phân tách hoàn toàn:</p>
+            <div class="callout" style="margin-top: 10px;">
+              <strong>Frontend Next.js (chạy phía client & Vercel serverless) &lt;=&gt; Backend FastAPI (chạy độc lập trên Vercel Python runtime)</strong>
+            </div>
+            <p style="margin-top: 10px;">Mặc dù Vercel mang lại tốc độ triển khai và phát triển (Developer Experience - DX) vượt trội, việc duy trì hai dịch vụ phân tách trên môi trường PaaS bộc lộ nhiều điểm yếu khi ứng dụng thương mại phát triển lên quy mô công nghiệp:</p>
+            <ul class="list" style="margin-top: 8px;">
+              <li><strong>Ràng buộc công nghệ:</strong> Khó khăn trong việc kiểm soát sâu cấu trúc máy chủ bên dưới và tối ưu hóa runtime của Python.</li>
+              <li><strong>Thời gian chạy giới hạn (Timeout):</strong> Các Serverless Function ở gói miễn phí hoặc giá rẻ của Vercel thường bị giới hạn timeout từ 10-15 giây, gây lỗi đứt gãy kết nối khi OpenAI API phản hồi chậm đối với các bệnh án y khoa dài.</li>
+              <li><strong>Chi phí tăng nhanh:</strong> Chi phí băng thông và tài nguyên CPU Serverless trên Vercel tăng vọt khi quy mô người dùng trả phí lớn.</li>
+            </ul>
+            <p style="margin-top: 10px;"><strong>Day 5</strong> đánh dấu bước chuyển dịch lớn của ứng dụng sang hạ tầng đám mây chuyên nghiệp <strong>AWS (Amazon Web Services)</strong>. Chúng ta hợp nhất toàn bộ frontend tĩnh Next.js và API FastAPI vào trong một <strong>Docker Container duy nhất (Single Container)</strong> và triển khai serverless trên **AWS Lambda**. Kiến trúc này đem lại quyền kiểm soát tuyệt đối về bảo mật, tài nguyên, hỗ trợ timeout lên tới 15 phút, co giãn về không (scale-to-zero) khi rảnh rỗi và đặc biệt là chi phí cực kỳ rẻ (gần như $0/tháng cho giai đoạn thử nghiệm).</p>
+          </div>
+        </section>
+
+        <!-- Section 3: Core Theory -->
+        <section id="core-theory" class="section">
+          <div class="section-title">
+            <div>
+              <div class="kicker">Section 3</div>
+              <h2>Core Theory - Lý thuyết chuyên sâu</h2>
+            </div>
+          </div>
+          <div class="grid-2">
+            <article class="card">
+              <h3>Root User vs IAM User trên AWS</h3>
+              <p><strong>Root User (Tài khoản gốc):</strong> Là tài khoản được khởi tạo bằng email đăng ký đầu tiên. Tài khoản này có quyền tối cao và toàn phần đối với mọi tài nguyên, cấu hình mạng và thông tin thanh toán của hệ thống. Nếu rò rỉ Access Key của Root User lên GitHub, tin tặc có thể quét và chiếm quyền kiểm soát toàn bộ tài khoản, khởi chạy hàng trăm máy chủ ảo cấu hình cao để đào tiền ảo, dẫn đến những hóa đơn khổng lồ lên tới hàng chục nghìn USD.</p>
+              <p style="margin-top: 8px;"><strong>IAM User (Người dùng danh tính):</strong> Được tạo ra dưới sự quản lý của Root User thông qua dịch vụ AWS Identity and Access Management. IAM User tuân thủ nghiêm ngặt <strong>Nguyên tắc đặc quyền tối thiểu (Least Privilege Access Control)</strong>: chỉ được cấp đúng những quyền tối thiểu cần thiết để làm việc. Chúng ta sử dụng IAM User <code>aiengineer</code> cho công việc lập trình và deploy hàng ngày nhằm khoanh vùng thiệt hại tối đa nếu xảy ra sự cố bảo mật.</p>
+            </article>
+
+            <article class="card">
+              <h3>Triết lý AWS Budgets & Lưới an toàn tài chính</h3>
+              <p>Một điểm khác biệt căn bản giữa AWS và các nhà cung cấp PaaS nhỏ hơn: <strong>AWS không hỗ trợ cơ chế giới hạn cứng (hard cap) tự động ngắt dịch vụ khi vượt quá ngân sách đã đặt</strong>. AWS ưu tiên tính liên tục của hệ thống sản xuất dành cho khách hàng doanh nghiệp lớn (ví dụ: không thể vì lỗi thanh toán hoặc vượt ngân sách nhỏ mà AWS tự động tắt các server đang vận hành của Netflix).</p>
+              <p style="margin-top: 8px;">Do đó, trách nhiệm kiểm soát chi phí hoàn toàn thuộc về lập trình viên. Việc thiết lập <strong>AWS Budgets</strong> để gửi cảnh báo tự động về email cá nhân dựa trên cả chi phí thực tế (Actual Spend) lẫn chi phí dự báo (Forecasted Spend) của thuật toán AWS là bắt buộc. Thuật toán của AWS sẽ dự báo chi phí cả tháng dựa trên tốc độ tiêu thụ hiện tại của tài nguyên đang chạy, đóng vai trò cảnh báo sớm (early warning) giúp lập trình viên phát hiện sớm các tài nguyên quên tắt trước khi chúng thực sự tiêu tốn nhiều tiền.</p>
+            </article>
+
+            <article class="card">
+              <h3>Docker Containers vs Virtual Machines (VM)</h3>
+              <p><strong>Virtual Machines (Máy ảo - VM):</strong> Hoạt động dựa trên lớp phần cứng ảo hóa được quản lý bởi Hypervisor. Mỗi VM phải chạy một hệ điều hành khách (Guest OS) riêng biệt bên trong nó, dẫn đến dung lượng rất nặng (hàng chục GB), tiêu tốn lượng RAM lớn để duy trì hệ điều hành giả lập và mất vài phút để khởi động hoàn toàn.</p>
+              <p style="margin-top: 8px;"><strong>Docker Containers:</strong> Là công nghệ ảo hóa ở cấp độ hệ điều hành (OS-level virtualization). Container không chứa hệ điều hành khách riêng biệt mà chia sẻ chung nhân hệ điều hành (OS Kernel) của máy chủ vật lý thông qua Docker Engine. Container chỉ đóng gói mã nguồn và các thư viện phụ thuộc của ứng dụng. Do đó, Docker container cực kỳ nhẹ (chỉ vài trăm MB), khởi động tức thì trong vòng vài giây và tiêu hao rất ít tài nguyên bộ nhớ.</p>
+            </article>
+
+            <article class="card">
+              <h3>Cơ chế hoạt động của AWS Lambda Web Adapter</h3>
+              <p>AWS Lambda hoạt động theo cơ chế dựa trên sự kiện (Event-driven). Khi có request gửi tới, Lambda nhận một sự kiện JSON chứa thông tin HTTP request. Thông thường, để chạy một ứng dụng web như FastAPI trên Lambda, lập trình viên phải sửa đổi mã nguồn để sử dụng các thư viện trung gian như <code>mangum</code> dịch sự kiện JSON này.</p>
+              <p style="margin-top: 8px;"><strong>AWS Lambda Web Adapter (LWA)</strong> là một công cụ mã nguồn mở của AWS Labs giúp giải quyết triệt để vấn đề này. Bằng cách copy binary của LWA vào thư mục <code>/opt/extensions/lambda-adapter</code> bên trong container, LWA hoạt động như một tiến trình extension ngầm. Khi Lambda khởi chạy container, LWA tự động bắt các sự kiện JSON từ Lambda runtime, dịch chúng thành HTTP Request chuẩn rồi gửi đến cổng <code>8000</code> của FastAPI, đồng thời nhận phản hồi HTTP từ FastAPI dịch ngược lại cho Lambda. Công nghệ này giúp chúng ta chạy mã nguồn FastAPI nguyên bản trên Lambda mà không cần chỉnh sửa bất kỳ dòng code backend nào.</p>
+            </article>
+
+            <article class="card">
+              <h3>Lý thuyết Docker Layers & Cache Optimization</h3>
+              <p>Mỗi chỉ thị cấu hình trong Dockerfile (như <code>RUN</code>, <code>COPY</code>) tạo ra một lớp dữ liệu chỉ đọc (layer) xếp chồng lên nhau trong Docker Image. Khi build lại image, Docker engine sẽ kiểm tra xem nội dung của chỉ thị và các file liên quan có thay đổi không. Nếu không đổi, Docker sẽ tái sử dụng cache của layer cũ để tăng tốc độ build (Docker Cache).</p>
+              <p style="margin-top: 8px;"><strong>Quy tắc vàng:</strong> Sắp xếp các chỉ thị ít thay đổi (như cài đặt thư viện hệ thống, cài đặt dependencies <code>npm ci</code> hoặc <code>pip install</code>) lên phía trước, và đặt các chỉ thị hay thay đổi (copy mã nguồn dự án) ở cuối cùng của Dockerfile. Điều này giúp giảm thời gian build image từ vài phút xuống còn vài giây khi cập nhật code ứng dụng.</p>
+            </article>
+
+            <article class="card">
+              <h3>Cân nhắc về Serverless Cold Start & RAM Allocation</h3>
+              <p>Khi ứng dụng serverless không nhận request nào trong khoảng 15 phút, AWS Lambda sẽ tự động hủy container instance để giải phóng tài nguyên (Scale-to-Zero). Khi có request mới đến, Lambda phải thực hiện **Cold Start (Khởi động lạnh)**: cấp phát máy chủ ảo, kéo Docker image từ ECR, dựng container, và khởi động FastAPI server. Quá trình này mất khoảng 10-30 giây.</p>
+              <p style="margin-top: 8px;">Để giảm thiểu độ trễ khởi động lạnh, chúng ta áp dụng các kỹ thuật: tối giản hóa kích thước Docker image (sử dụng image nền python-slim), giảm thiểu import thư viện không cần thiết và đặc biệt là <strong>tăng dung lượng RAM cấp phát cho Lambda lên 1024 MB</strong>. Trên AWS Lambda, việc tăng RAM sẽ tỷ lệ thuận với việc AWS cấp thêm sức mạnh CPU ảo (vCPU), giúp container khởi động nhanh hơn đáng kể so với cấu hình RAM mặc định thấp.</p>
+            </article>
+          </div>
+        </section>
+
+        <!-- Section 4: Architectures & Pipelines -->
+        <section id="architectures" class="section">
+          <div class="section-title">
+            <div>
+              <div class="kicker">Section 4</div>
+              <h2>System Architectures & Deployment Pipelines</h2>
+            </div>
+          </div>
+
+          <h3>1. Sơ đồ kiến trúc Single Container & Lambda Web Adapter</h3>
+          <p>Mô hình chi tiết về luồng đi của gói tin từ trình duyệt người dùng qua Lambda Function URL ở chế độ RESPONSE_STREAM, dịch chuyển qua Lambda Web Adapter ngầm và đi vào FastAPI xử lý xác thực Clerk JWT & OpenAI Streaming API:</p>
+          <div class="diagram-container">
+            <div class="mermaid">
+              graph TD
+                Client[Trình duyệt Client] -->|1. HTTP POST Request kèm Bearer JWT| FURL[Lambda Function URL <br> InvokeMode: RESPONSE_STREAM]
+                FURL -->|2. Lambda JSON Event| LWA[AWS Lambda Web Adapter <br> /opt/extensions/lambda-adapter]
+                LWA -->|3. Chuyển đổi thành HTTP localhost:8000| FastAPI[FastAPI Web Server <br> uvicorn server:app port 8000]
+                FastAPI -->|4. Gọi xác minh token chữ ký số| Clerk[Clerk JWKS Endpoint]
+                Clerk -->|5. Token hợp lệ| FastAPI
+                FastAPI -->|6. Gửi prompt yêu cầu stream| OpenAI[OpenAI API completions]
+                OpenAI -->|7. Trả dữ liệu chunk-by-chunk| FastAPI
+                FastAPI -->|8. Tạo Generator trả về SSE data| LWA
+                LWA -->|9. Đẩy luồng dữ liệu thô| FURL
+                FURL -->|10. Stream chữ chạy chữ từng từ| Client
+            </div>
+          </div>
+
+          <h3 style="margin-top: 24px;">2. Sơ đồ quy trình triển khai Docker ECR & Lambda Deployment</h3>
+          <p>Quy trình đóng gói phần mềm đồng nhất trên máy phát triển, phân phối qua kho lưu trữ Amazon ECR và triển khai cập nhật Lambda Function:</p>
+          <div class="diagram-container">
+            <div class="mermaid">
+              graph LR
+                Code[Mã nguồn dự án & Dockerfile] -->|1. docker build --platform linux/amd64| DImg[Docker Image linux/amd64]
+                DImg -->|2. docker tag & push| ECR[Amazon ECR <br> Private Repository]
+                ECR -->|3. Cung cấp Container URI| Lambda[AWS Lambda Function <br> Cấu hình RAM, Timeout, Concurrency]
+                Lambda -->|4. Tạo Endpoint HTTPS| FURL[Function URL công khai]
+                CLI[AWS CLI <br> aws lambda update-function-code] -.->|Kích hoạt cập nhật code từ xa| Lambda
+            </div>
+          </div>
+        </section>
+
+        <!-- Section 5: Detailed Workflows -->
+        <section id="workflows" class="section">
+          <div class="section-title">
+            <div>
+              <div class="kicker">Section 5</div>
+              <h2>Detailed Workflows - Quy trình thực hành chi tiết</h2>
+            </div>
+          </div>
+          
+          <details>
+            <summary>Đăng ký tài khoản AWS & Thiết lập lưới bảo vệ tài chính (MFA & Budgets)</summary>
+            <div class="callout">
+              <strong>Kinh nghiệm thực tế từ sinh viên Andy C.:</strong> Tránh tuyệt đối việc lựa chọn tài khoản "Free Sandbox" của AWS khi đăng ký vì tài khoản sandbox bị giới hạn không cho quyền sử dụng App Runner hoặc tạo một số chính sách IAM nâng cao. Hãy đăng ký tài khoản <strong>Personal</strong> thông thường và điền thông tin thẻ thanh toán quốc tế hợp lệ. Bạn vẫn được hưởng đầy đủ các chính sách Free Tier của AWS.
+            </div>
+            <ol class="list" style="margin-top: 10px;">
+              <li>Truy cập <a href="https://aws.amazon.com">aws.amazon.com</a>, nhấp **Create an AWS Account** và đăng ký loại tài khoản Personal. Chọn gói **Basic Support - Free**.</li>
+              <li>Đăng nhập vào AWS Console bằng **Root User** (tài khoản email chính). Nhấp vào tên tài khoản ở góc trên bên phải → Chọn **Security credentials**.</li>
+              <li>Tại mục **Multi-factor authentication (MFA)**, click **Assign MFA device**. Đặt tên thiết bị (ví dụ: <code>root-mfa</code>), chọn **Authenticator app** và click Next. Sử dụng Google Authenticator hoặc Authy trên điện thoại quét mã QR. Nhập 2 mã số xác thực liên tiếp được sinh ra trên ứng dụng để kích hoạt MFA thành công.</li>
+              <li>Tìm kiếm từ khóa **Billing** trên thanh công cụ của AWS Console → Click chọn dịch vụ **Billing and Cost Management**.</li>
+              <li>Chọn mục **Budgets** ở menu bên trái → Click **Create budget** → Chọn tùy chọn **Use a template (simplified)** → Chọn loại **Monthly cost budget**.</li>
+              <li>Tạo 3 budget cảnh báo bằng email để kiểm soát chi phí:
+                <ul>
+                  <li><strong>Budget 1 (early-warning):</strong> Đặt tên budget là <code>early-warning</code>, budgeted amount là <code>1</code> USD, nhập địa chỉ email cá nhân nhận cảnh báo và click Create budget.</li>
+                  <li><strong>Budget 2 (caution-budget):</strong> Tạo tương tự với mức hạn mức <code>5</code> USD.</li>
+                  <li><strong>Budget 3 (stop-budget):</strong> Tạo hạn mức chốt chặn cuối cùng là <code>10</code> USD.</li>
+                </ul>
+                Hệ thống AWS sẽ tự động gửi email thông báo khi chi phí thực tế tiêu dùng vượt quá 85%, 100% của hạn mức hoặc khi chi phí dự báo (Forecasted) trong tháng của bạn ước tính chạm mốc 100% hạn mức.
+              </li>
+            </ol>
+          </details>
+
+          <details>
+            <summary>Tạo IAM User, IAM Group và Phân quyền tối thiểu (Least Privilege)</summary>
+            <p>Để đảm bảo an toàn, chúng ta tạo một IAM User giới hạn quyền cho lập trình hàng ngày và cất giữ tài khoản Root:</p>
+            <ol class="list" style="margin-top: 10px;">
+              <li>Đăng nhập Root User → Tìm kiếm dịch vụ <strong>IAM</strong> (Identity and Access Management) trên Console.</li>
+              <li>Click **Users** ở cột trái → Click **Create user**. Đặt Username là <code>aiengineer</code>.</li>
+              <li>Tích chọn <strong>Provide user access to the AWS Management Console</strong> → Chọn <strong>I want to create an IAM user</strong> → Chọn **Custom password** và thiết lập mật khẩu mạnh → Bỏ tích chọn <strong>Users must create a new password at next sign-in</strong> → Click **Next**.</li>
+              <li>Tại trang thiết lập quyền (Permissions), chọn **Add user to group** → Click **Create group**.</li>
+              <li>Đặt tên Group là <code>BroadAIEngineerAccess</code>.</li>
+              <li>Tại ô tìm kiếm chính sách (Permissions policies), tìm kiếm và tích chọn chính xác 5 chính sách phân quyền sau:
+                <ul>
+                  <li><code>AWSLambda_FullAccess</code>: Cho phép quản lý toàn quyền Lambda function (thay thế cho <code>AWSAppRunnerFullAccess</code> cũ).</li>
+                  <li><code>AmazonEC2ContainerRegistryFullAccess</code>: Cho phép tạo repository, đẩy và kéo ảnh Docker trên ECR.</li>
+                  <li><code>CloudWatchLogsFullAccess</code>: Cho phép đọc, ghi và quản lý log ghi nhận từ ứng dụng.</li>
+                  <li><code>IAMUserChangePassword</code>: Cho phép IAM User tự thay đổi thông tin mật khẩu đăng nhập của mình.</li>
+                  <li><strong><code>IAMFullAccess</code> (Quan trọng):</strong> Bắt buộc phải có để Lambda Function có đủ thẩm quyền tự khởi tạo và gắn kết vai trò thực thi service-linked execution role khi chạy container image.</li>
+                </ul>
+              </li>
+              <li>Click **Create user group** → Tích chọn nhóm <code>BroadAIEngineerAccess</code> vừa tạo → Click **Next** → Click **Create user**.</li>
+              <li><strong>Cực kỳ quan trọng:</strong> Click **Download .csv file** chứa đường link đăng nhập console riêng biệt và thông tin đăng nhập của IAM User này, lưu trữ file này tại vị trí an toàn trên máy tính cá nhân.</li>
+            </ol>
+          </details>
+
+          <details>
+            <summary>Tái cấu trúc ứng dụng sang Single Domain & Single Container</summary>
+            <p>Trên môi trường Vercel, mã nguồn chạy phân tán. Để đưa lên AWS Lambda tối ưu chi phí, chúng ta chuyển đổi sang kiến trúc Single Container:</p>
+            <ol class="list" style="margin-top: 10px;">
+              <li><strong>Cấu hình Static Export cho Next.js:</strong> Mở tệp `next.config.ts` ở thư mục gốc của dự án. Thêm cấu hình:
+                <pre><code>const nextConfig: NextConfig = {
+  output: 'export',  // Biên dịch toàn bộ các trang React thành file tĩnh HTML/JS/CSS
+  images: {
+    unoptimized: true  // Tắt tính năng tối ưu ảnh động (bắt buộc đối với chế độ static export)
+  }
+};</code></pre>
+              </li>
+              <li><strong>Chuyển hướng API Route:</strong> Mở tệp `pages/product.tsx`. Tìm đến lời gọi hàm gọi API stream `fetchEventSource`. Sửa đường dẫn API từ `/api` (dùng trên Vercel) thành `/api/consultation`.
+                <pre><code>// Sửa lại đường dẫn endpoint
+await fetchEventSource('/api/consultation', { ... })</code></pre>
+                Cả giao diện người dùng tĩnh và API backend FastAPI sẽ được host chung một cổng và chung một domain duy nhất.
+              </li>
+              <li><strong>Tạo server FastAPI host tệp tĩnh:</strong> Tạo tệp `api/server.py`. Cấu hình mount thư mục file tĩnh `static/` (là thư mục chứa kết quả build của Next.js) lên route gốc `/` của FastAPI.
+                <pre><code># Phải đặt lệnh mount này ở cuối cùng của file server.py
+app.mount("/", StaticFiles(directory="static", html=True), name="static")</code></pre>
+              </li>
+              <li><strong>Tạo tệp cấu hình môi trường đám mây:</strong> Tạo tệp `.env` ở thư mục gốc dự án (copy cấu hình từ `.env.local` và bổ sung 2 biến môi trường AWS):
+                <pre><code>DEFAULT_AWS_REGION=us-east-1  # Chọn region bạn muốn sử dụng (ví dụ us-east-1)
+AWS_ACCOUNT_ID=123456789012  # Thay thế bằng 12 chữ số Account ID của bạn</code></pre>
+                <em>Cách tìm AWS Account ID: Đăng nhập Console, click vào tên tài khoản ở góc trên bên phải màn hình và copy chuỗi số Account ID gồm 12 chữ số.</em>
+              </li>
+            </ol>
+          </details>
+
+          <details>
+            <summary>Biên dịch Docker và Đẩy Image lên Amazon ECR</summary>
+            <ol class="list" style="margin-top: 10px;">
+              <li>Khởi động Docker Desktop trên máy tính cá nhân. Đảm bảo ứng dụng chạy ổn định.</li>
+              <li>Đăng nhập vào AWS Console bằng tài khoản IAM User <code>aiengineer</code> qua link sign-in trong file CSV.</li>
+              <li>Tìm kiếm dịch vụ <strong>ECR (Elastic Container Registry)</strong> → Đảm bảo Region ở góc phải Console trùng khớp với region trong file <code>.env</code> (ví dụ: N. Virginia - <code>us-east-1</code>) → Click **Create repository** → Chọn loại **Private** → Đặt tên Repository là <code>consultation-app</code> → Click **Create repository**.</li>
+              <li>Tạo Access Keys cho CLI của IAM User: Vào IAM → Users → Click chọn user <code>aiengineer</code> → Tab Security credentials → Click **Create access key** → Chọn **Command Line Interface (CLI)** → Tích chọn xác nhận và click Next → Điền mô tả <code>Docker push access</code> → Click **Create access key**. Copy hoặc tải file CSV chứa `Access key ID` và `Secret access key`.</li>
+              <li>Mở Terminal (Mac) hoặc PowerShell (Windows) tại thư mục dự án. Cấu hình AWS CLI kết nối:
+                <pre><code>aws configure</code></pre>
+                Lần lượt nhập: Access Key ID, Secret Access Key, Default region name (ví dụ: <code>us-east-1</code>) và Default output format (<code>json</code>).
+              </li>
+              <li>Nạp các biến môi trường từ file <code>.env</code> vào phiên terminal hiện tại (xem lệnh cụ thể ở mục Code Walkthrough).</li>
+              <li>Đăng nhập Docker client vào AWS ECR registry bằng lệnh xác thực tự động lấy token từ AWS CLI:
+                <pre><code>aws ecr get-login-password --region $env:DEFAULT_AWS_REGION | docker login --username AWS --password-stdin "$env:AWS_ACCOUNT_ID.dkr.ecr.$env:DEFAULT_AWS_REGION.amazonaws.com"</code></pre>
+              </li>
+              <li><strong>Thao tác bắt buộc đối với máy Apple Silicon Mac (M1/M2/M3/M4/M5):</strong> Chạy lệnh build image Docker chỉ định rõ kiến trúc chip xử lý là <code>linux/amd64</code> tương thích máy chủ cloud:
+                <pre><code>docker build --platform linux/amd64 --build-arg NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY="$env:NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY" -t consultation-app .</code></pre>
+              </li>
+              <li>Gắn tag ECR cho ảnh Docker vừa build:
+                <pre><code>docker tag consultation-app:latest "$env:AWS_ACCOUNT_ID.dkr.ecr.$env:DEFAULT_AWS_REGION.amazonaws.com/consultation-app:latest"</code></pre>
+              </li>
+              <li>Đẩy ảnh Docker lên repository ECR của AWS:
+                <pre><code>docker push "$env:AWS_ACCOUNT_ID.dkr.ecr.$env:DEFAULT_AWS_REGION.amazonaws.com/consultation-app:latest"</code></pre>
+              </li>
+            </ol>
+          </details>
+
+          <details>
+            <summary>Triển khai Serverless AWS Lambda Function & Cấu hình Streaming Endpoint</summary>
+            <ol class="list" style="margin-top: 10px;">
+              <li>Tìm kiếm dịch vụ <strong>Lambda</strong> trên AWS Console → Nhấp **Create function**.</li>
+              <li>Cấu hình nguồn khởi tạo:
+                <ul>
+                  <li>Chọn mục **Container image** (không chọn "Author from scratch").</li>
+                  <li>Đặt Function name: <code>consultation-app</code>.</li>
+                  <li>Tại Container image URI: Click **Browse images**, chọn repository <code>consultation-app</code>, chọn tag <code>latest</code> và click **Select image**.</li>
+                </ul>
+                Click **Create function** và chờ từ 30-60 giây để AWS nạp image từ ECR.
+              </li>
+              <li><strong>Cấu hình RAM và Timeout:</strong> Vào tab **Configuration** của hàm vừa tạo → Chọn mục **General configuration** ở menu bên trái → Click **Edit**. Sửa bộ nhớ RAM thành **1024 MB** (để ứng dụng uvicorn và host tệp tĩnh thoải mái bộ nhớ) và Timeout thành **5 min 0 sec** (300 giây - đủ thời gian chờ OpenAI stream trả về hết văn bản dài) → Click **Save**.</li>
+              <li><strong>Thiết lập giới hạn chi phí Concurrency:</strong> Vẫn ở tab Configuration → Chọn mục **Concurrency and recursion detection** ở cột trái → Tại thẻ Concurrency click **Edit** → Chọn **Reserve concurrency** và nhập số lượng là **2** → Click **Save**. <i>Lưu ý: Không thay đổi mục Provisioned Concurrency để tránh phát sinh chi phí chạy ngầm container ấm khi rảnh rỗi.</i></li>
+              <li><strong>Thiết lập Biến môi trường:</strong> Chọn mục **Environment variables** ở cột trái → Click **Edit** → Thêm 3 khóa biến môi trường:
+                <ul>
+                  <li><code>CLERK_SECRET_KEY</code> (Lấy từ Clerk dashboard)</li>
+                  <li><code>CLERK_JWKS_URL</code> (Đường dẫn JWKS của Clerk app để xác thực chữ ký số token)</li>
+                  <li><code>OPENAI_API_KEY</code> (Khóa API OpenAI để gọi mô hình GPT)</li>
+                </ul>
+                Click **Save** để lưu lại.
+              </li>
+              <li><strong>Tạo đường dẫn URL công khai (Function URL):</strong> Chọn mục **Function URL** ở menu cột trái → Click **Create function URL**.
+                <ul>
+                  <li>Auth type: Chọn **NONE** (Vì ứng dụng tự xác thực người dùng bằng Clerk JWT Bearer Token trong code).</li>
+                  <li>Additional settings: Mở rộng mục này và giữ nguyên cấu hình mặc định (không chọn CORS do FastAPI code đã trả về CORS headers middleware).</li>
+                  <li><strong>Invoke mode:</strong> Tích chọn **RESPONSE_STREAM** (Đây là cấu hình quan trọng nhất giúp truyền dữ liệu chunk streaming Server-Sent Events trực tiếp về client không qua bộ đệm của AWS).</li>
+                </ul>
+                Click **Save**. Copy đường dẫn Function URL vừa sinh ra ở đầu trang để sử dụng.
+              </li>
+            </ol>
+          </details>
+        </section>
+
+        <!-- Section 6: Code Walkthrough -->
+        <section id="code-walkthrough" class="section">
+          <div class="section-title">
+            <div>
+              <div class="kicker">Section 6</div>
+              <h2>Code & CLI Walkthrough - Phân tích chi tiết mã nguồn</h2>
+            </div>
+          </div>
+
+          <!-- File 1: api/server.py -->
+          <article class="code-panel">
+            <div>
+              <h3>File: <code>api/server.py</code></h3>
+              <p>Mã nguồn backend FastAPI hợp nhất, thực hiện xác thực Clerk Bearer JWT Token của client gửi lên, gọi streaming completions từ OpenAI API và trả về Server-Sent Events (SSE) stream, đồng thời kiêm nhiệm host toàn bộ tệp tĩnh của Next.js.</p>
+            </div>
+            <div class="code-meta">
+              <span>FastAPI Web Backend</span>
+              <span>Clerk Auth Verification</span>
+              <span>Server-Sent Events (SSE)</span>
+            </div>
+            <pre><code>import os
+from pathlib import Path
+from fastapi import FastAPI, Depends
+from fastapi.responses import StreamingResponse, FileResponse
+from fastapi.staticfiles import StaticFiles
+from fastapi.middleware.cors import CORSMiddleware
+from pydantic import BaseModel
+from fastapi_clerk_auth import ClerkConfig, ClerkHTTPBearer, HTTPAuthorizationCredentials
+from openai import OpenAI
+
+app = FastAPI()
+
+# Gắn cấu hình CORS middleware để cho phép trình duyệt gọi API chéo domain trong lúc dev cục bộ
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+# Khởi tạo bộ bảo vệ xác thực Clerk Auth từ khóa JWKS URL nạp từ biến môi trường
+clerk_config = ClerkConfig(jwks_url=os.getenv("CLERK_JWKS_URL"))
+clerk_guard = ClerkHTTPBearer(clerk_config)
+
+# Khai báo cấu trúc dữ liệu Pydantic BaseModel để tự động validate đầu vào của request body
+class Visit(BaseModel):
+    patient_name: str
+    date_of_visit: str
+    notes: str
+
+# System Prompt cố định phân chia chính xác cấu trúc đầu ra của bệnh án y khoa
+system_prompt = """
+You are provided with notes written by a doctor from a patient's visit.
+Your job is to summarize the visit for the doctor and provide an email.
+Reply with exactly three sections with the headings:
+### Summary of visit for the doctor's records
+### Next steps for the doctor
+### Draft of email to patient in patient-friendly language
+"""
+
+def user_prompt_for(visit: Visit) -> str:
+    return f"""Create the summary, next steps and draft email for:
+Patient Name: {visit.patient_name}
+Date of Visit: {visit.date_of_visit}
+Notes:
+{visit.notes}"""
+
+@app.post("/api/consultation")
+def consultation_summary(
+    visit: Visit,
+    creds: HTTPAuthorizationCredentials = Depends(clerk_guard), # Chốt chặn xác thực Clerk JWT Token
+):
+    # Trích xuất user ID của Clerk từ token đã được giải mã và kiểm tra chữ ký số thành công
+    user_id = creds.decoded["sub"]
+    client = OpenAI() # Khởi tạo OpenAI client (lấy API Key tự động từ biến môi trường)
+
+    user_prompt = user_prompt_for(visit)
+    prompt = [
+        {"role": "system", "content": system_prompt},
+        {"role": "user", "content": user_prompt},
+    ]
+
+    # Gửi request lên OpenAI API kích hoạt chế độ stream=True
+    stream = client.chat.completions.create(
+        model="gpt-4o-mini",
+        messages=prompt,
+        stream=True,
+    )
+
+    # Hàm generator sử dụng cơ chế yield để sinh và đẩy dữ liệu chunk-by-chunk chuẩn định dạng SSE
+    def event_stream():
+        for chunk in stream:
+            text = chunk.choices[0].delta.content
+            if text:
+                # Xử lý phân tách xuống dòng của Markdown để trình duyệt client hiển thị chuẩn xác
+                lines = text.split("\n")
+                for line in lines[:-1]:
+                    yield f"data: {line}\n\n"
+                    yield "data:  \n"
+                yield f"data: {lines[-1]}\n\n"
+
+    # Trả về StreamingResponse với kiểu MIME text/event-stream hỗ trợ Server-Sent Events
+    return StreamingResponse(event_stream(), media_type="text/event-stream")
+
+@app.get("/health")
+def health_check():
+    """Endpoint giám sát tình trạng hoạt động của container"""
+    return {"status": "healthy"}
+
+# PHỤC VỤ TỆP TĨNH GIAO DIỆN FRONTEND - LƯU Ý: PHẢI LÀ LỆNH CUỐI CÙNG TRONG FILE SERVER.PY
+static_path = Path("static")
+if static_path.exists():
+    # Khi truy cập root /, trả về tệp index.html tĩnh của Next.js export
+    @app.get("/")
+    async def serve_root():
+        return FileResponse(static_path / "index.html")
+
+    # Mount toàn bộ các file CSS/JS/Image tĩnh của thư mục static lên route gốc /
+    app.mount("/", StaticFiles(directory="static", html=True), name="static")</code></pre>
+          </article>
+
+          <!-- File 2: Dockerfile -->
+          <article class="code-panel" style="margin-top: 24px;">
+            <div>
+              <h3>File: <code>Dockerfile</code></h3>
+              <p>Cấu hình Multi-Stage Dockerfile tối ưu hóa kích thước image và tốc độ biên dịch. Tích hợp AWS Lambda Web Adapter ngầm định cấu hình response streaming cho môi trường serverless.</p>
+            </div>
+            <div class="code-meta">
+              <span>Docker Configuration</span>
+              <span>Multi-Stage Build</span>
+              <span>Lambda Web Adapter Config</span>
+            </div>
+            <pre><code># STAGE 1: Xây dựng môi trường node và biên dịch ứng dụng React/Next.js tĩnh
+FROM node:22-alpine AS frontend-builder
+
+WORKDIR /app
+
+# Copy các tệp cấu hình package trước để Docker cache tầng node_modules hiệu quả
+COPY package*.json ./
+RUN npm ci
+
+# Sao chép toàn bộ mã nguồn của dự án vào builder stage
+COPY . .
+
+# Khai báo khóa Clerk Publishable Key (Bắt buộc nạp lúc build vì React bundle chạy ở Client)
+ARG NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY
+ENV NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=$NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY
+
+# Khởi chạy lệnh build Next.js tĩnh (sinh ra thư mục 'out' chứa toàn bộ tệp tĩnh)
+RUN npm run build
+
+
+# STAGE 2: Khởi tạo container runtime Python gọn nhẹ để triển khai lên cloud
+FROM python:3.12-slim
+
+WORKDIR /app
+
+# --- TÍCH HỢP AWS LAMBDA WEB ADAPTER ---
+# Sao chép tệp thực thi lambda-adapter từ ECR registry chính thức của AWS Labs vào thư mục extensions
+COPY --from=public.ecr.aws/awsguru/aws-lambda-adapter:1.0.0 /lambda-adapter /opt/extensions/lambda-adapter
+
+# Thiết lập cổng PORT mà FastAPI server lắng nghe để Web Adapter chuyển tiếp gói tin đến
+ENV PORT=8000
+
+# Kích hoạt chế độ response streaming để hỗ trợ truyền tải Server-Sent Events (SSE)
+ENV AWS_LWA_INVOKE_MODE=response_stream
+# --- KẾT THÚC TÍCH HỢP WEB ADAPTER ---
+
+# Cài đặt các thư viện Python dependencies từ requirements.txt
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+
+# Sao chép file backend FastAPI
+COPY api/server.py .
+
+# Sao chép toàn bộ thư mục tệp tĩnh Next.js đã được build ở Stage 1 vào thư mục static của container Python
+COPY --from=frontend-builder /app/out ./static
+
+# Khai báo cổng 8000
+EXPOSE 8000
+
+# Khởi động server uvicorn lắng nghe trên mọi dải IP và cổng 8000
+CMD ["uvicorn", "server:app", "--host", "0.0.0.0", "--port", "8000"]</code></pre>
+          </article>
+
+          <!-- File 3: Terminal CLI Scripts -->
+          <article class="code-panel" style="margin-top: 24px;">
+            <div>
+              <h3>Terminal CLI Scripts - Kịch bản cập nhật ứng dụng tự động</h3>
+              <p>Mã kịch bản chạy trên Windows PowerShell để tự động hóa toàn bộ quy trình biên dịch chéo Docker Image cho platform amd64, đẩy lên AWS ECR và cập nhật trực tiếp mã nguồn trên Lambda Function.</p>
+            </div>
+            <div class="code-meta">
+              <span>Windows PowerShell</span>
+              <span>AWS CLI v2</span>
+              <span>Docker CLI</span>
+            </div>
+            <pre><code># 1. Nạp các biến môi trường bảo mật từ file .env cục bộ vào phiên PowerShell hiện tại
+Get-Content .env | ForEach-Object {
+    if ($_ -match '^(.+?)=(.+)$') {
+        [System.Environment]::SetEnvironmentVariable($matches[1], $matches[2])
+    }
+}
+
+# 2. Thực hiện đăng nhập Docker client vào AWS ECR Registry (Tự động cấp token đăng nhập tạm thời)
+aws ecr get-login-password --region $env:DEFAULT_AWS_REGION | docker login --username AWS --password-stdin "$env:AWS_ACCOUNT_ID.dkr.ecr.$env:DEFAULT_AWS_REGION.amazonaws.com"
+
+# 3. Biên dịch Docker Image chỉ định rõ platform linux/amd64 (Bắt buộc để tránh exec format error trên Apple Silicon Mac)
+docker build `
+  --platform linux/amd64 `
+  --build-arg NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY="$env:NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY" `
+  -t consultation-app .
+
+# 4. Gắn tag cho Docker image trùng khớp với địa chỉ URI repository ECR của bạn
+docker tag consultation-app:latest "$env:AWS_ACCOUNT_ID.dkr.ecr.$env:DEFAULT_AWS_REGION.amazonaws.com/consultation-app:latest"
+
+# 5. Đẩy ảnh Docker lên repository ECR của bạn
+docker push "$env:AWS_ACCOUNT_ID.dkr.ecr.$env:DEFAULT_AWS_REGION.amazonaws.com/consultation-app:latest"
+
+# 6. Thông báo cho AWS Lambda tải và cập nhật mã nguồn mới nhất từ container image ECR vừa được đẩy lên
+aws lambda update-function-code `
+  --function-name consultation-app `
+  --image-uri "$env:AWS_ACCOUNT_ID.dkr.ecr.$env:DEFAULT_AWS_REGION.amazonaws.com/consultation-app:latest" `
+  --region $env:DEFAULT_AWS_REGION</code></pre>
+          </article>
+        </section>
+
+        <!-- Section 7: Options & Trade-offs -->
+        <section id="options" class="section">
+          <div class="section-title">
+            <div>
+              <div class="kicker">Section 7</div>
+              <h2>Options & Trade-offs - Bản đồ lựa chọn kiến trúc</h2>
+            </div>
+          </div>
+          <p>Bảng so sánh kỹ thuật chi tiết giúp Solopreneur và Startup đánh giá tối ưu các giải pháp tính toán compute container trên môi trường đám mây AWS trong năm 2026:</p>
+          <table>
+            <thead>
+              <tr>
+                <th>Tham số so sánh</th>
+                <th>AWS Lambda Container (Lựa chọn tối ưu Day 5)</th>
+                <th>AWS App Runner (Cũ - Chế độ bảo trì)</th>
+                <th>Amazon ECS Express Mode (Fargate)</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>Chi phí tối thiểu hàng tháng</strong></td>
+                <td><strong>Gần như $0/tháng</strong> (Tận dụng Free Tier vĩnh viễn của Lambda gồm 1 triệu request và 400.000 GB-giây miễn phí hàng tháng. Phí lưu trữ ECR chỉ ~$0.05 - $0.10/tháng).</td>
+                <td><strong>Từ $5 - $6/tháng</strong> (Bắt buộc phải trả phí duy trì tối thiểu 1 container instance luôn hoạt động).</td>
+                <td><strong>Từ $16 - $20/tháng</strong> (Bắt buộc trả phí duy trì cố định cho Application Load Balancer chạy không tải).</td>
+              </tr>
+              <tr>
+                <td><strong>Cơ chế co giãn (Scaling)</strong></td>
+                <td><strong>Scale to zero</strong> (Tự động tắt sạch container khi không có tải, co giãn tối đa tức thì khi có request).</td>
+                <td>Tự động co giãn theo số lượng request đồng thời cấu hình sẵn (giới hạn dưới tối thiểu là 1).</td>
+                <td>Co giãn theo ngưỡng sử dụng tài nguyên CPU/RAM (không hỗ trợ cơ chế scale-to-zero).</td>
+              </tr>
+              <tr>
+                <td><strong>Độ trễ Cold Start</strong></td>
+                <td><strong>Có hiện tượng trễ 10-30 giây</strong> ở request đầu tiên sau thời gian dài rảnh rỗi (~15 phút).</td>
+                <td>Không có độ trễ khởi động lạnh do luôn duy trì ít nhất một instance chạy ấm.</td>
+                <td>Không có độ trễ khởi động lạnh do container chạy liên tục 24/7.</td>
+              </tr>
+              <tr>
+                <td><strong>Phản hồi Streaming (SSE)</strong></td>
+                <td>Hỗ trợ tuyệt vời qua Function URL cấu hình ở chế độ <code>RESPONSE_STREAM</code>.</td>
+                <td>Hỗ trợ trực tiếp qua kết nối HTTP streaming thông thường.</td>
+                <td>Đòi hỏi cấu hình Load Balancer hỗ trợ WebSocket hoặc thiết lập mạng phức tạp hơn.</td>
+              </tr>
+              <tr>
+                <td><strong>Độ phức tạp mạng lưới</strong></td>
+                <td><strong>Thấp nhất</strong>. Nhận HTTPS URL trực tiếp qua Function URL mà không cần tạo VPC hay API Gateway.</td>
+                <td>Thấp. Tự động cấp phát tên miền HTTPS ngẫu nhiên có chứng chỉ bảo mật.</td>
+                <td>Cao. Phải tự cấu hình VPC, Subnets, Route Tables, Security Groups và Load Balancers.</td>
+              </tr>
+              <tr>
+                <td><strong>Đánh giá chung</strong></td>
+                <td><strong>Tối ưu nhất cho MVP, Solopreneurs</strong>, dự án mới học tập cần chi phí vận hành bằng $0 và co giãn tự động tốt.</td>
+                <td>Đang duy trì cho khách hàng cũ. Không nên sử dụng cho các dự án mới từ tháng 5/2026.</td>
+                <td>Phù hợp cho các doanh nghiệp lớn, có lưu lượng truy cập lớn liên tục và ngân sách hạ tầng dồi dào.</td>
+              </tr>
+            </tbody>
+          </table>
+        </section>
+
+        <!-- Section 8: Pitfalls & Fixes -->
+        <section id="pitfalls" class="section">
+          <div class="section-title">
+            <div>
+              <div class="kicker">Section 8</div>
+              <h2>Pitfalls - Các lỗi thường gặp & Cách xử lý phòng ngừa</h2>
+            </div>
+          </div>
+          <div class="grid-2">
+            <article class="card">
+              <h3>Các trường hợp lỗi (Failure Modes)</h3>
+              <ul class="list">
+                <li><strong>Lỗi <code>Exec format error</code> trong CloudWatch Logs:</strong> Khi truy cập Function URL, trình duyệt báo lỗi và kiểm tra log ghi nhận lỗi định dạng thực thi nhị phân. Lý do: Image được build mặc định trên máy Mac M1/M2/M3 dùng kiến trúc ARM64, trong khi máy chủ ảo của AWS Lambda mặc định chạy kiến trúc CPU x86_64 (amd64).</li>
+                <li><strong>Giao diện chatbot bị đơ, chữ hiển thị toàn bộ cùng lúc:</strong> Kết quả summary của bác sĩ đứng im khoảng 15 giây rồi xuất hiện một lượt, làm mất hoàn toàn hiệu ứng chạy chữ streaming thời gian thực. Lý do: Invoke Mode của Lambda Function URL bị đặt nhầm thành <code>BUFFERED</code> (mặc định khi tạo trên console), làm AWS tích lũy toàn bộ dữ liệu phản hồi mới trả về một lượt.</li>
+                <li><strong>Lỗi HTTP 502/503 Bad Gateway khi gọi API:</strong> Trang web hiển thị được giao diện tĩnh nhưng các yêu cầu sinh summary trả về lỗi 502 hoặc 503. Lý do: Cấu hình RAM của Lambda quá thấp (mặc định 128MB) dẫn đến Out of Memory (OOM) làm crash tiến trình uvicorn khi chạy FastAPI, hoặc điền thiếu các khóa biến môi trường trong cấu hình Lambda.</li>
+              </ul>
+            </article>
+            <article class="card">
+              <h3>Cách khắc phục & Phòng ngừa (Fix/Prevention)</h3>
+              <ul class="list">
+                <li><strong>Khắc phục Exec format error:</strong> Luôn thêm flag <code>--platform linux/amd64</code> vào câu lệnh <code>docker build</code> để Docker Desktop thực hiện biên dịch chéo sang tập lệnh amd64 tương thích đám mây.</li>
+                <li><strong>Khắc phục lỗi đơ streaming:</strong> Vào Lambda Console → Tab Configuration → Mục Function URL → Click Edit → Sửa cấu hình Invoke Mode từ <code>BUFFERED</code> thành <strong><code>RESPONSE_STREAM</code></strong> và bấm lưu lại.</li>
+                <li><strong>Khắc phục lỗi 502/503 Bad Gateway:</strong> Truy cập Lambda General configuration, tăng cấu hình bộ nhớ RAM lên tối thiểu <strong>1024 MB</strong> và thời gian chờ Timeout lên <strong>5 phút</strong>. Kiểm tra kỹ 3 biến môi trường <code>CLERK_SECRET_KEY</code>, <code>CLERK_JWKS_URL</code> và <code>OPENAI_API_KEY</code> xem có khoảng trắng thừa hay ký tự sai lệch không.</li>
+              </ul>
+            </article>
+          </div>
+        </section>
+
+        <!-- Section 9: Knowledge Extension -->
+        <section id="knowledge-extension" class="section">
+          <div class="section-title">
+            <div>
+              <div class="kicker">Section 9</div>
+              <h2>Knowledge Extension - Kiến thức mở rộng thực tế</h2>
+            </div>
+          </div>
+          <div class="grid-2">
+            <article class="card">
+              <h3>Quản lý vòng đời lưu trữ ảnh Docker với ECR Lifecycle Policies</h3>
+              <p>Mỗi khi chạy script cập nhật ứng dụng, Docker build sẽ đẩy một image mới lên ECR với tag <code>latest</code>. Image cũ hơn sẽ bị mất tag và trở thành các ảnh orphan (<i>untagged image</i>).</p>
+              <p style="margin-top: 8px;">Mặc dù không có nhãn định dạng, các image mồ côi này vẫn nằm trên ECR và tiêu tốn phí lưu trữ của AWS ECR (khoảng $0.10/GB/tháng). Bằng cách thiết lập <strong>ECR Lifecycle Policy</strong> cho repository, chúng ta có thể cấu hình quy tắc tự động hóa: **Tự động xóa các ảnh untagged cũ hơn 14 ngày**, giúp tối ưu hóa chi phí lưu trữ trên AWS hoàn toàn tự động mà không cần dọn dẹp thủ công.</p>
+            </article>
+            <article class="card">
+              <h3>Xây dựng CI/CD tự động bằng GitHub Actions</h3>
+              <p>Trong quy trình vận hành công nghiệp, các lập trình viên không chạy lệnh build và push Docker thủ công từ terminal máy cá nhân vì dễ gây lỗi cấu hình. Thay vào đó, họ sử dụng **GitHub Actions** để tự động hóa hoàn toàn quy trình CI/CD:</p>
+              <p style="margin-top: 8px;">Mỗi khi lập trình viên thực hiện lệnh <code>git push</code> mã nguồn mới lên nhánh <code>main</code>, GitHub Actions sẽ kích hoạt một máy ảo chạy ngầm: Tự động chạy test kiểm tra cú pháp, đăng nhập vào AWS ECR thông qua thông tin đăng nhập bảo mật nạp từ GitHub Secrets, build image platform amd64, push lên ECR và ra lệnh cho AWS Lambda cập nhật code mới hoàn toàn tự động và an toàn.</p>
+            </article>
+          </div>
+        </section>
+
+        <!-- Section 10: Study Pack -->
+        <section id="study-pack" class="section">
+          <div class="section-title">
+            <div>
+              <div class="kicker">Section 10</div>
+              <h2>Study Pack - Thẻ ôn tập tương tác & Quick Quiz</h2>
+            </div>
+          </div>
+          
+          <div class="grid-2 font-check">
+            <!-- Flashcard 1 -->
+            <article class="card flashcard" id="fc1">
+              <h3>Q: Tại sao AWS không cung cấp giới hạn cứng (hard cap) tự động tắt dịch vụ khi vượt quá ngân sách đặt ra?</h3>
+              <button class="button primary" type="button" data-reveal>Reveal Answer</button>
+              <p class="flash-answer"><strong>A:</strong> Nhằm bảo vệ tính liên tục hoạt động của doanh nghiệp sản xuất lớn (ví dụ: Không thể vì một sự cố lỗi billing nhỏ mà AWS tự động đánh sập hệ thống máy chủ của Netflix hay một ngân hàng). Trách nhiệm kiểm soát chi phí thuộc về lập trình viên thông qua thiết lập Budget Alerts gửi về email và thắt trần Reserved Concurrency ở mức thấp.</p>
+            </article>
+
+            <!-- Flashcard 2 -->
+            <article class="card flashcard" id="fc2">
+              <h3>Q: Sự khác nhau về mặt tính phí giữa Reserved Concurrency và Provisioned Concurrency là gì?</h3>
+              <button class="button primary" type="button" data-reveal>Reveal Answer</button>
+              <p class="flash-answer"><strong>A:</strong> **Reserved Concurrency** là hoàn toàn miễn phí, chỉ đóng vai trò chốt chặn giới hạn trần số lượng container chạy đồng thời của Lambda để tránh rò rỉ chi phí (ví dụ giới hạn bằng 2). **Provisioned Concurrency** là tính năng trả phí theo thời gian duy trì một số container ở trạng thái ấm liên tục trong RAM để loại bỏ cold start, phí này tính liên tục ngay cả khi không có request nào gửi tới ứng dụng.</p>
+            </article>
+
+            <!-- Quiz Card -->
+            <article class="card">
+              <h3>Quick Quiz - Câu hỏi trắc nghiệm nhanh</h3>
+              <p>Khi tích hợp OpenAI streaming API vào Lambda Container, cấu hình Invoke Mode nào của Lambda Function URL là bắt buộc để tính năng sinh chữ chạy chữ hoạt động mượt mà?</p>
+              <button class="button quiz-option" type="button" data-correct="false">A. BUFFERED (Mặc định)</button>
+              <button class="button quiz-option" type="button" data-correct="true">B. RESPONSE_STREAM</button>
+              <button class="button quiz-option" type="button" data-correct="false">C. AWS_IAM</button>
+              <div class="quiz-result" aria-live="polite"></div>
+            </article>
+          </div>
+        </section>
+
+        <!-- Footer -->
+        <footer class="footer">
+          <strong>Sunny-sunnyy/AIProduction2026</strong> · Tài liệu học tập và ôn tập Day 5 Week 1 · Cập nhật theo kiến trúc AWS Lambda 2026 mới nhất.
+        </footer>
+      </main>
+    </div>
+  </div>
+
+  <!-- Interactive JavaScript for UI elements -->
+  <script>
+    const links = Array.from(document.querySelectorAll(".toc a"));
+    const sections = links.map((link) => document.querySelector(link.getAttribute("href"))).filter(Boolean);
+    const progressBar = document.getElementById("progressBar");
+
+    // Scroll active link highlight
+    function setActiveLink() {
+      let current = sections[0]?.id;
+      const offset = window.scrollY + 180;
+      for (const section of sections) {
+        if (section.offsetTop <= offset) {
+          current = section.id;
+        }
+      }
+      links.forEach((link) => {
+        link.classList.toggle("active", link.getAttribute("href") === `#${current}`);
+      });
+    }
+
+    // Scroll progress bar indicator
+    function updateProgress() {
+      const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+      const progress = docHeight > 0 ? Math.min((window.scrollY / docHeight) * 100, 100) : 0;
+      progressBar.style.width = `${progress}%`;
+    }
+
+    // Reveal flashcard answers
+    document.querySelectorAll("[data-reveal]").forEach((button) => {
+      button.addEventListener("click", () => {
+        const card = button.closest(".flashcard");
+        card.classList.toggle("revealed");
+        button.innerText = card.classList.contains("revealed") ? "Hide Answer" : "Reveal Answer";
+      });
+    });
+
+    // Quiz answer check and description response
+    document.querySelectorAll(".quiz-option").forEach((button) => {
+      button.addEventListener("click", () => {
+        const result = button.parentElement.querySelector(".quiz-result");
+        const isCorrect = button.dataset.correct === "true";
+        if (isCorrect) {
+          result.style.background = "rgba(93, 184, 114, 0.15)";
+          result.style.color = "var(--success)";
+          result.innerText = "Chính xác! Cấu hình RESPONSE_STREAM yêu cầu AWS chuyển tiếp dữ liệu chunk từ Server-Sent Events (SSE) trực tiếp về trình duyệt người dùng ngay khi FastAPI sinh ra, triệt tiêu bộ đệm lưu trữ làm chậm của AWS.";
+        } else {
+          result.style.background = "rgba(198, 69, 69, 0.15)";
+          result.style.color = "var(--error)";
+          result.innerText = "Chưa chính xác. BUFFERED là chế độ mặc định lưu trữ toàn bộ phản hồi trước khi gửi về client, làm mất tính năng streaming. AWS_IAM là cấu hình phân quyền truy cập Function URL, không liên quan đến cơ chế truyền dữ liệu.";
+        }
+      });
+    });
+
+    window.addEventListener("scroll", () => {
+      setActiveLink();
+      updateProgress();
+    }, { passive: true });
+
+    // Initial load calls
+    setActiveLink();
+    updateProgress();
+  </script>
+</body>
+
+</html>

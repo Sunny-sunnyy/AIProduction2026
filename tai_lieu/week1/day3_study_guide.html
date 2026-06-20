@@ -1,0 +1,1447 @@
+<!doctype html>
+<html lang="vi">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Day 3: User Authentication & Subscription Billing - Study Guide</title>
+  <!-- Google Fonts: Inter and Cormorant Garamond -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  
+  <style>
+    :root {
+      --canvas: #faf9f5;
+      --surface-soft: #f5f0e8;
+      --surface-card: #efe9de;
+      --surface-strong: #e8e0d2;
+      --surface-dark: #181715;
+      --surface-dark-elevated: #252320;
+      --surface-dark-soft: #1f1e1b;
+      --hairline: #e6dfd8;
+      --hairline-soft: #ebe6df;
+      --ink: #141413;
+      --body: #3d3d3a;
+      --body-strong: #252523;
+      --muted: #6c6a64;
+      --muted-soft: #8e8b82;
+      --primary: #cc785c;
+      --primary-active: #a9583e;
+      --accent-teal: #5db8a6;
+      --accent-amber: #e8a55a;
+      --success: #5db872;
+      --warning: #d4a017;
+      --error: #c64545;
+      --on-dark: #faf9f5;
+      --on-dark-soft: #a09d96;
+      --radius-md: 8px;
+      --radius-lg: 12px;
+      --radius-xl: 16px;
+      --content: 1200px;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      margin: 0;
+      background: var(--canvas);
+      color: var(--body);
+      font-family: "Inter", "Segoe UI", Arial, sans-serif;
+      line-height: 1.62;
+    }
+
+    h1,
+    h2,
+    .editorial-title {
+      color: var(--ink);
+      font-family: "Cormorant Garamond", Cambria, Georgia, serif;
+      font-weight: 500;
+      letter-spacing: -0.5px;
+      line-height: 1.15;
+      margin: 0;
+    }
+
+    h1 {
+      font-size: clamp(2.2rem, 4.5vw, 3.8rem);
+      max-width: 20ch;
+      font-weight: 400;
+    }
+
+    h2 {
+      font-size: clamp(1.6rem, 2.5vw, 2.2rem);
+    }
+
+    h3 {
+      color: var(--ink);
+      font-size: 1.1rem;
+      font-weight: 600;
+      line-height: 1.4;
+      margin: 0;
+    }
+
+    p,
+    li {
+      margin: 0;
+    }
+
+    code {
+      border-radius: 6px;
+      background: var(--surface-strong);
+      color: var(--body-strong);
+      font-family: "JetBrains Mono", Consolas, monospace;
+      font-size: 0.9em;
+      padding: 2px 6px;
+    }
+
+    pre {
+      margin: 0;
+      overflow-x: auto;
+      border-radius: var(--radius-lg);
+      background: var(--surface-dark-soft);
+      color: var(--on-dark);
+      padding: 20px;
+      font-family: "JetBrains Mono", Consolas, monospace;
+      font-size: 13px;
+      line-height: 1.6;
+      white-space: pre;
+    }
+
+    pre code {
+      background: transparent;
+      color: inherit;
+      padding: 0;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.95rem;
+      margin-top: 14px;
+    }
+
+    th,
+    td {
+      border-bottom: 1px solid var(--hairline);
+      padding: 14px;
+      text-align: left;
+      vertical-align: top;
+    }
+
+    th {
+      color: var(--ink);
+      font-weight: 700;
+      background: var(--surface-soft);
+    }
+
+    .page {
+      max-width: var(--content);
+      margin: 0 auto;
+      padding: 30px 20px 64px;
+    }
+
+    .hero {
+      display: grid;
+      grid-template-columns: minmax(0, 1.2fr) minmax(320px, 0.8fr);
+      gap: 28px;
+      align-items: stretch;
+      padding: 44px;
+      border: 1px solid var(--hairline);
+      border-radius: var(--radius-xl);
+      background: var(--surface-soft);
+    }
+
+    .hero-copy {
+      display: grid;
+      gap: 18px;
+      align-content: start;
+    }
+
+    .eyebrow {
+      width: fit-content;
+      border-radius: 999px;
+      background: var(--primary);
+      color: white;
+      font-size: 0.72rem;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      padding: 6px 14px;
+      text-transform: uppercase;
+    }
+
+    .lead {
+      max-width: 72ch;
+      color: var(--body-strong);
+      font-size: 1.1rem;
+    }
+
+    .tag-row,
+    .source-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .tag,
+    .source {
+      display: inline-flex;
+      align-items: center;
+      border-radius: 999px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      padding: 5px 12px;
+    }
+
+    .tag {
+      background: var(--surface-card);
+      color: var(--ink);
+    }
+
+    .source {
+      border: 1px solid var(--hairline);
+      background: var(--canvas);
+      color: var(--muted);
+    }
+
+    .source.extended {
+      border-color: rgba(204, 120, 92, 0.38);
+      background: rgba(204, 120, 92, 0.1);
+      color: var(--primary-active);
+    }
+
+    .hero-panel,
+    .code-panel {
+      border-radius: var(--radius-lg);
+      background: var(--surface-dark);
+      color: var(--on-dark);
+      padding: 28px;
+    }
+
+    .hero-panel {
+      display: grid;
+      gap: 18px;
+      align-content: start;
+    }
+
+    .hero-panel h2,
+    .hero-panel h3,
+    .code-panel h3 {
+      color: var(--on-dark);
+      font-family: "Inter", sans-serif;
+      font-weight: 600;
+      letter-spacing: 0;
+    }
+
+    .hero-panel h2 {
+      font-size: 1.4rem;
+    }
+
+    .hero-panel p,
+    .hero-panel li,
+    .code-panel p,
+    .code-panel li {
+      color: var(--on-dark-soft);
+    }
+
+    .progress-track {
+      height: 6px;
+      overflow: hidden;
+      border-radius: 999px;
+      background: var(--surface-dark-elevated);
+      margin-top: 6px;
+    }
+
+    .progress-bar {
+      width: 0;
+      height: 100%;
+      background: var(--primary);
+      transition: width 0.1s ease;
+    }
+
+    .layout {
+      display: grid;
+      grid-template-columns: 280px minmax(0, 1fr);
+      gap: 24px;
+      align-items: start;
+      margin-top: 26px;
+    }
+
+    .toc {
+      position: sticky;
+      top: 20px;
+      border: 1px solid var(--hairline);
+      border-radius: var(--radius-lg);
+      background: var(--canvas);
+      padding: 20px;
+    }
+
+    .toc h2 {
+      font-family: "Inter", "Segoe UI", Arial, sans-serif;
+      font-size: 1.05rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--muted);
+      margin-bottom: 12px;
+    }
+
+    .toc nav {
+      display: grid;
+      gap: 4px;
+    }
+
+    .toc a {
+      border-radius: var(--radius-md);
+      color: var(--muted);
+      padding: 8px 12px;
+      text-decoration: none;
+      font-size: 0.92rem;
+      font-weight: 500;
+      transition: all 0.2s ease;
+    }
+
+    .toc a:hover,
+    .toc a.active {
+      background: var(--surface-card);
+      color: var(--ink);
+      font-weight: 600;
+    }
+
+    .toc-tools {
+      display: grid;
+      gap: 8px;
+      margin-top: 16px;
+      padding-top: 16px;
+      border-top: 1px solid var(--hairline);
+    }
+
+    .button {
+      min-height: 40px;
+      border: 1px solid var(--hairline);
+      border-radius: var(--radius-md);
+      background: var(--canvas);
+      color: var(--ink);
+      cursor: pointer;
+      font: inherit;
+      font-size: 0.88rem;
+      font-weight: 600;
+      padding: 10px 16px;
+      transition: all 0.2s ease;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .button:hover {
+      background: var(--surface-card);
+    }
+
+    .button.primary {
+      border-color: var(--primary);
+      background: var(--primary);
+      color: white;
+    }
+
+    .button.primary:hover {
+      background: var(--primary-active);
+    }
+
+    .content {
+      display: grid;
+      gap: 24px;
+    }
+
+    .section {
+      border: 1px solid var(--hairline);
+      border-radius: var(--radius-lg);
+      background: var(--canvas);
+      padding: 32px;
+      scroll-margin-top: 20px;
+    }
+
+    .section-title {
+      display: flex;
+      justify-content: space-between;
+      gap: 16px;
+      align-items: start;
+      margin-bottom: 20px;
+      border-bottom: 1px solid var(--hairline-soft);
+      padding-bottom: 16px;
+    }
+
+    .kicker {
+      color: var(--primary);
+      font-size: 0.78rem;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      margin-bottom: 6px;
+      text-transform: uppercase;
+    }
+
+    .grid-2,
+    .grid-3 {
+      display: grid;
+      gap: 16px;
+    }
+
+    .grid-2 {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .grid-3 {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+
+    .card,
+    details {
+      border: 1px solid var(--hairline);
+      border-radius: var(--radius-lg);
+      background: var(--surface-card);
+      padding: 20px;
+    }
+
+    .card p,
+    .card ul,
+    .card ol,
+    details p,
+    details ul,
+    details ol {
+      margin-top: 10px;
+    }
+
+    .list {
+      padding-left: 20px;
+    }
+
+    .list li + li {
+      margin-top: 8px;
+    }
+
+    details {
+      margin-top: 16px;
+      transition: all 0.3s ease;
+    }
+
+    summary {
+      color: var(--ink);
+      cursor: pointer;
+      font-weight: 700;
+      outline: none;
+    }
+
+    .callout {
+      border-left: 4px solid var(--primary);
+      border-radius: var(--radius-md);
+      background: var(--surface-soft);
+      padding: 16px 20px;
+      margin-top: 14px;
+    }
+
+    .code-panel {
+      display: grid;
+      gap: 14px;
+      margin-top: 16px;
+    }
+
+    .code-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      color: var(--on-dark-soft);
+      font-size: 0.85rem;
+      border-bottom: 1px solid var(--surface-dark-elevated);
+      padding-bottom: 8px;
+    }
+
+    .flashcard {
+      display: grid;
+      gap: 12px;
+      align-content: start;
+    }
+
+    .flash-answer {
+      display: none;
+      border-top: 1px solid var(--hairline);
+      padding-top: 12px;
+      color: var(--body-strong);
+    }
+
+    .flashcard.revealed .flash-answer {
+      display: block;
+    }
+
+    .quiz-option {
+      display: block;
+      width: 100%;
+      margin-top: 8px;
+      text-align: left;
+      justify-content: flex-start;
+    }
+
+    .quiz-result {
+      min-height: 24px;
+      margin-top: 12px;
+      color: var(--primary-active);
+      font-weight: 700;
+      padding: 8px 12px;
+      border-radius: var(--radius-md);
+    }
+
+    .diagram-container {
+      background: var(--surface-soft);
+      border: 1px solid var(--hairline);
+      border-radius: var(--radius-lg);
+      padding: 20px;
+      margin-top: 14px;
+      overflow-x: auto;
+      display: flex;
+      justify-content: center;
+    }
+
+    .footer {
+      border-radius: var(--radius-lg);
+      background: var(--surface-dark);
+      color: var(--on-dark-soft);
+      padding: 32px;
+      margin-top: 32px;
+      text-align: center;
+      font-size: 0.9rem;
+    }
+
+    .footer strong {
+      color: var(--on-dark);
+    }
+
+    .badge-pill {
+      background: var(--primary);
+      color: white;
+      font-size: 0.75rem;
+      padding: 2px 8px;
+      border-radius: 999px;
+      font-weight: 700;
+      margin-left: 6px;
+    }
+
+    @media (max-width: 900px) {
+      .hero,
+      .layout,
+      .grid-2,
+      .grid-3 {
+        grid-template-columns: 1fr;
+      }
+
+      .toc {
+        position: static;
+        margin-bottom: 20px;
+      }
+    }
+  </style>
+
+  <!-- Include Mermaid.js from CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+  <script>
+    mermaid.initialize({
+      startOnLoad: true,
+      theme: 'base',
+      themeVariables: {
+        background: '#f5f0e8', // surface-soft
+        primaryColor: '#efe9de', // surface-card
+        primaryTextColor: '#141413', // ink
+        primaryBorderColor: '#e6dfd8', // hairline
+        lineColor: '#cc785c', // primary/coral
+        secondaryColor: '#faf9f5', // canvas
+        tertiaryColor: '#181715' // surface-dark
+      }
+    });
+  </script>
+</head>
+
+<body>
+  <div class="page">
+    <!-- Hero Header -->
+    <header class="hero">
+      <div class="hero-copy">
+        <span class="eyebrow">Study Guide</span>
+        <h1>Day 3: User Authentication & Subscription Billing</h1>
+        <p class="lead">Thiết lập cơ chế xác thực người dùng doanh nghiệp thông qua Clerk Auth và cấu hình hệ thống thanh toán gói cước Premium Subscription Billing giúp chuyển đổi ứng dụng AI Generator từ bản demo phi thương mại thành một sản phẩm SaaS hoàn thiện, bảo mật đầu-cuối.</p>
+        <div class="tag-row">
+          <span class="tag">AI Engineer Production Track</span>
+          <span class="tag">Week 1 Day 3</span>
+          <span class="tag">Next.js & FastAPI Integration</span>
+        </div>
+        <div class="source-row">
+          <span class="source">Transcript</span>
+          <span class="source">Slide</span>
+          <span class="source">Code Guide</span>
+          <span class="source extended">Knowledge Extension</span>
+        </div>
+      </div>
+      <aside class="hero-panel">
+        <h2>Quick Focus</h2>
+        <ul class="list">
+          <li><strong>Clerk Auth v6</strong>: Cài đặt và tích hợp xác thực đa phương thức phía client Next.js.</li>
+          <li><strong>JWT & JWKS</strong>: Truyền mã token bảo mật từ client và giải mã không trạng thái ở backend FastAPI.</li>
+          <li><strong>403 Timeout Fix</strong>: Xử lý xoay vòng token khi SSE streaming dài hơn thời hạn 60 giây của Clerk token.</li>
+          <li><strong>Clerk Billing / Stripe</strong>: Cấu hình cổng thanh toán và bảo vệ route bằng Subscription Plan Key.</li>
+        </ul>
+        <div>
+          <p style="margin-bottom: 4px; font-weight: 600;">Reading Progress</p>
+          <div class="progress-track" aria-label="Reading progress">
+            <div class="progress-bar" id="progressBar"></div>
+          </div>
+        </div>
+      </aside>
+    </header>
+
+    <!-- Layout Container -->
+    <div class="layout">
+      <!-- Navigation Sidebar (Sticky TOC) -->
+      <aside class="toc">
+        <h2>Navigation</h2>
+        <nav>
+          <a href="#source-map">1. Source Map</a>
+          <a href="#cheat-sheet">2. Cheat Sheet</a>
+          <a href="#previous-context">3. Previous Context</a>
+          <a href="#core-theory">4. Core Theory</a>
+          <a href="#workflow">5. Workflow / Pipeline</a>
+          <a href="#techniques">6. Techniques</a>
+          <a href="#code-walkthrough">7. Code Walkthrough</a>
+          <a href="#options">8. Options & Trade-offs</a>
+          <a href="#pitfalls">9. Pitfalls</a>
+          <a href="#flashcards">10. Flashcards / Quiz</a>
+          <a href="#memory">11. Quick Memory</a>
+        </nav>
+        <div class="toc-tools">
+          <button class="button" type="button" id="expandAll">Expand Notes</button>
+          <button class="button" type="button" id="collapseAll">Collapse Notes</button>
+        </div>
+      </aside>
+
+      <!-- Main Study Guide Content -->
+      <main class="content">
+        
+        <!-- Section 1: Source Map -->
+        <section id="source-map" class="section">
+          <div class="section-title">
+            <div>
+              <div class="kicker">Section 1</div>
+              <h2>Source Map - Bản đồ nguồn</h2>
+            </div>
+          </div>
+          <div class="grid-2">
+            <article class="card">
+              <h3>Sources Used - Nguồn đã dùng</h3>
+              <ul class="list">
+                <li><strong>Transcript:</strong> Đọc chi tiết các bài giảng 15, 16, 17, 18 của Day 3 để nắm toàn bộ bối cảnh và ý định thiết kế của giảng viên.</li>
+                <li><strong>Slide:</strong> Tham chiếu sơ đồ kiến trúc Auth, API Keys, luồng thanh toán và bảng giá trong file <code>Production W1D3.pdf</code>.</li>
+                <li><strong>Code:</strong> Phân tích các file hướng dẫn <code>day3.md</code>, <code>day3.part2.md</code> và file cài đặt thực tế của cộng đồng <code>community_contributions/product.tsx</code>.</li>
+              </ul>
+            </article>
+            <article class="card">
+              <h3>Grounding Notes - Ghi chú căn cứ</h3>
+              <p>Toàn bộ kiến thức kỹ thuật trong hướng dẫn được đối chiếu chéo giữa transcript và mã nguồn chạy thực tế. Tài liệu đặc biệt tích hợp giải pháp sửa lỗi hết hạn token JWT 60 giây khi kết nối stream dài (SSE) từ đóng góp của thành viên Artur P, đây là chi tiết thực tế cực kỳ quan trọng không có trong video gốc.</p>
+            </article>
+          </div>
+          <div class="callout">
+            <strong>Terminology Rule - Quy tắc thuật ngữ:</strong> Các thuật ngữ kỹ thuật trong tài liệu tuân thủ quy tắc: Cụm từ kỹ thuật viết dưới dạng <code>English - nghĩa tiếng Việt</code>; từ đơn phổ biến viết dưới dạng <code>cost (chi phí)</code>.
+            <br><em>Ví dụ:</em> <code>JSON Web Token (JWT) - mã thông báo web JSON</code>, <code>stateless authentication - xác thực phi trạng thái</code>.
+          </div>
+        </section>
+
+        <!-- Section 2: Cheat Sheet -->
+        <section id="cheat-sheet" class="section">
+          <div class="section-title">
+            <div>
+              <div class="kicker">Section 2</div>
+              <h2>Cheat Sheet - Tóm tắt một trang</h2>
+            </div>
+          </div>
+          <div class="grid-3">
+            <article class="card">
+              <h3>Core Idea - Ý chính</h3>
+              <p>Day 3 tập trung vào việc biến ứng dụng generative AI mở thành một sản phẩm SaaS thương mại bằng cách bọc giao diện Next.js trong một lớp bảo vệ người dùng (Clerk Auth) và tích hợp cổng thanh toán (Clerk Billing/Stripe). Điều này đảm bảo mỗi request API gửi lên FastAPI đều được ký số, xác thực và giới hạn quyền truy cập theo gói cước Premium.</p>
+            </article>
+            <article class="card">
+              <h3>Must Know - Cần nhớ</h3>
+              <ul class="list">
+                <li>Clerk SDK bản v6 (`@clerk/nextjs@6.39.0`) được sử dụng để duy trì tính tương thích với cấu trúc của Pages Router.</li>
+                <li>Client gửi JWT token qua HTTP Header <code>Authorization: Bearer &lt;token&gt;</code> cho backend FastAPI.</li>
+                <li>Backend FastAPI giải mã token bằng chữ ký công khai lấy từ <code>CLERK_JWKS_URL</code> giúp xác thực không trạng thái cực nhanh.</li>
+                <li>Token mặc định hết hạn sau 60 giây, gây lỗi 403 trên luồng kết nối dài. Cần cơ chế tự động refresh token và tái kết nối SSE.</li>
+              </ul>
+            </article>
+            <article class="card">
+              <h3>Use in Practice - Thực hành</h3>
+              <p>Áp dụng khi cần thương mại hóa ứng dụng AI nhanh chóng dưới dạng MVP (Minimum Viable Product). Giúp giải quyết nhanh bài toán quản lý người dùng, đăng nhập social auth, tích hợp cổng thanh toán mô phỏng (Clerk Gateway) hoặc thật (Stripe) mà không tốn hàng tuần xây dựng cơ sở hạ tầng auth/billing từ đầu.</p>
+            </article>
+          </div>
+        </section>
+
+        <!-- Section 3: Previous Context -->
+        <section id="previous-context" class="section">
+          <div class="section-title">
+            <div>
+              <div class="kicker">Section 3</div>
+              <h2>Previous Context - Liên hệ với bài trước</h2>
+            </div>
+          </div>
+          <div class="callout">
+            Nối tiếp Day 2, nơi học viên đã xây dựng ứng dụng Business Idea Generator full-stack chạy trên Next.js và FastAPI và triển khai thành công lên Vercel. Ở phiên bản cũ, bất kỳ ai có URL đều có thể truy cập và sử dụng dịch vụ sinh ý tưởng không giới hạn. Day 3 giải quyết bài toán bảo mật và kiếm tiền (monetization) bằng cách buộc người dùng phải tạo tài khoản, đăng nhập và đăng ký gói Premium Subscription mới có thể tiếp tục sử dụng tính năng AI này.
+          </div>
+        </section>
+
+        <!-- Section 4: Core Theory -->
+        <section id="core-theory" class="section">
+          <div class="section-title">
+            <div>
+              <div class="kicker">Section 4</div>
+              <h2>Core Theory - Lý thuyết cốt lõi</h2>
+            </div>
+            <div class="source-row">
+              <span class="source">Slide</span>
+              <span class="source">Transcript</span>
+            </div>
+          </div>
+          <div class="grid-2">
+            <article class="card">
+              <h3>Key Concepts - Khái niệm chính</h3>
+              <ul class="list">
+                <li><strong>JSON Web Token (JWT) - mã thông báo web JSON:</strong> Một định dạng mã bảo mật dạng chuỗi nén dùng để truyền tải thông tin danh tính giữa client và server. JWT được ký số bằng khóa riêng tư của Clerk để đảm bảo không bị giả mạo.</li>
+                <li><strong>JSON Web Key Set (JWKS) - bộ khóa web JSON:</strong> Tập hợp các khóa mật mã công khai do Clerk cung cấp qua một URL công khai. Backend sử dụng các khóa này để giải mã và kiểm tra chữ ký của JWT độc lập mà không cần thực hiện một request truy vấn mạng ngược lại Clerk server.</li>
+                <li><strong>Stateless Authentication - xác thực phi trạng thái:</strong> Cơ chế xác thực không lưu phiên (session) trong bộ nhớ RAM hoặc database của backend. Backend chỉ cần giải mã token JWT thành công là đủ để phê duyệt request, giúp hệ thống mở rộng quy mô (scaling) rất tốt.</li>
+                <li><strong>Zero-config Payment Gateway - cổng thanh toán không cấu hình:</strong> Cổng giả lập tích hợp sẵn của Clerk cho phép lập trình viên kiểm thử toàn bộ luồng thanh toán bằng thẻ test ngay lập tức mà không cần tạo tài khoản Stripe thật.</li>
+                <li><strong>PCI-DSS Compliance - tuân thủ chuẩn bảo mật thẻ thanh toán:</strong> Tiêu chuẩn bảo mật bắt buộc đối với hệ thống lưu trữ/xử lý thông tin thẻ tín dụng. Việc tích hợp Stripe/Clerk Billing giúp startup đạt chuẩn này tự động vì thông tin thẻ truyền thẳng đến cổng thanh toán, không đi qua server của ứng dụng.</li>
+              </ul>
+            </article>
+            <article class="card">
+              <h3>Concept Relationships - Quan hệ giữa các khái niệm</h3>
+              <p>Mối quan hệ chặt chẽ giữa các thành phần được thể hiện qua sơ đồ kiến trúc truyền nhận JWT. Client (Next.js) đóng vai trò lấy token từ nhà cung cấp định danh Clerk, sau đó đính kèm token này vào mọi API request gửi tới Backend (FastAPI). Backend dựa vào cấu hình JWKS URL để tải khóa công khai và xác minh tính hợp lệ của token mà không phát sinh thêm tải (overhead) cho database.</p>
+              <p style="margin-top: 12px;">Đồng thời, Billing System của Clerk liên kết chặt chẽ với trạng thái user session. Khi người dùng thanh toán qua cổng giả lập, Clerk cập nhật metadata của session token, giúp frontend Next.js tự động cập nhật giao diện thông qua component <code>&lt;Protect&gt;</code>.</p>
+            </article>
+          </div>
+
+          <div class="diagram-container">
+            <div class="mermaid">
+              graph TD
+                subgraph Client-Side Next.js
+                  A[Browser/User] -->|1. Đăng nhập| B[Clerk SDK]
+                  B -->|2. Trả về Session Token JWT| A
+                  A -->|3. Gọi API kèm Header Bearer JWT| C[Next.js API Route / Product]
+                end
+                subgraph Authentication & Billing Provider
+                  B <-->|Đồng bộ trạng thái| D[Clerk Core Server]
+                  D <-->|Cấu hình gói Premium| E[Clerk Billing / Stripe]
+                end
+                subgraph Server-Side FastAPI Backend
+                  C -->|4. Chuyển tiếp request| F[FastAPI Endpoint]
+                  F -->|5. Tải khóa công khai giải mã JWT| G[CLERK_JWKS_URL]
+                  F -->|6. Xác thực JWT & lấy User ID| H[clerk_guard]
+                  H -->|7. Gọi LLM Stream| I[OpenAI API]
+                  I -->|8. Phản hồi StreamingResponse| F
+                  F -->|9. Trả về luồng SSE| C
+                end
+                style B fill:#efe9de,stroke:#cc785c,stroke-width:2px;
+                style F fill:#efe9de,stroke:#cc785c,stroke-width:2px;
+                style E fill:#efe9de,stroke:#5db8a6,stroke-width:2px;
+                style I fill:#efe9de,stroke:#181715,stroke-width:1px;
+            </div>
+          </div>
+
+          <details>
+            <summary>Deep Explanation - Giải thích sâu về JWKS và Bảo mật phi trạng thái</summary>
+            <p>Trong cơ chế xác thực truyền thống (Stateful Session), mỗi khi client gửi request, backend phải thực hiện truy vấn cơ sở dữ liệu hoặc Redis session store để kiểm tra xem session ID có hợp lệ hay không. Điều này tạo ra nút thắt cổ chai về hiệu năng (I/O bottleneck) khi số lượng người dùng tăng cao.</p>
+            <p>Với <strong>Stateless JWT</strong>, token bản thân nó đã chứa đầy đủ thông tin định danh (như User ID <code>sub</code>, thời gian hết hạn <code>exp</code>, và các quyền hạn <code>org</code> hay <code>subscription</code>) được mã hóa. Chữ ký số đi kèm token chứng minh rằng thông tin này do Clerk tạo ra và không bị thay đổi trên đường truyền.</p>
+            <p>Để xác minh chữ ký này mà không phải gọi một request mạng (HTTP request) đến Clerk (điều này sẽ làm tăng độ trễ mạng lên hàng trăm mili-giây), backend tải trước danh sách các khóa công khai từ <code>CLERK_JWKS_URL</code> và lưu vào bộ nhớ cache. Khi nhận được một JWT mới, thuật toán mã hóa bất đối xứng sử dụng khóa công khai này để xác nhận chữ ký của token trong vài mili-giây ở cấp CPU. Đây chính là bí quyết giúp các hệ thống API có hiệu năng cao và khả năng mở rộng không giới hạn.</p>
+          </details>
+        </section>
+
+        <!-- Section 5: Workflow -->
+        <section id="workflow" class="section">
+          <div class="section-title">
+            <div>
+              <div class="kicker">Section 5</div>
+              <h2>Workflow / Pipeline - Quy trình hoạt động đầu-cuối</h2>
+            </div>
+            <div class="source-row">
+              <span class="source">Code</span>
+              <span class="source">Slide</span>
+            </div>
+          </div>
+          
+          <div class="grid-2">
+            <article class="card">
+              <h3>High-level Flow - Luồng tổng quát</h3>
+              <ol class="list">
+                <li><strong>Khởi tạo:</strong> Ứng dụng Next.js bọc trong <code>&lt;ClerkProvider&gt;</code> tại <code>pages/_app.tsx</code>. Người dùng truy cập route được bảo vệ <code>pages/product.tsx</code>.</li>
+                <li><strong>Kiểm tra quyền:</strong> Component <code>&lt;Protect plan="premium_subscription"&gt;</code> đánh giá trạng thái người dùng. Nếu chưa thanh toán, hiển thị fallback <code>&lt;PricingTable /&gt;</code>.</li>
+                <li><strong>Thanh toán:</strong> Người dùng mua gói qua Clerk Billing -> token session được cập nhật tự động phía Client.</li>
+                <li><strong>Lấy Token & Khởi tạo SSE:</strong> Hàm <code>connectWithFreshToken()</code> lấy token JWT mới và tạo kết nối <code>fetchEventSource('/api')</code> đính kèm token trong header Authorization.</li>
+                <li><strong>Xác thực API Backend:</strong> FastAPI chặn request tại middleware <code>clerk_guard</code>, lấy JWT verify bằng các khóa công khai của JWKS.</li>
+                <li><strong>Stream Ý Tưởng:</strong> Backend gọi OpenAI API với tham số stream và sinh dữ liệu định dạng SSE trả về client.</li>
+              </ol>
+            </article>
+            <article class="card">
+              <h3>Data & Control Flow - Luồng dữ liệu / điều khiển</h3>
+              <p>Luồng điều khiển được định hướng hoàn toàn bởi cơ chế khai báo (declarative check) ở frontend và dependency injection ở backend. Dữ liệu là luồng văn bản (text stream) truyền tải bất đồng bộ thông qua giao thức Server-Sent Events (SSE). Client sử dụng <code>AbortController</code> để chủ động điều phối luồng dữ liệu, cho phép hủy kết nối cũ và tái lập kết nối mới khi phát hiện token JWT hết hạn 60 giây.</p>
+            </article>
+          </div>
+
+          <div class="diagram-container">
+            <div class="mermaid">
+              sequenceDiagram
+                autonumber
+                actor User as Người dùng
+                participant FE as Next.js (/product)
+                participant Clerk as Clerk Server
+                participant BE as FastAPI Backend
+                participant OpenAI as OpenAI API
+
+                User->>FE: Truy cập trang sản phẩm
+                FE->>FE: Kiểm tra quyền sở hữu gói "premium_subscription"
+                alt Chưa mua gói
+                  FE->>User: Hiển thị bảng giá &lt;PricingTable&gt;
+                  User->>Clerk: Tiến hành thanh toán giả lập
+                  Clerk->>FE: Cập nhật trạng thái subscription thành công
+                end
+                FE->>FE: Gọi connectWithFreshToken()
+                FE->>Clerk: Gọi getToken() lấy JWT mới
+                Clerk-->>FE: Trả về chuỗi JWT Token
+                FE->>BE: fetchEventSource('/api') [Headers: Authorization: Bearer <JWT>]
+                Note over BE: clerk_guard thực hiện:<br/>1. Lấy JWT từ Authorization Header<br/>2. Tải public keys từ CLERK_JWKS_URL<br/>3. Verify chữ ký JWT và thời hạn 60s
+                alt Token không hợp lệ hoặc hết hạn
+                  BE-->>FE: Phản hồi mã lỗi HTTP 403 Forbidden
+                  FE->>FE: Kích hoạt AbortController.abort()
+                  FE->>Clerk: Lấy fresh token mới
+                  FE->>BE: Kết nối lại bằng token mới sau 1 giây
+                end
+                BE->>BE: Trích xuất user_id = token["sub"]
+                BE->>OpenAI: Gọi chat.completions.create(model="gpt-5-nano", stream=True)
+                loop Streaming chunks
+                  OpenAI-->>BE: Trả về chunk văn bản
+                  BE->>FE: yield f"data: {text}\n\n" (Giao thức SSE)
+                  FE->>User: Render ReactMarkdown cập nhật UI liên tục
+                end
+                FE->>FE: onclose() ngắt kết nối an toàn khi stream kết thúc
+            </div>
+          </div>
+
+          <h3 style="margin-top:20px; margin-bottom:10px;">End-to-End Detailed Workflow Walkthrough (Chi tiết cấp hàm)</h3>
+          <p>Dưới đây là chi tiết quy trình khởi chạy, gọi hàm và trao đổi dữ liệu giữa các file trong hệ thống:</p>
+          
+          <div class="grid-2" style="margin-top:10px;">
+            <article class="card">
+              <h4>Giai đoạn 1: Khởi chạy và Kiểm tra quyền (Frontend)</h4>
+              <ul class="list">
+                <li><strong>Bước 1.1:</strong> <code>pages/_app.tsx</code> là điểm đầu vào của Next.js Pages Router. Hàm <code>MyApp</code> bọc toàn bộ component trong thẻ <code>&lt;ClerkProvider&gt;</code> để khởi tạo context xác thực toàn cục, cho phép các page con truy cập trạng thái auth.</li>
+                <li><strong>Bước 1.2:</strong> Khi người dùng truy cập trang <code>/product</code>, file <code>pages/product.tsx</code> được thực thi. Hàm default export <code>Product</code> chạy đầu tiên.</li>
+                <li><strong>Bước 1.3:</strong> <code>Product</code> sử dụng component <code>&lt;Protect&gt;</code> của Clerk SDK. Component này thực hiện kiểm tra thuộc tính <code>plan="premium_subscription"</code>:
+                  <ul>
+                    <li>Nếu user chưa đăng nhập hoặc chưa đăng ký gói Premium, <code>&lt;Protect&gt;</code> sẽ ngăn chặn việc render component con và thay bằng giao diện khai báo trong thuộc tính <code>fallback</code> (chứa component <code>&lt;PricingTable /&gt;</code>).</li>
+                    <li>Nếu user đã sở hữu gói Premium, <code>&lt;Protect&gt;</code> tiến hành render component con <code>&lt;IdeaGenerator /&gt;</code>.</li>
+                  </ul>
+                </li>
+              </ul>
+            </article>
+
+            <article class="card">
+              <h4>Giai đoạn 2: Khởi tạo kết nối SSE (Frontend)</h4>
+              <ul class="list">
+                <li><strong>Bước 2.1:</strong> Component <code>IdeaGenerator</code> được mount, kích hoạt hook <code>useEffect</code> chạy duy nhất một lần (do mảng dependency rỗng).</li>
+                <li><strong>Bước 2.2:</strong> Hook <code>useEffect</code> định nghĩa và gọi ngay lập tức hàm bất đồng bộ <code>connectWithFreshToken()</code>.</li>
+                <li><strong>Bước 2.3:</strong> Hàm <code>connectWithFreshToken</code> thực hiện:
+                  <ul>
+                    <li>Kiểm tra cờ <code>isConnecting</code> để tránh kết nối trùng lặp. Nếu đang kết nối, thoát hàm.</li>
+                    <li>Hủy kết nối cũ đang chạy (nếu có) thông qua hàm <code>controller.abort()</code>, sau đó gán <code>controller = new AbortController()</code>.</li>
+                    <li>Gọi hàm <code>getToken()</code> (lấy từ hook <code>useAuth()</code>) để yêu cầu Clerk Client cấp một mã JWT mới nhất.</li>
+                    <li>Nếu lấy thành công JWT, gọi hàm thư viện <code>fetchEventSource('/api', { headers: { Authorization: `Bearer ${jwt}` }, signal: controller.signal, ... })</code>.</li>
+                  </ul>
+                </li>
+              </ul>
+            </article>
+          </div>
+
+          <div class="grid-2" style="margin-top:14px;">
+            <article class="card">
+              <h4>Giai đoạn 3: Xác thực và Xử lý nghiệp vụ (Backend FastAPI)</h4>
+              <ul class="list">
+                <li><strong>Bước 3.1:</strong> Request SSE được truyền đến Backend FastAPI tại file <code>api/index.py</code> ở endpoint <code>/api</code>.</li>
+                <li><strong>Bước 3.2:</strong> Endpoint <code>idea</code> khai báo dependency <code>Depends(clerk_guard)</code>. Trước khi chạy code của hàm, FastAPI chuyển quyền kiểm soát sang đối tượng <code>clerk_guard</code> (kiểu <code>ClerkHTTPBearer</code>).</li>
+                <li><strong>Bước 3.3:</strong> Hàm verify của <code>clerk_guard</code> đọc Authorization Header, bóc tách chuỗi token JWT sau chữ <code>Bearer </code>:
+                  <ul>
+                    <li>Tải công khai JWKS từ địa chỉ cấu hình trong biến môi trường <code>CLERK_JWKS_URL</code>.</li>
+                    <li>Giải mã chữ ký số của JWT và kiểm tra tính toàn vẹn, đảm bảo token chưa hết hạn (nhỏ hơn 60 giây).</li>
+                    <li>Nếu không hợp lệ, ném ngoại lệ trả về HTTP 403 Forbidden về phía Client.</li>
+                    <li>Nếu hợp lệ, trả về đối tượng credentials và tiếp tục chạy hàm <code>idea</code>.</li>
+                  </ul>
+                </li>
+                <li><strong>Bước 3.4:</strong> Hàm <code>idea</code> trích xuất User ID từ thuộc tính <code>creds.decoded["sub"]</code>.</li>
+                <li><strong>Bước 3.5:</strong> Hàm khởi tạo OpenAI client và gọi phương thức <code>client.chat.completions.create(..., stream=True)</code> để lấy một generator stream từ OpenAI.</li>
+                <li><strong>Bước 3.6:</strong> Hàm định nghĩa generator nội bộ <code>event_stream()</code>, duyệt qua các chunk kết quả trả về của OpenAI. Định dạng mỗi chunk text thành chuẩn SSE: <code>yield f"data: {line}\n\n"</code>.</li>
+                <li><strong>Bước 3.7:</strong> Trả về đối tượng <code>StreamingResponse(event_stream(), media_type="text/event-stream")</code> duy trì kết nối HTTP dài để stream dữ liệu về trình duyệt.</li>
+              </ul>
+            </article>
+
+            <article class="card">
+              <h4>Giai đoạn 4: Nhận Dữ liệu & Xoay vòng Token (Frontend Client)</h4>
+              <ul class="list">
+                <li><strong>Bước 4.1:</strong> Phía client Next.js tiếp nhận stream tại callback <code>onmessage(ev)</code> của hàm <code>fetchEventSource</code>. Hàm đọc <code>ev.data</code>, nối vào biến <code>buffer</code> và cập nhật state <code>setIdea(buffer)</code> để hiển thị văn bản ra màn hình thông qua ReactMarkdown.</li>
+                <li><strong>Bước 4.2:</strong> Nếu kết nối đang chạy mà token JWT hết hạn (quá 60 giây) và backend ngắt kết nối bằng mã lỗi 403:
+                  <ul>
+                    <li>Sự kiện lỗi được bắt tại callback <code>onerror(err)</code> hoặc <code>onopen(response)</code> của client.</li>
+                    <li>Code kiểm tra xem mã lỗi có phải là <code>403</code> hay không.</li>
+                    <li>Nếu đúng, client chủ động cập nhật UI <code>setIdea('Refreshing connection...')</code>, reset buffer, đặt cờ <code>isConnecting = false</code>, hủy controller kết nối cũ, chờ 1 giây rồi gọi đệ quy hàm <code>connectWithFreshToken()</code> để lấy token mới và tái kết nối tự động.</li>
+                  </ul>
+                </li>
+                <li><strong>Bước 4.3:</strong> Khi stream kết thúc bình thường, callback <code>onclose()</code> của <code>fetchEventSource</code> được kích hoạt để giải phóng cờ <code>isConnecting = false</code> và đóng kết nối an toàn.</li>
+              </ul>
+            </article>
+          </div>
+        </section>
+
+        <!-- Section 6: Techniques -->
+        <section id="techniques" class="section">
+          <div class="section-title">
+            <div>
+              <div class="kicker">Section 6</div>
+              <h2>Techniques - Kỹ thuật sử dụng</h2>
+            </div>
+          </div>
+          <div class="grid-2">
+            <article class="card">
+              <h3>1. Bearer JWT Authorization Header</h3>
+              <p><strong>Purpose - Mục đích:</strong> Truyền tải an toàn thông tin định danh người dùng đã được ký mã hóa từ Client lên Backend API.</p>
+              <p><strong>When to use - Dùng khi nào:</strong> Dùng cho mọi API request cần bảo vệ và định danh người dùng trong các ứng dụng decoupled (frontend và backend tách biệt).</p>
+              <p><strong>Trade-off - Đánh đổi:</strong> Phải quản lý việc lấy token bất đồng bộ ở frontend và đính kèm thủ công vào header của request. Cần lưu ý bảo mật token trong RAM, tránh lưu trữ lâu dài ở LocalStorage để giảm thiểu rủi ro XSS (Cross-Site Scripting).</p>
+            </article>
+            <article class="card">
+              <h3>2. Client-side Auth & Billing Guards</h3>
+              <p><strong>Purpose - Mục đích:</strong> Sử dụng các component khai báo (declarative components) của Clerk như <code>&lt;SignedIn&gt;</code>, <code>&lt;SignedOut&gt;</code>, và <code>&lt;Protect&gt;</code> để ẩn/hiển thị giao diện phù hợp với trạng thái đăng nhập và thanh toán.</p>
+              <p><strong>When to use - Dùng khi nào:</strong> Xây dựng thanh điều hướng (navbar), trang Landing Page và bảo vệ định tuyến client-side nhanh chóng.</p>
+              <p><strong>Trade-off - Đánh đổi:</strong> Giao diện ứng dụng Next.js bị phụ thuộc sâu vào cấu trúc và phiên bản của Clerk SDK. Nếu cập nhật thư viện lên bản mới hơn (như v7), một số component có thể bị thay đổi hành vi hoặc bị loại bỏ.</p>
+            </article>
+            <article class="card">
+              <h3>3. Auto Token Refresh & Reconnect (SSE)</h3>
+              <p><strong>Purpose - Mục đích:</strong> Bắt lỗi HTTP 403 Forbidden phát sinh do token JWT của Clerk hết hạn sau 60 giây, tự động lấy token mới và tái kết nối SSE không gây ngắt quãng trải nghiệm.</p>
+              <p><strong>When to use - Dùng khi nào:</strong> Khi kết nối Server-Sent Events hoặc WebSocket kéo dài hơn thời gian hết hạn mặc định của token xác thực.</p>
+              <p><strong>Trade-off - Đánh đổi:</strong> Phải viết code kết nối phức tạp hơn bằng cách tự quản lý trạng thái qua <code>AbortController</code> và cờ hiệu <code>isConnecting</code>, thay vì chỉ sử dụng hàm fetch mặc định đơn giản.</p>
+            </article>
+            <article class="card">
+              <h3>4. Hide My Email Testing Method</h3>
+              <p><strong>Purpose - Mục đích:</strong> Đăng ký nhiều tài khoản độc lập để kiểm thử luồng mua gói cước Premium nhiều lần mà không bị Clerk tự động gộp (Identity Consolidation) vào tài khoản Google gốc.</p>
+              <p><strong>When to use - Dùng khi nào:</strong> Trong giai đoạn chạy thử nghiệm luồng thanh toán đầu-cuối (End-to-End Testing) trên môi trường Staging/Production.</p>
+              <p><strong>Trade-off - Đánh đổi:</strong> Cần sử dụng các tài khoản Apple hoặc cấu hình email phụ (như Gmail alias `email+1@gmail.com`), tốn thời gian thao tác đăng ký thủ công.</p>
+            </article>
+          </div>
+        </section>
+
+        <!-- Section 7: Code Walkthrough -->
+        <section id="code-walkthrough" class="section">
+          <div class="section-title">
+            <div>
+              <div class="kicker">Section 7</div>
+              <h2>Code Walkthrough - Phân tích mã nguồn</h2>
+            </div>
+            <div class="source-row">
+              <span class="source">Code</span>
+            </div>
+          </div>
+
+          <!-- File 1: pages/_app.tsx -->
+          <article class="code-panel">
+            <div>
+              <h3>File: <code>pages/_app.tsx</code></h3>
+              <p>Khởi tạo Clerk Provider cấp toàn cục cho ứng dụng Next.js Pages Router.</p>
+            </div>
+            <div class="code-meta">
+              <span>Next.js App Wrap</span>
+              <span>Provider Pattern</span>
+            </div>
+            <pre><code>import { ClerkProvider } from '@clerk/nextjs';
+import type { AppProps } from 'next/app';
+import '../styles/globals.css';
+
+export default function MyApp({ Component, pageProps }: AppProps) {
+  return (
+    // Bọc toàn bộ các Component trang con trong ClerkProvider để cấp Context xác thực
+    &lt;ClerkProvider {...pageProps}&gt;
+      &lt;Component {...pageProps} /&gt;
+    &lt;/ClerkProvider&gt;
+  );
+}</code></pre>
+          </article>
+
+          <!-- File 2: pages/product.tsx -->
+          <article class="code-panel" style="margin-top: 24px;">
+            <div>
+              <h3>File: <code>pages/product.tsx</code> <span class="badge-pill">Premium Fix</span></h3>
+              <p>Trang sản phẩm được bảo vệ bằng phân quyền subscription, tích hợp cơ chế tự động xoay vòng làm mới token (Token Rotation) khi kết nối SSE bị lỗi 403 Forbidden do hết hạn 60 giây.</p>
+            </div>
+            <div class="code-meta">
+              <span>Next.js Client Component</span>
+              <span>SSE Auto Reconnect</span>
+              <span>AbortController Management</span>
+            </div>
+            <pre><code>"use client"
+
+import { useEffect, useState } from 'react';
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
+import remarkBreaks from 'remark-breaks';
+import { useAuth } from '@clerk/nextjs';
+import { fetchEventSource } from '@microsoft/fetch-event-source';
+import { Protect, PricingTable, UserButton } from '@clerk/nextjs';
+
+function IdeaGenerator() {
+    const { getToken } = useAuth();
+    const [idea, setIdea] = useState&lt;string&gt;('…loading');
+
+    useEffect(() => {
+        let buffer = '';
+        let controller: AbortController | null = null;
+        let isConnecting = false; // Cờ chống gửi trùng yêu cầu kết nối song song
+
+        const connectWithFreshToken = async () => {
+            if (isConnecting) return;
+            isConnecting = true;
+
+            try {
+                // Bước 1: Huỷ kết nối cũ trước khi tạo kết nối mới
+                if (controller) {
+                    controller.abort();
+                }
+                controller = new AbortController();
+
+                // Bước 2: Lấy token JWT mới nhất từ Clerk Client
+                const jwt = await getToken();
+                if (!jwt) {
+                    setIdea('Authentication required');
+                    isConnecting = false;
+                    return;
+                }
+
+                console.log('Connecting with fresh token...');
+
+                // Bước 3: Khởi chạy kết nối Event Source dài
+                await fetchEventSource('/api', {
+                    headers: { Authorization: `Bearer ${jwt}` }, // Gửi kèm token xác thực
+                    signal: controller.signal, // Gắn tín hiệu huỷ kết nối
+                    onmessage(ev) {
+                        console.log('Received message:', ev.data);
+                        buffer += ev.data;
+                        setIdea(buffer);
+                    },
+                    onerror(err) {
+                        console.error('SSE onerror called:', err);
+                        isConnecting = false;
+
+                        // Bước 4: Nhận diện lỗi 403 (Token Clerk hết hạn mặc định sau 60s)
+                        if (err instanceof Response && err.status === 403) {
+                            console.log('Token expired in onerror, reconnecting...');
+                            buffer = '';
+                            setIdea('Refreshing connection...');
+                            // Chờ 1 giây để Clerk làm mới phiên rồi gọi lại hàm đệ quy
+                            setTimeout(() => connectWithFreshToken(), 1000);
+                            return;
+                        }
+                        console.log('Non-403 error, letting fetchEventSource handle it');
+                    },
+                    onopen: async (response) => {
+                        console.log('SSE onopen called, status:', response.status);
+
+                        if (response.ok) {
+                            console.log('SSE connection opened successfully');
+                            isConnecting = false;
+                        } else if (response.status === 403) {
+                            // Bước 5: Chủ động bắt lỗi 403 ngay khi bắt đầu mở kết nối
+                            console.log('403 detected in onopen, triggering reconnect');
+                            isConnecting = false;
+                            buffer = '';
+                            setIdea('Refreshing connection...');
+                            setTimeout(() => connectWithFreshToken(), 1000);
+                            throw new Error('Authentication failed - triggering reconnect');
+                        } else {
+                            console.log('Non-403 error in onopen:', response.status);
+                            isConnecting = false;
+                            throw new Error(`HTTP ${response.status}`);
+                        }
+                    },
+                    onclose() {
+                        console.log('SSE connection closed');
+                        isConnecting = false;
+                    }
+                });
+            } catch (error) {
+                console.error('Failed to connect:', error);
+                isConnecting = false;
+
+                // Tự động thử kết nối lại nếu gặp lỗi mạng thuần túy
+                if (!controller?.signal.aborted) {
+                    if (error instanceof TypeError || (error instanceof Error && error.message?.includes('fetch'))) {
+                        console.log('Network error, retrying...');
+                        setTimeout(() => connectWithFreshToken(), 2000);
+                    } else {
+                        setIdea('Connection failed. Please refresh the page.');
+                    }
+                }
+            }
+        };
+
+        connectWithFreshToken();
+
+        // Cleanup: Huỷ kết nối SSE khi component bị unmount khỏi màn hình
+        return () => {
+            if (controller) {
+                controller.abort();
+            }
+        };
+    }, []);
+
+    return (
+        &lt;div className="container mx-auto px-4 py-12"&gt;
+            &lt;header className="text-center mb-12"&gt;
+                &lt;h1 className="text-5xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent mb-4"&gt;
+                    Business Idea Generator
+                &lt;/h1&gt;
+                &lt;p className="text-gray-600 dark:text-gray-400 text-lg"&gt;
+                    AI-powered innovation at your fingertips
+                &lt;/p&gt;
+            &lt;/header&gt;
+
+            &lt;div className="max-w-3xl mx-auto"&gt;
+                &lt;div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-8 backdrop-blur-lg bg-opacity-95"&gt;
+                    {idea === '…loading' ? (
+                        &lt;div className="flex items-center justify-center py-12"&gt;
+                            &lt;div className="animate-pulse text-gray-400"&gt;
+                                Generating your business idea...
+                            &lt;/div&gt;
+                        &lt;/div&gt;
+                    ) : (
+                        &lt;div className="markdown-content text-gray-700 dark:text-gray-300"&gt;
+                            &lt;ReactMarkdown remarkPlugins={[remarkGfm, remarkBreaks]}&gt;
+                                {idea}
+                            &lt;/ReactMarkdown&gt;
+                        &lt;/div&gt;
+                    )}
+                &lt;/div&gt;
+            &lt;/div&gt;
+        &lt;/div&gt;
+    );
+}
+
+export default function Product() {
+    return (
+        &lt;main className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-gray-800"&gt;
+            &lt;div className="absolute top-4 right-4"&gt;
+                &lt;UserButton showName={true} /&gt;
+            &lt;/div&gt;
+
+            {/* Bọc bảo vệ bằng gói Premium. Nếu chưa mua gói, hiển thị fallback là PricingTable */}
+            &lt;Protect
+                plan="premium_subscription"
+                fallback={
+                    &lt;div className="container mx-auto px-4 py-12"&gt;
+                        &lt;header className="text-center mb-12"&gt;
+                            &lt;h1 className="text-5xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent mb-4"&gt;
+                                Choose Your Plan
+                            &lt;/h1&gt;
+                            &lt;p className="text-gray-600 dark:text-gray-400 text-lg mb-8"&gt;
+                                Unlock unlimited AI-powered business ideas
+                            &lt;/p&gt;
+                        &lt;/header&gt;
+                        &lt;div className="max-w-4xl mx-auto"&gt;
+                            &lt;PricingTable /&gt;
+                        &lt;/div&gt;
+                    &lt;/div&gt;
+                }
+            &gt;
+                &lt;IdeaGenerator /&gt;
+            &lt;/Protect&gt;
+        &lt;/main&gt;
+    );
+}</code></pre>
+          </article>
+
+          <!-- File 3: api/index.py -->
+          <article class="code-panel" style="margin-top: 24px;">
+            <div>
+              <h3>File: <code>api/index.py</code></h3>
+              <p>Backend FastAPI tiếp nhận request, verify chữ ký JWT không trạng thái bằng bộ khóa JWKS URL và thực hiện streaming kết quả.</p>
+            </div>
+            <div class="code-meta">
+              <span>FastAPI Backend</span>
+              <span>clerk_guard Dependency</span>
+              <span>OpenAI Stream Response</span>
+            </div>
+            <pre><code>import os
+from fastapi import FastAPI, Depends  # type: ignore
+from fastapi.responses import StreamingResponse  # type: ignore
+from fastapi_clerk_auth import ClerkConfig, ClerkHTTPBearer, HTTPAuthorizationCredentials  # type: ignore
+from openai import OpenAI  # type: ignore
+
+app = FastAPI()
+
+# Cấu hình đối tượng giải mã bằng JWKS URL lấy từ biến môi trường Clerk
+clerk_config = ClerkConfig(jwks_url=os.getenv("CLERK_JWKS_URL"))
+clerk_guard = ClerkHTTPBearer(clerk_config)
+
+@app.get("/api")
+# Đính kèm Depends(clerk_guard) để ép buộc FastAPI xác thực JWT trước khi chạy hàm
+def idea(creds: HTTPAuthorizationCredentials = Depends(clerk_guard)):
+    # Trích xuất User ID từ thuộc tính 'sub' của token đã được giải mã
+    user_id = creds.decoded["sub"]  
+    
+    # Có thể sử dụng user_id này để:
+    # 1. Ghi log lịch sử request của người dùng vào database
+    # 2. Giới hạn số lượng request (rate limit) trong ngày
+    
+    client = OpenAI()
+    prompt = [{"role": "user", "content": "Reply with a new business idea for AI Agents, formatted with headings, sub-headings and bullet points"}]
+    stream = client.chat.completions.create(model="gpt-5-nano", messages=prompt, stream=True)
+
+    # Hàm generator định dạng luồng SSE theo chuẩn
+    def event_stream():
+        for chunk in stream:
+            text = chunk.choices[0].delta.content
+            if text:
+                lines = text.split("\n")
+                # Đảm bảo mỗi dòng dữ liệu được bao bởi 'data: ' và kết thúc bằng hai ký tự xuống dòng
+                for line in lines[:-1]:
+                    yield f"data: {line}\n\n"
+                    yield "data:  \n"
+                yield f"data: {lines[-1]}\n\n"
+
+    return StreamingResponse(event_stream(), media_type="text/event-stream")</code></pre>
+          </article>
+        </section>
+
+        <!-- Section 8: Options -->
+        <section id="options" class="section">
+          <div class="section-title">
+            <div>
+              <div class="kicker">Section 8</div>
+              <h2>Options / Trade-offs - Bản đồ lựa chọn</h2>
+            </div>
+          </div>
+          <table>
+            <thead>
+              <tr>
+                <th>Lựa chọn thiết kế</th>
+                <th>Phù hợp nhất khi</th>
+                <th>Đánh đổi (Trade-off)</th>
+                <th>Rủi ro chính (Risk)</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>Tự viết hệ thống Auth (Custom Auth)</strong></td>
+                <td>Dự án lớn, doanh nghiệp yêu cầu lưu trữ dữ liệu tại chỗ (On-Premise), đội ngũ kỹ sư bảo mật đông đảo.</td>
+                <td>Tốn hàng tuần/tháng để phát triển; tự quản lý hạ tầng lưu trữ mật khẩu, session, hashing.</td>
+                <td>Dễ gặp lỗ hổng bảo mật nghiêm trọng (SQL Injection, rò rỉ cơ sở dữ liệu mật khẩu) nếu không có kinh nghiệm sâu.</td>
+              </tr>
+              <tr>
+                <td><strong>Sử dụng dịch vụ Clerk Auth</strong></td>
+                <td>Các dự án khởi nghiệp, sản phẩm MVP cần đưa ra thị trường nhanh để test tính năng (Go-to-market).</td>
+                <td>Phụ thuộc hoàn toàn vào hạ tầng của Clerk; phát sinh chi phí hàng tháng khi lượng người dùng hoạt động (MAU) vượt hạn mức free.</td>
+                <td>Ứng dụng có thể bị gián đoạn nếu Clerk Server gặp sự cố ngừng hoạt động (downtime).</td>
+              </tr>
+              <tr>
+                <td><strong>Bảo vệ route ở Client-side (ẩn hiện UI)</strong></td>
+                <td>Ứng dụng đơn giản, UX mượt mà, không yêu cầu bảo mật quá cao về cấu trúc trang HTML/JS.</td>
+                <td>Chỉ bảo mật ở mức giao diện trình duyệt; dữ liệu mã nguồn HTML vẫn được tải về.</td>
+                <td>Nếu quên bảo mật ở API Endpoint backend, kẻ xấu vẫn có thể dùng công cụ để gọi trực tiếp API lấy dữ liệu thô.</td>
+              </tr>
+              <tr>
+                <td><strong>Bảo vệ route ở Next.js Middleware</strong></td>
+                <td>Ứng dụng chứa thông tin cực kỳ nhạy cảm; muốn chặn request ngay tại Edge Server trước khi trả về HTML/JS.</td>
+                <td>Cấu hình định tuyến phức tạp hơn; có thể làm tăng nhẹ độ trễ tải trang do phải xác thực trước ở Edge.</td>
+                <td>Cấu hình sai có thể chặn luôn cả các file tĩnh (CSS, JS, hình ảnh) khiến trang web không tải được tài nguyên.</td>
+              </tr>
+            </tbody>
+          </table>
+        </section>
+
+        <!-- Section 9: Pitfalls -->
+        <section id="pitfalls" class="section">
+          <div class="section-title">
+            <div>
+              <div class="kicker">Section 9</div>
+              <h2>Pitfalls - Lỗi / bẫy thường gặp</h2>
+            </div>
+          </div>
+          <div class="grid-2">
+            <article class="card">
+              <h3>Failure Modes - Các lỗi dễ gặp</h3>
+              <ul class="list">
+                <li><strong>Lỗi 403 Forbidden sau 60 giây stream:</strong> Kết nối SSE bị ngắt giữa chừng khi AI đang viết dở ý tưởng. Lý do: Token JWT của Clerk chỉ có hiệu lực mặc định 60 giây để đảm bảo an toàn. Sau 60s, request backend từ chối token cũ.</li>
+                <li><strong>Lỗi Màn hình xác thực kép (Double Auth):</strong> Người dùng truy cập trang chủ nhưng bị chặn bởi màn hình đăng nhập của Vercel thay vì giao diện của Clerk. Lý do: Quên tắt tính năng <code>Deployment Protection</code> trong cài đặt dự án của Vercel.</li>
+                <li><strong>Lỗi Backend từ chối mọi token (401/403 liên tục):</strong> Client đã đăng nhập thành công và gửi request bình thường nhưng backend FastAPI luôn phản hồi không hợp lệ. Lý do: Cấu hình sai URL trong biến <code>CLERK_JWKS_URL</code> ở backend.</li>
+              </ul>
+            </article>
+            <article class="card">
+              <h3>Fix / Prevention - Cách khắc phục</h3>
+              <ul class="list">
+                <li><strong>Khắc phục lỗi 403 SSE:</strong> Thực hiện bắt mã trạng thái 403 trong hàm <code>onopen</code> và <code>onerror</code> của <code>fetchEventSource</code>. Sử dụng <code>AbortController</code> để ngắt kết nối cũ một cách an toàn, sau đó lấy token mới bằng <code>getToken()</code> và thiết lập kết nối lại tự động.</li>
+                <li><strong>Khắc phục lỗi xác thực kép Vercel:</strong> Vào <code>Vercel Settings -> Project Settings -> Deployment Protection</code> và chuyển trạng thái từ ON sang OFF, sau đó lưu lại.</li>
+                <li><strong>Khắc phục cấu hình JWKS URL:</strong> Truy cập <code>Clerk Dashboard -> Configure -> API Keys</code>, sao chép chính xác dòng JWKS URL và cập nhật vào biến môi trường Vercel bằng câu lệnh <code>vercel env add CLERK_JWKS_URL</code>.</li>
+              </ul>
+            </article>
+          </div>
+        </section>
+
+        <!-- Section 10: Flashcards -->
+        <section id="flashcards" class="section">
+          <div class="section-title">
+            <div>
+              <div class="kicker">Section 10</div>
+              <h2>Flashcards & Quiz - Thẻ ôn tập tương tác</h2>
+            </div>
+          </div>
+          <div class="grid-2">
+            <!-- Flashcard 1 -->
+            <article class="card flashcard" id="card1">
+              <h3>Q: Tại sao Clerk thiết lập thời hạn sống (TTL) của token JWT cực kỳ ngắn (chỉ 60 giây)?</h3>
+              <button class="button primary" type="button" data-reveal>Reveal Answer</button>
+              <p class="flash-answer"><strong>A:</strong> Để giảm thiểu rủi ro bảo mật trong trường hợp token bị kẻ xấu đánh cắp (man-in-the-middle attack). Do token chỉ sống được 60 giây, kẻ xấu không thể tái sử dụng lâu dài. Token ngắn buộc Client phải liên tục xoay vòng lấy token mới (silent refresh) để bảo vệ người dùng.</p>
+            </article>
+
+            <!-- Flashcard 2 -->
+            <article class="card flashcard" id="card2">
+              <h3>Q: Vai trò của biến môi trường CLERK_JWKS_URL ở backend là gì?</h3>
+              <button class="button primary" type="button" data-reveal>Reveal Answer</button>
+              <p class="flash-answer"><strong>A:</strong> Cung cấp địa chỉ để backend tải về bộ khóa công khai của Clerk. Khóa công khai này dùng để giải mã chữ ký số của JWT ngay lập tức ở CPU backend, thực hiện xác thực không trạng thái (stateless auth) mà không cần tạo request truy vấn mạng ngược lại server của Clerk.</p>
+            </article>
+
+            <!-- Quiz Card -->
+            <article class="card">
+              <h3>Quick Quiz - Câu hỏi nhanh</h3>
+              <p>Nếu bạn thay đổi thuộc tính <code>plan="premium_subscription"</code> trong mã nguồn của trang <code>product.tsx</code> nhưng lại đặt tên key trên Clerk Dashboard là <code>premium_sub</code> (khác nhau một chút), điều gì sẽ xảy ra?</p>
+              <button class="button quiz-option" type="button" data-correct="false">A. Hệ thống vẫn chạy bình thường vì Clerk tự động liên kết bằng ID thực tế.</button>
+              <button class="button quiz-option" type="button" data-correct="true">B. Người dùng luôn bị chặn bởi Pricing Table kể cả sau khi đã thanh toán thành công.</button>
+              <button class="button quiz-option" type="button" data-correct="false">C. Ứng dụng Next.js báo lỗi biên dịch (Compilation Error) ngay khi build.</button>
+              <div class="quiz-result" aria-live="polite"></div>
+            </article>
+          </div>
+        </section>
+
+        <!-- Section 11: Quick Memory -->
+        <section id="memory" class="section">
+          <div class="section-title">
+            <div>
+              <div class="kicker">Section 11</div>
+              <h2>Quick Memory - Ôn nhanh cuối bài</h2>
+            </div>
+          </div>
+          <div class="grid-2">
+            <article class="card">
+              <h3>Must Remember - Phải nhớ</h3>
+              <ol class="list">
+                <li>Bảo vệ route client Next.js bằng <code>&lt;Protect&gt;</code> giúp điều phối fallback hiển thị bảng giá cước (Pricing Table) tự động.</li>
+                <li>Lệnh đẩy ứng dụng lên môi trường chạy thực tế nhanh bằng Vercel CLI là <code>vercel --prod</code>.</li>
+                <li>Hạn chế lưu trữ vĩnh viễn các khóa API nhạy cảm (như OpenAI Key, Clerk Secret Key) ở client-side; tất cả phải được gọi an toàn từ backend FastAPI.</li>
+                <li>Cơ chế Identity Consolidation của Clerk sẽ tự động gộp các tài khoản đăng nhập (như Google, Apple) có chung email thành một hồ sơ người dùng duy nhất.</li>
+              </ol>
+            </article>
+            <article class="card">
+              <h3>Self-check - Tự kiểm tra</h3>
+              <ul class="list">
+                <li>Bạn có thể giải thích chi tiết luồng đi của mã JWT từ trình duyệt sang backend và cách backend verify chữ ký không trạng thái không?</li>
+                <li>Bạn có thể so sánh ưu nhược điểm của việc dùng Clerk Billing Gateway giả lập so với cổng thật Stripe không?</li>
+                <li>Bạn có thể mô tả các bước sử dụng AbortController để ngắt kết nối SSE cũ và thực hiện reconnect bằng token mới khi xảy ra lỗi 403 không?</li>
+              </ul>
+            </article>
+          </div>
+        </section>
+
+        <!-- Footer -->
+        <footer class="footer">
+          <strong>Sunny-sunnyy/AIProduction2026</strong> · Tài liệu học tập cá nhân ôn tập Day 3 · Thiết kế bám sát Claude Design System.
+        </footer>
+      </main>
+    </div>
+  </div>
+
+  <!-- Interactive JavaScript for UI elements -->
+  <script>
+    const links = Array.from(document.querySelectorAll(".toc a"));
+    const sections = links.map((link) => document.querySelector(link.getAttribute("href"))).filter(Boolean);
+    const progressBar = document.getElementById("progressBar");
+    const detailsNodes = Array.from(document.querySelectorAll("details"));
+
+    // Scroll active link highlight
+    function setActiveLink() {
+      let current = sections[0]?.id;
+      const offset = window.scrollY + 180;
+      for (const section of sections) {
+        if (section.offsetTop <= offset) {
+          current = section.id;
+        }
+      }
+      links.forEach((link) => {
+        link.classList.toggle("active", link.getAttribute("href") === `#${current}`);
+      });
+    }
+
+    // Scroll progress bar indicator
+    function updateProgress() {
+      const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+      const progress = docHeight > 0 ? Math.min((window.scrollY / docHeight) * 100, 100) : 0;
+      progressBar.style.width = `${progress}%`;
+    }
+
+    // Expand / Collapse all details elements
+    document.getElementById("expandAll").addEventListener("click", () => {
+      detailsNodes.forEach((node) => {
+        node.open = true;
+      });
+    });
+
+    document.getElementById("collapseAll").addEventListener("click", () => {
+      detailsNodes.forEach((node) => {
+        node.open = false;
+      });
+    });
+
+    // Reveal flashcard answers
+    document.querySelectorAll("[data-reveal]").forEach((button) => {
+      button.addEventListener("click", () => {
+        const card = button.closest(".flashcard");
+        card.classList.toggle("revealed");
+        button.innerText = card.classList.contains("revealed") ? "Hide Answer" : "Reveal Answer";
+      });
+    });
+
+    // Quiz answer check and description response
+    document.querySelectorAll(".quiz-option").forEach((button) => {
+      button.addEventListener("click", () => {
+        const result = button.parentElement.querySelector(".quiz-result");
+        const isCorrect = button.dataset.correct === "true";
+        if (isCorrect) {
+          result.style.background = "rgba(93, 184, 114, 0.15)";
+          result.style.color = "var(--success)";
+          result.innerText = "Chính xác! Do Plan Key khai báo trong mã nguồn không khớp với Plan Key trên Clerk Dashboard, hệ thống Protect của Clerk sẽ không nhận diện được gói cước người dùng đã mua và liên tục render ra bảng giá Pricing Table như một fallback mặc định.";
+        } else {
+          result.style.background = "rgba(198, 69, 69, 0.15)";
+          result.style.color = "var(--error)";
+          result.innerText = "Chưa chính xác. Key của gói cước cần phải khớp 100% giữa Dashboard và Code để Clerk SDK nhận diện đúng trạng thái của tài khoản.";
+        }
+      });
+    });
+
+    window.addEventListener("scroll", () => {
+      setActiveLink();
+      updateProgress();
+    }, { passive: true });
+
+    // Initial load calls
+    setActiveLink();
+    updateProgress();
+  </script>
+</body>
+
+</html>
