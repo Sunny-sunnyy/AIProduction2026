@@ -1,0 +1,1370 @@
+<!doctype html>
+<html lang="vi">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>CI/CD with GitHub Actions - Study Guide</title>
+  
+  <!-- Import Google Fonts (Cormorant Garamond & Inter) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+  <!-- Import Mermaid.js for Architecture & Workflow Rendering -->
+  <script type="module">
+    import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+    mermaid.initialize({ 
+      startOnLoad: true,
+      theme: 'neutral',
+      themeVariables: {
+        background: '#181715',
+        primaryColor: '#cc785c',
+        primaryTextColor: '#faf9f5',
+        lineColor: '#cc785c',
+        textColor: '#faf9f5'
+      }
+    });
+  </script>
+
+  <style>
+    :root {
+      --canvas: #faf9f5;
+      --surface-soft: #f5f0e8;
+      --surface-card: #efe9de;
+      --surface-strong: #e8e0d2;
+      --surface-dark: #181715;
+      --surface-dark-elevated: #252320;
+      --surface-dark-soft: #1f1e1b;
+      --hairline: #e6dfd8;
+      --hairline-soft: #ebe6df;
+      --ink: #141413;
+      --body: #3d3d3a;
+      --body-strong: #252523;
+      --muted: #6c6a64;
+      --muted-soft: #8e8b82;
+      --primary: #cc785c;
+      --primary-active: #a9583e;
+      --accent-teal: #5db8a6;
+      --accent-amber: #e8a55a;
+      --on-dark: #faf9f5;
+      --on-dark-soft: #a09d96;
+      --radius-md: 8px;
+      --radius-lg: 12px;
+      --radius-xl: 16px;
+      --content: 1200px;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      margin: 0;
+      background: var(--canvas);
+      color: var(--body);
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      line-height: 1.62;
+    }
+
+    h1,
+    h2,
+    h3 {
+      color: var(--ink);
+      font-family: 'Cormorant Garamond', Garamond, 'Times New Roman', serif;
+      font-weight: 400;
+      letter-spacing: -0.01em;
+      line-height: 1.1;
+      margin: 0;
+      overflow-wrap: normal;
+      word-break: normal;
+    }
+
+    h1 {
+      font-size: clamp(2.2rem, 4.5vw, 3.8rem);
+      max-width: 25ch;
+    }
+
+    h2 {
+      font-size: clamp(1.6rem, 2.5vw, 2.2rem);
+      border-bottom: 1px solid var(--hairline-soft);
+      padding-bottom: 8px;
+    }
+
+    h3 {
+      font-size: 1.25rem;
+      line-height: 1.35;
+      margin: 0;
+      font-weight: 600;
+    }
+
+    p,
+    li {
+      margin: 0;
+    }
+
+    ul, ol {
+      margin: 0;
+      padding: 0;
+    }
+
+    code {
+      border-radius: 6px;
+      background: var(--surface-strong);
+      color: var(--body-strong);
+      font-family: "JetBrains Mono", Consolas, monospace;
+      font-size: 0.9em;
+      padding: 2px 6px;
+    }
+
+    pre {
+      margin: 0;
+      overflow-x: auto;
+      border-radius: var(--radius-lg);
+      background: var(--surface-dark-soft);
+      color: var(--on-dark);
+      padding: 18px;
+      font-family: "JetBrains Mono", Consolas, monospace;
+      font-size: 13px;
+      line-height: 1.58;
+      white-space: pre;
+    }
+
+    pre code {
+      background: transparent;
+      color: inherit;
+      padding: 0;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.95rem;
+      margin-top: 14px;
+    }
+
+    th,
+    td {
+      border-bottom: 1px solid var(--hairline);
+      padding: 12px;
+      text-align: left;
+      vertical-align: top;
+    }
+
+    th {
+      color: var(--ink);
+      font-weight: 700;
+      background: var(--surface-soft);
+    }
+
+    .page {
+      max-width: var(--content);
+      margin: 0 auto;
+      padding: 30px 20px 64px;
+    }
+
+    .hero {
+      display: grid;
+      grid-template-columns: minmax(0, 1.2fr) minmax(320px, 0.8fr);
+      gap: 28px;
+      align-items: stretch;
+      padding: 40px;
+      border: 1px solid var(--hairline);
+      border-radius: var(--radius-xl);
+      background: var(--surface-soft);
+    }
+
+    .hero-copy {
+      display: grid;
+      gap: 18px;
+      align-content: start;
+    }
+
+    .eyebrow {
+      width: fit-content;
+      border-radius: 999px;
+      background: var(--primary);
+      color: white;
+      font-size: 0.75rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      padding: 6px 12px;
+      text-transform: uppercase;
+    }
+
+    .lead {
+      max-width: 72ch;
+      color: var(--body-strong);
+      font-size: 1.1rem;
+    }
+
+    .tag-row,
+    .source-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .tag,
+    .source {
+      display: inline-flex;
+      align-items: center;
+      border-radius: 999px;
+      font-size: 0.82rem;
+      font-weight: 600;
+      padding: 5px 11px;
+    }
+
+    .tag {
+      background: var(--surface-card);
+      color: var(--ink);
+    }
+
+    .source {
+      border: 1px solid var(--hairline);
+      background: var(--canvas);
+      color: var(--muted);
+    }
+
+    .source.extended {
+      border-color: rgba(204, 120, 92, 0.38);
+      background: rgba(204, 120, 92, 0.12);
+      color: var(--primary-active);
+    }
+
+    .hero-panel,
+    .code-panel {
+      border-radius: var(--radius-lg);
+      background: var(--surface-dark);
+      color: var(--on-dark);
+      padding: 24px;
+    }
+
+    .hero-panel {
+      display: grid;
+      gap: 16px;
+      align-content: start;
+    }
+
+    .hero-panel h2,
+    .hero-panel h3,
+    .code-panel h3 {
+      color: var(--on-dark);
+      border-bottom: none;
+      padding-bottom: 0;
+    }
+
+    .hero-panel p,
+    .hero-panel li,
+    .code-panel p,
+    .code-panel li {
+      color: var(--on-dark-soft);
+    }
+
+    .progress-track {
+      height: 8px;
+      overflow: hidden;
+      border-radius: 999px;
+      background: var(--surface-dark-elevated);
+    }
+
+    .progress-bar {
+      width: 0;
+      height: 100%;
+      background: var(--primary);
+      transition: width 0.1s ease;
+    }
+
+    .layout {
+      display: grid;
+      grid-template-columns: 280px minmax(0, 1fr);
+      gap: 24px;
+      align-items: start;
+      margin-top: 26px;
+    }
+
+    .toc {
+      position: sticky;
+      top: 20px;
+      border: 1px solid var(--hairline);
+      border-radius: var(--radius-lg);
+      background: var(--canvas);
+      padding: 18px;
+    }
+
+    .toc h2 {
+      font-family: 'Inter', sans-serif;
+      font-size: 1rem;
+      font-weight: 700;
+      border-bottom: none;
+      padding-bottom: 0;
+      margin-bottom: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--muted);
+    }
+
+    .toc nav {
+      display: grid;
+      gap: 6px;
+    }
+
+    .toc a {
+      border-radius: var(--radius-md);
+      color: var(--muted);
+      padding: 8px 10px;
+      text-decoration: none;
+      font-size: 0.9rem;
+      font-weight: 500;
+      transition: all 0.2s ease;
+    }
+
+    .toc a:hover,
+    .toc a.active {
+      background: var(--surface-card);
+      color: var(--ink);
+    }
+
+    .toc-tools {
+      display: grid;
+      gap: 8px;
+      margin-top: 16px;
+      padding-top: 16px;
+      border-top: 1px solid var(--hairline);
+    }
+
+    .button {
+      min-height: 40px;
+      border: 1px solid var(--hairline);
+      border-radius: var(--radius-md);
+      background: var(--canvas);
+      color: var(--ink);
+      cursor: pointer;
+      font: inherit;
+      font-size: 0.9rem;
+      font-weight: 700;
+      padding: 10px 12px;
+      transition: all 0.2s ease;
+    }
+
+    .button:hover {
+      background: var(--surface-card);
+    }
+
+    .button.primary {
+      border-color: var(--primary);
+      background: var(--primary);
+      color: white;
+    }
+
+    .button.primary:hover {
+      background: var(--primary-active);
+    }
+
+    .button.primary:disabled {
+      background: var(--muted-soft);
+      border-color: var(--muted-soft);
+      cursor: not-allowed;
+    }
+
+    .button.quiz-option {
+      display: block;
+      width: 100%;
+      margin-top: 8px;
+      text-align: left;
+      font-weight: 500;
+    }
+
+    .content {
+      display: grid;
+      gap: 20px;
+    }
+
+    .section {
+      border: 1px solid var(--hairline);
+      border-radius: var(--radius-lg);
+      background: var(--canvas);
+      padding: 28px;
+    }
+
+    .section-title {
+      display: flex;
+      justify-content: space-between;
+      gap: 16px;
+      align-items: start;
+      margin-bottom: 18px;
+    }
+
+    .kicker {
+      color: var(--primary-active);
+      font-size: 0.8rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      margin-bottom: 6px;
+      text-transform: uppercase;
+    }
+
+    .grid-2,
+    .grid-3 {
+      display: grid;
+      gap: 14px;
+    }
+
+    .grid-2 {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .grid-3 {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+
+    .card,
+    details {
+      border: 1px solid var(--hairline);
+      border-radius: var(--radius-lg);
+      background: var(--surface-card);
+      padding: 18px;
+    }
+
+    .card p,
+    .card ul,
+    .card ol,
+    details p,
+    details ul,
+    details ol {
+      margin-top: 10px;
+    }
+
+    .list {
+      padding-left: 21px;
+    }
+
+    .list li + li {
+      margin-top: 8px;
+    }
+
+    details {
+      margin-top: 14px;
+      transition: all 0.2s ease;
+    }
+
+    summary {
+      color: var(--ink);
+      cursor: pointer;
+      font-weight: 700;
+      outline: none;
+    }
+
+    .callout {
+      border-left: 4px solid var(--primary);
+      border-radius: var(--radius-md);
+      background: var(--surface-soft);
+      padding: 14px 16px;
+    }
+
+    .code-panel {
+      display: grid;
+      gap: 14px;
+      margin-top: 14px;
+    }
+
+    .code-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      color: var(--on-dark-soft);
+      font-size: 0.86rem;
+    }
+
+    .flashcard {
+      display: grid;
+      gap: 10px;
+    }
+
+    .flash-answer {
+      display: none;
+      border-top: 1px solid var(--hairline);
+      padding-top: 10px;
+      margin-top: 10px;
+      font-style: italic;
+      color: var(--body-strong);
+    }
+
+    .flashcard.revealed .flash-answer {
+      display: block;
+    }
+
+    .quiz-result {
+      min-height: 24px;
+      margin-top: 10px;
+      color: var(--primary-active);
+      font-weight: 700;
+      font-size: 0.95rem;
+    }
+
+    .mermaid-container {
+      background: var(--surface-dark);
+      padding: 20px;
+      border-radius: var(--radius-lg);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      margin-top: 14px;
+    }
+
+    .footer {
+      border-top: 1px solid var(--hairline);
+      margin-top: 40px;
+      padding-top: 20px;
+      color: var(--muted);
+      font-size: 0.85rem;
+      text-align: center;
+    }
+
+    @media (max-width: 860px) {
+      .hero {
+        grid-template-columns: 1fr;
+      }
+      .layout {
+        grid-template-columns: 1fr;
+      }
+      .toc {
+        position: static;
+      }
+      .grid-2,
+      .grid-3 {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="page">
+    <!-- HERO HEADER -->
+    <header class="hero">
+      <div class="hero-copy">
+        <div class="eyebrow">Week 2 • Day 5</div>
+        <h1>CI/CD with GitHub Actions & Remote State</h1>
+        <p class="lead">
+          Hoàn thiện vòng đời DevOps cho Digital Twin bằng việc thiết lập đường ống tích hợp và triển khai liên tục (CI/CD) tự động qua GitHub Actions. Nội dung bao gồm di chuyển file trạng thái sang S3 Remote State kết hợp DynamoDB Lock, cấu hình xác thực không mật khẩu (passwordless) qua AWS OpenID Connect (OIDC), xử lý lỗi cấu trúc Git lồng nhau và tối ưu hóa trải nghiệm UI Focus cho chatbot.
+        </p>
+        <div class="tag-row">
+          <span class="tag">GitHub Actions</span>
+          <span class="tag">CI/CD Pipeline</span>
+          <span class="tag">Remote State</span>
+          <span class="tag">DynamoDB Lock</span>
+          <span class="tag">AWS OIDC Auth</span>
+          <span class="tag">React UI Refocus</span>
+        </div>
+        <div class="source-row">
+          <span class="source">Production W2D5.pdf (Slide)</span>
+          <span class="source">day5.md (Source Code)</span>
+          <span class="source extended">day5_summary.md (Extended Notes)</span>
+        </div>
+      </div>
+
+      <!-- SIDE PROGRESS PANEL -->
+      <div class="hero-panel">
+        <h3>Tiến trình học tập</h3>
+        <p>Theo dõi tiến trình đọc và hoàn thành nội dung ôn tập của bài học.</p>
+        <div class="progress-track">
+          <div id="progressBar" class="progress-bar"></div>
+        </div>
+        <p id="progressPercent" style="font-size: 0.85rem; font-weight: 700; color: var(--primary);">0% Completed</p>
+        <div class="toc-tools">
+          <button id="expandAll" class="button">Expand All Details</button>
+          <button id="collapseAll" class="button">Collapse All Details</button>
+        </div>
+      </div>
+    </header>
+
+    <!-- MAIN LAYOUT -->
+    <div class="layout">
+      <!-- SIDEBAR TOC -->
+      <aside class="toc">
+        <h2>Mục lục</h2>
+        <nav>
+          <a href="#cicd-intro">1. CI/CD & GitHub Actions Basics</a>
+          <a href="#remote-state">2. Remote State & DynamoDB Locks</a>
+          <a href="#oidc-auth">3. Passwordless OIDC Authentication</a>
+          <a href="#git-flat">4. Nested Git Repositories Fix</a>
+          <a href="#ui-focus">5. React Input Focus Improvement</a>
+          <a href="#code-bootstrap">6. Bootstrap HCL Code Walkthrough</a>
+          <a href="#yaml-workflows">7. GitHub Actions Workflows YAML</a>
+          <a href="#script-updates">8. Deploy/Destroy Script Upgrades</a>
+          <a href="#options-tradeoffs">9. Options & Trade-offs</a>
+          <a href="#pitfalls">10. Pitfalls - Bẫy & Lỗi thường gặp</a>
+          <a href="#interactive">11. Flashcards & Quiz</a>
+          <a href="#quick-memory">12. Quick Memory - Ghi nhớ nhanh</a>
+        </nav>
+      </aside>
+
+      <!-- MAIN CONTENT -->
+      <main class="content">
+        <!-- SECTION 1: CICD INTRO -->
+        <section id="cicd-intro" class="section">
+          <div class="section-title">
+            <div>
+              <div class="kicker">Section 1</div>
+              <h2>CI/CD & GitHub Actions Basics - Tự động hóa tích hợp liên tục</h2>
+            </div>
+          </div>
+          <div class="grid-2">
+            <article class="card">
+              <h3>Ý nghĩa cốt lõi của CI/CD</h3>
+              <p>
+                <strong>Tích hợp liên tục (Continuous Integration)</strong> và <strong>Triển khai liên tục (Continuous Deployment)</strong> là trụ cột DevOps giúp tự động hóa quá trình kiểm thử, đóng gói và đẩy mã nguồn mới lên AWS ngay khi có thay đổi trên repository GitHub.
+              </p>
+              <p>
+                <strong>Lợi ích:</strong> Loại bỏ hoàn toàn lỗi thao tác thủ công, tăng tốc phát hành sản phẩm, đảm bảo hệ thống luôn trong trạng thái ổn định và có thể tự động khôi phục (rollback) nhanh chóng.
+              </p>
+            </article>
+            <article class="card">
+              <h3>Kiến trúc GitHub Actions</h3>
+              <p>GitHub Actions là nền tảng tự động hóa trực tiếp trong repository GitHub:</p>
+              <ul class="list" style="margin-top: 6px;">
+                <li><strong>Workflow:</strong> Quy trình tự động hóa được định nghĩa trong file YAML đặt tại thư mục <code>.github/workflows/</code>.</li>
+                <li><strong>Event/Trigger:</strong> Sự kiện kích hoạt chạy pipeline (như git <code>push</code> nhánh main, pull request, hoặc trigger tay qua <code>workflow_dispatch</code>).</li>
+                <li><strong>Job:</strong> Nhóm các bước (steps) thực thi tuần tự trên cùng một máy ảo độc lập gọi là <strong>Runner</strong> (ví dụ: máy ảo <code>ubuntu-latest</code>).</li>
+              </ul>
+            </article>
+          </div>
+        </section>
+
+        <!-- SECTION 2: REMOTE STATE -->
+        <section id="remote-state" class="section">
+          <div class="section-title">
+            <div>
+              <div class="kicker">Section 2</div>
+              <h2>Remote State & DynamoDB Locks - Quản lý trạng thái từ xa</h2>
+            </div>
+          </div>
+          <p>
+            Khi chạy Terraform ở máy local, file <code>terraform.tfstate</code> được lưu trực tiếp trên đĩa cứng. Tuy nhiên, trong môi trường CI/CD, máy ảo Runner chạy GitHub Actions là một máy ảo tạm thời (ephemeral VM) - nó sẽ bị xóa sạch hoàn toàn ngay sau khi kết thúc công việc. Nếu lưu state local, pipeline tiếp theo sẽ mất vết hạ tầng và cố gắng tạo lại toàn bộ tài nguyên, gây lỗi trùng lặp nghiêm trọng.
+          </p>
+          <div class="grid-2" style="margin-top: 14px;">
+            <div class="card">
+              <h3>S3 Remote State & DynamoDB Lock Table</h3>
+              <p>
+                <strong>AWS S3</strong> được dùng làm kho lưu trữ tệp tin <code>.tfstate</code> tập trung trực tuyến. S3 bucket này bắt buộc phải bật tính năng <strong>Versioning</strong> để lưu lịch sử và khôi phục khi state bị lỗi.
+              </p>
+              <p>
+                <strong>DynamoDB Lock Table</strong> (chứa partition key có tên chính xác là <code>LockID</code>) làm nhiệm vụ khóa trạng thái (State Locking). Khi một tiến trình apply đang chạy, một khóa tạm thời được ghi vào DynamoDB. Các tiến trình khác (ví dụ: kỹ sư khác hoặc một pipeline khác kích hoạt song song) cố chạy apply lúc này sẽ bị chặn lại, ngăn chặn lỗi ghi đè gây hỏng file state.
+              </p>
+            </div>
+            <div class="card">
+              <h3>Bootstrapping & Target Apply</h3>
+              <p>
+                Để tạo S3 bucket lưu state và DynamoDB lock table bằng Terraform, ta gặp bài toán "con gà và quả trứng": Cần backend S3 để chạy init, nhưng backend S3 lại yêu cầu S3 bucket đó tồn tại trước.
+              </p>
+              <p>
+                <strong>Giải pháp (Bootstrapping):</strong> Viết file cấu hình phụ tạm thời <code>backend-setup.tf</code> định nghĩa S3 & DynamoDB. Chạy lệnh <code>terraform apply</code> khoanh vùng chọn lọc bằng cờ <code>-target</code> để AWS tạo trước các tài nguyên nền móng này. Sau khi tạo xong, cấu hình backend S3 chính thức trong <code>backend.tf</code> và xóa tệp tạm <code>backend-setup.tf</code> đi.
+              </p>
+            </div>
+          </div>
+        </section>
+
+        <!-- SECTION 3: OIDC AUTH -->
+        <section id="oidc-auth" class="section">
+          <div class="section-title">
+            <div>
+              <div class="kicker">Section 3</div>
+              <h2>OpenID Connect (OIDC) - Xác thực không khóa (Passwordless Auth)</h2>
+            </div>
+          </div>
+          <p>
+            Cách làm truyền thống để cấp quyền cho GitHub Actions truy cập vào AWS là tạo một IAM User với Access Key ID và Secret Access Key dài hạn, rồi lưu vào GitHub Secrets. Phương pháp này mang lại rủi ro bảo mật cực kỳ lớn: nếu tài khoản GitHub bị xâm nhập, hacker sẽ chiếm toàn quyền AWS; khóa dài hạn cũng không tự xoay vòng (rotation).
+          </p>
+          <div class="callout">
+            <p><strong>OpenID Connect (OIDC):</strong> Cơ chế xác thực liên kết định danh (Federated Identity) hiện đại. GitHub Actions Runner chứng minh danh tính với AWS Security Token Service (STS) bằng một Web Identity Token ngắn hạn do GitHub ký số. AWS xác thực token đó và cấp quyền tạm thời (credentials tự xoay vòng sau vài phút) cho Actions thực thi mà không cần lưu trữ bất kỳ mật khẩu dài hạn nào.</p>
+          </div>
+
+          <!-- MERMAID 1: OIDC AUTHENTICATION FLOW -->
+          <div class="mermaid-container">
+            <div class="mermaid">
+sequenceDiagram
+    participant GitHub as GitHub Actions Runner
+    participant STS as AWS STS (Security Token Service)
+    participant IAM as AWS IAM Deploy Role
+    participant AWS as AWS Resources (S3, Lambda, CloudFront)
+
+    GitHub->>GitHub: Khởi tạo Job (Nhận OIDC Token từ GitHub OIDC Provider)
+    GitHub->>STS: Gọi AssumeRoleWithWebIdentity (Gửi OIDC Token)
+    Note over STS: Xác thực OIDC Provider & Thumbprint<br/>Kiểm tra Repo trust policy condition
+    STS-->>GitHub: Cấp AccessKey, SecretKey & SessionToken tạm thời (thời hạn ngắn)
+    GitHub->>AWS: Thực thi Terraform Apply / CLI commands (Ký request qua Token tạm)
+    Note over AWS: Thực thi tạo lập hoặc gỡ bỏ tài nguyên
+    AWS-->>GitHub: Hoàn thành tác vụ
+            </div>
+          </div>
+
+          <div class="grid-2" style="margin-top: 14px;">
+            <div class="card">
+              <h3>IAM Role Trust Policy</h3>
+              <p>
+                Để AWS cho phép giả lập vai trò (assume role) an toàn, ta khai báo điều kiện trust policy nghiêm ngặt:
+              </p>
+              <ul class="list" style="margin-top: 6px;">
+                <li>Khóa <code>aud</code> (audience) bắt buộc phải khớp với <code>sts.amazonaws.com</code>.</li>
+                <li>Khóa <code>sub</code> (subject) bắt buộc phải chứa ràng buộc tên repository chính xác của bạn: <code>repo:owner/repo-name:*</code>. Điều này ngăn chặn các tài khoản GitHub của người khác giả mạo để gọi vào tài khoản AWS của bạn.</li>
+              </ul>
+            </div>
+            <div class="card">
+              <h3>Quyền hạn Role (IAM Policy)</h3>
+              <p>
+                IAM Role dành cho GitHub Actions cần được cấp quyền tối thiểu để có thể tự động tạo hạ tầng:
+              </p>
+              <ul class="list" style="margin-top: 6px;">
+                <li>Gắn các AWS Managed Policies: Lambda, S3, API Gateway, CloudFront, Bedrock, DynamoDB, ACM, Route 53.</li>
+                <li><strong>Cấp quyền IAM quản trị:</strong> Cấp thêm các quyền tạo, cập nhật và gán IAM Role cho Lambda (<code>iam:CreateRole</code>, <code>iam:PassRole</code>, v.v.) thông qua inline policy.</li>
+              </ul>
+            </div>
+          </div>
+        </section>
+
+        <!-- SECTION 4: GIT FLAT -->
+        <section id="git-flat" class="section">
+          <div class="section-title">
+            <div>
+              <div class="kicker">Section 4</div>
+              <h2>Nested Git Repositories Fix - Giải quyết lỗi thư mục Git lồng nhau</h2>
+            </div>
+          </div>
+          <p>
+            Khi sử dụng các công cụ khởi tạo khung dự án (scaffolding tools) tự động như <code>create-next-app</code> cho frontend Next.js hoặc <code>uv init</code> cho backend Python, các công cụ này thường tự động tạo sẵn một thư mục ẩn <code>.git</code> bên trong thư mục con đó.
+          </p>
+          <div class="grid-2" style="margin-top: 14px;">
+            <div class="card">
+              <h3>Lỗi Git Submodule xám</h3>
+              <p>
+                Nếu có thư mục ẩn <code>.git</code> bên trong thư mục con <code>frontend/</code> hoặc <code>backend/</code>, khi ta chạy lệnh khởi tạo Git và commit ở thư mục root cha, Git cha sẽ coi các thư mục con đó là một Git Submodule chưa được cấu hình.
+              </p>
+              <p>
+                <strong>Symptom:</strong> Trên giao diện web GitHub, thư mục <code>frontend/</code> hiển thị dưới dạng một biểu tượng màu xám có dấu mũi tên và không thể nhấp mở ra xem file con bên trong. Toàn bộ code frontend thực tế bị bỏ qua không được push lên đám mây, khiến pipeline của GitHub Actions bị crash do thiếu tệp <code>package.json</code>.
+              </p>
+            </div>
+            <div class="card">
+              <h3>Cách khắc phục triệt để</h3>
+              <p>Thực hiện các bước dọn dẹp và nạp lại dữ liệu sau để loại bỏ hoàn toàn repo con:</p>
+              <ol class="list" style="margin-top: 6px;">
+                <li>Xóa index tracking cũ của Git cha:
+                  <pre style="margin-top: 4px; padding: 6px; font-size: 11px;"><code>git rm --cached frontend backend -f</code></pre>
+                </li>
+                <li>Xóa thư mục ẩn <code>.git</code> của thư mục con:
+                  <ul style="margin-top: 4px; padding-left: 16px;">
+                    <li>Windows: <code>Remove-Item -Path frontend/.git -Recurse -Force</code></li>
+                    <li>Linux/Mac: <code>rm -rf frontend/.git</code></li>
+                  </ul>
+                </li>
+                <li>Thêm lại toàn bộ và commit:
+                  <pre style="margin-top: 4px; padding: 6px; font-size: 11px;"><code>git add .
+git commit -m "Fix nested repositories"</code></pre>
+                </li>
+              </ol>
+            </div>
+          </div>
+        </section>
+
+        <!-- SECTION 5: UI FOCUS -->
+        <section id="ui-focus" class="section">
+          <div class="section-title">
+            <div>
+              <div class="kicker">Section 5</div>
+              <h2>React Input Focus Improvement - Tối ưu hóa trải nghiệm hội thoại</h2>
+            </div>
+          </div>
+          <p>
+            Một lỗi UI nhỏ nhưng gây ảnh hưởng lớn đến trải nghiệm người dùng (UX) trong giao diện chatbot cũ: Khi người dùng nhấn gửi tin nhắn (hoặc nhấn phím Enter), sau khi tin nhắn được gửi đi và API bắt đầu xử lý, ô nhập liệu text input bị mất focus (con trỏ chuột biến mất). Người dùng bắt buộc phải dùng chuột click lại vào ô input thì mới có thể gõ tiếp tin nhắn thứ hai.
+          </p>
+          <div class="grid-2" style="margin-top: 14px;">
+            <div class="card">
+              <h3>Giải pháp sử dụng React useRef</h3>
+              <p>
+                Để kiểm soát trực tiếp phần tử DOM của ô input trong React mà không làm trigger re-render lại component, chúng ta sử dụng hook <code>useRef</code>:
+              </p>
+              <pre style="margin-top: 8px;"><code>import { useRef } from 'react';
+
+// Khai báo ref trong component
+const inputRef = useRef&lt;HTMLInputElement&gt;(null);
+
+// Liên kết ref vào thẻ input HTML
+&lt;input ref={inputRef} type="text" ... /&gt;</code></pre>
+            </div>
+            <div class="card">
+              <h3>Tự động lấy lại Focus sau khi gửi</h3>
+              <p>
+                Trong hàm gửi tin nhắn <code>sendMessage</code>, chúng ta thực hiện lấy lại focus cho ô nhập liệu bên trong khối <code>finally</code> của tiến trình gọi API (đảm bảo luôn chạy bất kể API gọi thành công hay thất bại):
+              </p>
+              <pre style="margin-top: 8px;"><code>} finally {
+    setIsLoading(false);
+    // Trì hoãn 100ms để trình duyệt cập nhật lại trạng thái DOM
+    setTimeout(() => {
+        inputRef.current?.focus();
+    }, 100);
+}</code></pre>
+            </div>
+          </div>
+        </section>
+
+        <!-- SECTION 6: CODE BOOTSTRAP -->
+        <section id="code-bootstrap" class="section">
+          <div class="section-title">
+            <div>
+              <div class="kicker">Section 6</div>
+              <h2>Bootstrap HCL Code Walkthrough - Khởi tạo OIDC & Backend</h2>
+            </div>
+          </div>
+          <p>
+            Mã nguồn chi tiết của các tệp tin cấu hình Terraform phục vụ cho việc khởi tạo hạ tầng nền móng Remote State và OIDC Role trên AWS:
+          </p>
+
+          <!-- CODE 1: BACKEND-SETUP.TF -->
+          <div class="code-panel">
+            <h3>1. Khởi tạo S3 State Bucket & DynamoDB Lock Table (terraform/backend-setup.tf)</h3>
+            <div class="code-meta">
+              <span><strong>File:</strong> terraform/backend-setup.tf</span>
+              <span>•</span>
+              <span><strong>Lưu ý:</strong> Thực hiện target apply một lần duy nhất tại workspace default rồi xóa file</span>
+            </div>
+            <pre><code># Bucket luu tru State file chu ky phien ban (Versioning) và ma hoa tĩnh
+resource "aws_s3_bucket" "terraform_state" {
+  bucket = "twin-terraform-state-${data.aws_caller_identity.current.account_id}"
+  
+  tags = {
+    Name        = "Terraform State Store"
+    Environment = "global"
+    ManagedBy   = "terraform"
+  }
+}
+
+resource "aws_s3_bucket_versioning" "terraform_state" {
+  bucket = aws_s3_bucket.terraform_state.id
+  versioning_configuration {
+    status = "Enabled"
+  }
+}
+
+resource "aws_s3_bucket_server_side_encryption_configuration" "terraform_state" {
+  bucket = aws_s3_bucket.terraform_state.id
+  rule {
+    apply_server_side_encryption_by_default {
+      sse_algorithm = "AES256"
+    }
+  }
+}
+
+resource "aws_s3_bucket_public_access_block" "terraform_state" {
+  bucket                  = aws_s3_bucket.terraform_state.id
+  block_public_acls       = true
+  block_public_policy     = true
+  ignore_public_acls      = true
+  restrict_public_buckets = true
+}
+
+# Bang DynamoDB khoa phien LockID de State Locking hoạt động
+resource "aws_dynamodb_table" "terraform_locks" {
+  name         = "twin-terraform-locks"
+  billing_mode = "PAY_PER_REQUEST"
+  hash_key     = "LockID"
+
+  attribute {
+    name = "LockID"
+    type = "S"
+  }
+
+  tags = {
+    Name        = "Terraform State Locks"
+    Environment = "global"
+    ManagedBy   = "terraform"
+  }
+}</code></pre>
+          </div>
+
+          <!-- CODE 2: GITHUB-OIDC.TF -->
+          <div class="code-panel">
+            <h3>2. Khai báo OIDC Federated Provider & Trust Policy (terraform/github-oidc.tf)</h3>
+            <div class="code-meta">
+              <span><strong>File:</strong> terraform/github-oidc.tf</span>
+              <span>•</span>
+              <span><strong>Trọng tâm:</strong> Ràng buộc repo owner/name trong condition block của trust policy</span>
+            </div>
+            <pre><code>variable "github_repository" {
+  description = "GitHub repository in format 'owner/repo'"
+  type        = string
+}
+
+# 1. Khởi tạo OIDC Identity Provider cho token.actions.githubusercontent.com
+resource "aws_iam_openid_connect_provider" "github" {
+  url            = "https://token.actions.githubusercontent.com"
+  client_id_list = ["sts.amazonaws.com"]
+  
+  # Thumbprint ky so xac thuc tu GitHub Actions documentation
+  thumbprint_list = ["1b511abead59c6ce207077c0bf0e0043b1382612"]
+}
+
+# 2. IAM Role cho phep gia lap danh tinh (Assume Role With Web Identity)
+resource "aws_iam_role" "github_actions" {
+  name = "github-actions-twin-deploy"
+  
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect = "Allow"
+        Principal = {
+          Federated = aws_iam_openid_connect_provider.github.arn
+        }
+        Action = "sts:AssumeRoleWithWebIdentity"
+        Condition = {
+          StringEquals = {
+            "token.actions.githubusercontent.com:aud" = "sts.amazonaws.com"
+          }
+          StringLike = {
+            # Chỉ cho phép duy nhất repository chỉ định của bạn được giả lập role này
+            "token.actions.githubusercontent.com:sub" = "repo:${var.github_repository}:*"
+          }
+        }
+      }
+    ]
+  })
+}
+
+# 3. Custom Inline Policy cap cac quyen IAM Administrator dac thu
+resource "aws_iam_role_policy" "github_additional" {
+  name = "github-actions-additional"
+  role = aws_iam_role.github_actions.id
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect = "Allow"
+        Action = [
+          "iam:CreateRole",
+          "iam:DeleteRole",
+          "iam:AttachRolePolicy",
+          "iam:DetachRolePolicy",
+          "iam:PutRolePolicy",
+          "iam:DeleteRolePolicy",
+          "iam:GetRole",
+          "iam:GetRolePolicy",
+          "iam:ListRolePolicies",
+          "iam:ListAttachedRolePolicies",
+          "iam:UpdateAssumeRolePolicy",
+          "iam:PassRole",
+          "iam:TagRole",
+          "iam:UntagRole",
+          "sts:GetCallerIdentity"
+        ]
+        Resource = "*"
+      }
+    ]
+  })
+}</code></pre>
+          </div>
+        </section>
+
+        <!-- SECTION 7: YAML WORKFLOWS -->
+        <section id="yaml-workflows" class="section">
+          <div class="section-title">
+            <div>
+              <div class="kicker">Section 7</div>
+              <h2>GitHub Actions Workflows YAML - Tệp tin cấu hình tự động hóa</h2>
+            </div>
+          </div>
+          <p>
+            Mã nguồn tệp tin YAML cấu hình pipeline tự động hóa quy trình triển khai hạ tầng và ứng dụng khi có sự kiện đẩy code lên GitHub.
+          </p>
+
+          <!-- CODE 1: DEPLOY.YML -->
+          <div class="code-panel">
+            <h3>1. Đường ống triển khai tự động hóa full-stack (.github/workflows/deploy.yml)</h3>
+            <div class="code-meta">
+              <span><strong>File:</strong> .github/workflows/deploy.yml</span>
+              <span>•</span>
+              <span><strong>Runner:</strong> ubuntu-latest</span>
+              <span>•</span>
+              <span><strong>Mục đích:</strong> Cài đặt Node/Python/Terraform, assume role OIDC, chạy deploy.sh và invalidate cache CloudFront</span>
+            </div>
+            <pre><code>name: Deploy Digital Twin
+
+on:
+  push:
+    branches: [main] # Trigger tu dong khi push len nhanh main
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Environment to deploy'
+        required: true
+        default: 'dev'
+        type: choice
+        options:
+          - dev
+          - test
+          - prod
+
+permissions:
+  id-token: write  # Bắt buộc phải có để OIDC xác thực thành công lấy credentials tạm
+  contents: read
+
+jobs:
+  deploy:
+    name: Deploy to ${{ github.event.inputs.environment || 'dev' }}
+    runs-on: ubuntu-latest
+    environment: ${{ github.event.inputs.environment || 'dev' }}
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
+          role-session-name: github-actions-deploy
+          aws-region: ${{ secrets.DEFAULT_AWS_REGION }}
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install uv
+        run: |
+          curl -LsSf https://astral.sh/uv/install.sh | sh
+          echo "$HOME/.local/bin" >> $GITHUB_PATH
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_wrapper: false  # Tắt wrapper để lấy ra output thô dạng string
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Run Deployment Script
+        run: |
+          export AWS_ACCOUNT_ID=${{ secrets.AWS_ACCOUNT_ID }}
+          export DEFAULT_AWS_REGION=${{ secrets.DEFAULT_AWS_REGION }}
+          chmod +x scripts/deploy.sh
+          ./scripts/deploy.sh ${{ github.event.inputs.environment || 'dev' }}
+        env:
+          AWS_ROLE_ARN: ${{ secrets.AWS_ROLE_ARN }}
+          
+      - name: Get Deployment Output URLs
+        id: deploy_outputs
+        working-directory: ./terraform
+        run: |
+          terraform workspace select ${{ github.event.inputs.environment || 'dev' }}
+          echo "cloudfront_url=$(terraform output -raw cloudfront_url)" >> $GITHUB_OUTPUT
+          echo "api_url=$(terraform output -raw api_gateway_url)" >> $GITHUB_OUTPUT
+          echo "frontend_bucket=$(terraform output -raw s3_frontend_bucket)" >> $GITHUB_OUTPUT
+
+      # Xóa cache CloudFront cũ để người dùng nhận ngay giao diện frontend mới
+      - name: Invalidate CloudFront
+        run: |
+          DISTRIBUTION_ID=$(aws cloudfront list-distributions \
+            --query "DistributionList.Items[?Origins.Items[?DomainName=='${{ steps.deploy_outputs.outputs.frontend_bucket }}.s3-website-${{ secrets.DEFAULT_AWS_REGION }}.amazonaws.com']].Id | [0]" \
+            --output text)
+          
+          if [ "$DISTRIBUTION_ID" != "None" ] && [ -n "$DISTRIBUTION_ID" ]; then
+            aws cloudfront create-invalidation \
+              --distribution-id $DISTRIBUTION_ID \
+              --paths "/*"
+          fi
+
+      - name: Deployment Summary
+        run: |
+          echo "✅ Deployment Complete!"
+          echo "🌐 CloudFront URL: ${{ steps.deploy_outputs.outputs.cloudfront_url }}"
+          echo "📡 API Gateway: ${{ steps.deploy_outputs.outputs.api_url }}"
+          echo "🪣 Frontend Bucket: ${{ steps.deploy_outputs.outputs.frontend_bucket }}"</code></pre>
+          </div>
+        </section>
+
+        <!-- SECTION 8: SCRIPT UPDATES -->
+        <section id="script-updates" class="section">
+          <div class="section-title">
+            <div>
+              <div class="kicker">Section 8</div>
+              <h2>Deploy/Destroy Script Upgrades - Cấu hình Backend từ xa</h2>
+            </div>
+          </div>
+          <p>
+            Để tương tác với S3 Remote State, các script deploy/destroy local của chúng ta phải được nâng cấp để truyền các tham số cấu hình backend động thông qua cờ <code>-backend-config</code>.
+          </p>
+          <div class="grid-2">
+            <!-- DEPLOY UPDATE -->
+            <div class="card">
+              <h3>Nâng cấp lệnh init trong `deploy.sh`</h3>
+              <p>Thay thế câu lệnh init tĩnh bằng việc truyền động tham số S3 Bucket chứa Account ID:</p>
+              <pre style="font-size: 11px;"><code># Lấy Account ID của tài khoản chạy
+AWS_ACCOUNT_ID=$(aws sts get-caller-identity --query Account --output text)
+AWS_REGION=${DEFAULT_AWS_REGION:-us-east-1}
+
+# Init động kết nối S3 State Store
+terraform init -input=false \
+  -backend-config="bucket=twin-terraform-state-${AWS_ACCOUNT_ID}" \
+  -backend-config="key=${ENVIRONMENT}/terraform.tfstate" \
+  -backend-config="region=${AWS_REGION}" \
+  -backend-config="dynamodb_table=twin-terraform-locks" \
+  -backend-config="encrypt=true"</code></pre>
+            </div>
+            <!-- DESTROY UPDATE -->
+            <div class="card">
+              <h3>Bản vá Dummy package trong `destroy.sh`</h3>
+              <p>Khi chạy destroy trên GitHub Actions runner sạch, code backend Python chưa được build nên không có file zip `lambda-deployment.zip`. Terraform sẽ báo lỗi compile và từ chối chạy destroy.</p>
+              <p><strong>Giải pháp:</strong> Tạo một tệp nén dummy tạm thời trước khi ra lệnh destroy:</p>
+              <pre style="font-size: 11px;"><code># Tạo zip giả lập nếu chưa có
+if [ ! -f "../backend/lambda-deployment.zip" ]; then
+    echo "Creating dummy lambda package for destroy..."
+    echo "dummy" | zip ../backend/lambda-deployment.zip -
+fi</code></pre>
+            </div>
+          </div>
+        </section>
+
+        <!-- SECTION 9: OPTIONS / TRADE-OFFS -->
+        <section id="options-tradeoffs" class="section">
+          <div class="section-title">
+            <div>
+              <div class="kicker">Section 9</div>
+              <h2>Options / Trade-offs - Bản đồ lựa chọn thiết kế</h2>
+            </div>
+          </div>
+          <table>
+            <thead>
+              <tr>
+                <th>Lựa chọn - Option</th>
+                <th>Ưu điểm - Pros</th>
+                <th>Nhược điểm - Cons</th>
+                <th>Ngữ cảnh lựa chọn - When to choose</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>AWS Access Keys (Dài hạn)</strong></td>
+                <td>Triển khai nhanh, đơn giản, chỉ cần copy chuỗi key vào GitHub Secrets là chạy ngay.</td>
+                <td>Rủi ro bảo mật cực cao nếu lộ khóa, khóa không tự xoay vòng, vi phạm tiêu chuẩn bảo mật đám mây chuyên nghiệp.</td>
+                <td>Chỉ dùng cho các bài thử nghiệm lab siêu tốc cá nhân, không khuyên dùng cho dự án thực tế.</td>
+              </tr>
+              <tr>
+                <td><strong>AWS OIDC (Passwordless)</strong></td>
+                <td>(Recommended) Bảo mật tối đa, không cần lưu trữ khóa dài hạn, tự động xoay vòng credentials tạm, kiểm soát chi tiết repo được gán quyền.</td>
+                <td>Phức tạp trong khâu cấu hình ban đầu (phải tạo OIDC Identity Provider và viết trust policy điều kiện).</td>
+                <td>Bắt buộc áp dụng cho mọi dự án doanh nghiệp thực tế chạy môi trường Production để tuân thủ quy tắc bảo mật.</td>
+              </tr>
+              <tr>
+                <td><strong>Flat Monorepo (Gom phẳng)</strong></td>
+                <td>(Recommended) Quản lý tập trung toàn bộ code frontend, backend và cấu hình hạ tầng Terraform trong 1 repo duy nhất, deploy đồng bộ.</td>
+                <td>Repo có kích thước nặng hơn, khó phân tách quyền truy cập mã nguồn đối với team lớn đông lập trình viên.</td>
+                <td>Rất thích hợp cho các dự án serverless gọn nhẹ, các lập trình viên Fullstack AI hoặc dự án vừa và nhỏ.</td>
+              </tr>
+              <tr>
+                <td><strong>Git Submodules (Nhánh con)</strong></td>
+                <td>Chia nhỏ repo con độc lập, giữ nguyên lịch sử phát triển riêng của frontend và backend.</td>
+                <td>Thao tác kéo code và cập nhật phiên bản cực kỳ phức tạp, dễ gây lỗi lệch tag phiên bản.</td>
+                <td>Chỉ nên dùng khi các thành phần con là các thư viện chia sẻ được phát triển song song bởi các team chuyên biệt khác.</td>
+              </tr>
+            </tbody>
+          </table>
+        </section>
+
+        <!-- SECTION 10: PITFALLS -->
+        <section id="pitfalls" class="section">
+          <div class="section-title">
+            <div>
+              <div class="kicker">Section 10</div>
+              <h2>Pitfalls - Bẫy phát sinh lỗi & Cách khắc phục</h2>
+            </div>
+          </div>
+          <div class="grid-2">
+            <article class="card">
+              <h3>Các trường hợp dễ gây lỗi (Failure Modes)</h3>
+              <ul class="list" style="margin-top: 8px;">
+                <li><strong>Lỗi submodule xám trên GitHub:</strong> Thư mục <code>frontend/</code> hiển thị màu xám có dấu mũi tên trên GitHub và không thể click mở ra xem code bên trong.</li>
+                <li><strong>Lỗi OIDC AssumeRoleWithWebIdentity AccessDenied:</strong> Pipeline chạy đến bước cấu hình AWS credentials thì báo lỗi từ chối truy cập 403.</li>
+                <li><strong>Lỗi destroy bị crash do thiếu zip file:</strong> Lệnh destroy hạ tầng chạy trên máy ảo Actions bị dừng đột ngột và báo lỗi thiếu file <code>lambda-deployment.zip</code>.</li>
+                <li><strong>Lỗi YAML Invalid syntax:</strong> GitHub Actions tab báo lỗi đỏ toàn bộ workflow và không cho phép chạy do tệp tin cấu hình YAML không hợp lệ.</li>
+              </ul>
+            </article>
+            <article class="card">
+              <h3>Biện pháp ngăn ngừa & Xử lý (Fix / Prevention)</h3>
+              <ul class="list" style="margin-top: 8px;">
+                <li><strong>Xóa triệt để folder .git con:</strong> Nhớ chạy lệnh xóa thư mục quản lý Git ẩn của frontend trước khi add ở thư mục root (chạy lệnh: <code>Remove-Item -Path frontend/.git -Recurse -Force</code>).</li>
+                <li><strong>Kiểm tra điều kiện Trust Policy:</strong> Đảm bảo trường <code>github_repository</code> được truyền đúng định dạng <code>owner/repo-name</code> (ví dụ: <code>johndoe/digital-twin</code>) và KHÔNG được chứa URL link <code>https://...</code> ở trước.</li>
+                <li><strong>Bản vá Dummy package:</strong> Sử dụng đoạn code nén dummy zip giả lập trong file <code>destroy.sh</code> trước khi thực thi lệnh destroy để lừa bộ biên dịch của Terraform.</li>
+                <li><strong>Không dùng ký tự Tab:</strong> Tuyệt đối không sử dụng Tab để thụt dòng trong file YAML. Hãy cài đặt các extension YAML Linter để kiểm tra cú pháp tự động trong IDE.</li>
+              </ul>
+            </article>
+          </div>
+        </section>
+
+        <!-- SECTION 11: INTERACTIVE -->
+        <section id="interactive" class="section">
+          <div class="section-title">
+            <div>
+              <div class="kicker">Section 11</div>
+              <h2>Flashcards & Quick Quiz - Ôn tập tương tác</h2>
+            </div>
+          </div>
+          <div class="grid-2">
+            <!-- FLASHCARD 1 -->
+            <article class="card flashcard">
+              <h3>Q: Tại sao phải bật S3 Bucket Versioning cho bucket chứa file state của Terraform?</h3>
+              <button class="button primary" type="button" data-reveal>Reveal answer - Hiện câu trả lời</button>
+              <p class="flash-answer">
+                <strong>A:</strong> Để đảm bảo tính an toàn dữ liệu. File state lưu cấu trúc ánh xạ hạ tầng. Nếu quá trình apply bị mất điện hoặc mất mạng giữa chừng gây hỏng file state (corrupted), tính năng Versioning cho phép ta khôi phục lại (roll back) nhanh chóng về phiên bản state cũ ổn định trước đó.
+              </p>
+            </article>
+
+            <!-- FLASHCARD 2 -->
+            <article class="card flashcard">
+              <h3>Q: Tại sao OIDC lại được coi là phương thức bảo mật passwordless vượt trội?</h3>
+              <button class="button primary" type="button" data-reveal>Reveal answer - Hiện câu trả lời</button>
+              <p class="flash-answer">
+                <strong>A:</strong> Vì nó loại bỏ việc phải lưu trữ AWS Access Keys dài hạn trên GitHub. GitHub Actions lấy token ngắn hạn tự động, AWS xác thực token qua OIDC Provider và chỉ cấp quyền tạm thời trong vài phút. Không có rủi ro lộ key vĩnh viễn khi repo bị hack.
+              </p>
+            </article>
+
+            <!-- FLASHCARD 3 -->
+            <article class="card flashcard">
+              <h3>Q: Cờ -target trong lệnh terraform apply giải quyết bài toán gì?</h3>
+              <button class="button primary" type="button" data-reveal>Reveal answer - Hiện câu trả lời</button>
+              <p class="flash-answer">
+                <strong>A:</strong> Giải quyết bài toán bootstrapping (con gà và quả trứng). Cho phép ta chỉ định tạo trước S3 Bucket và DynamoDB Table dùng để lưu state trước khi cấu hình backend S3 được kích hoạt chính thức.
+              </p>
+            </article>
+
+            <!-- QUIZ WIDGET -->
+            <article class="card">
+              <h3>Quick quiz - Trắc nghiệm nhanh</h3>
+              <p>Khi cấu hình Trust Policy của IAM Role cho phép GitHub Actions giả lập danh tính qua OIDC, tại sao thuộc tính Condition StringLike "token.actions.githubusercontent.com:sub" lại đóng vai trò quyết định bảo mật?</p>
+              <button class="button quiz-option" type="button" data-correct="false">A. Để AWS biết region nào sẽ deploy tài nguyên hạ tầng.</button>
+              <button class="button quiz-option" type="button" data-correct="true">B. Để giới hạn chỉ cho phép duy nhất repository cụ thể của bạn được giả lập role, ngăn chặn các tài khoản GitHub khác chiếm quyền AWS của bạn.</button>
+              <button class="button quiz-option" type="button" data-correct="false">C. Để kích hoạt tính năng tự động ghi log giám sát trên CloudWatch.</button>
+              <div class="quiz-result" aria-live="polite"></div>
+            </article>
+          </div>
+        </section>
+
+        <!-- SECTION 12: QUICK MEMORY -->
+        <section id="quick-memory" class="section">
+          <div class="section-title">
+            <div>
+              <div class="kicker">Section 12</div>
+              <h2>Quick Memory - Ghi nhớ nhanh cuối bài</h2>
+            </div>
+          </div>
+          <div class="grid-2">
+            <article class="card">
+              <h3>Must remember - Điều bắt buộc phải nhớ</h3>
+              <ol class="list" style="margin-top: 8px;">
+                <li>Chạy init động qua cờ <code>-backend-config</code> để nạp S3 bucket chứa Account ID động.</li>
+                <li>Xóa thư mục ẩn <code>.git</code> ở các folder con để tránh lỗi submodule màu xám trên GitHub.</li>
+                <li>Ghi đè biến môi trường API URL vào file <code>.env.production</code> của Next.js trước khi build.</li>
+                <li>Sử dụng React <code>useRef</code> và hàm <code>focus()</code> để sửa lỗi mất trỏ chuột sau khi chat.</li>
+                <li>Phân quyền OIDC IAM Role bắt buộc phải có quyền quản lý role <code>iam:CreateRole</code> và <code>iam:PassRole</code>.</li>
+              </ol>
+            </article>
+            <article class="card">
+              <h3>Self-check - Bộ câu hỏi tự kiểm tra</h3>
+              <ul class="list" style="margin-top: 8px;">
+                <li>Bạn có giải thích được luồng trao đổi token Web Identity giữa GitHub Actions runner và AWS STS không?</li>
+                <li>Tại sao DynamoDB table làm nhiệm vụ khóa state bắt buộc phải có hash key là LockID?</li>
+                <li>Sự khác biệt giữa sự kiện push và workflow_dispatch trong file deploy.yml là gì?</li>
+                <li>Hãy mô tả quy trình dọn dẹp hạ tầng S3 Remote State local trước khi thiết lập Git?</li>
+              </ul>
+            </article>
+          </div>
+        </section>
+
+        <!-- FOOTER -->
+        <footer class="footer">
+          <strong>Study guide note:</strong> Học liệu ôn tập này được biên soạn tỉ mỉ dựa trên slide chính thức, mã nguồn thực hành và tài liệu tóm tắt mở rộng của Week 2 Day 5. Định dạng Claude editorial, hoàn toàn không chứa placeholder.
+        </footer>
+      </main>
+    </div>
+  </div>
+
+  <!-- INTERACTIVE JAVASCRIPT -->
+  <script>
+    const links = Array.from(document.querySelectorAll(".toc a"));
+    const sections = links.map((link) => document.querySelector(link.getAttribute("href"))).filter(Boolean);
+    const progressBar = document.getElementById("progressBar");
+    const progressPercent = document.getElementById("progressPercent");
+    const detailsNodes = Array.from(document.querySelectorAll("details"));
+
+    function setActiveLink() {
+      let current = sections[0]?.id;
+      const offset = window.scrollY + 170;
+      for (const section of sections) {
+        if (section.offsetTop <= offset) {
+          current = section.id;
+        }
+      }
+      links.forEach((link) => {
+        link.classList.toggle("active", link.getAttribute("href") === `#${current}`);
+      });
+    }
+
+    function updateProgress() {
+      const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+      const progress = docHeight > 0 ? Math.min((window.scrollY / docHeight) * 100, 100) : 0;
+      progressBar.style.width = `${progress}%`;
+      progressPercent.innerText = `${Math.round(progress)}% Completed`;
+    }
+
+    document.getElementById("expandAll").addEventListener("click", () => {
+      detailsNodes.forEach((node) => {
+        node.open = true;
+      });
+    });
+
+    document.getElementById("collapseAll").addEventListener("click", () => {
+      detailsNodes.forEach((node) => {
+        node.open = false;
+      });
+    });
+
+    document.querySelectorAll("[data-reveal]").forEach((button) => {
+      button.addEventListener("click", () => {
+        const card = button.closest(".flashcard");
+        card.classList.toggle("revealed");
+        button.innerText = card.classList.contains("revealed") ? "Hide answer - Ẩn câu trả lời" : "Reveal answer - Hiện câu trả lời";
+      });
+    });
+
+    document.querySelectorAll(".quiz-option").forEach((button) => {
+      button.addEventListener("click", () => {
+        const result = button.parentElement.querySelector(".quiz-result");
+        if (button.dataset.correct === "true") {
+          result.innerHTML = "Correct! - Chính xác. Ràng buộc `token.actions.githubusercontent.com:sub` chứa tên repository của bạn (chỉ định dưới dạng `repo:owner/repo-name:*`) là chốt chặn bảo mật quan trọng nhất. Nếu không cấu hình thuộc tính này, bất kỳ tài khoản GitHub của người lạ nào cũng có thể assume role OIDC này để can thiệp và sửa đổi tài nguyên AWS của bạn.";
+          result.style.color = "var(--accent-teal)";
+        } else {
+          result.innerHTML = "Not quite. - Chưa chính xác. Thuộc tính sub (subject) của token OIDC không liên quan trực tiếp đến việc deploy region hay log CloudWatch. Vui lòng xem kỹ phần phân tích Trust Policy ở Section 3.";
+          result.style.color = "var(--primary-active)";
+        }
+      });
+    });
+
+    window.addEventListener("scroll", () => {
+      setActiveLink();
+      updateProgress();
+    }, { passive: true });
+
+    setActiveLink();
+    updateProgress();
+  </script>
+</body>
+
+</html>
