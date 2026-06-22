@@ -1,0 +1,1447 @@
+<!doctype html>
+<html lang="vi">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>AWS Foundations & Local Digital Twin Setup - Study Guide</title>
+  
+  <!-- Import Google Fonts (Cormorant Garamond & Inter) to substitute Copernicus & StyreneB -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+  <!-- Import Mermaid.js for Architecture & Workflow Rendering -->
+  <script type="module">
+    import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+    mermaid.initialize({ 
+      startOnLoad: true,
+      theme: 'neutral',
+      themeVariables: {
+        background: '#181715',
+        primaryColor: '#cc785c',
+        primaryTextColor: '#faf9f5',
+        lineColor: '#cc785c',
+        textColor: '#faf9f5'
+      }
+    });
+  </script>
+
+  <style>
+    :root {
+      --canvas: #faf9f5;
+      --surface-soft: #f5f0e8;
+      --surface-card: #efe9de;
+      --surface-strong: #e8e0d2;
+      --surface-dark: #181715;
+      --surface-dark-elevated: #252320;
+      --surface-dark-soft: #1f1e1b;
+      --hairline: #e6dfd8;
+      --hairline-soft: #ebe6df;
+      --ink: #141413;
+      --body: #3d3d3a;
+      --body-strong: #252523;
+      --muted: #6c6a64;
+      --muted-soft: #8e8b82;
+      --primary: #cc785c;
+      --primary-active: #a9583e;
+      --accent-teal: #5db8a6;
+      --accent-amber: #e8a55a;
+      --on-dark: #faf9f5;
+      --on-dark-soft: #a09d96;
+      --radius-md: 8px;
+      --radius-lg: 12px;
+      --radius-xl: 16px;
+      --content: 1200px;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      margin: 0;
+      background: var(--canvas);
+      color: var(--body);
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      line-height: 1.62;
+    }
+
+    h1,
+    h2,
+    h3 {
+      color: var(--ink);
+      font-family: 'Cormorant Garamond', Garamond, 'Times New Roman', serif;
+      font-weight: 400;
+      letter-spacing: -0.01em;
+      line-height: 1.1;
+      margin: 0;
+      overflow-wrap: normal;
+      word-break: normal;
+    }
+
+    h1 {
+      font-size: clamp(2.2rem, 4.5vw, 3.8rem);
+      max-width: 20ch;
+    }
+
+    h2 {
+      font-size: clamp(1.6rem, 2.5vw, 2.2rem);
+      border-bottom: 1px solid var(--hairline-soft);
+      padding-bottom: 8px;
+    }
+
+    h3 {
+      font-size: 1.25rem;
+      line-height: 1.35;
+      margin: 0;
+      font-weight: 600;
+    }
+
+    p,
+    li {
+      margin: 0;
+    }
+
+    ul, ol {
+      margin: 0;
+      padding: 0;
+    }
+
+    code {
+      border-radius: 6px;
+      background: var(--surface-strong);
+      color: var(--body-strong);
+      font-family: "JetBrains Mono", Consolas, monospace;
+      font-size: 0.9em;
+      padding: 2px 6px;
+    }
+
+    pre {
+      margin: 0;
+      overflow-x: auto;
+      border-radius: var(--radius-lg);
+      background: var(--surface-dark-soft);
+      color: var(--on-dark);
+      padding: 18px;
+      font-family: "JetBrains Mono", Consolas, monospace;
+      font-size: 13px;
+      line-height: 1.58;
+      white-space: pre;
+    }
+
+    pre code {
+      background: transparent;
+      color: inherit;
+      padding: 0;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.95rem;
+      margin-top: 14px;
+    }
+
+    th,
+    td {
+      border-bottom: 1px solid var(--hairline);
+      padding: 12px;
+      text-align: left;
+      vertical-align: top;
+    }
+
+    th {
+      color: var(--ink);
+      font-weight: 700;
+      background: var(--surface-soft);
+    }
+
+    .page {
+      max-width: var(--content);
+      margin: 0 auto;
+      padding: 30px 20px 64px;
+    }
+
+    .hero {
+      display: grid;
+      grid-template-columns: minmax(0, 1.2fr) minmax(320px, 0.8fr);
+      gap: 28px;
+      align-items: stretch;
+      padding: 40px;
+      border: 1px solid var(--hairline);
+      border-radius: var(--radius-xl);
+      background: var(--surface-soft);
+    }
+
+    .hero-copy {
+      display: grid;
+      gap: 18px;
+      align-content: start;
+    }
+
+    .eyebrow {
+      width: fit-content;
+      border-radius: 999px;
+      background: var(--primary);
+      color: white;
+      font-size: 0.75rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      padding: 6px 12px;
+      text-transform: uppercase;
+    }
+
+    .lead {
+      max-width: 72ch;
+      color: var(--body-strong);
+      font-size: 1.1rem;
+    }
+
+    .tag-row,
+    .source-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .tag,
+    .source {
+      display: inline-flex;
+      align-items: center;
+      border-radius: 999px;
+      font-size: 0.82rem;
+      font-weight: 600;
+      padding: 5px 11px;
+    }
+
+    .tag {
+      background: var(--surface-card);
+      color: var(--ink);
+    }
+
+    .source {
+      border: 1px solid var(--hairline);
+      background: var(--canvas);
+      color: var(--muted);
+    }
+
+    .source.extended {
+      border-color: rgba(204, 120, 92, 0.38);
+      background: rgba(204, 120, 92, 0.12);
+      color: var(--primary-active);
+    }
+
+    .hero-panel,
+    .code-panel {
+      border-radius: var(--radius-lg);
+      background: var(--surface-dark);
+      color: var(--on-dark);
+      padding: 24px;
+    }
+
+    .hero-panel {
+      display: grid;
+      gap: 16px;
+      align-content: start;
+    }
+
+    .hero-panel h2,
+    .hero-panel h3,
+    .code-panel h3 {
+      color: var(--on-dark);
+      border-bottom: none;
+      padding-bottom: 0;
+    }
+
+    .hero-panel p,
+    .hero-panel li,
+    .code-panel p,
+    .code-panel li {
+      color: var(--on-dark-soft);
+    }
+
+    .progress-track {
+      height: 8px;
+      overflow: hidden;
+      border-radius: 999px;
+      background: var(--surface-dark-elevated);
+    }
+
+    .progress-bar {
+      width: 0;
+      height: 100%;
+      background: var(--primary);
+      transition: width 0.1s ease;
+    }
+
+    .layout {
+      display: grid;
+      grid-template-columns: 280px minmax(0, 1fr);
+      gap: 24px;
+      align-items: start;
+      margin-top: 26px;
+    }
+
+    .toc {
+      position: sticky;
+      top: 20px;
+      border: 1px solid var(--hairline);
+      border-radius: var(--radius-lg);
+      background: var(--canvas);
+      padding: 18px;
+    }
+
+    .toc h2 {
+      font-family: 'Inter', sans-serif;
+      font-size: 1rem;
+      font-weight: 700;
+      border-bottom: none;
+      padding-bottom: 0;
+      margin-bottom: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--muted);
+    }
+
+    .toc nav {
+      display: grid;
+      gap: 6px;
+    }
+
+    .toc a {
+      border-radius: var(--radius-md);
+      color: var(--muted);
+      padding: 8px 10px;
+      text-decoration: none;
+      font-size: 0.9rem;
+      font-weight: 500;
+      transition: all 0.2s ease;
+    }
+
+    .toc a:hover,
+    .toc a.active {
+      background: var(--surface-card);
+      color: var(--ink);
+    }
+
+    .toc-tools {
+      display: grid;
+      gap: 8px;
+      margin-top: 16px;
+      padding-top: 16px;
+      border-top: 1px solid var(--hairline);
+    }
+
+    .button {
+      min-height: 40px;
+      border: 1px solid var(--hairline);
+      border-radius: var(--radius-md);
+      background: var(--canvas);
+      color: var(--ink);
+      cursor: pointer;
+      font: inherit;
+      font-size: 0.9rem;
+      font-weight: 700;
+      padding: 10px 12px;
+      transition: all 0.2s ease;
+    }
+
+    .button:hover {
+      background: var(--surface-card);
+    }
+
+    .button.primary {
+      border-color: var(--primary);
+      background: var(--primary);
+      color: white;
+    }
+
+    .button.primary:hover {
+      background: var(--primary-active);
+    }
+
+    .button.quiz-option {
+      display: block;
+      width: 100%;
+      margin-top: 8px;
+      text-align: left;
+      font-weight: 500;
+    }
+
+    .content {
+      display: grid;
+      gap: 20px;
+    }
+
+    .section {
+      border: 1px solid var(--hairline);
+      border-radius: var(--radius-lg);
+      background: var(--canvas);
+      padding: 28px;
+    }
+
+    .section-title {
+      display: flex;
+      justify-content: space-between;
+      gap: 16px;
+      align-items: start;
+      margin-bottom: 18px;
+    }
+
+    .kicker {
+      color: var(--primary-active);
+      font-size: 0.8rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      margin-bottom: 6px;
+      text-transform: uppercase;
+    }
+
+    .grid-2,
+    .grid-3 {
+      display: grid;
+      gap: 14px;
+    }
+
+    .grid-2 {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .grid-3 {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+
+    .card,
+    details {
+      border: 1px solid var(--hairline);
+      border-radius: var(--radius-lg);
+      background: var(--surface-card);
+      padding: 18px;
+    }
+
+    .card p,
+    .card ul,
+    .card ol,
+    details p,
+    details ul,
+    details ol {
+      margin-top: 10px;
+    }
+
+    .list {
+      padding-left: 21px;
+    }
+
+    .list li + li {
+      margin-top: 8px;
+    }
+
+    details {
+      margin-top: 14px;
+      transition: all 0.2s ease;
+    }
+
+    summary {
+      color: var(--ink);
+      cursor: pointer;
+      font-weight: 700;
+      outline: none;
+    }
+
+    .callout {
+      border-left: 4px solid var(--primary);
+      border-radius: var(--radius-md);
+      background: var(--surface-soft);
+      padding: 14px 16px;
+    }
+
+    .code-panel {
+      display: grid;
+      gap: 14px;
+      margin-top: 14px;
+    }
+
+    .code-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      color: var(--on-dark-soft);
+      font-size: 0.86rem;
+    }
+
+    .flashcard {
+      display: grid;
+      gap: 10px;
+    }
+
+    .flash-answer {
+      display: none;
+      border-top: 1px solid var(--hairline);
+      padding-top: 10px;
+      margin-top: 10px;
+      font-style: italic;
+      color: var(--body-strong);
+    }
+
+    .flashcard.revealed .flash-answer {
+      display: block;
+    }
+
+    .quiz-result {
+      min-height: 24px;
+      margin-top: 10px;
+      color: var(--primary-active);
+      font-weight: 700;
+      font-size: 0.95rem;
+    }
+
+    /* Diagram containers */
+    .diagram-container {
+      background: var(--surface-dark);
+      padding: 20px;
+      border-radius: var(--radius-lg);
+      margin-top: 14px;
+      overflow-x: auto;
+    }
+
+    .footer {
+      border-radius: var(--radius-lg);
+      background: var(--surface-dark);
+      color: var(--on-dark-soft);
+      padding: 24px;
+      margin-top: 20px;
+    }
+
+    .footer strong {
+      color: var(--on-dark);
+    }
+
+    @media (max-width: 900px) {
+      .hero,
+      .layout,
+      .grid-2,
+      .grid-3 {
+        grid-template-columns: 1fr;
+      }
+
+      .toc {
+        position: static;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="page">
+    <header class="hero">
+      <div class="hero-copy">
+        <span class="eyebrow">Study guide</span>
+        <h1>AWS Foundations & Local Digital Twin Setup</h1>
+        <p class="lead">Tìm hiểu sâu về nền tảng hạ tầng đám mây Amazon Web Services (AWS), phân tích 5 mô hình triển khai đám mây (Cloud Deployment Archetypes), và thực hành xây dựng chatbot trợ lý cá nhân Digital Twin cục bộ có lưu trữ bộ nhớ (Conversational Memory) bằng FastAPI và React Next.js.</p>
+        <div class="tag-row">
+          <span class="tag">AI Engineer Production Track</span>
+          <span class="tag">Architecture & Implementation</span>
+          <span class="tag">Week 2 Day 1</span>
+        </div>
+        <div class="source-row">
+          <span class="source">Docx LLM</span>
+          <span class="source">Slide PDF</span>
+          <span class="source">Code day1.md</span>
+          <span class="source extended">Knowledge extension</span>
+        </div>
+      </div>
+      <aside class="hero-panel">
+        <h2>Quick focus - Trọng tâm nhanh</h2>
+        <ul class="list">
+          <li><strong>AWS Resource Cleanup:</strong> Hủy bỏ App Runner service và repository ECR cũ để kiểm soát tối ưu hóa chi phí đám mây (cost optimization).</li>
+          <li><strong>Infrastructure as Code (IaC):</strong> Quản lý cơ sở hạ tầng đa nền tảng bằng Terraform và HCL thay vì AWS CDK.</li>
+          <li><strong>Serverless FaaS (AWS Lambda):</strong> Chạy code theo hàm event-driven, cơ chế scale-to-zero và độ trễ khởi động lạnh (cold start).</li>
+          <li><strong>Conversational Memory:</strong> Xây dựng bộ nhớ lưu trữ lịch sử chat dựa trên tệp tin JSON cục bộ theo UUID.</li>
+        </ul>
+        <div>
+          <p style="margin-bottom: 8px;">Reading progress - Tiến độ đọc</p>
+          <div class="progress-track" aria-label="Reading progress">
+            <div class="progress-bar" id="progressBar"></div>
+          </div>
+        </div>
+      </aside>
+    </header>
+
+    <div class="layout">
+      <aside class="toc">
+        <h2>Navigation - Mục lục</h2>
+        <nav>
+          <a href="#source-map">1. Source Map</a>
+          <a href="#cheat-sheet">2. Cheat Sheet</a>
+          <a href="#previous-context">3. Previous Context</a>
+          <a href="#core-theory">4. Core Theory</a>
+          <a href="#workflow">5. Workflow / Pipeline</a>
+          <a href="#techniques">6. Techniques</a>
+          <a href="#code-walkthrough">7. Code Walkthrough</a>
+          <a href="#options">8. Options / Trade-offs</a>
+          <a href="#pitfalls">9. Pitfalls</a>
+          <a href="#flashcards">10. Flashcards / Quiz</a>
+          <a href="#memory">11. Quick Memory</a>
+        </nav>
+        <div class="toc-tools">
+          <button class="button" type="button" id="expandAll">Expand notes - Mở rộng</button>
+          <button class="button" type="button" id="collapseAll">Collapse notes - Thu gọn</button>
+        </div>
+      </aside>
+
+      <main class="content">
+        <!-- SECTION 1: SOURCE MAP -->
+        <section id="source-map" class="section">
+          <div class="section-title">
+            <div>
+              <div class="kicker">Section 1</div>
+              <h2>Source Map - Bản đồ nguồn</h2>
+            </div>
+          </div>
+          <div class="grid-2">
+            <article class="card">
+              <h3>Sources used - Nguồn đã dùng</h3>
+              <ul class="list">
+                <li><strong>Docx LLM:</strong> [day1_summary.md](file:///G:/AIProduction_t6_2026/production/tai_lieu/week2/day1_summary.md) tóm tắt bài học hiện tại về AWS Foundations và Cloud Components.</li>
+                <li><strong>Slide:</strong> [Production W2D1.pdf](file:///G:/AIProduction_t6_2026/production/slide/week2/Production%20W2D1.pdf) sơ đồ kiến trúc deployment của Digital Twin.</li>
+                <li><strong>Code:</strong> [day1.md](file:///G:/AIProduction_t6_2026/production/week2/day1.md) mã nguồn backend server.py (stateless & stateful), frontend components, postcss.config.mjs và globals.css.</li>
+                <li><strong>Transcript:</strong> Đã dùng trực tiếp từ các tài liệu tóm tắt và slide đính kèm.</li>
+              </ul>
+            </article>
+            <article class="card">
+              <h3>Grounding notes - Ghi chú căn cứ</h3>
+              <p>Mọi nội dung lý thuyết về AWS, 5 Cloud Deployment Archetypes, và 5 AWS Components được đối chiếu trực tiếp từ Slide PDF và tài liệu tóm tắt summary. Các phần Code Walkthrough được kiểm tra cú pháp trực tiếp từ mã nguồn thực hành trong file day1.md. Các kiến thức mở rộng được ký hiệu rõ ràng để phân biệt với tài liệu gốc.</p>
+            </article>
+          </div>
+          <div class="callout" style="margin-top: 14px;">
+            <strong>Terminology rule - Quy tắc thuật ngữ:</strong> Cụm technical term viết dạng
+            <code>English - nghĩa tiếng Việt</code>. Từ đơn phổ biến viết dạng <code>cost (chi phí)</code>.
+            Ví dụ: <code>Infrastructure as Code - Cơ sở hạ tầng dưới dạng mã</code>,
+            <code>Cloud-agnostic - độc lập đám mây</code>.
+          </div>
+        </section>
+
+        <!-- SECTION 2: CHEAT SHEET -->
+        <section id="cheat-sheet" class="section">
+          <div class="section-title">
+            <div>
+              <div class="kicker">Section 2</div>
+              <h2>Cheat Sheet - Tóm tắt một trang</h2>
+            </div>
+          </div>
+          <div class="grid-3">
+            <article class="card">
+              <h3>Core idea - Ý chính</h3>
+              <p>Chuyển dịch từ việc click chuột thủ công cấu hình máy chủ sang quản lý tự động hóa bằng Infrastructure as Code (IaC) dùng Terraform. Thực hành xây dựng chatbot Digital Twin cục bộ và giải quyết bài toán mất bộ nhớ (stateless) bằng cơ chế lưu trữ JSON theo phiên làm việc (Session-based file memory).</p>
+            </article>
+            <article class="card">
+              <h3>Must know - Cần nhớ</h3>
+              <ul class="list">
+                <li><strong>Cloud Teardown:</strong> Phải xóa dịch vụ App Runner và ECR cũ để tối ưu hóa cost (chi phí) đám mây.</li>
+                <li><strong>IaC Choice:</strong> Terraform được chọn thay vì AWS CDK nhờ đặc tính cloud-agnostic (độc lập đám mây).</li>
+                <li><strong>Lambda FaaS:</strong> Hỗ trợ scale-to-zero (co giãn về không) giúp tiết kiệm cost nhưng bị hiện tượng cold start (khởi động lạnh).</li>
+              </ul>
+            </article>
+            <article class="card">
+              <h3>Use in practice - Dùng khi nào</h3>
+              <p>Áp dụng khi thiết lập môi trường phát triển chatbot cá nhân, cấu hình CORS an toàn giữa frontend-backend khác domain, và lập kế hoạch di chuyển ứng dụng từ môi trường cục bộ lên AWS Serverless (Lambda, S3, API Gateway, Bedrock).</p>
+            </article>
+          </div>
+        </section>
+
+        <!-- SECTION 3: PREVIOUS CONTEXT -->
+        <section id="previous-context" class="section">
+          <div class="section-title">
+            <div>
+              <div class="kicker">Section 3</div>
+              <h2>Previous Context - Liên hệ với bài trước</h2>
+            </div>
+          </div>
+          <div class="callout">
+            Bài học này liên kết trực tiếp với dự án Consultation App (Ứng dụng tư vấn y tế) đã hoàn thành ở cuối Week 1. Để chuẩn bị môi trường sạch cho dự án AI Digital Twin tuần này, học viên được yêu cầu dọn dẹp triệt để hạ tầng của dự án cũ trên AWS Console (bao gồm instance AWS App Runner và Docker image trong ECR) nhằm tránh phát sinh idle cost (chi phí nhàn rỗi). Đồng thời, bài này nâng cấp frontend của chúng ta từ Pages Router (sử dụng ở Week 1) sang cấu trúc Next.js App Router hiện đại hơn.
+          </div>
+        </section>
+
+        <!-- SECTION 4: CORE THEORY -->
+        <section id="core-theory" class="section">
+          <div class="section-title">
+            <div>
+              <div class="kicker">Section 4</div>
+              <h2>Core Theory - Lý thuyết cốt lõi</h2>
+            </div>
+            <div class="source-row">
+              <span class="source">Docx LLM</span>
+              <span class="source">Slide PDF</span>
+            </div>
+          </div>
+          <div class="grid-2">
+            <article class="card">
+              <h3>Key concepts - Khái niệm chính</h3>
+              <ul class="list">
+                <li><strong>Root user - Người dùng gốc:</strong> Tài khoản tối cao được tạo bằng email đăng ký AWS ban đầu, sở hữu quyền lực cao nhất và không thể bị giới hạn bởi bất kỳ chính sách nào. Chỉ dùng khi Billing, quản lý tài chính, dọn dẹp tài nguyên hoặc đóng tài khoản.</li>
+                <li><strong>Infrastructure as Code (IaC) - Cơ sở hạ tầng dưới dạng mã:</strong> Phương pháp thiết lập và quản lý tài nguyên mạng, máy chủ bằng các file cấu hình declarative (khai báo) được kiểm soát phiên bản bằng Git thay vì thao tác tay trên web GUI.</li>
+                <li><strong>Terraform:</strong> Công cụ IaC mã nguồn mở của HashiCorp, sử dụng ngôn ngữ cấu hình HCL (HashiCorp Configuration Language) để khai báo hạ tầng độc lập đám mây (cloud-agnostic).</li>
+                <li><strong>Cloud Deployment Archetypes - Các mô hình triển khai đám mây:</strong> Phân loại hạ tầng gồm: IaaS (máy chủ EC2 ảo), PaaS (Elastic Beanstalk, Vercel tự quản lý runtime), CaaS (App Runner chạy container), Container Orchestration (ECS/EKS quản lý nhiều container), và Serverless FaaS (chạy code theo hàm Lambda).</li>
+                <li><strong>FaaS (Function as a Service) - Hàm dưới dạng dịch vụ:</strong> Mô hình serverless chạy code event-driven (hướng sự kiện). Tự động co giãn theo tải thực tế và hỗ trợ scale-to-zero (co giãn về không khi rảnh).</li>
+              </ul>
+            </article>
+            <article class="card">
+              <h3>Concept relationships - Quan hệ giữa khái niệm</h3>
+              <p>Mối quan hệ giữa các mô hình triển khai đám mây nằm ở sự đánh đổi giữa <strong>control (quyền kiểm soát)</strong> và <strong>convenience (tính tiện lợi)</strong>. Trong khi IaaS (EC2) cho phép cấu hình tối đa đến cấp hệ điều hành nhưng tốn công bảo trì lớn, thì Serverless FaaS (Lambda) giải phóng hoàn toàn sức lao động quản trị server nhưng bị giới hạn về thời gian thực thi (tối đa 15 phút) và gặp hiện tượng cold start. CDN (CloudFront) bổ trợ trực tiếp cho S3 bằng cách cache nội dung tĩnh tại các Edge Location để giảm tải trực tiếp cho S3 Origin.</p>
+            </article>
+          </div>
+          
+          <details>
+            <summary>Deep explanation - Giải thích sâu về scale-to-zero và cold start</summary>
+            <p><strong>Scale-to-zero (Co giãn về không):</strong> Trong kiến trúc Serverless (như AWS Lambda), khi ứng dụng không nhận được request nào, nhà cung cấp cloud sẽ giải phóng toàn bộ container đang chạy hàm đó. Người dùng sẽ không phải trả bất kỳ chi phí nào cho phần cứng nhàn rỗi. Đây là ưu điểm tài chính cực lớn cho startup.</p>
+            <p><strong>Cold Start (Khởi động lạnh):</strong> Khi có một request mới gửi tới sau một thời gian dài không hoạt động, AWS sẽ phải khởi tạo một container siêu nhỏ mới, nạp runtime (Python, Node.js) và tải mã nguồn của hàm lên bộ nhớ. Quá trình này gây ra một độ trễ phản hồi (cold start latency) kéo dài từ vài trăm mili-giây đến vài giây cho người dùng đầu tiên. Các request tiếp theo sẽ được chuyển tới container ấm (warm container) có sẵn nên phản hồi cực kỳ nhanh.</p>
+          </details>
+
+          <details class="extended">
+            <summary>Knowledge extension - Cơ chế Single Domain Routing bằng CloudFront để triệt tiêu lỗi CORS</summary>
+            <p><span class="source extended">Kiến thức mở rộng</span> CORS (Cross-Origin Resource Sharing) block error xảy ra khi trình duyệt chặn request JavaScript từ một origin này (ví dụ frontend: <code>http://localhost:3000</code>) gửi tới origin khác (ví dụ backend API: <code>http://localhost:8000</code>).</p>
+            <p>Để triệt tiêu CORS tận gốc trên Production mà không cần mở header CORS wildcard (kém bảo mật), ta cấu hình <strong>Amazon CloudFront</strong> làm proxy trung tâm duy nhất dưới một domain chung (ví dụ: <code>https://my-twin.cloudfront.net</code>):</p>
+            <ul class="list" style="margin-top: 8px;">
+              <li>Cấu hình route mặc định <code>/*</code> trỏ về origin S3 Frontend Bucket để tải giao diện.</li>
+              <li>Cấu hình route phụ <code>/api/*</code> trỏ về origin Amazon API Gateway.</li>
+            </ul>
+            <p>Do cả frontend và API cùng nằm dưới một domain duy nhất của CloudFront, trình duyệt sẽ coi đây là giao tiếp Same-Origin và hoàn toàn không kích hoạt cơ chế chặn CORS của trình duyệt.</p>
+          </details>
+        </section>
+
+        <!-- SECTION 5: WORKFLOW / PIPELINE -->
+        <section id="workflow" class="section">
+          <div class="section-title">
+            <div>
+              <div class="kicker">Section 5</div>
+              <h2>Workflow / Pipeline - Quy trình / luồng hoạt động</h2>
+            </div>
+            <div class="source-row">
+              <span class="source">Docx LLM</span>
+              <span class="source">Slide PDF</span>
+              <span class="source">Code</span>
+            </div>
+          </div>
+
+          <h3>1. Sơ đồ Kiến trúc Cục bộ (Local Architecture - Day 1)</h3>
+          <div class="diagram-container">
+            <pre class="mermaid">
+graph LR
+    User[Client Browser] <-->|HTTP POST /chat| API[FastAPI Server: Port 8000]
+    API <-->|OpenAI SDK| GPT[OpenAI API gpt-4o-mini]
+    API <-->|Read / Write JSON| Storage[(Local File Storage: /memory)]
+            </pre>
+          </div>
+
+          <h3 style="margin-top: 20px;">2. Sơ đồ Kiến trúc Đám mây AWS (AWS Production Architecture - Day 2)</h3>
+          <div class="diagram-container">
+            <pre class="mermaid">
+graph TD
+    User[Client Browser] -->|Load Static Web| CF[Amazon CloudFront CDN]
+    CF -->|Read Assets| S3F[S3 Frontend Bucket]
+    User -->|HTTP POST /chat| APG[Amazon API Gateway]
+    APG -->|Trigger Event| Lambda[AWS Lambda Function]
+    Lambda <-->|AWS SDK Boto3| Bedrock[Amazon Bedrock Claude API]
+    Lambda <-->|Read / Write JSON| S3M[S3 Memory Bucket]
+            </pre>
+          </div>
+
+          <h3 style="margin-top: 20px;">3. Quy trình chi tiết đầu-cuối bằng văn bản (End-to-End Workflow Walkthrough)</h3>
+          <div class="card" style="margin-top: 10px;">
+            <p>Quy trình hoạt động xử lý hội thoại có lưu trữ bộ nhớ (Conversational Memory) cục bộ ở Day 1 được thực hiện qua các giai đoạn sau:</p>
+            
+            <p><strong>Giai đoạn 1: Frontend Client gửi Request</strong></p>
+            <ol class="list">
+              <li>Người dùng nhập tin nhắn vào ô input trên trình duyệt và bấm gửi (hoặc nhấn phím Enter).</li>
+              <li>Hàm <code>sendMessage()</code> trong component [twin.tsx](file:///G:/AIProduction_t6_2026/production/week2/day1.md#L296) được kích hoạt.</li>
+              <li>Tin nhắn mới của người dùng được đóng gói thành một đối tượng <code>Message</code> và cập nhật trực tiếp vào React state <code>messages</code> thông qua <code>setMessages</code> để hiển thị lập tức lên UI.</li>
+              <li>Frontend gọi hàm <code>fetch('http://localhost:8000/chat', ...)</code> gửi HTTP POST request đến Backend API dưới định dạng JSON body chứa: <code>message</code> (nội dung tin nhắn) và <code>session_id</code> (lấy từ React state <code>sessionId</code>, nếu là tin nhắn đầu tiên thì giá trị này là rỗng).</li>
+            </ol>
+
+            <p style="margin-top: 12px;"><strong>Giai đoạn 2: Backend tiếp nhận và xử lý bộ nhớ</strong></p>
+            <ol class="list" start="5">
+              <li>FastAPI Server tiếp nhận request tại route [app.post("/chat")](file:///G:/AIProduction_t6_2026/production/week2/day1.md#L696) với schema <code>ChatRequest</code>.</li>
+              <li>Hệ thống kiểm tra <code>session_id</code> từ request. Nếu trống (lượt chat đầu tiên), backend sử dụng thư viện <code>uuid</code> để tạo một chuỗi định danh ngẫu nhiên phiên bản 4 thông qua lệnh <code>str(uuid.uuid4())</code>.</li>
+              <li>Backend gọi hàm <code>load_conversation(session_id)</code> để tìm kiếm tệp tin lịch sử:
+                <ul>
+                  <li>Hàm này sử dụng thư viện <code>pathlib.Path</code> định vị tệp <code>../memory/{session_id}.json</code>.</li>
+                  <li>Nếu tệp tồn tại, nó mở tệp với mã hóa UTF-8 bằng <code>open(..., encoding="utf-8")</code> và sử dụng <code>json.load(f)</code> để giải tuần tự hóa (deserialize) nội dung tệp thành một danh sách (list) các tin nhắn cũ.</li>
+                  <li>Nếu tệp chưa tồn tại, nó trả về một mảng rỗng <code>[]</code>.</li>
+                </ul>
+              </li>
+            </ol>
+
+            <p style="margin-top: 12px;"><strong>Giai đoạn 3: Gọi LLM suy luận với đầy đủ bối cảnh</strong></p>
+            <ol class="list" start="8">
+              <li>Backend khởi tạo danh sách tin nhắn gửi đi <code>messages</code> bắt đầu bằng System Prompt mô tả tính cách (Personality) được tải trước từ file <code>me.txt</code>.</li>
+              <li>Backend lặp qua mảng lịch sử trò chuyện <code>conversation</code> vừa tải từ file JSON và đẩy toàn bộ các tin nhắn cũ vào danh sách <code>messages</code>.</li>
+              <li>Backend đẩy tiếp tin nhắn hiện tại của người dùng (<code>request.message</code>) vào cuối danh sách <code>messages</code>. Điều này giúp LLM nhận được đầy đủ ngữ cảnh của cả cuộc hội thoại.</li>
+              <li>Backend dùng SDK OpenAI gọi API suy luận: <code>client.chat.completions.create(model="gpt-4o-mini", messages=messages)</code>.</li>
+              <li>OpenAI trả về đối tượng phản hồi chứa nội dung câu trả lời của AI.</li>
+            </ol>
+
+            <p style="margin-top: 12px;"><strong>Giai đoạn 4: Cập nhật lịch sử và lưu trữ</strong></p>
+            <ol class="list" start="13">
+              <li>Backend thêm tin nhắn hiện tại của user và phản hồi của trợ lý AI vào danh sách <code>conversation</code>.</li>
+              <li>Backend gọi hàm <code>save_conversation(session_id, conversation)</code>:
+                <ul>
+                  <li>Hàm mở tệp <code>../memory/{session_id}.json</code> ở chế độ ghi đè (<code>"w"</code>) với mã hóa UTF-8.</li>
+                  <li>Nó gọi lệnh <code>json.dump(messages, f, indent=2, ensure_ascii=False)</code> để tuần tự hóa (serialize) dữ liệu xuống đĩa cứng. Tham số <code>indent=2</code> thụt lề dòng giúp dễ đọc, và <code>ensure_ascii=False</code> đảm bảo tiếng Việt unicode được hiển thị nguyên bản thay vì bị mã hóa thành ký tự escape (như \u00fa).</li>
+                </ul>
+              </li>
+              <li>FastAPI trả về HTTP response JSON chứa câu trả lời của AI và <code>session_id</code> (mới sinh hoặc kế thừa) về cho client.</li>
+            </ol>
+
+            <p style="margin-top: 12px;"><strong>Giai đoạn 5: Frontend nhận kết quả và render UI</strong></p>
+            <ol class="list" start="16">
+              <li>Client Browser tiếp nhận response. Nếu state <code>sessionId</code> của React đang rỗng, nó sẽ cập nhật giá trị <code>sessionId</code> nhận được từ backend bằng <code>setSessionId(data.session_id)</code> để sử dụng cho các lượt chat kế tiếp.</li>
+              <li>Frontend đóng gói câu trả lời của AI thành đối tượng <code>Message</code> và cập nhật vào React state <code>messages</code> để hiển thị lên màn hình.</li>
+            </ol>
+          </div>
+        </section>
+
+        <!-- SECTION 6: TECHNIQUES -->
+        <section id="techniques" class="section">
+          <div class="section-title">
+            <div>
+              <div class="kicker">Section 6</div>
+              <h2>Techniques - Kỹ thuật sử dụng</h2>
+            </div>
+          </div>
+          <div class="grid-3">
+            <article class="card">
+              <h3>Cloud Resource Cleanup</h3>
+              <p><strong>Purpose:</strong> Kiểm soát tối ưu hóa chi phí (cost optimization) tài nguyên đám mây, tránh việc phát sinh chi phí duy trì tài nguyên nhàn rỗi (idle cost) khi đã kết thúc thực hành.</p>
+              <p><strong>When to use:</strong> Ngay sau khi hoàn thành các buổi học, bài lab thử nghiệm, kết thúc giai đoạn POC (Proof of Concept) hoặc dọn dẹp các tài nguyên cũ bị kẹt.</p>
+              <p><strong>Trade-off:</strong> Xóa tài nguyên đồng nghĩa với việc mất môi trường chạy trực tiếp của ứng dụng, cần thiết lập IaC (Terraform) để có thể dựng lại nhanh chóng khi cần.</p>
+            </article>
+            <article class="card">
+              <h3>Edge Caching</h3>
+              <p><strong>Purpose:</strong> Giảm thiểu latency (độ trễ mạng) cho người dùng cuối bằng cách lưu trữ tạm thời nội dung tĩnh (static assets) tại các trạm biên CDN (Edge Location) gần người dùng nhất.</p>
+              <p><strong>When to use:</strong> Dùng cho tất cả các static assets của ứng dụng như tệp frontend HTML/JS/CSS, hình ảnh, video và font chữ.</p>
+              <p><strong>Trade-off:</strong> Phải kiểm soát cơ chế Invalidation (làm mới cache) khi deploy phiên bản mới để tránh người dùng tải phải tệp tin cũ bị lỗi đồng bộ.</p>
+            </article>
+            <article class="card">
+              <h3>JSON Session Serialization</h3>
+              <p><strong>Purpose:</strong> Thiết lập tính năng lưu giữ trạng thái (conversational memory) cho chatbot cục bộ một cách tối giản, gọn nhẹ mà không cần cài đặt và cấu hình cơ sở dữ liệu (database) phức tạp.</p>
+              <p><strong>When to use:</strong> Phù hợp cho môi trường phát triển thử nghiệm cục bộ (local development) hoặc ứng dụng đơn người dùng (single-user application).</p>
+              <p><strong>Trade-off:</strong> Tốc độ đọc/ghi file trên đĩa cứng sẽ chậm dần khi kích thước cuộc trò chuyện dài ra, dễ bị lỗi xung đột ghi file đồng thời khi có nhiều user nhắn tin cùng lúc.</p>
+            </article>
+          </div>
+        </section>
+
+        <!-- SECTION 7: CODE WALKTHROUGH -->
+        <section id="code-walkthrough" class="section">
+          <div class="section-title">
+            <div>
+              <div class="kicker">Section 7</div>
+              <h2>Code Walkthrough - Phân tích code</h2>
+            </div>
+            <div class="source-row">
+              <span class="source">Code</span>
+              <span class="source">Docx LLM</span>
+            </div>
+          </div>
+
+          <article class="code-panel">
+            <div>
+              <h3>backend/server.py (Stateful Version có Memory)</h3>
+              <p>Phần mã nguồn backend hoàn chỉnh của máy chủ FastAPI, chịu trách nhiệm tiếp nhận request chat, tự động quản lý session và ghi nhớ lịch sử hội thoại của từng phiên chat độc lập ra các file JSON trên đĩa.</p>
+            </div>
+            <div class="code-meta">
+              <span>Purpose: API Server & File Memory Manager</span>
+              <span>Key functions: load_conversation, save_conversation, chat, list_sessions</span>
+            </div>
+            <pre><code>from fastapi import FastAPI, HTTPException
+from fastapi.middleware.cors import CORSMiddleware
+from pydantic import BaseModel
+from openai import OpenAI
+import os
+from dotenv import load_dotenv
+from typing import Optional, List, Dict
+import json
+import uuid
+from pathlib import Path
+
+# Load bien moi truong tu file .env, override=True de ep tai lai bien moi nhat
+load_dotenv(override=True)
+
+app = FastAPI()
+
+# Doc cau hinh CORS tu file .env, mac dinh cho phep frontend localhost:3000 truy cap
+origins = os.getenv("CORS_ORIGINS", "http://localhost:3000").split(",")
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+# Khoi tao client OpenAI tu bien moi truong OPENAI_API_KEY
+client = OpenAI()
+
+# Khoi tao va tu dong tao thu muc luu tru memory o ngoai backend neu chua co
+MEMORY_DIR = Path("../memory")
+MEMORY_DIR.mkdir(exist_ok=True)
+
+# Doc file persona de lam System Prompt cho AI chatbot
+def load_personality():
+    with open("me.txt", "r", encoding="utf-8") as f:
+        return f.read().strip()
+
+PERSONALITY = load_personality()
+
+# Khai bao schema request va response cho API chat
+class ChatRequest(BaseModel):
+    message: str
+    session_id: Optional[str] = None
+
+class ChatResponse(BaseModel):
+    response: str
+    session_id: str
+
+# Ham doc lich su chat tu file JSON cua session tuong ung
+def load_conversation(session_id: str) -> List[Dict]:
+    file_path = MEMORY_DIR / f"{session_id}.json"
+    if file_path.exists():
+        with open(file_path, "r", encoding="utf-8") as f:
+            return json.load(f)
+    return []
+
+# Ham ghi de lich su chat moi nhat xuong file JSON dung dinh dang unicode tieng Viet
+def save_conversation(session_id: str, messages: List[Dict]):
+    file_path = MEMORY_DIR / f"{session_id}.json"
+    with open(file_path, "w", encoding="utf-8") as f:
+        # ensure_ascii=False giup hien thi dung ky tu tieng Viet co dau, indent=2 thut dong de doc
+        json.dump(messages, f, indent=2, ensure_ascii=False)
+
+@app.post("/chat", response_model=ChatResponse)
+async def chat(request: ChatRequest):
+    try:
+        # Sinh session ID ngau nhien bang UUID neu day la luot chat dau tien
+        session_id = request.session_id or str(uuid.uuid4())
+        
+        # Load lai toan bo cuoc tro chuyen cu tu dia cung
+        conversation = load_conversation(session_id)
+        
+        # Khoi tao mang tin nhan gui toi OpenAI voi System Personality prompt
+        messages = [{"role": "system", "content": PERSONALITY}]
+        
+        # Nạp toan bo cac tin nhan lich su cu vao mang
+        for msg in conversation:
+            messages.append(msg)
+        
+        # Append tin nhan moi cua user vao cuoi mang tin nhan gui di
+        messages.append({"role": "user", "content": request.message})
+        
+        # Goi OpenAI API hoan thanh logic hoi thoai
+        response = client.chat.completions.create(
+            model="gpt-4o-mini",
+            messages=messages
+        )
+        
+        assistant_response = response.choices[0].message.content
+        
+        # Cap nhat tin nhan moi cua user va bot vao danh sach lich su chat
+        conversation.append({"role": "user", "content": request.message})
+        conversation.append({"role": "assistant", "content": assistant_response})
+        
+        # Ghi lai lich su moi nhat vao file JSON session de tiep tuc nho o lan sau
+        save_conversation(session_id, conversation)
+        
+        return ChatResponse(
+            response=assistant_response,
+            session_id=session_id
+        )
+
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.get("/sessions")
+async def list_sessions():
+    # Quet va liet ke thong tin tat ca cac file session dang co trong thu muc memory
+    sessions = []
+    for file_path in MEMORY_DIR.glob("*.json"):
+        session_id = file_path.stem # Lay ten file khong kem duoi extension
+        with open(file_path, "r", encoding="utf-8") as f:
+            conversation = json.load(f)
+            sessions.append({
+                "session_id": session_id,
+                "message_count": len(conversation),
+                "last_message": conversation[-1]["content"] if conversation else None
+            })
+    return {"sessions": sessions}
+</code></pre>
+          </article>
+
+          <article class="code-panel" style="margin-top: 20px;">
+            <div>
+              <h3>frontend/components/twin.tsx</h3>
+              <p>Mã nguồn React Chat Interface cho phép người dùng tương tác trực tiếp với Digital Twin. Sử dụng React state để render danh sách tin nhắn và gửi API request kèm theo session ID.</p>
+            </div>
+            <div class="code-meta">
+              <span>Purpose: React Chat UI</span>
+              <span>Key states: messages, input, isLoading, sessionId</span>
+            </div>
+            <pre><code>'use client';
+
+import { useState, useRef, useEffect } from 'react';
+import { Send, Bot, User } from 'lucide-react'; // Su dung lucide-react lam thu vien icon chinh
+
+interface Message {
+    id: string;
+    role: 'user' | 'assistant';
+    content: string;
+    timestamp: Date;
+}
+
+export default function Twin() {
+    const [messages, setMessages] = useState<Message[]>([]);
+    const [input, setInput] = useState('');
+    const [isLoading, setIsLoading] = useState(false);
+    const [sessionId, setSessionId] = useState<string>(''); // Luu tru session ID cua phien chat hien tai
+    const messagesEndRef = useRef<HTMLDivElement>(null);
+
+    // Tu dong cuon xuong cuoi danh sach khi co tin nhan moi
+    const scrollToBottom = () => {
+        messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    };
+
+    useEffect(() => {
+        scrollToBottom();
+    }, [messages]);
+
+    const sendMessage = async () => {
+        if (!input.trim() || isLoading) return;
+
+        const userMessage: Message = {
+            id: Date.now().toString(),
+            role: 'user',
+            content: input,
+            timestamp: new Date(),
+        };
+
+        // Render ngay lap tuc tin nhan cua user len UI de tao cam giac nhanh nhay
+        setMessages(prev => [...prev, userMessage]);
+        setInput('');
+        setIsLoading(true);
+
+        try {
+            const response = await fetch('http://localhost:8000/chat', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    message: input,
+                    session_id: sessionId || undefined, // Gui kem session ID neu da co
+                }),
+            });
+
+            if (!response.ok) throw new Error('Failed to send message');
+
+            const data = await response.json();
+
+            // Neu day la tin nhan dau tien, nhan session ID do backend sinh ra va luu vao state
+            if (!sessionId) {
+                setSessionId(data.session_id);
+            }
+
+            const assistantMessage: Message = {
+                id: (Date.now() + 1).toString(),
+                role: 'assistant',
+                content: data.response,
+                timestamp: new Date(),
+            };
+
+            setMessages(prev => [...prev, assistantMessage]);
+        } catch (error) {
+            console.error('Error:', error);
+            const errorMessage: Message = {
+                id: (Date.now() + 1).toString(),
+                role: 'assistant',
+                content: 'Sorry, I encountered an error. Please try again.',
+                timestamp: new Date(),
+            };
+            setMessages(prev => [...prev, errorMessage]);
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
+    const handleKeyPress = (e: React.KeyboardEvent) => {
+        if (e.key === 'Enter' && !e.shiftKey) {
+            e.preventDefault();
+            sendMessage();
+        }
+    };
+
+    return (
+        <div className="flex flex-col h-full bg-gray-50 rounded-lg shadow-lg">
+            {/* Header cua Chat Box */}
+            <div className="bg-gradient-to-r from-slate-700 to-slate-800 text-white p-4 rounded-t-lg">
+                <h2 className="text-xl font-semibold flex items-center gap-2" style={{color: 'white', border: 'none', padding: 0}}>
+                    <Bot className="w-6 h-6" />
+                    AI Digital Twin
+                </h2>
+                <p className="text-sm text-slate-300 mt-1">Your AI course companion</p>
+            </div>
+
+            {/* Khung hien thi danh sach tin nhan chat */}
+            <div className="flex-1 overflow-y-auto p-4 space-y-4">
+                {messages.length === 0 && (
+                    <div className="text-center text-gray-500 mt-8">
+                        <Bot className="w-12 h-12 mx-auto mb-3 text-gray-400" />
+                        <p>Hello! I am your Digital Twin.</p>
+                        <p className="text-sm mt-2">Ask me anything about AI deployment!</p>
+                    </div>
+                )}
+
+                {messages.map((message) => (
+                    <div
+                        key={message.id}
+                        className={`flex gap-3 ${
+                            message.role === 'user' ? 'justify-end' : 'justify-start'
+                        }`}
+                    >
+                        {message.role === 'assistant' && (
+                            <div className="flex-shrink-0">
+                                <div className="w-8 h-8 bg-slate-700 rounded-full flex items-center justify-center">
+                                    <Bot className="w-5 h-5 text-white" />
+                                </div>
+                            </div>
+                        )}
+
+                        <div
+                            className={`max-w-[70%] rounded-lg p-3 ${
+                                message.role === 'user'
+                                    ? 'bg-slate-700 text-white'
+                                    : 'bg-white border border-gray-200 text-gray-800'
+                            }`}
+                        >
+                            <p className="whitespace-pre-wrap">{message.content}</p>
+                            <p
+                                className={`text-xs mt-1 ${
+                                    message.role === 'user' ? 'text-slate-300' : 'text-gray-500'
+                                }`}
+                            >
+                                {message.timestamp.toLocaleTimeString()}
+                            </p>
+                        </div>
+
+                        {message.role === 'user' && (
+                            <div className="flex-shrink-0">
+                                <div className="w-8 h-8 bg-gray-600 rounded-full flex items-center justify-center">
+                                    <User className="w-5 h-5 text-white" />
+                                </div>
+                            </div>
+                        )}
+                    </div>
+                ))}
+
+                {/* Bong bong loading khi AI dang suy nghi */}
+                {isLoading && (
+                    <div className="flex gap-3 justify-start">
+                        <div className="flex-shrink-0">
+                            <div className="w-8 h-8 bg-slate-700 rounded-full flex items-center justify-center">
+                                <Bot className="w-5 h-5 text-white" />
+                            </div>
+                        </div>
+                        <div className="bg-white border border-gray-200 rounded-lg p-3">
+                            <div className="flex space-x-2">
+                                <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" />
+                                <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{animationDelay: '0.1s'}} />
+                                <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{animationDelay: '0.2s'}} />
+                            </div>
+                        </div>
+                    </div>
+                )}
+
+                <div ref={messagesEndRef} />
+            </div>
+
+            {/* Input nhap tin nhan */}
+            <div className="border-t border-gray-200 p-4 bg-white rounded-b-lg">
+                <div className="flex gap-2">
+                    <input
+                        type="text"
+                        value={input}
+                        onChange={(e) => setInput(e.target.value)}
+                        onKeyDown={handleKeyPress}
+                        placeholder="Type your message..."
+                        className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-slate-600 focus:border-transparent text-gray-800"
+                        disabled={isLoading}
+                    />
+                    <button
+                        onClick={sendMessage}
+                        disabled={!input.trim() || isLoading}
+                        className="px-4 py-2 bg-slate-700 text-white rounded-lg hover:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-slate-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                    >
+                        <Send className="w-5 h-5" />
+                    </button>
+                </div>
+            </div>
+        </div>
+    );
+}
+</code></pre>
+          </article>
+
+          <article class="card" style="margin-top: 20px;">
+            <h3>Cấu hình Tailwind v4 & PostCSS trong Next.js 15.5</h3>
+            <p><strong>frontend/postcss.config.mjs:</strong> Tailwind v4 biên dịch bằng PostCSS thông qua plugin mới:</p>
+            <pre><code>export default {
+    plugins: {
+        '@tailwindcss/postcss': {}, // Engine bien dich CSS moi cua Tailwind v4
+    },
+}</code></pre>
+            <p style="margin-top: 10px;"><strong>frontend/app/globals.css:</strong> Import thư viện Tailwind v4 bằng directive duy nhất thay thế cho các lệnh v3 cũ:</p>
+            <pre><code>@import 'tailwindcss'; /* Nạp toan bo style cua Tailwind v4 */
+
+@keyframes bounce {
+  0%, 80%, 100% { transform: translateY(0); }
+  40% { transform: translateY(-10px); }
+}
+
+.animate-bounce {
+  animation: bounce 1.4s infinite;
+}</code></pre>
+          </article>
+        </section>
+
+        <!-- SECTION 8: OPTIONS / TRADE-OFFS -->
+        <section id="options" class="section">
+          <div class="section-title">
+            <div>
+              <div class="kicker">Section 8</div>
+              <h2>Options / Trade-offs - Bản đồ lựa chọn</h2>
+            </div>
+          </div>
+          <table>
+            <thead>
+              <tr>
+                <th>Lựa chọn - Option</th>
+                <th>Phù hợp nhất - Best for</th>
+                <th>Đánh đổi - Trade-off</th>
+                <th>Rủi ro - Risk</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>Terraform (IaC)</strong></td>
+                <td>Dự án startup, doanh nghiệp có hạ tầng đa đám mây (multi-cloud), cần tính tự động hóa và ổn định cao.</td>
+                <td>Phải học ngôn ngữ cấu hình mới (HCL) và cấu hình tệp tin state ban đầu khá phức tạp.</td>
+                <td>Lỗi rách nát hạ tầng nếu tự ý chỉnh sửa thủ công tệp tin Terraform State file (`.tfstate`).</td>
+              </tr>
+              <tr>
+                <td><strong>AWS CDK (IaC)</strong></td>
+                <td>Đội ngũ kỹ sư cam kết sử dụng 100% hạ tầng AWS và muốn lập trình hạ tầng bằng Python/TypeScript thuần.</td>
+                <td>Bị khóa chặt vào hệ sinh thái của AWS (vendor lock-in), không thể chuyển đổi sang GCP hay Azure.</td>
+                <td>Quá trình biên dịch CloudFormation gián tiếp tốn nhiều thời gian và khó debug cấu hình lỗi.</td>
+              </tr>
+              <tr>
+                <td><strong>API Gateway + Lambda</strong></td>
+                <td>(Recommended) Hệ thống AI chatbot thực tế phục vụ khách hàng, cần kiểm soát rate-limiting, CORS, và bảo mật.</td>
+                <td>Cấu hình phức tạp qua nhiều bước và phát sinh thêm chi phí nhỏ theo lưu lượng request qua Gateway.</td>
+                <td>Độ trễ tăng nhẹ do phải đi qua proxy trung gian của API Gateway.</td>
+              </tr>
+              <tr>
+                <td><strong>AWS Lambda Function URL</strong></td>
+                <td>Sản phẩm thử nghiệm nhỏ, webhook nội bộ hoặc các buổi lab thực hành nhanh để giảm chi phí.</td>
+                <td>Thiếu hoàn toàn các tính năng bảo mật nâng cao và các công cụ rate-limiting, CORS handling.</td>
+                <td>Dễ bị tấn công DDoS làm cạn kiệt tài nguyên hoặc tăng vọt chi phí gọi LLM API.</td>
+              </tr>
+              <tr>
+                <td><strong>File-based Memory</strong></td>
+                <td>(Recommended local) Chatbot cục bộ, demo thử nghiệm hoặc chạy đơn người dùng giúp tiết kiệm thời gian.</td>
+                <td>Tốc độ đọc/ghi file chậm dần khi lịch sử chat dài ra, khó mở rộng quy mô.</td>
+                <td>Xung đột ghi đè đồng thời (concurrency lock) làm malformed định dạng JSON của file.</td>
+              </tr>
+              <tr>
+                <td><strong>Database Memory (DynamoDB)</strong></td>
+                <td>(Recommended prod) Chatbot production phục vụ hàng nghìn người dùng đồng thời, cần tính nhất quán cao.</td>
+                <td>Cần cấu hình kết nối database, thiết kế khóa phân vùng (partition key) và tốn thêm chi phí duy trì.</td>
+                <td>Độ trễ tăng nhẹ nếu truy vấn database không được tối ưu hóa chỉ mục.</td>
+              </tr>
+            </tbody>
+          </table>
+        </section>
+
+        <!-- SECTION 9: PITFALLS -->
+        <section id="pitfalls" class="section">
+          <div class="section-title">
+            <div>
+              <div class="kicker">Section 9</div>
+              <h2>Pitfalls - Lỗi / bẫy thường gặp</h2>
+            </div>
+          </div>
+          <div class="grid-2">
+            <article class="card">
+              <h3>Failure modes - Trường hợp dễ lỗi</h3>
+              <ul class="list">
+                <li><strong>Bill Shock (Hóa đơn tăng vọt):</strong> Học viên quên không tắt các tài nguyên chạy ngầm của Week 1 (App Runner, ECR) dẫn đến bị AWS trừ tiền tài khoản lớn hàng tháng.</li>
+                <li><strong>CORS Block Error:</strong> Frontend Next.js ở cổng 3000 không thể gửi tin nhắn chat đến FastAPI ở cổng 8000 do trình duyệt từ chối request chéo origin.</li>
+                <li><strong>Concurrency File Lock:</strong> Nhiều request gửi lên backend cùng một lúc cho một session khiến các tiến trình đọc/ghi đè đè lên file JSON, gây lỗi malformed JSON syntax.</li>
+                <li><strong>Cold Start Latency:</strong> Người dùng đầu tiên truy cập chatbot sau một khoảng thời gian dài gặp hiện tượng loading rất lâu (vài giây) trước khi nhận được phản hồi.</li>
+              </ul>
+            </article>
+            <article class="card">
+              <h3>Fix / prevention - Cách tránh</h3>
+              <ul class="list">
+                <li><strong>Thiết lập cảnh báo Billing:</strong> Đăng nhập Root user, truy cập CloudWatch tạo Billing Alarm để gửi email cảnh báo tự động khi hóa đơn vượt ngưỡng nhỏ (ví dụ $5). Luôn dọn dẹp hạ tầng lab ngay sau khi học xong.</li>
+                <li><strong>Cấu hình CORSMiddleware:</strong> Khai báo cụ thể origin <code>http://localhost:3000</code> vào thuộc tính <code>allow_origins</code> của FastAPI. Đảm bảo ghi đủ cả giao thức <code>http://</code>.</li>
+                <li><strong>Consistent DB Write:</strong> Khi chuyển giao lên cloud production, sử dụng database DynamoDB thay cho File-based Storage để tận dụng cơ chế khóa ghi giao dịch nhất quán.</li>
+                <li><strong>Provisioned Concurrency:</strong> Trả thêm phí giữ ấm container Lambda, hoặc setup cron job tự động ping định kỳ để giữ ấm hàm Lambda không bị giải phóng.</li>
+              </ul>
+            </article>
+          </div>
+        </section>
+
+        <!-- SECTION 10: FLASHCARDS -->
+        <section id="flashcards" class="section">
+          <div class="section-title">
+            <div>
+              <div class="kicker">Section 10</div>
+              <h2>Flashcards / Q&A - Ôn tập tương tác</h2>
+            </div>
+          </div>
+          <div class="grid-2">
+            <article class="card flashcard">
+              <h3>Q: Tại sao lưu trữ Docker image trên ECR vẫn phát sinh chi phí hàng tháng mặc dù service App Runner đã bị xóa?</h3>
+              <button class="button primary" type="button" data-reveal>Reveal answer - Hiện câu trả lời</button>
+              <p class="flash-answer"><strong>A:</strong> Vì ECR tính phí lưu trữ dựa trên dung lượng đĩa cloud thực tế (Storage Cost) của Docker image (thường nặng từ vài trăm MB đến hàng GB). Xóa App Runner chỉ dừng runtime tính toán (CPU/RAM) chứ không giải phóng dung lượng đĩa ECR. Bạn bắt buộc phải xóa repository chứa image trên ECR để dừng phát sinh chi phí lưu trữ.</p>
+            </article>
+            <article class="card flashcard">
+              <h3>Q: Sự khác biệt cốt lõi về tính chất đám mây của Terraform và AWS CDK là gì?</h3>
+              <button class="button primary" type="button" data-reveal>Reveal answer - Hiện câu trả lời</button>
+              <p class="flash-answer"><strong>A:</strong> Terraform là công cụ độc lập đám mây (cloud-agnostic), sử dụng cú pháp HCL để quản lý tài nguyên của nhiều cloud khác nhau (AWS, GCP, Azure) trên cùng một ngôn ngữ. AWS CDK là công cụ chính chủ của AWS, cho phép viết hạ tầng bằng ngôn ngữ lập trình phổ biến nhưng bị khóa chặt (vendor lock-in) chỉ dùng riêng cho dịch vụ AWS.</p>
+            </article>
+            <article class="card flashcard">
+              <h3>Q: Lợi ích chính của việc đặt API Gateway đứng trước AWS Lambda là gì?</h3>
+              <button class="button primary" type="button" data-reveal>Reveal answer - Hiện câu trả lời</button>
+              <p class="flash-answer"><strong>A:</strong> API Gateway đóng vai trò như một proxy bảo mật trung tâm giúp định tuyến API, xử lý CORS, chứng thực API Key, kiểm soát rate-limiting (chống spam request) và theo dõi giám sát lưu lượng truy cập trước khi chuyển request kích hoạt Lambda.</p>
+            </article>
+            <article class="card">
+              <h3>Quick quiz - Câu hỏi nhanh</h3>
+              <p>Để triệt tiêu lỗi CORS một cách triệt để nhất khi triển khai React frontend và API Gateway trên môi trường AWS Production, bạn chọn phương pháp cấu hình định tuyến nào qua CloudFront?</p>
+              <button class="button quiz-option" type="button" data-correct="false">A. Cấu hình CORS Header cho phép mọi nguồn gốc (*) trên API Gateway.</button>
+              <button class="button quiz-option" type="button" data-correct="true">B. Cấu hình CloudFront làm Single Domain: định tuyến route mặc định /* về S3 Frontend và route /api/* về API Gateway.</button>
+              <button class="button quiz-option" type="button" data-correct="false">C. Gọi trực tiếp endpoint của Lambda URL từ trình duyệt mà không cần qua CloudFront.</button>
+              <div class="quiz-result" aria-live="polite"></div>
+            </article>
+          </div>
+        </section>
+
+        <!-- SECTION 11: QUICK MEMORY -->
+        <section id="memory" class="section">
+          <div class="section-title">
+            <div>
+              <div class="kicker">Section 11</div>
+              <h2>Quick Memory - Ôn nhanh cuối bài</h2>
+            </div>
+          </div>
+          <div class="grid-2">
+            <article class="card">
+              <h3>Must remember - Phải nhớ</h3>
+              <ol class="list">
+                <li>Luôn dọn dẹp ECR và App Runner sau bài thực hành để tối ưu hóa cost (chi phí).</li>
+                <li>Root user là tài khoản tối cao dùng để quản lý Billing và cleanup triệt để tài nguyên nhàn rỗi.</li>
+                <li>Terraform sử dụng cú pháp khai báo HCL độc lập đám mây (cloud-agnostic) để dựng cơ sở hạ tầng IaC.</li>
+                <li>FaaS (Lambda) chỉ tính chi phí theo thời gian CPU chạy thực tế (tính bằng mili-giây) và số request, hỗ trợ scale-to-zero nhưng gặp hiện tượng cold start.</li>
+                <li>Lưu trữ JSON theo Session ID (UUID) là kỹ thuật lưu bộ nhớ (conversational memory) đơn giản nhất cho phát triển cục bộ.</li>
+              </ol>
+            </article>
+            <article class="card">
+              <h3>Self-check - Tự kiểm tra</h3>
+              <ul class="list">
+                <li>Bạn có giải thích được sự khác nhau giữa trách nhiệm quản trị hệ thống của EC2 (IaaS) và Lambda (Serverless FaaS) không?</li>
+                <li>Tại sao chatbot stateless của chúng ta lại bị mất trí nhớ và cách giải quyết bằng File-based Session Storage thế nào?</li>
+                <li>Cold start xảy ra khi nào trong kiến trúc Serverless và cách khắc phục?</li>
+                <li>Cơ chế Single Domain của CloudFront giải quyết CORS ra sao?</li>
+              </ul>
+            </article>
+          </div>
+        </section>
+
+        <footer class="footer">
+          <strong>Study note:</strong> Học liệu ôn tập này được tổng hợp từ slide, docx và mã nguồn chính thức của Week 2 Day 1. Đã được định dạng chuẩn chỉnh theo thiết kế Claude editorial và loại bỏ hoàn toàn các placeholder.
+        </footer>
+      </main>
+    </div>
+  </div>
+
+  <script>
+    const links = Array.from(document.querySelectorAll(".toc a"));
+    const sections = links.map((link) => document.querySelector(link.getAttribute("href"))).filter(Boolean);
+    const progressBar = document.getElementById("progressBar");
+    const detailsNodes = Array.from(document.querySelectorAll("details"));
+
+    function setActiveLink() {
+      let current = sections[0]?.id;
+      const offset = window.scrollY + 170;
+      for (const section of sections) {
+        if (section.offsetTop <= offset) {
+          current = section.id;
+        }
+      }
+      links.forEach((link) => {
+        link.classList.toggle("active", link.getAttribute("href") === `#${current}`);
+      });
+    }
+
+    function updateProgress() {
+      const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+      const progress = docHeight > 0 ? Math.min((window.scrollY / docHeight) * 100, 100) : 0;
+      progressBar.style.width = `${progress}%`;
+    }
+
+    document.getElementById("expandAll").addEventListener("click", () => {
+      detailsNodes.forEach((node) => {
+        node.open = true;
+      });
+    });
+
+    document.getElementById("collapseAll").addEventListener("click", () => {
+      detailsNodes.forEach((node) => {
+        node.open = false;
+      });
+    });
+
+    document.querySelectorAll("[data-reveal]").forEach((button) => {
+      button.addEventListener("click", () => {
+        const card = button.closest(".flashcard");
+        card.classList.toggle("revealed");
+        button.innerText = card.classList.contains("revealed") ? "Hide answer - Ẩn câu trả lời" : "Reveal answer - Hiện câu trả lời";
+      });
+    });
+
+    document.querySelectorAll(".quiz-option").forEach((button) => {
+      button.addEventListener("click", () => {
+        const result = button.parentElement.querySelector(".quiz-result");
+        if (button.dataset.correct === "true") {
+          result.innerHTML = "Correct! - Chính xác. Cấu hình Single Domain giúp tích hợp cả frontend và backend dưới một domain duy nhất của CloudFront CDN, khiến trình duyệt nhận diện Same-Origin và triệt tiêu hoàn toàn cơ chế CORS.";
+          result.style.color = "var(--accent-teal)";
+        } else {
+          result.innerHTML = "Not quite. - Chưa chính xác. Lựa chọn này vẫn có thể gặp lỗi CORS hoặc không tối ưu về mặt bảo mật. Vui lòng xem lại kiến thức mở rộng ở trên.";
+          result.style.color = "var(--primary-active)";
+        }
+      });
+    });
+
+    window.addEventListener("scroll", () => {
+      setActiveLink();
+      updateProgress();
+    }, { passive: true });
+
+    setActiveLink();
+    updateProgress();
+  </script>
+</body>
+
+</html>
