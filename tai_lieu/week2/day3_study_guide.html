@@ -1,0 +1,1372 @@
+<!doctype html>
+<html lang="vi">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>AWS Bedrock Transition & Production AI Monitoring - Study Guide</title>
+  
+  <!-- Import Google Fonts (Cormorant Garamond & Inter) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+  <!-- Import Mermaid.js for Architecture & Workflow Rendering -->
+  <script type="module">
+    import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+    mermaid.initialize({ 
+      startOnLoad: true,
+      theme: 'neutral',
+      themeVariables: {
+        background: '#181715',
+        primaryColor: '#cc785c',
+        primaryTextColor: '#faf9f5',
+        lineColor: '#cc785c',
+        textColor: '#faf9f5'
+      }
+    });
+  </script>
+
+  <style>
+    :root {
+      --canvas: #faf9f5;
+      --surface-soft: #f5f0e8;
+      --surface-card: #efe9de;
+      --surface-strong: #e8e0d2;
+      --surface-dark: #181715;
+      --surface-dark-elevated: #252320;
+      --surface-dark-soft: #1f1e1b;
+      --hairline: #e6dfd8;
+      --hairline-soft: #ebe6df;
+      --ink: #141413;
+      --body: #3d3d3a;
+      --body-strong: #252523;
+      --muted: #6c6a64;
+      --muted-soft: #8e8b82;
+      --primary: #cc785c;
+      --primary-active: #a9583e;
+      --accent-teal: #5db8a6;
+      --accent-amber: #e8a55a;
+      --on-dark: #faf9f5;
+      --on-dark-soft: #a09d96;
+      --radius-md: 8px;
+      --radius-lg: 12px;
+      --radius-xl: 16px;
+      --content: 1200px;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      margin: 0;
+      background: var(--canvas);
+      color: var(--body);
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      line-height: 1.62;
+    }
+
+    h1,
+    h2,
+    h3 {
+      color: var(--ink);
+      font-family: 'Cormorant Garamond', Garamond, 'Times New Roman', serif;
+      font-weight: 400;
+      letter-spacing: -0.01em;
+      line-height: 1.1;
+      margin: 0;
+      overflow-wrap: normal;
+      word-break: normal;
+    }
+
+    h1 {
+      font-size: clamp(2.2rem, 4.5vw, 3.8rem);
+      max-width: 25ch;
+    }
+
+    h2 {
+      font-size: clamp(1.6rem, 2.5vw, 2.2rem);
+      border-bottom: 1px solid var(--hairline-soft);
+      padding-bottom: 8px;
+    }
+
+    h3 {
+      font-size: 1.25rem;
+      line-height: 1.35;
+      margin: 0;
+      font-weight: 600;
+    }
+
+    p,
+    li {
+      margin: 0;
+    }
+
+    ul, ol {
+      margin: 0;
+      padding: 0;
+    }
+
+    code {
+      border-radius: 6px;
+      background: var(--surface-strong);
+      color: var(--body-strong);
+      font-family: "JetBrains Mono", Consolas, monospace;
+      font-size: 0.9em;
+      padding: 2px 6px;
+    }
+
+    pre {
+      margin: 0;
+      overflow-x: auto;
+      border-radius: var(--radius-lg);
+      background: var(--surface-dark-soft);
+      color: var(--on-dark);
+      padding: 18px;
+      font-family: "JetBrains Mono", Consolas, monospace;
+      font-size: 13px;
+      line-height: 1.58;
+      white-space: pre;
+    }
+
+    pre code {
+      background: transparent;
+      color: inherit;
+      padding: 0;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.95rem;
+      margin-top: 14px;
+    }
+
+    th,
+    td {
+      border-bottom: 1px solid var(--hairline);
+      padding: 12px;
+      text-align: left;
+      vertical-align: top;
+    }
+
+    th {
+      color: var(--ink);
+      font-weight: 700;
+      background: var(--surface-soft);
+    }
+
+    .page {
+      max-width: var(--content);
+      margin: 0 auto;
+      padding: 30px 20px 64px;
+    }
+
+    .hero {
+      display: grid;
+      grid-template-columns: minmax(0, 1.2fr) minmax(320px, 0.8fr);
+      gap: 28px;
+      align-items: stretch;
+      padding: 40px;
+      border: 1px solid var(--hairline);
+      border-radius: var(--radius-xl);
+      background: var(--surface-soft);
+    }
+
+    .hero-copy {
+      display: grid;
+      gap: 18px;
+      align-content: start;
+    }
+
+    .eyebrow {
+      width: fit-content;
+      border-radius: 999px;
+      background: var(--primary);
+      color: white;
+      font-size: 0.75rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      padding: 6px 12px;
+      text-transform: uppercase;
+    }
+
+    .lead {
+      max-width: 72ch;
+      color: var(--body-strong);
+      font-size: 1.1rem;
+    }
+
+    .tag-row,
+    .source-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .tag,
+    .source {
+      display: inline-flex;
+      align-items: center;
+      border-radius: 999px;
+      font-size: 0.82rem;
+      font-weight: 600;
+      padding: 5px 11px;
+    }
+
+    .tag {
+      background: var(--surface-card);
+      color: var(--ink);
+    }
+
+    .source {
+      border: 1px solid var(--hairline);
+      background: var(--canvas);
+      color: var(--muted);
+    }
+
+    .source.extended {
+      border-color: rgba(204, 120, 92, 0.38);
+      background: rgba(204, 120, 92, 0.12);
+      color: var(--primary-active);
+    }
+
+    .hero-panel,
+    .code-panel {
+      border-radius: var(--radius-lg);
+      background: var(--surface-dark);
+      color: var(--on-dark);
+      padding: 24px;
+    }
+
+    .hero-panel {
+      display: grid;
+      gap: 16px;
+      align-content: start;
+    }
+
+    .hero-panel h2,
+    .hero-panel h3,
+    .code-panel h3 {
+      color: var(--on-dark);
+      border-bottom: none;
+      padding-bottom: 0;
+    }
+
+    .hero-panel p,
+    .hero-panel li,
+    .code-panel p,
+    .code-panel li {
+      color: var(--on-dark-soft);
+    }
+
+    .progress-track {
+      height: 8px;
+      overflow: hidden;
+      border-radius: 999px;
+      background: var(--surface-dark-elevated);
+    }
+
+    .progress-bar {
+      width: 0;
+      height: 100%;
+      background: var(--primary);
+      transition: width 0.1s ease;
+    }
+
+    .layout {
+      display: grid;
+      grid-template-columns: 280px minmax(0, 1fr);
+      gap: 24px;
+      align-items: start;
+      margin-top: 26px;
+    }
+
+    .toc {
+      position: sticky;
+      top: 20px;
+      border: 1px solid var(--hairline);
+      border-radius: var(--radius-lg);
+      background: var(--canvas);
+      padding: 18px;
+    }
+
+    .toc h2 {
+      font-family: 'Inter', sans-serif;
+      font-size: 1rem;
+      font-weight: 700;
+      border-bottom: none;
+      padding-bottom: 0;
+      margin-bottom: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--muted);
+    }
+
+    .toc nav {
+      display: grid;
+      gap: 6px;
+    }
+
+    .toc a {
+      border-radius: var(--radius-md);
+      color: var(--muted);
+      padding: 8px 10px;
+      text-decoration: none;
+      font-size: 0.9rem;
+      font-weight: 500;
+      transition: all 0.2s ease;
+    }
+
+    .toc a:hover,
+    .toc a.active {
+      background: var(--surface-card);
+      color: var(--ink);
+    }
+
+    .toc-tools {
+      display: grid;
+      gap: 8px;
+      margin-top: 16px;
+      padding-top: 16px;
+      border-top: 1px solid var(--hairline);
+    }
+
+    .button {
+      min-height: 40px;
+      border: 1px solid var(--hairline);
+      border-radius: var(--radius-md);
+      background: var(--canvas);
+      color: var(--ink);
+      cursor: pointer;
+      font: inherit;
+      font-size: 0.9rem;
+      font-weight: 700;
+      padding: 10px 12px;
+      transition: all 0.2s ease;
+    }
+
+    .button:hover {
+      background: var(--surface-card);
+    }
+
+    .button.primary {
+      border-color: var(--primary);
+      background: var(--primary);
+      color: white;
+    }
+
+    .button.primary:hover {
+      background: var(--primary-active);
+    }
+
+    .button.primary:disabled {
+      background: var(--muted-soft);
+      border-color: var(--muted-soft);
+      cursor: not-allowed;
+    }
+
+    .button.quiz-option {
+      display: block;
+      width: 100%;
+      margin-top: 8px;
+      text-align: left;
+      font-weight: 500;
+    }
+
+    .content {
+      display: grid;
+      gap: 20px;
+    }
+
+    .section {
+      border: 1px solid var(--hairline);
+      border-radius: var(--radius-lg);
+      background: var(--canvas);
+      padding: 28px;
+    }
+
+    .section-title {
+      display: flex;
+      justify-content: space-between;
+      gap: 16px;
+      align-items: start;
+      margin-bottom: 18px;
+    }
+
+    .kicker {
+      color: var(--primary-active);
+      font-size: 0.8rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      margin-bottom: 6px;
+      text-transform: uppercase;
+    }
+
+    .grid-2,
+    .grid-3 {
+      display: grid;
+      gap: 14px;
+    }
+
+    .grid-2 {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .grid-3 {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+
+    .card,
+    details {
+      border: 1px solid var(--hairline);
+      border-radius: var(--radius-lg);
+      background: var(--surface-card);
+      padding: 18px;
+    }
+
+    .card p,
+    .card ul,
+    .card ol,
+    details p,
+    details ul,
+    details ol {
+      margin-top: 10px;
+    }
+
+    .list {
+      padding-left: 21px;
+    }
+
+    .list li + li {
+      margin-top: 8px;
+    }
+
+    details {
+      margin-top: 14px;
+      transition: all 0.2s ease;
+    }
+
+    summary {
+      color: var(--ink);
+      cursor: pointer;
+      font-weight: 700;
+      outline: none;
+    }
+
+    .callout {
+      border-left: 4px solid var(--primary);
+      border-radius: var(--radius-md);
+      background: var(--surface-soft);
+      padding: 14px 16px;
+    }
+
+    .code-panel {
+      display: grid;
+      gap: 14px;
+      margin-top: 14px;
+    }
+
+    .code-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      color: var(--on-dark-soft);
+      font-size: 0.86rem;
+    }
+
+    .flashcard {
+      display: grid;
+      gap: 10px;
+    }
+
+    .flash-answer {
+      display: none;
+      border-top: 1px solid var(--hairline);
+      padding-top: 10px;
+      margin-top: 10px;
+      font-style: italic;
+      color: var(--body-strong);
+    }
+
+    .flashcard.revealed .flash-answer {
+      display: block;
+    }
+
+    .quiz-result {
+      min-height: 24px;
+      margin-top: 10px;
+      color: var(--primary-active);
+      font-weight: 700;
+      font-size: 0.95rem;
+    }
+
+    .mermaid-container {
+      background: var(--surface-dark);
+      padding: 20px;
+      border-radius: var(--radius-lg);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      margin-top: 14px;
+    }
+
+    .footer {
+      border-top: 1px solid var(--hairline);
+      margin-top: 40px;
+      padding-top: 20px;
+      color: var(--muted);
+      font-size: 0.85rem;
+      text-align: center;
+    }
+
+    @media (max-width: 860px) {
+      .hero {
+        grid-template-columns: 1fr;
+      }
+      .layout {
+        grid-template-columns: 1fr;
+      }
+      .toc {
+        position: static;
+      }
+      .grid-2,
+      .grid-3 {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="page">
+    <!-- HERO HEADER -->
+    <header class="hero">
+      <div class="hero-copy">
+        <div class="eyebrow">Week 2 • Day 3</div>
+        <h1>AWS Bedrock Transition & Production AI Monitoring</h1>
+        <p class="lead">
+          Chuyển đổi hoàn toàn cơ chế gọi LLM từ OpenAI API sang AWS Bedrock cho chatbot Digital Twin. Bài học tập trung vào tối ưu hóa chi phí với họ mô hình Amazon Nova, bảo mật IAM, cấu hình Converse API, hồ sơ suy luận xuyên vùng (Cross-Region Inference Profiles), xác thực không khóa (Keyless Auth) và thiết lập giám sát hiệu năng với CloudWatch cùng cảnh báo ngân sách AWS Budgets.
+        </p>
+        <div class="tag-row">
+          <span class="tag">AWS Bedrock</span>
+          <span class="tag">Amazon Nova</span>
+          <span class="tag">Converse API</span>
+          <span class="tag">Cross-Region Inference</span>
+          <span class="tag">Keyless Auth</span>
+          <span class="tag">AWS CloudWatch</span>
+        </div>
+        <div class="source-row">
+          <span class="source">Production W2D3.pdf (Slide)</span>
+          <span class="source">day3.md (Source Code)</span>
+          <span class="source extended">day3_summary.md (Extended Notes)</span>
+        </div>
+      </div>
+
+      <!-- SIDE PROGRESS PANEL -->
+      <div class="hero-panel">
+        <h3>Tiến trình học tập</h3>
+        <p>Theo dõi tiến trình đọc và hoàn thành nội dung ôn tập của bài học.</p>
+        <div class="progress-track">
+          <div id="progressBar" class="progress-bar"></div>
+        </div>
+        <p id="progressPercent" style="font-size: 0.85rem; font-weight: 700; color: var(--primary);">0% Completed</p>
+        <div class="toc-tools">
+          <button id="expandAll" class="button">Expand All Details</button>
+          <button id="collapseAll" class="button">Collapse All Details</button>
+        </div>
+      </div>
+    </header>
+
+    <!-- MAIN LAYOUT -->
+    <div class="layout">
+      <!-- SIDEBAR TOC -->
+      <aside class="toc">
+        <h2>Mục lục</h2>
+        <nav>
+          <a href="#core-concepts">1. Core Concepts - Khái niệm cốt lõi</a>
+          <a href="#nova-models">2. Amazon Nova Family - Họ mô hình Nova</a>
+          <a href="#iam-permissions">3. IAM Permissions - Phân quyền hệ thống</a>
+          <a href="#converse-api">4. Converse API - Chuẩn hóa API hội thoại</a>
+          <a href="#cross-region">5. Cross-Region Inference - Suy luận xuyên vùng</a>
+          <a href="#keyless-auth">6. Keyless Authentication - Xác thực không khóa</a>
+          <a href="#cloudwatch">7. Monitoring & Budgets - Giám sát & Tài chính</a>
+          <a href="#code-walkthrough">8. Code Walkthrough - Phân tích mã nguồn</a>
+          <a href="#options-tradeoffs">9. Options & Trade-offs - Bản đồ lựa chọn</a>
+          <a href="#pitfalls">10. Pitfalls - Bẫy & Lỗi thường gặp</a>
+          <a href="#interactive">11. Flashcards & Quiz - Ôn tập tương tác</a>
+          <a href="#quick-memory">12. Quick Memory - Ghi nhớ nhanh</a>
+        </nav>
+      </aside>
+
+      <!-- MAIN CONTENT -->
+      <main class="content">
+        <!-- SECTION 1: CORE CONCEPTS -->
+        <section id="core-concepts" class="section">
+          <div class="section-title">
+            <div>
+              <div class="kicker">Section 1</div>
+              <h2>Core Concepts - Khái niệm cốt lõi</h2>
+            </div>
+          </div>
+          <div class="grid-2">
+            <article class="card">
+              <h3>Amazon Bedrock là gì?</h3>
+              <p>
+                <strong>Amazon Bedrock</strong> là dịch vụ đám mây được quản lý hoàn toàn (fully managed serverless service) của AWS. Nó cung cấp một API duy nhất để truy cập và sử dụng các mô hình nền tảng (Foundation Models - FMs) hiệu năng cao từ các công ty AI hàng đầu thế giới (Amazon, Anthropic, Meta, Cohere, AI21 Labs, v.v.).
+              </p>
+              <p>
+                <strong>Tầm quan trọng:</strong> Loại bỏ hoàn toàn gánh nặng vận hành hạ tầng phần cứng GPU phức tạp, hỗ trợ cơ chế thanh toán tập trung (unified billing) theo số lượng request thực tế, và cho phép tích hợp sâu sắc với hệ sinh thái IAM/VPC của AWS để bảo mật dữ liệu cấp doanh nghiệp.
+              </p>
+            </article>
+            <article class="card">
+              <h3>Sự khác biệt chiến lược: AWS vs Azure</h3>
+              <p>
+                Trong khi Microsoft Azure đi theo hướng hợp tác độc quyền và tích hợp sâu với OpenAI (Azure OpenAI Service), AWS lại chọn chiến lược <strong>đa mô hình (multi-model hub)</strong> với Bedrock. 
+              </p>
+              <p>
+                Khách hàng của AWS Bedrock có thể tự do thử nghiệm, so sánh và chuyển đổi giữa các mô hình hàng đầu (như Anthropic Claude, Meta Llama, Mistral, và dòng mô hình Amazon Nova chính chủ) thông qua một giao diện lập trình đồng nhất mà không cần thay đổi cấu trúc mã nguồn cốt lõi.
+              </p>
+            </article>
+          </div>
+        </section>
+
+        <!-- SECTION 2: AMAZON NOVA FAMILY -->
+        <section id="nova-models" class="section">
+          <div class="section-title">
+            <div>
+              <div class="kicker">Section 2</div>
+              <h2>Amazon Nova Family - Họ mô hình Nova chính chủ</h2>
+            </div>
+          </div>
+          <p>
+            Amazon giới thiệu dòng mô hình nền tảng <strong>Amazon Nova</strong> thế hệ mới nhằm tối ưu hóa chi phí vận hành thực tế ở quy mô sản xuất (production scale) với 3 phiên bản kích thước khác nhau:
+          </p>
+          <table>
+            <thead>
+              <tr>
+                <th>Mô hình - Model Name</th>
+                <th>Model ID chuẩn</th>
+                <th>Đặc điểm chính</th>
+                <th>Phân khúc phù hợp - Best use case</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>Amazon Nova Micro</strong></td>
+                <td><code>amazon.nova-micro-v1:0</code></td>
+                <td>Tốc độ phản hồi cực nhanh (thường dưới 1 giây), chi phí siêu rẻ.</td>
+                <td>Các tác vụ văn bản đơn giản, phân loại ý định (intent classification), phản hồi nhanh câu chào.</td>
+              </tr>
+              <tr>
+                <td><strong>Amazon Nova Lite</strong></td>
+                <td><code>amazon.nova-lite-v1:0</code> / <code>amazon.nova-2-lite-v1:0</code></td>
+                <td>Cân bằng xuất sắc giữa hiệu năng lý luận và chi phí. Hỗ trợ xử lý multimodal (ảnh, văn bản).</td>
+                <td>Mô hình khuyên dùng cho hội thoại chatbot Digital Twin thời gian thực ở môi trường Production.</td>
+              </tr>
+              <tr>
+                <td><strong>Amazon Nova Pro</strong></td>
+                <td><code>amazon.nova-pro-v1:0</code></td>
+                <td>Khả năng lý luận logic phức tạp, lập trình code tốt, xử lý tập tin lớn. Chi phí cao hơn.</td>
+                <td>Xử lý phân tích dữ liệu chuyên sâu, suy luận logic nhiều bước hoặc sinh mã nguồn tự động.</td>
+              </tr>
+            </tbody>
+          </table>
+          <div class="callout" style="margin-top: 14px;">
+            <p><strong>Note:</strong> Giá dịch vụ của Amazon Nova cực kỳ cạnh tranh và rẻ hơn nhiều so với việc gọi trực tiếp các API bên ngoài như OpenAI GPT-4o, đặc biệt khi tính toán trên quy mô hàng triệu lượt hội thoại mỗi tháng.</p>
+          </div>
+        </section>
+
+        <!-- SECTION 3: IAM PERMISSIONS -->
+        <section id="iam-permissions" class="section">
+          <div class="section-title">
+            <div>
+              <div class="kicker">Section 3</div>
+              <h2>IAM Permissions - Phân quyền hệ thống</h2>
+            </div>
+          </div>
+          <div class="grid-2">
+            <div class="card">
+              <h3>Quy trình cấp quyền (Thực hiện bởi Root Account)</h3>
+              <ol class="list">
+                <li>Đăng nhập vào AWS Console bằng tài khoản <strong>Root User</strong> nhạy cảm.</li>
+                <li>Truy cập dịch vụ <strong>IAM</strong> → Vào mục <strong>User groups</strong> → Chọn nhóm <code>TwinAccess</code> đã tạo ở bài trước.</li>
+                <li>Nhấp vào tab <strong>Permissions</strong> → Chọn <strong>Add permissions</strong> → <strong>Attach policies</strong>.</li>
+                <li>Tìm kiếm và gắn thêm 2 chính sách quản trị quan trọng:
+                  <ul style="margin-top: 6px; padding-left: 16px;">
+                    <li><code>AmazonBedrockFullAccess</code>: Cho phép gọi mô hình, cấu hình và quản trị Bedrock.</li>
+                    <li><code>CloudWatchFullAccess</code>: Cấp quyền ghi log, đọc chỉ số và tạo dashboard giám sát.</li>
+                  </ul>
+                </li>
+              </ol>
+            </div>
+            <div class="card">
+              <h3>Cấp quyền bổ sung & Kích hoạt Model Access</h3>
+              <ul class="list">
+                <li><strong>Cảnh báo thực tế (Andy C Tip):</strong> Hãy bổ sung thêm policy <code>AmazonDynamoDBFullAccess</code> vào nhóm <code>TwinAccess</code> ngay từ bây giờ để tránh phát sinh lỗi phân quyền ghi nhớ ở Day 5.</li>
+                <li><strong>Model access kích hoạt:</strong> Sau khi phân quyền IAM, thoát Root account và đăng nhập lại bằng IAM User <code>aiengineer</code>. Đi đến <strong>Amazon Bedrock Console</strong> → Vào tab <strong>Model access</strong> ở sidebar trái → Nhấp <strong>Modify model access</strong> → Tích chọn các dòng model Nova mong muốn và nhấn <strong>Save changes</strong> để trạng thái chuyển sang <code>Access granted</code>.</li>
+              </ul>
+            </div>
+          </div>
+        </section>
+
+        <!-- SECTION 4: CONVERSE API -->
+        <section id="converse-api" class="section">
+          <div class="section-title">
+            <div>
+              <div class="kicker">Section 4</div>
+              <h2>Converse API - Chuẩn hóa API hội thoại</h2>
+            </div>
+          </div>
+          <p>
+            Trước khi AWS giới thiệu Converse API, mỗi nhà cung cấp mô hình trên Bedrock yêu cầu một định dạng JSON body đầu vào hoàn toàn khác nhau khi gọi hàm <code>invoke_model</code>. Ví dụ: Anthropic yêu cầu khóa <code>max_tokens</code> và cấu hình prompt khác biệt so với Meta Llama hay Cohere.
+          </p>
+          <div class="callout">
+            <p><strong>Converse API (boto3: <code>bedrock_client.converse()</code>)</strong> ra đời để giải quyết triệt để sự phân mảnh này bằng cách cung cấp một giao thức API đồng nhất, chuẩn hóa hoàn toàn cấu trúc payload hội thoại tương thích với mô hình danh sách tin nhắn (messages list) tương tự như OpenAI API.</p>
+          </div>
+          <div class="grid-2" style="margin-top: 14px;">
+            <div class="card">
+              <h3>Cấu trúc tin nhắn chuẩn của Bedrock Converse</h3>
+              <p>Mỗi tin nhắn trong danh sách gửi lên Bedrock phải tuân thủ schema:</p>
+              <pre><code>{
+  "role": "user" | "assistant",
+  "content": [
+    {
+      "text": "Nội dung văn bản hội thoại..."
+    }
+  ]
+}</code></pre>
+              <p style="margin-top: 8px;"><strong>Lưu ý:</strong> Khóa <code>content</code> bắt buộc phải là một danh sách (List) các block JSON. Đây là thiết kế mở rộng cho phép Bedrock xử lý Multimodal (hình ảnh, tài liệu đính kèm) sau này.</p>
+            </div>
+            <div class="card">
+              <h3>Xử lý System Prompt trong Converse API</h3>
+              <p>Có hai cách để truyền chỉ thị hệ thống (System Prompt) nhằm định hình vai trò của Digital Twin:</p>
+              <ul class="list" style="margin-top: 6px;">
+                <li><strong>Cách 1 (Tương thích đơn giản):</strong> Ghép trực tiếp System Prompt vào đầu tin nhắn của user với tiền tố <code>"System: [nội dung prompt]"</code>.</li>
+                <li><strong>Cách 2 (Khuyên dùng):</strong> Truyền trực tiếp qua tham số <code>system</code> của API:
+                  <pre style="margin-top: 6px; padding: 10px; font-size: 11px;"><code>bedrock_client.converse(
+    modelId=BEDROCK_MODEL_ID,
+    messages=messages,
+    system=[{"text": prompt()}]
+)</code></pre>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </section>
+
+        <!-- SECTION 5: CROSS-REGION INFERENCE PROFILE -->
+        <section id="cross-region" class="section">
+          <div class="section-title">
+            <div>
+              <div class="kicker">Section 5</div>
+              <h2>Cross-Region Inference Profile - Hồ sơ suy luận xuyên vùng</h2>
+            </div>
+          </div>
+          <p>
+            Tại môi trường production thực tế của AWS thế hệ mới (2026), việc gọi trực tiếp Model ID tĩnh của một vùng (ví dụ: <code>amazon.nova-lite-v1:0</code> đặt tại <code>us-east-1</code>) không còn là phương án tối ưu do dễ bị chạm ngưỡng giới hạn băng thông (Rate limits / Quota limits) khi lượng request tăng đột biến.
+          </p>
+          <div class="grid-2">
+            <div class="card">
+              <h3>Cơ chế tự động cân bằng tải xuyên vùng</h3>
+              <p>
+                <strong>Cross-Region Inference Profiles</strong> là cơ chế định tuyến thông minh của AWS Bedrock. Bằng cách sử dụng Model ID bắt đầu với tiền tố <code>global.</code> hoặc <code>us.</code> (ví dụ: <code>global.amazon.nova-2-lite-v1:0</code>), AWS sẽ tự động phân bổ request suy luận của bạn đến vùng địa lý có tài nguyên GPU rảnh rỗi gần nhất.
+              </p>
+              <p style="margin-top: 8px;">
+                Cơ chế này mang lại hạn mức quota sử dụng mô hình cao hơn nhiều lần và giảm thiểu tối đa hiện tượng nghẽn mạng hoặc từ chối dịch vụ mà không cần lập trình viên tự viết code cân bằng tải.
+              </p>
+            </div>
+            <div class="card">
+              <h3>Cấu hình Model ID thế hệ mới (2026)</h3>
+              <p>Hãy lưu ý hai quy tắc cấu hình quan trọng sau để đảm bảo hệ thống hoạt động ổn định:</p>
+              <ul class="list" style="margin-top: 6px;">
+                <li>Khởi tạo <code>boto3.client</code> với region mặc định là <code>us-east-1</code> (Bắc Virginia). Region của Bedrock client không bắt buộc phải trùng với vùng đặt Lambda function hay S3 của bạn.</li>
+                <li>Thiết lập biến môi trường <code>BEDROCK_MODEL_ID</code> trỏ tới hồ sơ suy luận xuyên vùng:
+                  <ul style="margin-top: 4px; padding-left: 16px;">
+                    <li>Toàn cầu: <code>global.amazon.nova-2-lite-v1:0</code></li>
+                    <li>Vùng Mỹ: <code>us.amazon.nova-lite-v1:0</code></li>
+                    <li>Vùng Âu: <code>eu.amazon.nova-lite-v1:0</code></li>
+                  </ul>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </section>
+
+        <!-- SECTION 6: KEYLESS AUTHENTICATION -->
+        <section id="keyless-auth" class="section">
+          <div class="section-title">
+            <div>
+              <div class="kicker">Section 6</div>
+              <h2>Keyless Authentication - Xác thực không khóa</h2>
+            </div>
+          </div>
+          <p>
+            Trong mô hình OpenAI cũ, backend trên Lambda bắt buộc phải cấu hình biến môi trường <code>OPENAI_API_KEY</code> chứa chuỗi token bí mật. Việc lưu trữ khóa cứng này mang lại rủi ro bảo mật cực lớn nếu lập trình viên vô tình push file cấu hình lên kho chứa GitHub công khai.
+          </p>
+          <div class="callout">
+            <p><strong>Xác thực không khóa (Keyless Auth):</strong> Nhờ tích hợp sâu vào hệ sinh thái AWS, ứng dụng chạy trên Lambda gọi Bedrock mà không cần lưu trữ bất kỳ API key nào. Việc chứng thực được thực hiện hoàn toàn tự động thông qua IAM Execution Role được gán trực tiếp cho Lambda function.</p>
+          </div>
+
+          <!-- MERMAID DIAGRAM: IMDS KEYLESS AUTH -->
+          <div class="mermaid-container">
+            <div class="mermaid">
+sequenceDiagram
+    participant Lambda as AWS Lambda Function
+    participant IMDS as AWS Instance Metadata Service (IMDSv2)
+    participant Boto3 as Boto3 SDK (Python)
+    participant Bedrock as AWS Bedrock Service
+
+    Lambda->>Boto3: Gọi bedrock_client.converse() (Không truyền API Key)
+    Boto3->>IMDS: Gửi HTTP GET yêu cầu IAM Temporary Credentials
+    Note over IMDS: Truy vấn địa chỉ IP nội bộ:<br/>http://169.254.169.254/latest/meta-data/
+    IMDS-->>Boto3: Trả về access_key, secret_key & session_token (tạm thời)
+    Boto3->>Boto3: Ký request API bằng thuật toán AWS Signature Version 4 (SigV4)
+    Boto3->>Bedrock: Gửi HTTP Request kèm chữ ký SigV4
+    Note over Bedrock: Kiểm tra IAM Policy gắn trên Lambda Role
+    Bedrock-->>Lambda: Phản hồi kết quả sinh chữ từ mô hình Nova
+            </div>
+          </div>
+
+          <div style="margin-top: 14px;">
+            <p><strong>AWS Instance Metadata Service (IMDS):</strong> Boto3 client tự động nhận diện môi trường AWS và gửi truy vấn tới địa chỉ IP link-local đặc biệt <code>http://169.254.169.254/latest/meta-data/iam/security-credentials/</code> để lấy token bảo mật tạm thời. Token này tự động xoay vòng (rotation) liên tục theo thời gian thực để ngăn chặn các cuộc tấn công đánh cắp phiên.</p>
+          </div>
+        </section>
+
+        <!-- SECTION 7: MONITORING & BUDGETS -->
+        <section id="cloudwatch" class="section">
+          <div class="section-title">
+            <div>
+              <div class="kicker">Section 7</div>
+              <h2>Monitoring & Budgets - Giám sát hệ thống & Kiểm soát tài chính</h2>
+            </div>
+          </div>
+          <p>
+            Vận hành một ứng dụng AI Agent trong sản xuất thực tế đòi hỏi kỹ sư phải nắm rõ trạng thái hoạt động của tài nguyên thông qua số liệu trực quan (Metrics) và kiểm soát chặt chẽ chi phí đám mây.
+          </p>
+          <div class="grid-3">
+            <article class="card">
+              <h3>4 Chỉ số Vàng Lambda</h3>
+              <ul class="list" style="margin-top: 6px;">
+                <li><strong>Invocations:</strong> Số lượt gọi hàm Lambda xử lý tin nhắn chat của user.</li>
+                <li><strong>Duration:</strong> Thời gian thực thi trung bình. Thời gian này phụ thuộc lớn vào tốc độ phản hồi của Bedrock.</li>
+                <li><strong>Errors:</strong> Số lỗi runtime phát sinh (lỗi code, lỗi phân quyền).</li>
+                <li><strong>Throttles:</strong> Số request bị từ chối do vượt quá giới hạn concurrency cho phép.</li>
+              </ul>
+            </article>
+            <article class="card">
+              <h3>4 Chỉ số Hiệu năng Bedrock</h3>
+              <ul class="list" style="margin-top: 6px;">
+                <li><strong>InvocationLatency:</strong> Độ trễ thời gian phản hồi của mô hình nền tảng.</li>
+                <li><strong>Invocations:</strong> Tổng số lượt gọi truy vấn mô hình AI.</li>
+                <li><strong>InputTokenCount:</strong> Lượng token đầu vào gửi đi (ảnh hưởng trực tiếp bởi độ dài context window).</li>
+                <li><strong>OutputTokenCount:</strong> Lượng token sinh ra từ câu trả lời của mô hình.</li>
+              </ul>
+            </article>
+            <article class="card">
+              <h3>AWS Budgets & Cost Alert</h3>
+              <p>Tránh rủi ro nhận hóa đơn "khổng lồ" ngoài ý muốn:</p>
+              <ul class="list" style="margin-top: 6px;">
+                <li>Khởi tạo một <strong>Cost Budget</strong> mang tên <code>twin-budget</code> trên AWS Budgets Console.</li>
+                <li>Đặt hạn mức cảnh báo tối đa là <strong>$10 / tháng</strong>.</li>
+                <li>Cấu hình gửi email cảnh báo tự động ngay khi chi tiêu thực tế hoặc dự báo vượt ngưỡng <strong>80%</strong> ($8).</li>
+              </ul>
+            </article>
+          </div>
+        </section>
+
+        <!-- SECTION 8: CODE WALKTHROUGH -->
+        <section id="code-walkthrough" class="section">
+          <div class="section-title">
+            <div>
+              <div class="kicker">Section 8</div>
+              <h2>Code Walkthrough - Phân tích mã nguồn thực hành</h2>
+            </div>
+          </div>
+          <p>
+            Dưới đây là mã nguồn chi tiết phục vụ cho việc chuyển đổi backend sang Bedrock. Hãy xem kỹ các chú thích tiếng Việt đính kèm để hiểu rõ logic thiết lập.
+          </p>
+
+          <!-- CODE 1: REQUIREMENTS.TXT -->
+          <div class="code-panel">
+            <h3>1. Đóng gói dependencies tĩnh (backend/requirements.txt)</h3>
+            <div class="code-meta">
+              <span><strong>File:</strong> backend/requirements.txt</span>
+              <span>•</span>
+              <span><strong>Thay đổi:</strong> Loại bỏ thư viện `openai` và thêm `boto3` để tương tác trực tiếp với API AWS</span>
+            </div>
+            <pre><code>fastapi
+uvicorn
+python-dotenv
+python-multipart
+boto3
+pypdf
+mangum</code></pre>
+          </div>
+
+          <!-- CODE 2: SERVER.PY -->
+          <div class="code-panel">
+            <h3>2. Backend API Endpoint & Bedrock Integration (backend/server.py)</h3>
+            <div class="code-meta">
+              <span><strong>File:</strong> backend/server.py</span>
+              <span>•</span>
+              <span><strong>Trọng tâm:</strong> Khởi tạo client bedrock-runtime, gọi Converse API và xử lý các lỗi Validation / AccessDenied</span>
+            </div>
+            <pre><code>from fastapi import FastAPI, HTTPException
+from fastapi.middleware.cors import CORSMiddleware
+from pydantic import BaseModel
+import os
+from dotenv import load_dotenv
+from typing import Optional, List, Dict
+import json
+import uuid
+from datetime import datetime
+import boto3
+from botocore.exceptions import ClientError
+from context import prompt
+
+# Nap bien moi truong tu file .env
+load_dotenv()
+
+app = FastAPI()
+
+# Cau hinh chia se tai nguyen nguon goc (CORS) cho Frontend
+origins = os.getenv("CORS_ORIGINS", "http://localhost:3000").split(",")
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=False,
+    allow_methods=["GET", "POST", "OPTIONS"],
+    allow_headers=["*"],
+)
+
+# Khoi tao Bedrock Client - Dung dịch vụ "bedrock-runtime"
+# Dat default region ve us-east-1 de dam bao luon co san dong model Nova va co quota lon
+bedrock_client = boto3.client(
+    service_name="bedrock-runtime", 
+    region_name=os.getenv("DEFAULT_AWS_REGION", "us-east-1")
+)
+
+# Lua chon Model ID - Mac dinh su dung Cross-Region Inference Profile cua Nova Lite v1:0
+BEDROCK_MODEL_ID = os.getenv("BEDROCK_MODEL_ID", "global.amazon.nova-2-lite-v1:0")
+
+# Cau hinh vung nho luu tru lich su chat
+USE_S3 = os.getenv("USE_S3", "false").lower() == "true"
+S3_BUCKET = os.getenv("S3_BUCKET", "")
+MEMORY_DIR = os.getenv("MEMORY_DIR", "../memory")
+
+if USE_S3:
+    s3_client = boto3.client("s3")
+
+# Dinh nghia cac Schema cho request/response bang Pydantic
+class ChatRequest(BaseModel):
+    message: str
+    session_id: Optional[str] = None
+
+class ChatResponse(BaseModel):
+    response: str
+    session_id: str
+
+def load_conversation(session_id: str) -> List[Dict]:
+    """Tai lich su chat tu S3 hoac local directory"""
+    if USE_S3:
+        try:
+            response = s3_client.get_object(Bucket=S3_BUCKET, Key=f"{session_id}.json")
+            return json.loads(response["Body"].read().decode("utf-8"))
+        except ClientError as e:
+            if e.response["Error"]["Code"] == "NoSuchKey":
+                return []
+            raise
+    else:
+        file_path = os.path.join(MEMORY_DIR, f"{session_id}.json")
+        if os.path.exists(file_path):
+            with open(file_path, "r") as f:
+                return json.load(f)
+        return []
+
+def save_conversation(session_id: str, messages: List[Dict]):
+    """Ghi lai lich su chat vao vung nho luu tru"""
+    if USE_S3:
+        s3_client.put_object(
+            Bucket=S3_BUCKET,
+            Key=f"{session_id}.json",
+            Body=json.dumps(messages, indent=2),
+            ContentType="application/json",
+        )
+    else:
+        os.makedirs(MEMORY_DIR, exist_ok=True)
+        file_path = os.path.join(MEMORY_DIR, f"{session_id}.json")
+        with open(file_path, "w") as f:
+            json.dump(messages, f, indent=2)
+
+def call_bedrock(conversation: List[Dict], user_message: str) -> str:
+    """Gui payload hoi thoai toi AWS Bedrock Converse API"""
+    messages = []
+    
+    # Chen System Prompt dinh hinh Digital Twin duoi dang User Message dau tien
+    messages.append({
+        "role": "user", 
+        "content": [{"text": f"System: {prompt()}"}]
+    })
+    
+    # Nạp lịch sử (gioi han lay toi da 50 tin nhắn - 25 luot chat de tranh day context window)
+    for msg in conversation[-50:]:
+        messages.append({
+            "role": msg["role"],
+            "content": [{"text": msg["content"]}]
+        })
+    
+    # Them tin nhan moi nhat cua nguoi dung
+    messages.append({
+        "role": "user",
+        "content": [{"text": user_message}]
+    })
+    
+    try:
+        # Thuc hien goi Converse API dong nhat cua boto3 SDK
+        response = bedrock_client.converse(
+            modelId=BEDROCK_MODEL_ID,
+            messages=messages,
+            inferenceConfig={
+                "maxTokens": 2000,
+                "temperature": 0.7,
+                "topP": 0.9
+            }
+        )
+        
+        # Trich xuat noi dung text tra ve tu dung cau truc phan cap JSON cua Bedrock
+        return response["output"]["message"]["content"][0]["text"]
+        
+    except ClientError as e:
+        error_code = e.response['Error']['Code']
+        if error_code == 'ValidationException':
+            # Gap loi neu gui 2 tin nhan lien tiep cung vai tro (vi du user - user) ma khong xen ke
+            print(f"Bedrock validation error: {e}")
+            raise HTTPException(status_code=400, detail="Invalid message format for Bedrock")
+        elif error_code == 'AccessDeniedException':
+            # Gap loi neu chua cap quyen IAM Policy hoac chua bat Model Access tren Console
+            print(f"Bedrock access denied: {e}")
+            raise HTTPException(status_code=403, detail="Access denied to Bedrock model")
+        else:
+            print(f"Bedrock error: {e}")
+            raise HTTPException(status_code=500, detail=f"Bedrock error: {str(e)}")
+
+@app.get("/health")
+async def health_check():
+    """Endpoint kiem tra suc khoe cho API Gateway / Route 53"""
+    return {
+        "status": "healthy", 
+        "use_s3": USE_S3,
+        "bedrock_model": BEDROCK_MODEL_ID
+    }
+
+@app.post("/chat", response_model=ChatResponse)
+async def chat(request: ChatRequest):
+    try:
+        session_id = request.session_id or str(uuid.uuid4())
+        conversation = load_conversation(session_id)
+        
+        # Lay cau tra loi tu model Nova cua Bedrock
+        assistant_response = call_bedrock(conversation, request.message)
+        
+        # Cap nhat lich su hoi thoai
+        conversation.append(
+            {"role": "user", "content": request.message, "timestamp": datetime.now().isoformat()}
+        )
+        conversation.append(
+            {"role": "assistant", "content": assistant_response, "timestamp": datetime.now().isoformat()}
+        )
+        
+        save_conversation(session_id, conversation)
+        return ChatResponse(response=assistant_response, session_id=session_id)
+    except HTTPException:
+        raise
+    except Exception as e:
+        print(f"Error in chat endpoint: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))</code></pre>
+          </div>
+
+          <!-- CODE 3: POWERSHELL DEPLOY -->
+          <div class="code-panel">
+            <h3>3. Kịch bản triển khai tự động qua S3 Deployment Bucket (PowerShell - Windows)</h3>
+            <div class="code-meta">
+              <span><strong>Môi trường:</strong> Windows PowerShell</span>
+              <span>•</span>
+              <span><strong>Mục đích:</strong> Nạp biến môi trường từ .env, đóng gói qua deploy.py, upload zip lên S3 tạm, cập nhật Lambda và dọn dẹp hạ tầng</span>
+            </div>
+            <pre><code># 1. Nap cac bien moi truong tu file .env vào process session
+Get-Content .env | ForEach-Object {
+    if ($_ -match '^([^=]+)=(.*)$') {
+        [System.Environment]::SetEnvironmentVariable($matches[1], $matches[2], 'Process')
+    }
+}
+
+# Di chuyen vao thu muc chua code backend
+cd backend
+
+# 2. Khoi tao ten bucket doc nhat kem dau thoi gian nham tranh trung ten tren he thong toan cau cua S3
+$timestamp = Get-Date -Format "yyyyMMddHHmmss"
+$deployBucket = "twin-deploy-$timestamp"
+
+# 3. Tao bucket moi tren S3 o khu vuc default region da dinh nghia
+aws s3 mb s3://$deployBucket --region $env:DEFAULT_AWS_REGION
+
+# 4. Upload file nén lambda-deployment.zip len S3 bucket tam thoi
+aws s3 cp lambda-deployment.zip s3://$deployBucket/ --region $env:DEFAULT_AWS_REGION
+
+# 5. Chi thi AWS Lambda keo ma nguon moi ve va giai nen cap nhat cho function twin-api
+aws lambda update-function-code `
+    --function-name twin-api `
+    --s3-bucket $deployBucket `
+    --s3-key lambda-deployment.zip `
+    --region $env:DEFAULT_AWS_REGION
+
+# 6. Don dep tai nguyen: Xoa tep nén va xoa bucket tam thoi de tranh phat sinh phi luu tru
+aws s3 rm s3://$deployBucket/lambda-deployment.zip
+aws s3 rb s3://$deployBucket</code></pre>
+          </div>
+        </section>
+
+        <!-- SECTION 9: OPTIONS / TRADE-OFFS -->
+        <section id="options-tradeoffs" class="section">
+          <div class="section-title">
+            <div>
+              <div class="kicker">Section 9</div>
+              <h2>Options / Trade-offs - Bản đồ lựa chọn thiết kế</h2>
+            </div>
+          </div>
+          <p>
+            Đưa ra các đánh giá kỹ thuật và so sánh chi tiết giữa các phương án triển khai mô hình trí tuệ nhân tạo:
+          </p>
+          <table>
+            <thead>
+              <tr>
+                <th>Phương án - Option</th>
+                <th>Ưu điểm - Pros</th>
+                <th>Nhược điểm - Cons</th>
+                <th>Ngữ cảnh lựa chọn - When to choose</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>AWS Bedrock (Nova Lite/Micro)</strong></td>
+                <td>(Recommended) Request hoàn toàn chạy trong mạng nội bộ AWS (độ trễ cực thấp, bảo mật tuyệt đối), xác thực không khóa qua IAM, tích hợp CloudWatch giám sát chặt chẽ.</td>
+                <td>Giới hạn trong danh sách các dòng mô hình mà AWS phân phối. Đòi hỏi thiết lập phân quyền IAM và kích hoạt Model Access phức tạp hơn OpenAI ban đầu.</td>
+                <td>Bắt buộc cho các hệ thống ứng dụng AI chạy môi trường Production thực tế của doanh nghiệp trên đám mây AWS.</td>
+              </tr>
+              <tr>
+                <td><strong>OpenAI API trực tiếp</strong></td>
+                <td>Khả năng lý luận của GPT-4o dẫn đầu thị trường, tài liệu hỗ trợ phong phú, tốc độ tích hợp ban đầu nhanh chóng (chỉ cần truyền API key).</td>
+                <td>Dữ liệu phải truyền qua Internet công cộng tới máy chủ bên thứ ba (rủi ro bảo mật thông tin nhạy cảm), yêu cầu quản lý và bảo mật chuỗi API key, độ trễ mạng cao.</td>
+                <td>Phù hợp cho giai đoạn thử nghiệm ý tưởng ban đầu (Proof of Concept - PoC) hoặc khi ứng dụng chưa chạy trên hạ tầng cloud AWS.</td>
+              </tr>
+              <tr>
+                <td><strong>Direct Upload Lambda Code</strong></td>
+                <td>Đơn giản, nhanh gọn bằng 1 dòng lệnh CLI truyền cờ <code>--zip-file</code>.</td>
+                <td>Dễ bị timeout và ngắt kết nối giữa chừng nếu file zip nặng hoặc đường truyền mạng chập chờn. Giới hạn dung lượng upload qua trình duyệt là 50MB.</td>
+                <td>Chỉ dùng khi file nén deploy có kích thước siêu nhẹ (&lt;5MB) và đường truyền mạng internet local cực kỳ ổn định.</td>
+              </tr>
+              <tr>
+                <td><strong>S3 Deployment Bucket Pipeline</strong></td>
+                <td>(Recommended) Độ tin cậy cực cao, cho phép tiếp tục tải lên nếu bị gián đoạn (resume upload), an toàn cho các file nén dung lượng lớn.</td>
+                <td>Tốn thêm công đoạn viết script tự động hóa tạo/xóa bucket tạm thời và chạy qua nhiều câu lệnh trung gian.</td>
+                <td>Áp dụng khi gói nén zip chứa nhiều dependencies nặng (&gt;10MB) hoặc tích hợp vào các đường ống CI/CD chuyên nghiệp.</td>
+              </tr>
+            </tbody>
+          </table>
+        </section>
+
+        <!-- SECTION 10: PITFALLS -->
+        <section id="pitfalls" class="section">
+          <div class="section-title">
+            <div>
+              <div class="kicker">Section 10</div>
+              <h2>Pitfalls - Bẫy phát sinh lỗi & Cách khắc phục</h2>
+            </div>
+          </div>
+          <div class="grid-2">
+            <article class="card">
+              <h3>Các trường hợp dễ gây lỗi (Failure Modes)</h3>
+              <ul class="list" style="margin-top: 8px;">
+                <li><strong>AccessDeniedException từ Bedrock:</strong> Backend Lambda trả về lỗi HTTP 403 hoặc 500 khi người dùng gửi tin nhắn chat, log ghi nhận lỗi phân quyền gọi mô hình.</li>
+                <li><strong>ValidationException từ Bedrock:</strong> Hệ thống quăng lỗi cấu trúc dữ liệu không hợp lệ khi gửi mảng lịch sử hội thoại lên mô hình.</li>
+                <li><strong>S3 BucketAlreadyExists Error:</strong> Kịch bản deploy bị crash ngay ở bước chạy lệnh <code>aws s3 mb</code> để khởi tạo deployment bucket tạm thời.</li>
+                <li><strong>Bedrock ModelNotAvailable / Region Issues:</strong> Ứng dụng Lambda báo không tìm thấy mô hình hoặc báo lỗi vùng địa lý không tương thích.</li>
+              </ul>
+            </article>
+            <article class="card">
+              <h3>Biện pháp ngăn ngừa & Xử lý (Fix / Prevention)</h3>
+              <ul class="list" style="margin-top: 8px;">
+                <li><strong>Kiểm tra 2 lớp phân quyền:</strong> Đảm bảo IAM Execution Role của Lambda có policy <code>AmazonBedrockFullAccess</code> VÀ trạng thái của mô hình Nova trên Bedrock Console (tab Model Access) đã hiển thị chữ <code>Access granted</code> màu xanh lá.</li>
+                <li><strong>Xếp xen kẽ vai trò hội thoại:</strong> Đảm bảo mảng tin nhắn gửi lên Bedrock tuân thủ quy tắc xen kẽ tuần tự giữa <code>user</code> và <code>assistant</code>. Tuyệt đối không gửi 2 tin nhắn của cùng một vai trò liên tiếp nhau.</li>
+                <li><strong>Cải tiến sinh tên bucket ngẫu nhiên:</strong> Thay đổi định dạng timestamp chi tiết hơn (đến tận giây <code>yyyyMMddHHmmss</code>) hoặc nối thêm chuỗi hash ngẫu nhiên vào tên bucket để triệt tiêu tỷ lệ trùng lặp.</li>
+                <li><strong>Cố định Region cho Bedrock Client:</strong> Chỉ định rõ tham số <code>region_name="us-east-1"</code> khi khởi tạo client <code>bedrock-runtime</code> vì đây là vùng luôn được ưu tiên cập nhật model mới nhất và có quota rộng rãi nhất.</li>
+              </ul>
+            </article>
+          </div>
+        </section>
+
+        <!-- SECTION 11: INTERACTIVE -->
+        <section id="interactive" class="section">
+          <div class="section-title">
+            <div>
+              <div class="kicker">Section 11</div>
+              <h2>Flashcards & Quick Quiz - Ôn tập tương tác</h2>
+            </div>
+          </div>
+          <div class="grid-2">
+            <!-- FLASHCARD 1 -->
+            <article class="card flashcard">
+              <h3>Q: Tại sao gọi Bedrock qua Lambda trong mạng nội bộ AWS lại không cần lưu cấu hình API Key?</h3>
+              <button class="button primary" type="button" data-reveal>Reveal answer - Hiện câu trả lời</button>
+              <p class="flash-answer">
+                <strong>A:</strong> Vì hệ thống sử dụng cơ chế <strong>Keyless Authentication</strong>. Khi Lambda khởi chạy, Boto3 SDK tự động truy vấn địa chỉ IP nội bộ của AWS Instance Metadata Service (IMDS) để lấy temporary credentials (access key, secret key, session token) được cấp theo IAM Execution Role gắn trên Lambda, sau đó tự động ký request bằng SigV4 để xác thực an toàn.
+              </p>
+            </article>
+
+            <!-- FLASHCARD 2 -->
+            <article class="card flashcard">
+              <h3>Q: Sự khác biệt bản chất giữa dịch vụ bedrock và bedrock-runtime trong Boto3 SDK là gì?</h3>
+              <button class="button primary" type="button" data-reveal>Reveal answer - Hiện câu trả lời</button>
+              <p class="flash-answer">
+                <strong>A:</strong> Client <code>bedrock</code> được sử dụng cho các tác vụ quản trị mặt bằng điều khiển (Control Plane) như: liệt kê mô hình có sẵn, yêu cầu quyền truy cập (model access) hoặc cấu hình fine-tuning. Client <code>bedrock-runtime</code> được sử dụng cho luồng dữ liệu thực thi (Data Plane) để chạy suy luận mô hình (sinh văn bản qua Converse API, sinh hình ảnh, nhúng vector embeddings).
+              </p>
+            </article>
+
+            <!-- FLASHCARD 3 -->
+            <article class="card flashcard">
+              <h3>Q: Cross-Region Inference Profiles giải quyết bài toán gì ở môi trường thực tế?</h3>
+              <button class="button primary" type="button" data-reveal>Reveal answer - Hiện câu trả lời</button>
+              <p class="flash-answer">
+                <strong>A:</strong> Nó giải quyết bài toán giới hạn băng thông (Rate limit / Quota exhaust) và tăng độ ổn định của hệ thống. Thay vì gửi request tới một model cố định ở 1 vùng (dễ bị nghẽn), AWS tự động phân tuyến request thông minh xuyên vùng tới vị trí có tài nguyên GPU rảnh gần nhất, giúp nâng cao đáng kể hạn mức sử dụng mô hình.
+              </p>
+            </article>
+
+            <!-- QUIZ WIDGET -->
+            <article class="card">
+              <h3>Quick quiz - Trắc nghiệm nhanh</h3>
+              <p>Khi sử dụng Converse API của Boto3 để gửi chuỗi lịch sử hội thoại lên mô hình Bedrock Nova, cấu trúc nào sau đây là hợp lệ đối với thuộc tính content của một message?</p>
+              <button class="button quiz-option" type="button" data-correct="false">A. "content": "Nội dung văn bản tin nhắn hội thoại dạng chuỗi string"</button>
+              <button class="button quiz-option" type="button" data-correct="true">B. "content": [{"text": "Nội dung văn bản tin nhắn hội thoại"}]</button>
+              <button class="button quiz-option" type="button" data-correct="false">C. "content": {"text": "Nội dung văn bản tin nhắn hội thoại dạng dict"}</button>
+              <div class="quiz-result" aria-live="polite"></div>
+            </article>
+          </div>
+        </section>
+
+        <!-- SECTION 12: QUICK MEMORY -->
+        <section id="quick-memory" class="section">
+          <div class="section-title">
+            <div>
+              <div class="kicker">Section 12</div>
+              <h2>Quick Memory - Ghi nhớ nhanh cuối bài</h2>
+            </div>
+          </div>
+          <div class="grid-2">
+            <article class="card">
+              <h3>Must remember - Điều bắt buộc phải nhớ</h3>
+              <ol class="list" style="margin-top: 8px;">
+                <li>Bắt buộc dùng client <code>bedrock-runtime</code> để thực hiện suy luận mô hình sinh văn bản.</li>
+                <li>Họ mô hình Amazon Nova gồm: Nova Micro (nhẹ, rẻ), Nova Lite (cân bằng, đa phương tiện), Nova Pro (mạnh mẽ, lý luận phức tạp).</li>
+                <li>Cross-region Inference Profiles sử dụng tiền tố <code>global.*</code> hoặc <code>us.*</code> để tăng quota và tự cân bằng tải.</li>
+                <li>Ký tự ngắt dòng lệnh dài trong Windows PowerShell là dấu backtick (`` ` ``), còn trong Linux Bash Shell là dấu backslash (<code>\</code>).</li>
+                <li>Luôn luôn dọn dẹp (xóa file nén và xóa bucket tạm thời trên S3) sau khi cập nhật Lambda thành công để tránh phát sinh chi phí lưu trữ rác.</li>
+              </ol>
+            </article>
+            <article class="card">
+              <h3>Self-check - Bộ câu hỏi tự kiểm tra</h3>
+              <ul class="list" style="margin-top: 8px;">
+                <li>Bạn có giải thích được luồng trao đổi token xác thực tạm thời giữa Lambda Boto3 SDK với AWS IMDS không?</li>
+                <li>Lỗi ValidationException xảy ra khi nào và cách phòng tránh trong lập trình ra sao?</li>
+                <li>Tại sao việc theo dõi InputTokenCount và OutputTokenCount lại đóng vai trò quyết định trong việc quản trị chi phí AI Agent?</li>
+                <li>Cách thiết lập Billing Budget cảnh báo tài chính $10/tháng hoạt động thế nào trên AWS?</li>
+              </ul>
+            </article>
+          </div>
+        </section>
+
+        <!-- FOOTER -->
+        <footer class="footer">
+          <strong>Study guide note:</strong> Học liệu ôn tập này được biên soạn tỉ mỉ dựa trên slide chính thức, mã nguồn thực hành và tài liệu tóm tắt mở rộng của Week 2 Day 3. Định dạng Claude editorial, hoàn toàn không chứa placeholder.
+        </footer>
+      </main>
+    </div>
+  </div>
+
+  <!-- INTERACTIVE JAVASCRIPT -->
+  <script>
+    const links = Array.from(document.querySelectorAll(".toc a"));
+    const sections = links.map((link) => document.querySelector(link.getAttribute("href"))).filter(Boolean);
+    const progressBar = document.getElementById("progressBar");
+    const progressPercent = document.getElementById("progressPercent");
+    const detailsNodes = Array.from(document.querySelectorAll("details"));
+
+    function setActiveLink() {
+      let current = sections[0]?.id;
+      const offset = window.scrollY + 170;
+      for (const section of sections) {
+        if (section.offsetTop <= offset) {
+          current = section.id;
+        }
+      }
+      links.forEach((link) => {
+        link.classList.toggle("active", link.getAttribute("href") === `#${current}`);
+      });
+    }
+
+    function updateProgress() {
+      const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+      const progress = docHeight > 0 ? Math.min((window.scrollY / docHeight) * 100, 100) : 0;
+      progressBar.style.width = `${progress}%`;
+      progressPercent.innerText = `${Math.round(progress)}% Completed`;
+    }
+
+    document.getElementById("expandAll").addEventListener("click", () => {
+      detailsNodes.forEach((node) => {
+        node.open = true;
+      });
+    });
+
+    document.getElementById("collapseAll").addEventListener("click", () => {
+      detailsNodes.forEach((node) => {
+        node.open = false;
+      });
+    });
+
+    document.querySelectorAll("[data-reveal]").forEach((button) => {
+      button.addEventListener("click", () => {
+        const card = button.closest(".flashcard");
+        card.classList.toggle("revealed");
+        button.innerText = card.classList.contains("revealed") ? "Hide answer - Ẩn câu trả lời" : "Reveal answer - Hiện câu trả lời";
+      });
+    });
+
+    document.querySelectorAll(".quiz-option").forEach((button) => {
+      button.addEventListener("click", () => {
+        const result = button.parentElement.querySelector(".quiz-result");
+        if (button.dataset.correct === "true") {
+          result.innerHTML = "Correct! - Chính xác. Cấu trúc tin nhắn của Bedrock Converse API bắt buộc thuộc tính content phải là một danh sách (List) chứa các đối tượng JSON, ví dụ block văn bản: `[{'text': '...'}]`. Cấu trúc này hỗ trợ tính đa phương tiện cho mô hình.";
+          result.style.color = "var(--accent-teal)";
+        } else {
+          result.innerHTML = "Not quite. - Chưa chính xác. Thuộc tính content của Bedrock Converse API không chấp nhận định dạng chuỗi string thuần túy hay đối tượng dict đơn lẻ. Vui lòng xem kỹ phần phân tích cấu trúc ở Section 4.";
+          result.style.color = "var(--primary-active)";
+        }
+      });
+    });
+
+    window.addEventListener("scroll", () => {
+      setActiveLink();
+      updateProgress();
+    }, { passive: true });
+
+    setActiveLink();
+    updateProgress();
+  </script>
+</body>
+
+</html>
