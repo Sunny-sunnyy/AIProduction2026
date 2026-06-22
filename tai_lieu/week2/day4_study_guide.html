@@ -1,0 +1,1345 @@
+<!doctype html>
+<html lang="vi">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Infrastructure as Code with Terraform - Study Guide</title>
+  
+  <!-- Import Google Fonts (Cormorant Garamond & Inter) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+  <!-- Import Mermaid.js for Architecture & Workflow Rendering -->
+  <script type="module">
+    import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+    mermaid.initialize({ 
+      startOnLoad: true,
+      theme: 'neutral',
+      themeVariables: {
+        background: '#181715',
+        primaryColor: '#cc785c',
+        primaryTextColor: '#faf9f5',
+        lineColor: '#cc785c',
+        textColor: '#faf9f5'
+      }
+    });
+  </script>
+
+  <style>
+    :root {
+      --canvas: #faf9f5;
+      --surface-soft: #f5f0e8;
+      --surface-card: #efe9de;
+      --surface-strong: #e8e0d2;
+      --surface-dark: #181715;
+      --surface-dark-elevated: #252320;
+      --surface-dark-soft: #1f1e1b;
+      --hairline: #e6dfd8;
+      --hairline-soft: #ebe6df;
+      --ink: #141413;
+      --body: #3d3d3a;
+      --body-strong: #252523;
+      --muted: #6c6a64;
+      --muted-soft: #8e8b82;
+      --primary: #cc785c;
+      --primary-active: #a9583e;
+      --accent-teal: #5db8a6;
+      --accent-amber: #e8a55a;
+      --on-dark: #faf9f5;
+      --on-dark-soft: #a09d96;
+      --radius-md: 8px;
+      --radius-lg: 12px;
+      --radius-xl: 16px;
+      --content: 1200px;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      margin: 0;
+      background: var(--canvas);
+      color: var(--body);
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      line-height: 1.62;
+    }
+
+    h1,
+    h2,
+    h3 {
+      color: var(--ink);
+      font-family: 'Cormorant Garamond', Garamond, 'Times New Roman', serif;
+      font-weight: 400;
+      letter-spacing: -0.01em;
+      line-height: 1.1;
+      margin: 0;
+      overflow-wrap: normal;
+      word-break: normal;
+    }
+
+    h1 {
+      font-size: clamp(2.2rem, 4.5vw, 3.8rem);
+      max-width: 25ch;
+    }
+
+    h2 {
+      font-size: clamp(1.6rem, 2.5vw, 2.2rem);
+      border-bottom: 1px solid var(--hairline-soft);
+      padding-bottom: 8px;
+    }
+
+    h3 {
+      font-size: 1.25rem;
+      line-height: 1.35;
+      margin: 0;
+      font-weight: 600;
+    }
+
+    p,
+    li {
+      margin: 0;
+    }
+
+    ul, ol {
+      margin: 0;
+      padding: 0;
+    }
+
+    code {
+      border-radius: 6px;
+      background: var(--surface-strong);
+      color: var(--body-strong);
+      font-family: "JetBrains Mono", Consolas, monospace;
+      font-size: 0.9em;
+      padding: 2px 6px;
+    }
+
+    pre {
+      margin: 0;
+      overflow-x: auto;
+      border-radius: var(--radius-lg);
+      background: var(--surface-dark-soft);
+      color: var(--on-dark);
+      padding: 18px;
+      font-family: "JetBrains Mono", Consolas, monospace;
+      font-size: 13px;
+      line-height: 1.58;
+      white-space: pre;
+    }
+
+    pre code {
+      background: transparent;
+      color: inherit;
+      padding: 0;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.95rem;
+      margin-top: 14px;
+    }
+
+    th,
+    td {
+      border-bottom: 1px solid var(--hairline);
+      padding: 12px;
+      text-align: left;
+      vertical-align: top;
+    }
+
+    th {
+      color: var(--ink);
+      font-weight: 700;
+      background: var(--surface-soft);
+    }
+
+    .page {
+      max-width: var(--content);
+      margin: 0 auto;
+      padding: 30px 20px 64px;
+    }
+
+    .hero {
+      display: grid;
+      grid-template-columns: minmax(0, 1.2fr) minmax(320px, 0.8fr);
+      gap: 28px;
+      align-items: stretch;
+      padding: 40px;
+      border: 1px solid var(--hairline);
+      border-radius: var(--radius-xl);
+      background: var(--surface-soft);
+    }
+
+    .hero-copy {
+      display: grid;
+      gap: 18px;
+      align-content: start;
+    }
+
+    .eyebrow {
+      width: fit-content;
+      border-radius: 999px;
+      background: var(--primary);
+      color: white;
+      font-size: 0.75rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      padding: 6px 12px;
+      text-transform: uppercase;
+    }
+
+    .lead {
+      max-width: 72ch;
+      color: var(--body-strong);
+      font-size: 1.1rem;
+    }
+
+    .tag-row,
+    .source-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .tag,
+    .source {
+      display: inline-flex;
+      align-items: center;
+      border-radius: 999px;
+      font-size: 0.82rem;
+      font-weight: 600;
+      padding: 5px 11px;
+    }
+
+    .tag {
+      background: var(--surface-card);
+      color: var(--ink);
+    }
+
+    .source {
+      border: 1px solid var(--hairline);
+      background: var(--canvas);
+      color: var(--muted);
+    }
+
+    .source.extended {
+      border-color: rgba(204, 120, 92, 0.38);
+      background: rgba(204, 120, 92, 0.12);
+      color: var(--primary-active);
+    }
+
+    .hero-panel,
+    .code-panel {
+      border-radius: var(--radius-lg);
+      background: var(--surface-dark);
+      color: var(--on-dark);
+      padding: 24px;
+    }
+
+    .hero-panel {
+      display: grid;
+      gap: 16px;
+      align-content: start;
+    }
+
+    .hero-panel h2,
+    .hero-panel h3,
+    .code-panel h3 {
+      color: var(--on-dark);
+      border-bottom: none;
+      padding-bottom: 0;
+    }
+
+    .hero-panel p,
+    .hero-panel li,
+    .code-panel p,
+    .code-panel li {
+      color: var(--on-dark-soft);
+    }
+
+    .progress-track {
+      height: 8px;
+      overflow: hidden;
+      border-radius: 999px;
+      background: var(--surface-dark-elevated);
+    }
+
+    .progress-bar {
+      width: 0;
+      height: 100%;
+      background: var(--primary);
+      transition: width 0.1s ease;
+    }
+
+    .layout {
+      display: grid;
+      grid-template-columns: 280px minmax(0, 1fr);
+      gap: 24px;
+      align-items: start;
+      margin-top: 26px;
+    }
+
+    .toc {
+      position: sticky;
+      top: 20px;
+      border: 1px solid var(--hairline);
+      border-radius: var(--radius-lg);
+      background: var(--canvas);
+      padding: 18px;
+    }
+
+    .toc h2 {
+      font-family: 'Inter', sans-serif;
+      font-size: 1rem;
+      font-weight: 700;
+      border-bottom: none;
+      padding-bottom: 0;
+      margin-bottom: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--muted);
+    }
+
+    .toc nav {
+      display: grid;
+      gap: 6px;
+    }
+
+    .toc a {
+      border-radius: var(--radius-md);
+      color: var(--muted);
+      padding: 8px 10px;
+      text-decoration: none;
+      font-size: 0.9rem;
+      font-weight: 500;
+      transition: all 0.2s ease;
+    }
+
+    .toc a:hover,
+    .toc a.active {
+      background: var(--surface-card);
+      color: var(--ink);
+    }
+
+    .toc-tools {
+      display: grid;
+      gap: 8px;
+      margin-top: 16px;
+      padding-top: 16px;
+      border-top: 1px solid var(--hairline);
+    }
+
+    .button {
+      min-height: 40px;
+      border: 1px solid var(--hairline);
+      border-radius: var(--radius-md);
+      background: var(--canvas);
+      color: var(--ink);
+      cursor: pointer;
+      font: inherit;
+      font-size: 0.9rem;
+      font-weight: 700;
+      padding: 10px 12px;
+      transition: all 0.2s ease;
+    }
+
+    .button:hover {
+      background: var(--surface-card);
+    }
+
+    .button.primary {
+      border-color: var(--primary);
+      background: var(--primary);
+      color: white;
+    }
+
+    .button.primary:hover {
+      background: var(--primary-active);
+    }
+
+    .button.primary:disabled {
+      background: var(--muted-soft);
+      border-color: var(--muted-soft);
+      cursor: not-allowed;
+    }
+
+    .button.quiz-option {
+      display: block;
+      width: 100%;
+      margin-top: 8px;
+      text-align: left;
+      font-weight: 500;
+    }
+
+    .content {
+      display: grid;
+      gap: 20px;
+    }
+
+    .section {
+      border: 1px solid var(--hairline);
+      border-radius: var(--radius-lg);
+      background: var(--canvas);
+      padding: 28px;
+    }
+
+    .section-title {
+      display: flex;
+      justify-content: space-between;
+      gap: 16px;
+      align-items: start;
+      margin-bottom: 18px;
+    }
+
+    .kicker {
+      color: var(--primary-active);
+      font-size: 0.8rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      margin-bottom: 6px;
+      text-transform: uppercase;
+    }
+
+    .grid-2,
+    .grid-3 {
+      display: grid;
+      gap: 14px;
+    }
+
+    .grid-2 {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .grid-3 {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+
+    .card,
+    details {
+      border: 1px solid var(--hairline);
+      border-radius: var(--radius-lg);
+      background: var(--surface-card);
+      padding: 18px;
+    }
+
+    .card p,
+    .card ul,
+    .card ol,
+    details p,
+    details ul,
+    details ol {
+      margin-top: 10px;
+    }
+
+    .list {
+      padding-left: 21px;
+    }
+
+    .list li + li {
+      margin-top: 8px;
+    }
+
+    details {
+      margin-top: 14px;
+      transition: all 0.2s ease;
+    }
+
+    summary {
+      color: var(--ink);
+      cursor: pointer;
+      font-weight: 700;
+      outline: none;
+    }
+
+    .callout {
+      border-left: 4px solid var(--primary);
+      border-radius: var(--radius-md);
+      background: var(--surface-soft);
+      padding: 14px 16px;
+    }
+
+    .code-panel {
+      display: grid;
+      gap: 14px;
+      margin-top: 14px;
+    }
+
+    .code-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      color: var(--on-dark-soft);
+      font-size: 0.86rem;
+    }
+
+    .flashcard {
+      display: grid;
+      gap: 10px;
+    }
+
+    .flash-answer {
+      display: none;
+      border-top: 1px solid var(--hairline);
+      padding-top: 10px;
+      margin-top: 10px;
+      font-style: italic;
+      color: var(--body-strong);
+    }
+
+    .flashcard.revealed .flash-answer {
+      display: block;
+    }
+
+    .quiz-result {
+      min-height: 24px;
+      margin-top: 10px;
+      color: var(--primary-active);
+      font-weight: 700;
+      font-size: 0.95rem;
+    }
+
+    .mermaid-container {
+      background: var(--surface-dark);
+      padding: 20px;
+      border-radius: var(--radius-lg);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      margin-top: 14px;
+    }
+
+    .footer {
+      border-top: 1px solid var(--hairline);
+      margin-top: 40px;
+      padding-top: 20px;
+      color: var(--muted);
+      font-size: 0.85rem;
+      text-align: center;
+    }
+
+    @media (max-width: 860px) {
+      .hero {
+        grid-template-columns: 1fr;
+      }
+      .layout {
+        grid-template-columns: 1fr;
+      }
+      .toc {
+        position: static;
+      }
+      .grid-2,
+      .grid-3 {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="page">
+    <!-- HERO HEADER -->
+    <header class="hero">
+      <div class="hero-copy">
+        <div class="eyebrow">Week 2 • Day 4</div>
+        <h1>Infrastructure as Code with Terraform</h1>
+        <p class="lead">
+          Chuyển đổi toàn diện quy trình vận hành hạ tầng Digital Twin từ thủ công (click tay trên AWS Console) sang tự động hóa hoàn toàn bằng Cơ sở hạ tầng dưới dạng mã (Infrastructure as Code - IaC) với Terraform. Học viên sẽ làm quen với triết lý IaC, cô lập môi trường qua Workspace, tự động tạo tài nguyên (S3, Lambda, API Gateway, CloudFront, Route 53) và viết kịch bản deploy/destroy full-stack.
+        </p>
+        <div class="tag-row">
+          <span class="tag">Terraform</span>
+          <span class="tag">IaC</span>
+          <span class="tag">Workspace Isolation</span>
+          <span class="tag">HCL Programming</span>
+          <span class="tag">Auto Provisioning</span>
+          <span class="tag">NextJS Sync</span>
+        </div>
+        <div class="source-row">
+          <span class="source">Production W2D4.pdf (Slide)</span>
+          <span class="source">day4.md (Source Code)</span>
+          <span class="source extended">day4_summary.md (Extended Notes)</span>
+        </div>
+      </div>
+
+      <!-- SIDE PROGRESS PANEL -->
+      <div class="hero-panel">
+        <h3>Tiến trình học tập</h3>
+        <p>Theo dõi tiến trình đọc và hoàn thành nội dung ôn tập của bài học.</p>
+        <div class="progress-track">
+          <div id="progressBar" class="progress-bar"></div>
+        </div>
+        <p id="progressPercent" style="font-size: 0.85rem; font-weight: 700; color: var(--primary);">0% Completed</p>
+        <div class="toc-tools">
+          <button id="expandAll" class="button">Expand All Details</button>
+          <button id="collapseAll" class="button">Collapse All Details</button>
+        </div>
+      </div>
+    </header>
+
+    <!-- MAIN LAYOUT -->
+    <div class="layout">
+      <!-- SIDEBAR TOC -->
+      <aside class="toc">
+        <h2>Mục lục</h2>
+        <nav>
+          <a href="#iac-philosophy">1. IaC & Terraform Philosophy</a>
+          <a href="#clean-slate">2. Clean Slate - Dọn dẹp thủ công</a>
+          <a href="#core-concepts">3. Core Terraform Concepts</a>
+          <a href="#workspace-isolation">4. Workspace & Env Isolation</a>
+          <a href="#nextjs-sync">5. Next.js Dynamic Sync Workflow</a>
+          <a href="#custom-domain">6. Custom Domain (Optional)</a>
+          <a href="#code-walkthrough">7. Code Walkthrough - Terraform HCL</a>
+          <a href="#deploy-destroy">8. Shell & PowerShell Scripts</a>
+          <a href="#options-tradeoffs">9. Options & Trade-offs</a>
+          <a href="#pitfalls">10. Pitfalls - Lỗi & Bẫy thường gặp</a>
+          <a href="#interactive">11. Flashcards & Quiz</a>
+          <a href="#quick-memory">12. Quick Memory - Ghi nhớ nhanh</a>
+        </nav>
+      </aside>
+
+      <!-- MAIN CONTENT -->
+      <main class="content">
+        <!-- SECTION 1: IAC PHILOSOPHY -->
+        <section id="iac-philosophy" class="section">
+          <div class="section-title">
+            <div>
+              <div class="kicker">Section 1</div>
+              <h2>IaC & Terraform Philosophy - Triết lý và So sánh</h2>
+            </div>
+          </div>
+          <p>
+            Trong phát triển phần mềm hiện đại, việc cấu hình hạ tầng bằng cách click tay trên giao diện điều khiển (console) của Cloud Provider mang lại nhiều rủi ro lớn: không thể theo vết thay đổi, dễ sai sót do con người, không thể nhân bản môi trường đồng nhất và khó tích hợp tự động hóa.
+          </p>
+          <div class="grid-2" style="margin-top: 14px;">
+            <div class="card">
+              <h3>Infrastructure as Code (IaC)</h3>
+              <p>
+                <strong>IaC</strong> là phương pháp quản lý và thiết lập tài nguyên đám mây (mạng, máy chủ ảo, cơ sở dữ liệu, bảo mật) thông qua các tệp cấu hình dạng văn bản được định nghĩa rõ ràng.
+              </p>
+              <p><strong>3 Lợi ích cốt lõi của IaC:</strong></p>
+              <ul class="list" style="margin-top: 4px;">
+                <li><strong>Kiểm soát phiên bản (Version Controlled):</strong> Lưu trữ code hạ tầng trên Git để theo dõi lịch sử chỉnh sửa dễ dàng.</li>
+                <li><strong>Đánh giá ngang hàng (Reviewed):</strong> Kiểm duyệt các thay đổi hạ tầng thông qua Pull Requests (PRs).</li>
+                <li><strong>Lặp lại & Tự động hóa (Automated/Repeatable):</strong> Tạo mới các môi trường phát triển (dev, test, prod) giống hệt nhau bằng 1 câu lệnh duy nhất.</li>
+              </ul>
+            </div>
+            <div class="card">
+              <h3>So sánh: Terraform vs AWS CDK / CloudFormation</h3>
+              <p>
+                <strong>AWS CloudFormation</strong> và <strong>AWS CDK</strong> (Cloud Development Kit) là các công cụ chính chủ của AWS. Tuy nhiên, chúng bị khóa chặt vào hệ sinh thái AWS (vendor lock-in), không thể sử dụng cho Google Cloud hay Microsoft Azure.
+              </p>
+              <p>
+                <strong>Terraform (by HashiCorp)</strong> được chọn làm công cụ giảng dạy chính vì tính chất <strong>độc lập đám mây (cloud-agnostic)</strong>. Một kỹ sư DevOps chỉ cần học cú pháp HCL của Terraform là có thể quản lý hạ tầng đa nền tảng (AWS, GCP, Azure, Kubernetes, Cloudflare, v.v.). Đây cũng là kỹ năng số 1 được săn đón trong các yêu cầu tuyển dụng kỹ sư Platform/DevOps.
+              </p>
+            </div>
+          </div>
+        </section>
+
+        <!-- SECTION 2: CLEAN SLATE -->
+        <section id="clean-slate" class="section">
+          <div class="section-title">
+            <div>
+              <div class="kicker">Section 2</div>
+              <h2>Clean Slate - Dọn dẹp tài nguyên thủ công</h2>
+            </div>
+          </div>
+          <p>
+            Trước khi chuyển giao toàn bộ quyền quản lý hạ tầng cho Terraform, chúng ta bắt buộc phải dọn dẹp sạch sẽ (Clean Slate) các tài nguyên đã tạo thủ công ở Day 2 & 3 để tránh xung đột định danh (như trùng tên S3 bucket toàn cầu) và tránh phát sinh chi phí thừa.
+          </p>
+
+          <!-- MERMAID 1: CLEANUP WORKFLOW -->
+          <div class="mermaid-container">
+            <div class="mermaid">
+graph TD
+    A[Start: Đăng nhập IAM User aiengineer] --> B[Vào Lambda -> Delete twin-api]
+    B --> C[Vào API Gateway -> Delete twin-api-gateway]
+    C --> D[Vào S3 -> Empty memory & frontend buckets]
+    D --> E[Vào S3 -> Delete các bucket này]
+    E --> F[Vào CloudFront -> Disable distribution]
+    F --> G{Chờ 5-10 phút để Status chuyển sang Deployed}
+    G -->|Đồng bộ xong| H[Vào CloudFront -> Delete distribution]
+    H --> I[End: AWS Account sạch tài nguyên cũ]
+            </div>
+          </div>
+
+          <div class="grid-2" style="margin-top: 14px;">
+            <div class="card">
+              <h3>Bẫy Empty S3 Bucket</h3>
+              <p>
+                AWS chặn việc xóa trực tiếp một S3 bucket khi bên trong vẫn còn chứa file dữ liệu để tránh mất mát thông tin ngoài ý muốn. 
+              </p>
+              <p>
+                <strong>Cách xử lý:</strong> Bắt buộc nhấp vào nút <strong>Empty</strong> trên console trước, gõ chuỗi <code>"permanently delete"</code> để xóa sạch files, sau đó mới có thể thực hiện lệnh <strong>Delete bucket</strong> (gõ tên bucket để xác nhận).
+              </p>
+            </div>
+            <div class="card">
+              <h3>Bẫy Vô hiệu hóa CloudFront</h3>
+              <p>
+                Các phân phối CloudFront (distributions) được đồng bộ toàn cầu qua hàng trăm máy chủ Edge location của AWS. Do đó, nút Delete sẽ bị xám (không click được) nếu distribution đang ở trạng thái kích hoạt (Enabled).
+              </p>
+              <p>
+                <strong>Cách xử lý:</strong> Phải click nút <strong>Disable</strong> trước, kiên nhẫn chờ từ 5-10 phút cho đến khi cột Status hiển thị trạng thái <code>Deployed</code> và nút Enabled chuyển sang <code>Disabled</code>, lúc đó nút <strong>Delete</strong> mới sáng lên để thực hiện xóa vĩnh viễn.
+              </p>
+            </div>
+          </div>
+        </section>
+
+        <!-- SECTION 3: CORE TERRAFORM CONCEPTS -->
+        <section id="core-concepts" class="section">
+          <div class="section-title">
+            <div>
+              <div class="kicker">Section 3</div>
+              <h2>Core Terraform Concepts - Khái niệm cốt lõi</h2>
+            </div>
+          </div>
+          <p>
+            Hiểu rõ 6 khái niệm nền tảng trong cách thức hoạt động của Terraform:
+          </p>
+          <div class="grid-3">
+            <article class="card">
+              <h3>1. Providers (Nhà cung cấp)</h3>
+              <p>Các plugins làm nhiệm vụ kết nối và dịch lệnh từ Terraform sang API của nhà cung cấp đám mây cụ thể (như AWS, GCP, Azure, GitHub).</p>
+            </article>
+            <article class="card">
+              <h3>2. Variables (Biến đầu vào)</h3>
+              <p>Tham số hóa cấu hình hạ tầng để code linh hoạt hơn, ví dụ: truyền tên môi trường (dev, prod) hoặc cấu hình giới hạn API throttling.</p>
+            </article>
+            <article class="card">
+              <h3>3. Resources (Tài nguyên)</h3>
+              <p>Các viên gạch xây dựng cơ bản đại diện cho thực thể vật lý trên cloud (ví dụ: <code>aws_s3_bucket</code>, <code>aws_lambda_function</code>).</p>
+            </article>
+            <article class="card">
+              <h3>4. State File (Trạng thái)</h3>
+              <p>Tệp tin <code>terraform.tfstate</code> là <strong>nguồn thông tin tin cậy duy nhất (source of truth)</strong> lưu trữ ánh xạ giữa code cấu hình logic và hạ tầng thực tế được tạo ra.</p>
+            </article>
+            <article class="card">
+              <h3>5. Outputs (Đầu ra)</h3>
+              <p>Khai báo xuất thông tin hữu ích sau khi apply thành công (như CloudFront URL hoặc API Gateway Endpoint) phục vụ cho các script tự động hóa khác.</p>
+            </article>
+            <article class="card">
+              <h3>6. Workspaces (Môi trường cô lập)</h3>
+              <p>Cho phép chạy cùng một bộ code cấu hình Terraform nhưng tạo ra nhiều tệp state độc lập (cô lập dev, test, prod).</p>
+            </article>
+          </div>
+          <div class="callout" style="margin-top: 14px;">
+            <p><strong>Cực kỳ quan trọng:</strong> File State chứa các thông tin nhạy cảm của hệ thống và mã định danh tài nguyên thực tế. Tuyệt đối <strong>KHÔNG BAO GIỜ</strong> đưa file <code>terraform.tfstate</code> hoặc thư mục <code>.terraform/</code> lên GitHub. Hãy cấu hình chúng trong file <code>.gitignore</code>.</p>
+          </div>
+        </section>
+
+        <!-- SECTION 4: WORKSPACE ISOLATION -->
+        <section id="workspace-isolation" class="section">
+          <div class="section-title">
+            <div>
+              <div class="kicker">Section 4</div>
+              <h2>Workspace & Environment Isolation - Cô lập môi trường</h2>
+            </div>
+          </div>
+          <p>
+            Quy trình phát triển chuyên nghiệp yêu cầu phân tách hạ tầng thành nhiều môi trường độc lập. Terraform thực hiện việc này thông qua **Workspaces**. Mỗi workspace quản lý một file state riêng đặt trong thư mục <code>terraform.tfstate.d/[workspace-name]/</code>.
+          </p>
+          <div class="grid-3" style="margin-top: 14px;">
+            <div class="card">
+              <h3>Môi trường Development (dev)</h3>
+              <ul class="list" style="margin-top: 6px;">
+                <li><strong>Model AI:</strong> Amazon Nova Micro (tối ưu hóa tốc độ và chi phí siêu rẻ).</li>
+                <li><strong>API Throttling:</strong> Burst 10 / Rate 5 (thấp, đủ test).</li>
+                <li><strong>Custom Domain:</strong> Không dùng (sử dụng domain mặc định của CloudFront/API Gateway).</li>
+                <li><strong>Tên tài nguyên:</strong> Bắt đầu bằng <code>twin-dev-</code>.</li>
+              </ul>
+            </div>
+            <div class="card">
+              <h3>Môi trường Testing (test)</h3>
+              <ul class="list" style="margin-top: 6px;">
+                <li><strong>Model AI:</strong> Amazon Nova Micro (tiết kiệm ngân sách chạy test tự động).</li>
+                <li><strong>API Throttling:</strong> Burst 10 / Rate 5 (tiêu chuẩn).</li>
+                <li><strong>Custom Domain:</strong> Không dùng.</li>
+                <li><strong>Tên tài nguyên:</strong> Bắt đầu bằng <code>twin-test-</code>. Cô lập hoàn toàn với dev.</li>
+              </ul>
+            </div>
+            <div class="card">
+              <h3>Môi trường Production (prod)</h3>
+              <ul class="list" style="margin-top: 6px;">
+                <li><strong>Model AI:</strong> Amazon Nova Lite (khả năng suy luận tốt hơn, chất lượng trò chuyện cao hơn).</li>
+                <li><strong>API Throttling:</strong> Burst 20 / Rate 10 (nâng cao để phục vụ nhiều user).</li>
+                <li><strong>Custom Domain:</strong> Có tích hợp Route 53 và ACM SSL Certificate.</li>
+                <li><strong>Tên tài nguyên:</strong> Bắt đầu bằng <code>twin-prod-</code>.</li>
+              </ul>
+            </div>
+          </div>
+        </section>
+
+        <!-- SECTION 5: NEXTJS SYNC -->
+        <section id="nextjs-sync" class="section">
+          <div class="section-title">
+            <div>
+              <div class="kicker">Section 5</div>
+              <h2>Next.js Dynamic Sync Workflow - Luồng đồng bộ động</h2>
+            </div>
+          </div>
+          <p>
+            Một thách thức lớn khi tự động hóa ứng dụng fullstack là: **Làm sao frontend static web chạy trên trình duyệt biết được URL API của backend Lambda?**
+          </p>
+          <p>
+            Do API Gateway tạo ra một Endpoint ngẫu nhiên (ví dụ: <code>https://ab12cd34ef.execute-api.us-east-1.amazonaws.com</code>) sau khi Terraform khởi tạo, URL này không cố định. Mặt khác, Next.js build tĩnh ra HTML/JS chạy client-side, tức là URL API bắt buộc phải được biên dịch thẳng vào file JS tĩnh **ngay tại thời điểm build**.
+          </p>
+
+          <!-- MERMAID 2: DEPLOYMENT PIPELINE WORKFLOW -->
+          <div class="mermaid-container">
+            <div class="mermaid">
+sequenceDiagram
+    participant Script as Bash / PowerShell Script
+    participant TF as Terraform Engine
+    participant FE as Frontend Build (Next.js)
+    participant S3 as S3 Frontend Bucket
+
+    Script->>TF: Chạy terraform apply (tạo hạ tầng backend)
+    TF-->>Script: Trả về outputs: api_gateway_url & s3_frontend_bucket
+    Script->>Script: Trích xuất api_gateway_url từ output
+    Script->>FE: Ghi đè vào file frontend/.env.production
+    Note over FE: NEXT_PUBLIC_API_URL = [api_gateway_url]
+    Script->>FE: Thực thi npm run build (Biên dịch tĩnh assets)
+    Note over FE: Biên dịch mã tĩnh chứa URL API thật vào out/ folder
+    Script->>S3: Đồng bộ (aws s3 sync) thư mục out/ lên S3 Bucket
+            </div>
+          </div>
+
+          <div class="grid-2" style="margin-top: 14px;">
+            <div class="card">
+              <h3>Tiền tố NEXT_PUBLIC_</h3>
+              <p>
+                Next.js bảo vệ các biến cấu hình máy chủ nhạy cảm (như API keys, db password) bằng cách chặn không cho JavaScript phía client truy cập. 
+              </p>
+              <p>
+                Chỉ những biến môi trường có tiền tố <strong><code>NEXT_PUBLIC_</code></strong> (ví dụ: <code>NEXT_PUBLIC_API_URL</code>) mới được Next.js cho phép nhúng vào bản build client-side chạy trên trình duyệt của người dùng.
+              </p>
+            </div>
+            <div class="card">
+              <h3>Kiến trúc Dependency chéo</h3>
+              <p>
+                Terraform tự động phân tích đồ thị phụ thuộc (Directed Acyclic Graph - DAG) để xác định thứ tự tạo tài nguyên. 
+              </p>
+              <p>
+                Trong file HCL, ta truyền biến môi trường CORS cho Lambda trỏ tới CloudFront Domain Name. Để đảm bảo CloudFront đã có Domain Name thực tế nạp vào Lambda, ta sử dụng thuộc tính <code>depends_on = [aws_cloudfront_distribution.main]</code> trong định nghĩa Lambda.
+              </p>
+            </div>
+          </div>
+        </section>
+
+        <!-- SECTION 6: CUSTOM DOMAIN -->
+        <section id="custom-domain" class="section">
+          <div class="section-title">
+            <div>
+              <div class="kicker">Section 6</div>
+              <h2>Custom Domain Configuration (Optional) - Cấu hình tên miền chuyên nghiệp</h2>
+            </div>
+          </div>
+          <p>
+            Để đưa Digital Twin lên một tên miền tùy chỉnh chuyên nghiệp (ví dụ: <code>yourdomain.com</code>), chúng ta tích hợp thêm Route 53 và ACM (AWS Certificate Manager) vào mã nguồn Terraform:
+          </p>
+          <div class="grid-3">
+            <article class="card">
+              <h3>1. Đăng ký Domain</h3>
+              <p>Đăng ký tên miền thông qua Route 53 Registered Domains (Root User) hoặc cấu hình Hosted Zone trỏ NS từ nhà đăng ký bên thứ ba.</p>
+            </article>
+            <article class="card">
+              <h3>2. Chứng chỉ SSL (ACM)</h3>
+              <p>ACM Certificate bắt buộc phải được tạo và xác thực ở vùng <strong><code>us-east-1</code></strong> (Bắc Virginia) thì CloudFront CDN mới có thể nhận diện và ánh xạ HTTPS thành công.</p>
+            </article>
+            <article class="card">
+              <h3>3. Route 53 Alias Record</h3>
+              <p>Tạo các bản ghi DNS Alias (A & AAAA cho IPv6) trỏ trực tiếp Apex Domain (<code>@</code>) và subdomain (<code>www</code>) về địa chỉ phân phối của CloudFront.</p>
+            </article>
+          </div>
+        </section>
+
+        <!-- SECTION 7: CODE WALKTHROUGH -->
+        <section id="code-walkthrough" class="section">
+          <div class="section-title">
+            <div>
+              <div class="kicker">Section 7</div>
+              <h2>Code Walkthrough - Phân tích cấu hình Terraform HCL</h2>
+            </div>
+          </div>
+          <p>
+            Dưới đây là mã nguồn các tệp tin Terraform chính. Hãy phân tích cấu trúc cú pháp HCL để hiểu rõ cách thiết lập hạ tầng.
+          </p>
+
+          <!-- CODE 1: VERSIONS.TF -->
+          <div class="code-panel">
+            <h3>1. Khai báo Providers & Region Alias (terraform/versions.tf)</h3>
+            <div class="code-meta">
+              <span><strong>File:</strong> terraform/versions.tf</span>
+              <span>•</span>
+              <span><strong>Trọng tâm:</strong> Cấu hình provider phụ us_east_1 chuyên cho ACM SSL validation</span>
+            </div>
+            <pre><code>terraform {
+  required_version = ">= 1.0"
+
+  required_providers {
+    aws = {
+      source  = "hashicorp/aws"
+      version = "~> 6.0"
+    }
+  }
+}
+
+# Provider mặc định (sử dụng region cấu hình ở aws configure local)
+provider "aws" {}
+
+# Provider phụ với alias "us_east_1" bắt buộc định tuyến cho việc xác thực SSL ACM toàn cầu
+provider "aws" {
+  alias  = "us_east_1"
+  region = "us-east-1"
+}</code></pre>
+          </div>
+
+          <!-- CODE 2: VARIABLES.TF -->
+          <div class="code-panel">
+            <h3>2. Ràng buộc kiểm tra biến đầu vào (terraform/variables.tf)</h3>
+            <div class="code-meta">
+              <span><strong>File:</strong> terraform/variables.tf</span>
+              <span>•</span>
+              <span><strong>Trọng tâm:</strong> Khối validation kiểm tra định dạng tên project và giới hạn môi trường</span>
+            </div>
+            <pre><code>variable "project_name" {
+  description = "Name prefix for all resources"
+  type        = string
+  validation {
+    # Chỉ cho phép chữ thường, số và dấu gạch ngang
+    condition     = can(regex("^[a-z0-9-]+$", var.project_name))
+    error_message = "Project name must contain only lowercase letters, numbers, and hyphens."
+  }
+}
+
+variable "environment" {
+  description = "Environment name (dev, test, prod)"
+  type        = string
+  validation {
+    # Ngăn chặn các giá trị sai như staging, local, lab
+    condition     = contains(["dev", "test", "prod"], var.environment)
+    error_message = "Environment must be one of: dev, test, prod."
+  }
+}
+
+variable "bedrock_model_id" {
+  description = "Bedrock model ID"
+  type        = string
+  default     = "amazon.nova-micro-v1:0"
+}
+
+variable "lambda_timeout" {
+  description = "Lambda function timeout in seconds"
+  type        = number
+  default     = 60
+}
+
+variable "api_throttle_burst_limit" {
+  type        = number
+  default     = 10
+}
+
+variable "api_throttle_rate_limit" {
+  type        = number
+  default     = 5
+}
+
+variable "use_custom_domain" {
+  type        = bool
+  default     = false
+}
+
+variable "root_domain" {
+  type        = string
+  default     = ""
+}</code></pre>
+          </div>
+
+          <!-- CODE 3: MAIN.TF (EXCERPT) -->
+          <div class="code-panel">
+            <h3>3. Định nghĩa Tài nguyên & Dependency Link (terraform/main.tf)</h3>
+            <div class="code-meta">
+              <span><strong>File:</strong> terraform/main.tf</span>
+              <span>•</span>
+              <span><strong>Trọng tâm:</strong> Gắn logic depends_on để truyền CORS từ CloudFront sang Lambda và phân quyền S3 public/private</span>
+            </div>
+            <pre><code># Data source để lấy Account ID của tài khoản AWS đang chạy
+data "aws_caller_identity" "current" {}
+
+locals {
+  # Cú pháp gán tên tiền tố phân biệt môi trường
+  name_prefix = "${var.project_name}-${var.environment}"
+
+  aliases = var.use_custom_domain && var.root_domain != "" ? [
+    var.root_domain,
+    "www.${var.root_domain}"
+  ] : []
+
+  common_tags = {
+    Project     = var.project_name
+    Environment = var.environment
+    ManagedBy   = "terraform"
+  }
+}
+
+# 1. S3 Memory Bucket (Chặn public access tuyệt đối để bảo vệ lịch sử hội thoại)
+resource "aws_s3_bucket" "memory" {
+  bucket = "${local.name_prefix}-memory-${data.aws_caller_identity.current.account_id}"
+  tags   = local.common_tags
+}
+
+resource "aws_s3_bucket_public_access_block" "memory" {
+  bucket                  = aws_s3_bucket.memory.id
+  block_public_acls       = true
+  block_public_policy     = true
+  ignore_public_acls      = true
+  restrict_public_buckets = true
+}
+
+# 2. S3 Frontend Bucket (Mở Policy cho phép đọc công khai để CloudFront lấy assets)
+resource "aws_s3_bucket" "frontend" {
+  bucket = "${local.name_prefix}-frontend-${data.aws_caller_identity.current.account_id}"
+  tags   = local.common_tags
+}
+
+resource "aws_s3_bucket_public_access_block" "frontend" {
+  bucket                  = aws_s3_bucket.frontend.id
+  block_public_acls       = false
+  block_public_policy     = false
+  ignore_public_acls      = false
+  restrict_public_buckets = false
+}
+
+resource "aws_s3_bucket_website_configuration" "frontend" {
+  bucket = aws_s3_bucket.frontend.id
+  index_document { suffix = "index.html" }
+  error_document { key = "404.html" }
+}
+
+resource "aws_s3_bucket_policy" "frontend" {
+  bucket = aws_s3_bucket.frontend.id
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Sid       = "PublicReadGetObject"
+        Effect    = "Allow"
+        Principal = "*"
+        Action    = "s3:GetObject"
+        Resource  = "${aws_s3_bucket.frontend.arn}/*"
+      }
+    ]
+  })
+  depends_on = [aws_s3_bucket_public_access_block.frontend]
+}
+
+# 3. AWS Lambda Function
+resource "aws_lambda_function" "api" {
+  filename         = "${path.module}/../backend/lambda-deployment.zip"
+  function_name    = "${local.name_prefix}-api"
+  role             = aws_iam_role.lambda_role.arn
+  handler          = "lambda_handler.handler"
+  source_code_hash = filebase64sha256("${path.module}/../backend/lambda-deployment.zip")
+  runtime          = "python3.12"
+  timeout          = var.lambda_timeout
+  tags             = local.common_tags
+
+  environment {
+    variables = {
+      # Đọc URL CloudFront động hoặc tên miền tùy chỉnh để bảo mật CORS đầu vào
+      CORS_ORIGINS     = var.use_custom_domain ? "https://${var.root_domain},https://www.${var.root_domain}" : "https://${aws_cloudfront_distribution.main.domain_name}"
+      S3_BUCKET        = aws_s3_bucket.memory.id
+      USE_S3           = "true"
+      BEDROCK_MODEL_ID = var.bedrock_model_id
+    }
+  }
+
+  # Bắt buộc đợi CloudFront Distribution được tạo trước để có domain_name cấu hình CORS_ORIGINS
+  depends_on = [aws_cloudfront_distribution.main]
+}</code></pre>
+          </div>
+        </section>
+
+        <!-- SECTION 8: DEPLOY DESTROY -->
+        <section id="deploy-destroy" class="section">
+          <div class="section-title">
+            <div>
+              <div class="kicker">Section 8</div>
+              <h2>Shell & PowerShell Scripts - Kịch bản tự động hóa đầu cuối</h2>
+            </div>
+          </div>
+          <p>
+            Để đơn giản hóa việc triển khai fullstack và dọn dẹp hạ tầng, chúng ta viết các script tự động hóa cho cả môi trường Linux/macOS (Bash) và Windows (PowerShell).
+          </p>
+          <div class="grid-2">
+            <!-- DEPLOY SCRIPT -->
+            <div class="card">
+              <h3>Script Triển khai (deploy.sh / deploy.ps1)</h3>
+              <p>Thực hiện build backend, provision hạ tầng, cấu hình URL và build frontend:</p>
+              <ul class="list" style="margin-top: 6px;">
+                <li><strong>Khởi tạo Workspace:</strong> Kiểm tra workspace môi trường (ví dụ: dev). Tạo mới nếu chưa tồn tại qua lệnh <code>terraform workspace new dev</code>, hoặc chọn workspace hiện có qua <code>select</code>.</li>
+                <li><strong>Apply tự động:</strong> Thực thi <code>terraform apply -auto-approve</code> để tự động xác nhận không cần gõ "yes".</li>
+                <li><strong>Ghi đè cấu hình:</strong> Trích xuất URL từ <code>terraform output -raw</code>, ghi thẳng vào file <code>frontend/.env.production</code>.</li>
+                <li><strong>Build & Sync:</strong> Build Next.js ra thư mục <code>out/</code>, đẩy lên S3 frontend qua <code>aws s3 sync --delete</code>.</li>
+              </ul>
+            </div>
+            <!-- DESTROY SCRIPT -->
+            <div class="card">
+              <h3>Script Hủy bỏ (destroy.sh / destroy.ps1)</h3>
+              <p>Khắc phục lỗi S3 chứa file không cho xóa bằng cách empty bucket tự động trước khi hủy:</p>
+              <ul class="list" style="margin-top: 6px;">
+                <li><strong>Empty Buckets:</strong> Script chạy lệnh CLI <code>aws s3 rm s3://[bucket-name] --recursive</code> cho cả bucket memory và bucket frontend.</li>
+                <li><strong>Hủy hạ tầng:</strong> Chạy lệnh <code>terraform destroy -auto-approve</code> để gỡ bỏ toàn bộ tài nguyên đã tạo.</li>
+                <li><strong>Giữ Workspace:</strong> State file trống được lưu lại. Để xóa hoàn toàn workspace rác:
+                  <pre style="margin-top: 4px; padding: 8px; font-size: 11px;"><code>terraform workspace select default
+terraform workspace delete dev</code></pre>
+                </li>
+              </ul>
+            </div>
+          </div>
+          <div class="callout" style="margin-top: 14px;">
+            <p><strong>Lưu ý quyền thực thi trên Unix (Linux/macOS):</strong> Sau khi tạo file shell script, bắt buộc phải cấp quyền thực thi bằng lệnh <code>chmod +x scripts/deploy.sh scripts/destroy.sh</code> trước khi chạy.</p>
+          </div>
+        </section>
+
+        <!-- SECTION 9: OPTIONS / TRADE-OFFS -->
+        <section id="options-tradeoffs" class="section">
+          <div class="section-title">
+            <div>
+              <div class="kicker">Section 9</div>
+              <h2>Options / Trade-offs - Bản đồ lựa chọn thiết kế</h2>
+            </div>
+          </div>
+          <table>
+            <thead>
+              <tr>
+                <th>Phương án - Option</th>
+                <th>Ưu điểm - Pros</th>
+                <th>Nhược điểm - Cons</th>
+                <th>Ngữ cảnh lựa chọn - When to choose</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>Local State File (Mặc định)</strong></td>
+                <td>Rất đơn giản, cấu hình mặc định chạy ngay không cần thiết lập hạ tầng lưu trữ phụ trợ, tốc độ chạy nhanh.</td>
+                <td>Không hỗ trợ làm việc nhóm (team collaboration), dễ mất dữ liệu nếu hỏng ổ cứng local, có nguy cơ lộ thông tin nhạy cảm.</td>
+                <td>Phù hợp cho các bài thực hành cá nhân, môi trường lab học tập nghiên cứu.</td>
+              </tr>
+              <tr>
+                <td><strong>Remote State (S3 + DynamoDB Lock)</strong></td>
+                <td>(Recommended) Hỗ trợ làm việc nhóm hoàn hảo, DynamoDB giúp khóa trạng thái (state locking) tránh xung đột đồng thời, S3 hỗ trợ versioning khôi phục lịch sử state.</td>
+                <td>Phức tạp, phải viết thêm khối cấu hình backend và phải tạo trước S3 bucket + DynamoDB table thủ công từ trước.</td>
+                <td>Bắt buộc cho mọi ứng dụng production thực tế của doanh nghiệp có từ 2 kỹ sư vận hành trở lên.</td>
+              </tr>
+              <tr>
+                <td><strong>DNS Cố định cho API Gateway</strong></td>
+                <td>Frontend có thể hardcode URL API cố định, đơn giản hóa quy trình build frontend mà không cần script ghi đè <code>.env.production</code> động.</td>
+                <td>Bắt buộc phải sở hữu custom domain, tốn kém chi phí mua tên miền và Route 53 hosting, không linh hoạt cho môi trường thử nghiệm nhanh.</td>
+                <td>Khuyên dùng cho môi trường Production chính thức của sản phẩm thương mại.</td>
+              </tr>
+              <tr>
+                <td><strong>Ghi đè biến động qua Script</strong></td>
+                <td>(Recommended) Vô cùng linh hoạt, hoạt động ổn định trên mọi môi trường dev/test/prod với bất kỳ URL ngẫu nhiên nào do AWS sinh ra mà không tốn chi phí.</td>
+                <td>Làm tăng độ phức tạp của script deploy và tăng thời gian build frontend của đường ống CI/CD.</td>
+                <td>Giải pháp tối ưu cho mọi đường ống phát triển/kiểm thử tự động hóa (dev/test env) của dự án.</td>
+              </tr>
+            </tbody>
+          </table>
+        </section>
+
+        <!-- SECTION 10: PITFALLS -->
+        <section id="pitfalls" class="section">
+          <div class="section-title">
+            <div>
+              <div class="kicker">Section 10</div>
+              <h2>Pitfalls - Bẫy phát sinh lỗi & Cách khắc phục</h2>
+            </div>
+          </div>
+          <div class="grid-2">
+            <article class="card">
+              <h3>Các trường hợp dễ gây lỗi (Failure Modes)</h3>
+              <ul class="list" style="margin-top: 8px;">
+                <li><strong>Lỗi S3 BucketNotEmpty / BucketAlreadyExists:</strong> Chạy lệnh <code>terraform destroy</code> bị crash giữa chừng và từ chối xóa S3 bucket, hoặc <code>terraform apply</code> báo trùng tên bucket toàn cầu.</li>
+                <li><strong>Trang web báo undefined API URL hoặc fetch failed:</strong> Frontend CloudFront tải thành công giao diện chatbot nhưng khi gửi tin nhắn báo lỗi kết nối mạng (500/undefined).</li>
+                <li><strong>Lỗi AccessDenied Credentials:</strong> Chạy lệnh <code>terraform init</code> hoặc <code>plan</code> báo lỗi thiếu thông tin tài khoản AWS credentials.</li>
+                <li><strong>Route 53 ACM Certificate Validation Timeout:</strong> Quá trình deploy môi trường `prod` bị treo rất lâu (hơn 30 phút) ở bước tạo SSL certificate.</li>
+              </ul>
+            </article>
+            <article class="card">
+              <h3>Biện pháp ngăn ngừa & Xử lý (Fix / Prevention)</h3>
+              <ul class="list" style="margin-top: 8px;">
+                <li><strong>Empty trước khi destroy & Gắn Account ID:</strong> Luôn sử dụng script <code>destroy.sh/.ps1</code> để tự động chạy lệnh CLI xóa sạch file trước. Đồng thời nạp <code>data.aws_caller_identity</code> để sinh tên bucket chứa Account ID tránh trùng lặp toàn cầu.</li>
+                <li><strong>Kiểm tra NEXT_PUBLIC_ prefix:</strong> Đảm bảo biến môi trường trong code React React được gọi đúng cú pháp <code>process.env.NEXT_PUBLIC_API_URL</code> và script deploy ghi đè chính xác vào tệp <code>.env.production</code>.</li>
+                <li><strong>Cấu hình AWS CLI mặc định:</strong> Đảm bảo đã chạy lệnh <code>aws configure</code> trên máy local với thông tin tài khoản IAM User <code>aiengineer</code> có đầy đủ 6 policies trong group <code>TwinAccess</code>.</li>
+                <li><strong>Kiểm tra bản ghi xác thực DNS:</strong> Đảm bảo Route 53 hosted zone đã tạo các bản ghi validation CNAME chính xác. ACM Certificate bắt buộc phải được deploy tại region <code>us-east-1</code>.</li>
+              </ul>
+            </article>
+          </div>
+        </section>
+
+        <!-- SECTION 11: INTERACTIVE -->
+        <section id="interactive" class="section">
+          <div class="section-title">
+            <div>
+              <div class="kicker">Section 11</div>
+              <h2>Flashcards & Quick Quiz - Ôn tập tương tác</h2>
+            </div>
+          </div>
+          <div class="grid-2">
+            <!-- FLASHCARD 1 -->
+            <article class="card flashcard">
+              <h3>Q: Tại sao file terraform.tfstate tuyệt đối không được đưa lên Git?</h3>
+              <button class="button primary" type="button" data-reveal>Reveal answer - Hiện câu trả lời</button>
+              <p class="flash-answer">
+                <strong>A:</strong> Vì file state chứa toàn bộ thông tin cấu hình nhạy cảm dưới dạng bản rõ (plaintext), bao gồm cả biến môi trường, API keys, cơ sở dữ liệu credentials và mã định danh hạ tầng. Rò rỉ file state lên GitHub mang lại rủi ro bảo mật hệ thống nghiêm trọng.
+              </p>
+            </article>
+
+            <!-- FLASHCARD 2 -->
+            <article class="card flashcard">
+              <h3>Q: Tại sao ta phải tạo Workspace mới trong Terraform trước khi apply một môi trường?</h3>
+              <button class="button primary" type="button" data-reveal>Reveal answer - Hiện câu trả lời</button>
+              <p class="flash-answer">
+                <strong>A:</strong> Để cô lập file state. Nếu không tạo workspace, tất cả các môi trường (dev, test, prod) sẽ ghi chung vào file state mặc định <code>default</code>, dẫn đến việc môi trường này ghi đè và phá hủy hạ tầng của môi trường kia khi chạy apply.
+              </p>
+            </article>
+
+            <!-- FLASHCARD 3 -->
+            <article class="card flashcard">
+              <h3>Q: Tại sao chứng chỉ SSL (ACM Certificate) sử dụng với CloudFront bắt buộc phải deploy ở us-east-1?</h3>
+              <button class="button primary" type="button" data-reveal>Reveal answer - Hiện câu trả lời</button>
+              <p class="flash-answer">
+                <strong>A:</strong> Đây là yêu cầu kiến trúc của AWS: CloudFront là dịch vụ phân phối toàn cầu (Global Edge Network) và mặt bằng điều khiển trung tâm quản lý chứng chỉ SSL tùy chỉnh của CloudFront chỉ tích hợp với kho lưu trữ ACM đặt tại vùng Bắc Virginia (<code>us-east-1</code>).
+              </p>
+            </article>
+
+            <!-- QUIZ WIDGET -->
+            <article class="card">
+              <h3>Quick quiz - Trắc nghiệm nhanh</h3>
+              <p>Trong quy trình deploy fullstack tự động hóa, tại sao bắt buộc phải thực thi lệnh terraform apply trước khi chạy npm run build cho frontend Next.js?</p>
+              <button class="button quiz-option" type="button" data-correct="false">A. Để kiểm tra cú pháp HTML của frontend trước.</button>
+              <button class="button quiz-option" type="button" data-correct="true">B. Vì Next.js cần biết URL API thực tế sinh ra bởi API Gateway của Terraform để nhúng tĩnh vào code JS trong lúc build.</button>
+              <button class="button quiz-option" type="button" data-correct="false">C. Vì AWS S3 yêu cầu mã nguồn backend phải được tải lên trước frontend.</button>
+              <div class="quiz-result" aria-live="polite"></div>
+            </article>
+          </div>
+        </section>
+
+        <!-- SECTION 12: QUICK MEMORY -->
+        <section id="quick-memory" class="section">
+          <div class="section-title">
+            <div>
+              <div class="kicker">Section 12</div>
+              <h2>Quick Memory - Ghi nhớ nhanh cuối bài</h2>
+            </div>
+          </div>
+          <div class="grid-2">
+            <article class="card">
+              <h3>Must remember - Điều bắt buộc phải nhớ</h3>
+              <ol class="list" style="margin-top: 8px;">
+                <li>Empty S3 bucket trước khi tiến hành xóa bucket để tránh lỗi AWS chặn.</li>
+                <li>Chuyển CloudFront distribution sang Disabled và chờ 5-10 phút trước khi nhấn Delete.</li>
+                <li>Tiền tố <code>NEXT_PUBLIC_</code> cho phép React client-side truy cập biến môi trường Next.js.</li>
+                <li>Mọi file state <code>.tfstate</code> và folder <code>.terraform/</code> phải được đưa vào <code>.gitignore</code>.</li>
+                <li>Tạo alias provider <code>us_east_1</code> để cấu hình ACM SSL ở Bắc Virginia cho CloudFront.</li>
+              </ol>
+            </article>
+            <article class="card">
+              <h3>Self-check - Bộ câu hỏi tự kiểm tra</h3>
+              <ul class="list" style="margin-top: 8px;">
+                <li>Bạn có giải thích được đồ thị phụ thuộc DAG của Terraform hoạt động như thế nào không?</li>
+                <li>Tại sao locals được gọi qua <code>local.tên_biến</code> nhưng khối khai báo lại là <code>locals</code>?</li>
+                <li>Cách trích xuất giá trị output thô không kèm ký tự định dạng từ CLI là gì?</li>
+                <li>Sự khác nhau về mặt bảo mật public/private giữa bucket memory và bucket frontend của dự án là gì?</li>
+              </ul>
+            </article>
+          </div>
+        </section>
+
+        <!-- FOOTER -->
+        <footer class="footer">
+          <strong>Study guide note:</strong> Học liệu ôn tập này được biên soạn tỉ mỉ dựa trên slide chính thức, mã nguồn thực hành và tài liệu tóm tắt mở rộng của Week 2 Day 4. Định dạng Claude editorial, hoàn toàn không chứa placeholder.
+        </footer>
+      </main>
+    </div>
+  </div>
+
+  <!-- INTERACTIVE JAVASCRIPT -->
+  <script>
+    const links = Array.from(document.querySelectorAll(".toc a"));
+    const sections = links.map((link) => document.querySelector(link.getAttribute("href"))).filter(Boolean);
+    const progressBar = document.getElementById("progressBar");
+    const progressPercent = document.getElementById("progressPercent");
+    const detailsNodes = Array.from(document.querySelectorAll("details"));
+
+    function setActiveLink() {
+      let current = sections[0]?.id;
+      const offset = window.scrollY + 170;
+      for (const section of sections) {
+        if (section.offsetTop <= offset) {
+          current = section.id;
+        }
+      }
+      links.forEach((link) => {
+        link.classList.toggle("active", link.getAttribute("href") === `#${current}`);
+      });
+    }
+
+    function updateProgress() {
+      const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+      const progress = docHeight > 0 ? Math.min((window.scrollY / docHeight) * 100, 100) : 0;
+      progressBar.style.width = `${progress}%`;
+      progressPercent.innerText = `${Math.round(progress)}% Completed`;
+    }
+
+    document.getElementById("expandAll").addEventListener("click", () => {
+      detailsNodes.forEach((node) => {
+        node.open = true;
+      });
+    });
+
+    document.getElementById("collapseAll").addEventListener("click", () => {
+      detailsNodes.forEach((node) => {
+        node.open = false;
+      });
+    });
+
+    document.querySelectorAll("[data-reveal]").forEach((button) => {
+      button.addEventListener("click", () => {
+        const card = button.closest(".flashcard");
+        card.classList.toggle("revealed");
+        button.innerText = card.classList.contains("revealed") ? "Hide answer - Ẩn câu trả lời" : "Reveal answer - Hiện câu trả lời";
+      });
+    });
+
+    document.querySelectorAll(".quiz-option").forEach((button) => {
+      button.addEventListener("click", () => {
+        const result = button.parentElement.querySelector(".quiz-result");
+        if (button.dataset.correct === "true") {
+          result.innerHTML = "Correct! - Chính xác. Do Next.js được build tĩnh ra các tệp HTML/JS chạy trên trình duyệt (client-side), địa chỉ API URL của backend phải được biên dịch và nén trực tiếp vào code JS tại thời điểm build. Do đó, ta phải chạy Terraform để có API URL trước khi tiến hành build frontend Next.js.";
+          result.style.color = "var(--accent-teal)";
+        } else {
+          result.innerHTML = "Not quite. - Chưa chính xác. S3 hay HTML không phải nguyên nhân trực tiếp bắt buộc thứ tự triển khai này. Hãy xem kỹ phân tích luồng đồng bộ động ở Section 5.";
+          result.style.color = "var(--primary-active)";
+        }
+      });
+    });
+
+    window.addEventListener("scroll", () => {
+      setActiveLink();
+      updateProgress();
+    }, { passive: true });
+
+    setActiveLink();
+    updateProgress();
+  </script>
+</body>
+
+</html>
