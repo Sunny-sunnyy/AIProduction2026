@@ -181,3 +181,7 @@ finale/.dockerignore
 
 # AWS credentials file
 tai_lieu/week1/aiengineer_credentials.csv
+
+# Custom ignore
+lesson_synthesis_day_workflow.md
+quy trình tạo file ôn tập html.md
