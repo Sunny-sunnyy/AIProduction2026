@@ -498,11 +498,53 @@
       background: var(--surface-soft);
       border: 1px solid var(--hairline);
       border-radius: var(--radius-lg);
-      padding: 20px;
+      padding: 30px;
       margin-top: 14px;
       overflow-x: auto;
       display: flex;
       justify-content: center;
+    }
+
+    .diagram-container .mermaid {
+      width: 100%;
+      display: flex;
+      justify-content: center;
+    }
+
+    .diagram-container .mermaid svg {
+      max-width: 100% !important;
+      height: auto !important;
+    }
+
+    .diagram-container.small-container {
+      max-width: 580px;
+      margin-left: auto;
+      margin-right: auto;
+      width: 100%;
+    }
+
+    #architecture-chart svg {
+      max-width: 100% !important;
+      height: auto !important;
+    }
+
+    #architecture-chart .node text,
+    #architecture-chart .node .label,
+    #architecture-chart .node div,
+    #architecture-chart .node span {
+      font-size: 16px !important;
+      font-weight: 600 !important;
+    }
+
+    #architecture-chart .edgeLabel,
+    #architecture-chart .edgeLabel span,
+    #architecture-chart .edgeText {
+      font-size: 14px !important;
+      font-weight: 600 !important;
+    }
+
+    #deployment-chart svg {
+      min-width: 1350px !important;
     }
 
     .footer {
@@ -557,7 +599,14 @@
         primaryBorderColor: '#e6dfd8',
         lineColor: '#cc785c',
         secondaryColor: '#faf9f5',
-        tertiaryColor: '#181715'
+        tertiaryColor: '#181715',
+        fontSize: '16px',
+        fontFamily: 'Inter, system-ui, sans-serif'
+      },
+      flowchart: {
+        nodeSpacing: 50,
+        rankSpacing: 60,
+        htmlLabels: true
       }
     });
   </script>
@@ -717,8 +766,90 @@
 
             <article class="card">
               <h3>Cân nhắc về Serverless Cold Start & RAM Allocation</h3>
-              <p>Khi ứng dụng serverless không nhận request nào trong khoảng 15 phút, AWS Lambda sẽ tự động hủy container instance để giải phóng tài nguyên (Scale-to-Zero). Khi có request mới đến, Lambda phải thực hiện **Cold Start (Khởi động lạnh)**: cấp phát máy chủ ảo, kéo Docker image từ ECR, dựng container, và khởi động FastAPI server. Quá trình này mất khoảng 10-30 giây.</p>
+              <p>Khi ứng dụng serverless không nhận request nào trong khoảng 15 phút, AWS Lambda sẽ tự động hủy container instance để giải phóng tài nguyên (Scale-to-Zero). Khi có request mới đến, Lambda phải thực hiện <strong>Cold Start (Khởi động lạnh)</strong>: cấp phát máy chủ ảo, kéo Docker image từ ECR, dựng container, và khởi động FastAPI server. Quá trình này mất khoảng 10-30 giây.</p>
               <p style="margin-top: 8px;">Để giảm thiểu độ trễ khởi động lạnh, chúng ta áp dụng các kỹ thuật: tối giản hóa kích thước Docker image (sử dụng image nền python-slim), giảm thiểu import thư viện không cần thiết và đặc biệt là <strong>tăng dung lượng RAM cấp phát cho Lambda lên 1024 MB</strong>. Trên AWS Lambda, việc tăng RAM sẽ tỷ lệ thuận với việc AWS cấp thêm sức mạnh CPU ảo (vCPU), giúp container khởi động nhanh hơn đáng kể so với cấu hình RAM mặc định thấp.</p>
+            </article>
+
+            <article class="card">
+              <h3>Docker Multi-Stage Build & Xây dựng ảnh đa nền tảng</h3>
+              <p><strong>Multi-Stage Build:</strong> Tách biệt giai đoạn build (sử dụng môi trường Node.js đầy đủ để biên dịch Next.js tĩnh) và giai đoạn run (chỉ chạy FastAPI trên môi trường Python gọn nhẹ). Điều này giúp loại bỏ Node.js SDK và thư mục <code>node_modules</code> khổng lồ ra khỏi sản phẩm cuối cùng.</p>
+              <p style="margin-top: 8px;"><strong>Multi-Platform Build:</strong> Các dòng máy Mac Apple Silicon chạy kiến trúc ARM64, trong khi máy chủ AWS Lambda mặc định chạy kiến trúc x86_64 (amd64). Do đó, bạn bắt buộc phải build Docker bằng cờ chỉ định nền tảng để tránh lỗi <code>Exec format error</code> khi Lambda khởi chạy container.</p>
+              <div style="margin-top: 12px;">
+                <pre><code># Giai đoạn 1: Build Next.js
+FROM node:22-alpine AS builder
+WORKDIR /app
+COPY package*.json ./
+RUN npm ci
+COPY . .
+RUN npm run build
+
+# Giai đoạn 2: Tạo Python container nhẹ
+FROM python:3.12-slim
+WORKDIR /app
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+COPY api/server.py .
+COPY --from=builder /app/out ./static</code></pre>
+              </div>
+              <p style="margin-top: 8px; font-size: 0.85rem; color: var(--muted);"><em>Giải thích:</em> Từ khóa <code>AS builder</code> đặt tên cho stage đầu tiên. Chỉ thị <code>COPY --from=builder</code> ở stage 2 chỉ copy thư mục tĩnh đã biên dịch mà không mang theo các dependencies của Node.js, tối ưu hóa dung lượng image chỉ còn khoảng 200MB.</p>
+            </article>
+
+            <article class="card">
+              <h3>Amazon ECR (Elastic Container Registry) - Kho ảnh Container</h3>
+              <p>Amazon ECR là kho chứa Docker image private bảo mật tích hợp sâu với hệ thống phân quyền IAM của AWS. Để đẩy image lên ECR, Docker CLI cần xác thực thông qua một token tạm thời được cấp bởi AWS CLI.</p>
+              <div style="margin-top: 12px;">
+                <pre><code># 1. Lấy token đăng nhập tạm thời (hiệu lực 12 giờ)
+aws ecr get-login-password --region us-east-1 | \
+  docker login --username AWS --password-stdin 123456789012.dkr.ecr.us-east-1.amazonaws.com
+
+# 2. Tag image chuẩn cấu trúc ECR
+docker tag app:latest 123456789012.dkr.ecr.us-east-1.amazonaws.com/app:latest
+
+# 3. Đẩy image lên repository
+docker push 123456789012.dkr.ecr.us-east-1.amazonaws.com/app:latest</code></pre>
+              </div>
+              <p style="margin-top: 8px; font-size: 0.85rem; color: var(--muted);"><em>Giải thích:</em> Lệnh <code>get-login-password</code> lấy token mã hóa ngắn hạn và pipe trực tiếp vào <code>docker login</code> qua toán tử <code>|</code>. Khi <code>docker push</code> chạy, ECR chỉ truyền tải những layers có thay đổi (layer caching) giúp quá trình deploy sau đó diễn ra cực kỳ nhanh chóng.</p>
+            </article>
+
+            <article class="card">
+              <h3>Triển khai Container Serverless với AWS Lambda & Function URLs</h3>
+              <p>AWS Lambda hỗ trợ chạy các container image dung lượng lên tới 10GB, cho phép tích hợp các thư viện AI cồng kềnh (như PyTorch, OpenCV). Để chạy các framework như FastAPI mà không sửa đổi mã nguồn, chúng ta dùng Lambda Web Adapter.</p>
+              <p style="margin-top: 8px;"><strong>Function URLs:</strong> Cung cấp HTTPS endpoint trực tiếp miễn phí đi kèm Lambda. Chế độ <code>RESPONSE_STREAM</code> cho phép stream dữ liệu trực tiếp về client mà không bị buffer, thích hợp với các tác vụ stream text từ OpenAI.</p>
+              <div style="margin-top: 12px;">
+                <pre><code># FastAPI StreamingResponse cho Server-Sent Events (SSE)
+from fastapi.responses import StreamingResponse
+
+@app.post("/api/consultation")
+def consultation_summary(visit: Visit):
+    def event_stream():
+        for chunk in stream:
+            text = chunk.choices[0].delta.content
+            if text:
+                yield f"data: {text}\n\n"
+    return StreamingResponse(event_stream(), media_type="text/event-stream")</code></pre>
+              </div>
+              <p style="margin-top: 8px; font-size: 0.85rem; color: var(--muted);"><em>Giải thích:</em> Việc chọn Invoke Mode là <code>RESPONSE_STREAM</code> trên Function URL đảm bảo các khối dữ liệu từ <code>StreamingResponse</code> được gửi về trình duyệt lập tức thay vì bị giữ lại (buffered) cho đến khi toàn bộ request hoàn tất.</p>
+            </article>
+
+            <article class="card">
+              <h3>Lambda Execution Role & Cơ chế uỷ quyền trong AWS</h3>
+              <p>Trong AWS, một <strong>IAM Role</strong> (vai trò) khác với <strong>IAM User</strong> (người dùng). IAM User dành cho con người hoặc công cụ lập trình ngoài AWS, còn IAM Role dành cho các tiến trình chạy bên trong hạ tầng AWS. Lambda cần một Execution Role (vai trò thực thi) để có quyền ghi logs vào CloudWatch hoặc gọi các dịch vụ khác.</p>
+              <div style="margin-top: 12px;">
+                <pre><code>// Trust Policy cho phép dịch vụ Lambda đảm nhận IAM Role này
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Principal": {
+        "Service": "lambda.amazonaws.com"
+      },
+      "Action": "sts:AssumeRole"
+    }
+  ]
+}</code></pre>
+              </div>
+              <p style="margin-top: 8px; font-size: 0.85rem; color: var(--muted);"><em>Giải thích:</em> Trust Policy cấu hình quyền cho phép thực thể dịch vụ <code>lambda.amazonaws.com</code> được phép đảm nhận vai trò thực thi này. Việc gán <code>IAMFullAccess</code> cho IAM User <code>aiengineer</code> khi deploy là cần thiết để Lambda có thể tự động tạo ra role thực thi này mà không bị lỗi Access Denied.</p>
             </article>
           </div>
         </section>
@@ -734,12 +865,12 @@
 
           <h3>1. Sơ đồ kiến trúc Single Container & Lambda Web Adapter</h3>
           <p>Mô hình chi tiết về luồng đi của gói tin từ trình duyệt người dùng qua Lambda Function URL ở chế độ RESPONSE_STREAM, dịch chuyển qua Lambda Web Adapter ngầm và đi vào FastAPI xử lý xác thực Clerk JWT & OpenAI Streaming API:</p>
-          <div class="diagram-container">
-            <div class="mermaid">
+          <div class="diagram-container small-container">
+            <div class="mermaid" id="architecture-chart">
               graph TD
-                Client[Trình duyệt Client] -->|1. HTTP POST Request kèm Bearer JWT| FURL[Lambda Function URL <br> InvokeMode: RESPONSE_STREAM]
-                FURL -->|2. Lambda JSON Event| LWA[AWS Lambda Web Adapter <br> /opt/extensions/lambda-adapter]
-                LWA -->|3. Chuyển đổi thành HTTP localhost:8000| FastAPI[FastAPI Web Server <br> uvicorn server:app port 8000]
+                Client[Trình duyệt Client] -->|1. HTTP POST Request kèm Bearer JWT| FURL["Lambda Function URL<br/>InvokeMode: RESPONSE_STREAM"]
+                FURL -->|2. Lambda JSON Event| LWA["AWS Lambda Web Adapter<br/>/opt/extensions/lambda-adapter"]
+                LWA -->|3. Chuyển đổi thành HTTP localhost:8000| FastAPI["FastAPI Web Server<br/>uvicorn server:app port 8000"]
                 FastAPI -->|4. Gọi xác minh token chữ ký số| Clerk[Clerk JWKS Endpoint]
                 Clerk -->|5. Token hợp lệ| FastAPI
                 FastAPI -->|6. Gửi prompt yêu cầu stream| OpenAI[OpenAI API completions]
@@ -753,13 +884,13 @@
           <h3 style="margin-top: 24px;">2. Sơ đồ quy trình triển khai Docker ECR & Lambda Deployment</h3>
           <p>Quy trình đóng gói phần mềm đồng nhất trên máy phát triển, phân phối qua kho lưu trữ Amazon ECR và triển khai cập nhật Lambda Function:</p>
           <div class="diagram-container">
-            <div class="mermaid">
+            <div class="mermaid" id="deployment-chart">
               graph LR
-                Code[Mã nguồn dự án & Dockerfile] -->|1. docker build --platform linux/amd64| DImg[Docker Image linux/amd64]
-                DImg -->|2. docker tag & push| ECR[Amazon ECR <br> Private Repository]
-                ECR -->|3. Cung cấp Container URI| Lambda[AWS Lambda Function <br> Cấu hình RAM, Timeout, Concurrency]
+                Code["Mã nguồn dự án & Dockerfile"] -->|1. docker build --platform linux/amd64| DImg["Docker Image<br/>linux/amd64"]
+                DImg -->|2. docker tag & push| ECR["Amazon ECR<br/>Private Repository"]
+                ECR -->|3. Cung cấp Container URI| Lambda["AWS Lambda Function<br/>Cấu hình RAM, Timeout, Concurrency"]
                 Lambda -->|4. Tạo Endpoint HTTPS| FURL[Function URL công khai]
-                CLI[AWS CLI <br> aws lambda update-function-code] -.->|Kích hoạt cập nhật code từ xa| Lambda
+                CLI["AWS CLI<br/>aws lambda update-function-code"] -.->|Kích hoạt cập nhật code từ xa| Lambda
             </div>
           </div>
         </section>

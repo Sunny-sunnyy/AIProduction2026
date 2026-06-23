@@ -62,6 +62,18 @@ Bạn hãy dùng `brainstorming` làm quy trình chính để cùng tôi thảo 
    - Không hỏi lan man. Mỗi câu hỏi phải làm thay đổi scope, design, test, hoặc implementation plan.
    - Đừng bắt đầu viết code cho đến khi chúng ta đã thống nhất yêu cầu.
 
+Phải sử dụng "using-superpowers" và các skills liên quan được đề cập trong "superpowers" nếu thầy cần thiết:
+   brainstorming - Socratic design refinement
+   writing-plans - Detailed implementation plans
+   executing-plans - Batch execution with checkpoints
+   dispatching-parallel-agents - Concurrent subagent workflows
+   requesting-code-review - Pre-review checklist
+   receiving-code-review - Responding to feedback
+   using-git-worktrees - Parallel development branches
+   finishing-a-development-branch - Merge/PR decision workflow
+   subagent-driven-development - Fast iteration with two-stage review (spec compliance, then code quality)
+
+
 Load các skills ở:
 - Windows: `C:\Users\hieu\.agents\skills`
 - WSL/Linux: `/home/hieu0606sunny/.codex/skills/`

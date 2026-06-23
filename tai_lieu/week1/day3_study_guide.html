@@ -504,6 +504,18 @@
       justify-content: center;
     }
 
+    .diagram-container .mermaid {
+      width: 100%;
+      display: flex;
+      justify-content: center;
+    }
+
+    .diagram-container .mermaid svg {
+      width: 100% !important;
+      max-width: 950px !important;
+      height: auto !important;
+    }
+
     .footer {
       border-radius: var(--radius-lg);
       background: var(--surface-dark);
@@ -812,7 +824,7 @@
                 FE->>FE: Gọi connectWithFreshToken()
                 FE->>Clerk: Gọi getToken() lấy JWT mới
                 Clerk-->>FE: Trả về chuỗi JWT Token
-                FE->>BE: fetchEventSource('/api') [Headers: Authorization: Bearer <JWT>]
+                FE->>BE: "fetchEventSource('/api') [Headers: Authorization: Bearer JWT]"
                 Note over BE: clerk_guard thực hiện:<br/>1. Lấy JWT từ Authorization Header<br/>2. Tải public keys từ CLERK_JWKS_URL<br/>3. Verify chữ ký JWT và thời hạn 60s
                 alt Token không hợp lệ hoặc hết hạn
                   BE-->>FE: Phản hồi mã lỗi HTTP 403 Forbidden
@@ -821,10 +833,10 @@
                   FE->>BE: Kết nối lại bằng token mới sau 1 giây
                 end
                 BE->>BE: Trích xuất user_id = token["sub"]
-                BE->>OpenAI: Gọi chat.completions.create(model="gpt-5-nano", stream=True)
+                BE->>OpenAI: "Gọi chat.completions.create(model='gpt-5-nano', stream=True)"
                 loop Streaming chunks
                   OpenAI-->>BE: Trả về chunk văn bản
-                  BE->>FE: yield f"data: {text}\n\n" (Giao thức SSE)
+                  BE->>FE: "yield f'data: {text}\n\n' (Giao thức SSE)"
                   FE->>User: Render ReactMarkdown cập nhật UI liên tục
                 end
                 FE->>FE: onclose() ngắt kết nối an toàn khi stream kết thúc

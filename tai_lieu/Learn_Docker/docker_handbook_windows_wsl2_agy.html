@@ -1,0 +1,2655 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sổ tay Docker cho Windows & WSL2 - Hướng dẫn chi tiết từ Cơ bản đến Nâng cao</title>
+    <!-- Google Fonts: Cormorant Garamond (Serif Display) & Inter (Sans-serif Body) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,500;1,600;1,700&family=Inter:wght@100;200;300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    
+    <!-- Mermaid.js for architectural diagrams -->
+    <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            mermaid.initialize({
+                theme: 'base',
+                themeVariables: {
+                    primaryColor: '#fbeee9',
+                    primaryTextColor: '#141413',
+                    primaryBorderColor: '#cc785c',
+                    lineColor: '#cc785c',
+                    secondaryColor: '#f5f4ef',
+                    tertiaryColor: '#ffffff'
+                },
+                startOnLoad: true,
+                securityLevel: 'loose',
+                flowchart: { useMaxWidth: true, htmlLabels: true, curve: 'cardinal' }
+            });
+        });
+    </script>
+
+    <style>
+        /* CSS Variables - Claude Warm-Canvas & Premium Editorial Theme */
+        :root {
+            --color-canvas: #faf9f5;
+            --color-canvas-light: #ffffff;
+            --color-canvas-dark: #f3f1eb;
+            --color-ink: #141413;
+            --color-ink-light: #6b6a65;
+            --color-primary: #cc785c;
+            --color-primary-hover: #b36146;
+            --color-primary-light: #fbf1ed;
+            --color-surface-dark: #181715;
+            --color-surface-dark-ink: #faf9f5;
+            --color-border: #e6e2d6;
+            --color-border-light: #f2efe6;
+            
+            /* Status / Callout Colors */
+            --color-note: #4a7a96;
+            --color-note-light: #edf5f9;
+            --color-warning: #c28d38;
+            --color-warning-light: #fdfaf3;
+            --color-important: #cc785c;
+            --color-important-light: #fbf1ed;
+
+            /* Typography */
+            --font-display: 'Cormorant Garamond', Georgia, serif;
+            --font-body: 'Inter', system-ui, -apple-system, sans-serif;
+            --font-mono: 'Fira Code', Consolas, Monaco, 'Andale Mono', monospace;
+
+            /* Layout */
+            --sidebar-width: 290px;
+            --max-width-content: 840px;
+            --transition-smooth: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+            --shadow-subtle: 0 4px 20px rgba(20, 20, 19, 0.04);
+            --shadow-medium: 0 10px 30px rgba(20, 20, 19, 0.08);
+            --shadow-glow: 0 0 15px rgba(204, 120, 92, 0.2);
+            --border-radius: 8px;
+        }
+
+        /* Smooth Scrolling */
+        html {
+            scroll-behavior: smooth;
+        }
+
+        /* General Reset & Body */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: var(--color-canvas);
+            color: var(--color-ink);
+            font-family: var(--font-body);
+            font-size: 16px;
+            line-height: 1.7;
+            overflow-x: hidden;
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* Scroll Progress Bar */
+        .progress-bar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--color-primary), #e0967d);
+            width: 0%;
+            z-index: 1000;
+            transition: width 0.1s ease-out;
+        }
+
+        /* Scrollbar Styling */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: var(--color-canvas);
+        }
+        ::-webkit-scrollbar-thumb {
+            background: var(--color-border);
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--color-primary);
+        }
+
+        /* Page Layout Shell */
+        .page-shell {
+            display: grid;
+            grid-template-columns: var(--sidebar-width) 1fr;
+            width: 100%;
+            min-height: 100vh;
+            position: relative;
+        }
+
+        /* Sidebar - Table of Contents */
+        aside.toc {
+            position: fixed;
+            top: 0;
+            left: 0;
+            bottom: 0;
+            width: var(--sidebar-width);
+            background-color: var(--color-canvas-dark);
+            border-right: 1px solid var(--color-border);
+            padding: 40px 24px;
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+            overflow-y: auto;
+            z-index: 100;
+            transition: var(--transition-smooth);
+        }
+
+        /* Brand / Header inside Sidebar */
+        .toc-brand {
+            margin-bottom: 8px;
+        }
+        .toc-brand h2 {
+            font-family: var(--font-display);
+            font-size: 1.8rem;
+            font-weight: 700;
+            line-height: 1.2;
+            color: var(--color-ink);
+        }
+        .toc-brand p {
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: var(--color-ink-light);
+            margin-top: 4px;
+        }
+
+        /* Search Bar Input */
+        .search-box {
+            position: relative;
+            width: 100%;
+        }
+        .search-box input {
+            width: 100%;
+            padding: 10px 16px 10px 36px;
+            font-family: var(--font-body);
+            font-size: 0.85rem;
+            background-color: var(--color-canvas-light);
+            border: 1px solid var(--color-border);
+            border-radius: var(--border-radius);
+            color: var(--color-ink);
+            outline: none;
+            transition: var(--transition-smooth);
+        }
+        .search-box input:focus {
+            border-color: var(--color-primary);
+            box-shadow: var(--shadow-glow);
+        }
+        .search-box::before {
+            content: "🔍";
+            position: absolute;
+            left: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 0.85rem;
+            opacity: 0.5;
+        }
+
+        /* Navigation List */
+        .toc-nav {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            list-style: none;
+        }
+        .toc-group-title {
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: var(--color-primary);
+            margin-top: 16px;
+            margin-bottom: 4px;
+        }
+        .toc-link {
+            display: block;
+            padding: 8px 12px;
+            font-size: 0.9rem;
+            font-weight: 400;
+            color: var(--color-ink-light);
+            text-decoration: none;
+            border-radius: var(--border-radius);
+            border-left: 2px solid transparent;
+            transition: var(--transition-smooth);
+        }
+        .toc-link:hover {
+            color: var(--color-primary);
+            background-color: var(--color-canvas-light);
+            padding-left: 16px;
+        }
+        .toc-link.active {
+            color: var(--color-ink);
+            font-weight: 600;
+            background-color: var(--color-canvas-light);
+            border-left-color: var(--color-primary);
+            padding-left: 16px;
+        }
+
+        /* Content Panel */
+        main.content {
+            grid-column: 2;
+            padding: 80px 5vw;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 100%;
+            min-height: 100vh;
+        }
+
+        .content-container {
+            width: 100%;
+            max-width: var(--max-width-content);
+            display: flex;
+            flex-direction: column;
+            gap: 48px;
+        }
+
+        /* Hero Section */
+        .hero {
+            position: relative;
+            padding: 60px 0;
+            border-bottom: 2px double var(--color-border);
+            text-align: left;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+        .hero-tag {
+            align-self: flex-start;
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.15em;
+            background-color: var(--color-primary-light);
+            color: var(--color-primary);
+            padding: 4px 10px;
+            border-radius: 4px;
+        }
+        .hero h1 {
+            font-family: var(--font-display);
+            font-size: 3.5rem;
+            font-weight: 700;
+            line-height: 1.1;
+            color: var(--color-ink);
+        }
+        .hero-lead {
+            font-family: var(--font-display);
+            font-size: 1.5rem;
+            font-style: italic;
+            color: var(--color-ink-light);
+            line-height: 1.4;
+        }
+        .hero-meta {
+            font-size: 0.8rem;
+            color: var(--color-ink-light);
+            display: flex;
+            gap: 16px;
+            margin-top: 16px;
+        }
+
+        /* Chapters/Sections Container */
+        .chapter-container {
+            display: flex;
+            flex-direction: column;
+            gap: 64px;
+        }
+
+        /* Typography Styles for Content */
+        h2 {
+            font-family: var(--font-display);
+            font-size: 2.2rem;
+            font-weight: 700;
+            margin-top: 24px;
+            color: var(--color-ink);
+            border-bottom: 1px solid var(--color-border);
+            padding-bottom: 8px;
+        }
+        h3 {
+            font-family: var(--font-display);
+            font-size: 1.6rem;
+            font-weight: 600;
+            margin-top: 20px;
+            color: var(--color-ink);
+        }
+        p {
+            margin-bottom: 16px;
+        }
+        a {
+            color: var(--color-primary);
+            text-decoration: none;
+            transition: var(--transition-smooth);
+            border-bottom: 1px dotted var(--color-primary);
+        }
+        a:hover {
+            color: var(--color-primary-hover);
+            border-bottom-style: solid;
+        }
+
+        /* Code Panels (Code block styling) */
+        .code-panel {
+            position: relative;
+            background-color: var(--color-surface-dark);
+            color: var(--color-surface-dark-ink);
+            border-radius: var(--border-radius);
+            margin: 20px 0;
+            padding: 24px;
+            box-shadow: var(--shadow-medium);
+            font-family: var(--font-mono);
+            font-size: 0.9rem;
+            overflow-x: auto;
+            border-left: 4px solid var(--color-primary);
+        }
+        .code-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid rgba(250, 249, 245, 0.1);
+            padding-bottom: 12px;
+            margin-bottom: 16px;
+            font-size: 0.8rem;
+            color: rgba(250, 249, 245, 0.6);
+        }
+        .code-lang {
+            text-transform: uppercase;
+            font-weight: 600;
+            letter-spacing: 0.05em;
+        }
+        .copy-btn {
+            background: none;
+            border: 1px solid rgba(250, 249, 245, 0.2);
+            color: rgba(250, 249, 245, 0.8);
+            padding: 4px 8px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.75rem;
+            transition: var(--transition-smooth);
+        }
+        .copy-btn:hover {
+            background-color: rgba(250, 249, 245, 0.1);
+            color: var(--color-primary-light);
+            border-color: var(--color-primary);
+        }
+        pre {
+            white-space: pre;
+            word-spacing: normal;
+            word-break: normal;
+            line-height: 1.5;
+        }
+
+        /* Feature Cards */
+        .feature-card {
+            background-color: var(--color-canvas-light);
+            border: 1px solid var(--color-border);
+            border-radius: var(--border-radius);
+            padding: 30px;
+            margin: 24px 0;
+            box-shadow: var(--shadow-subtle);
+            transition: var(--transition-smooth);
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        .feature-card:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-medium);
+            border-color: var(--color-primary);
+        }
+        .feature-card-title {
+            font-family: var(--font-display);
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--color-ink);
+        }
+
+        /* Callout Cards (note, warning, important) */
+        .callout {
+            border-radius: var(--border-radius);
+            padding: 20px;
+            margin: 24px 0;
+            border-left: 4px solid;
+            display: flex;
+            gap: 16px;
+        }
+        .callout-icon {
+            font-size: 1.5rem;
+            line-height: 1;
+        }
+        .callout-body {
+            flex-grow: 1;
+        }
+        .callout-title {
+            font-weight: 700;
+            margin-bottom: 6px;
+            font-size: 0.95rem;
+        }
+        
+        .callout.note {
+            background-color: var(--color-note-light);
+            border-color: var(--color-note);
+            color: var(--color-ink);
+        }
+        .callout.note .callout-title {
+            color: var(--color-note);
+        }
+        
+        .callout.warning {
+            background-color: var(--color-warning-light);
+            border-color: var(--color-warning);
+            color: var(--color-ink);
+        }
+        .callout.warning .callout-title {
+            color: var(--color-warning);
+        }
+        
+        .callout.important {
+            background-color: var(--color-important-light);
+            border-color: var(--color-important);
+            color: var(--color-ink);
+        }
+        .callout.important .callout-title {
+            color: var(--color-important);
+        }
+
+        /* Accordions */
+        .accordion {
+            border: 1px solid var(--color-border);
+            border-radius: var(--border-radius);
+            margin: 12px 0;
+            background-color: var(--color-canvas-light);
+            overflow: hidden;
+            transition: var(--transition-smooth);
+        }
+        .accordion-header {
+            padding: 16px 20px;
+            font-weight: 600;
+            font-size: 1rem;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: var(--color-canvas-light);
+            user-select: none;
+            transition: var(--transition-smooth);
+        }
+        .accordion-header:hover {
+            background-color: var(--color-canvas-dark);
+            color: var(--color-primary);
+        }
+        .accordion-icon {
+            transition: transform 0.3s ease;
+            font-size: 0.8rem;
+        }
+        .accordion-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease-out, padding 0.3s ease;
+            padding: 0 20px;
+            border-top: 0 solid var(--color-border);
+        }
+        .accordion.open .accordion-icon {
+            transform: rotate(180deg);
+        }
+        .accordion.open .accordion-content {
+            max-height: 1000px; /* arbitrary height to slide down to */
+            padding: 20px;
+            border-top-width: 1px;
+        }
+
+        /* Tables styling */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 24px 0;
+            font-size: 0.95rem;
+            text-align: left;
+        }
+        th {
+            background-color: var(--color-canvas-dark);
+            color: var(--color-ink);
+            font-weight: 600;
+            padding: 12px 16px;
+            border-bottom: 2px solid var(--color-border);
+        }
+        td {
+            padding: 12px 16px;
+            border-bottom: 1px solid var(--color-border-light);
+            color: var(--color-ink-light);
+        }
+        tr:hover td {
+            color: var(--color-ink);
+            background-color: rgba(204, 120, 92, 0.02);
+        }
+
+        /* Responsive Mobile Layout adjustments */
+        @media (max-width: 900px) {
+            .page-shell {
+                grid-template-columns: 1fr;
+            }
+            aside.toc {
+                transform: translateX(-100%);
+                position: fixed;
+                box-shadow: var(--shadow-medium);
+            }
+            aside.toc.mobile-open {
+                transform: translateX(0);
+            }
+            main.content {
+                grid-column: 1;
+                margin-left: 0;
+                width: 100%;
+                padding-top: 100px;
+            }
+            .mobile-header {
+                display: flex;
+                position: fixed;
+                top: 0;
+                left: 0;
+                right: 0;
+                height: 60px;
+                background-color: var(--color-canvas-dark);
+                border-bottom: 1px solid var(--color-border);
+                align-items: center;
+                justify-content: space-between;
+                padding: 0 20px;
+                z-index: 200;
+            }
+            .menu-toggle {
+                background: none;
+                border: none;
+                font-size: 1.5rem;
+                cursor: pointer;
+                color: var(--color-ink);
+            }
+        }
+
+        @media (min-width: 901px) {
+            .mobile-header {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Scroll Progress Indicator -->
+    <div class="progress-bar" id="progressBar"></div>
+
+    <!-- Mobile Header -->
+    <header class="mobile-header">
+        <button class="menu-toggle" id="menuToggle" aria-label="Toggle Navigation">☰</button>
+        <span style="font-family: var(--font-display); font-weight: 700; font-size: 1.2rem;">Docker Windows & WSL2</span>
+        <span style="visibility: hidden;">☰</span> <!-- placeholder for alignment -->
+    </header>
+
+    <!-- Layout Shell -->
+    <div class="page-shell">
+        
+        <!-- Sidebar Navigation (TOC) -->
+        <aside class="toc" id="toc">
+            <div class="toc-brand">
+                <h2>Docker Guide - Hướng dẫn Docker</h2>
+                <p>Windows & WSL2 Handbook - Sổ tay Windows & WSL2</p>
+            </div>
+            
+            <div class="search-box">
+                <input type="text" id="searchInput" placeholder="Search (Tìm kiếm) chủ đề...">
+            </div>
+
+            <nav class="toc-nav">
+                <div class="toc-group-title">Getting Started</div>
+                <a href="#hero" class="toc-link active">Introduction</a>
+                <div class="toc-group-title">Fundamentals</div>
+                <a href="#chapter-1" class="toc-link">1. Hero & Promise</a>
+                <a href="#chapter-2" class="toc-link">2. What is Docker?</a>
+                <a href="#chapter-3" class="toc-link">3. Container vs VM</a>
+                <a href="#chapter-4" class="toc-link">4. Docker Ecosystem</a>
+                <a href="#chapter-5" class="toc-link">5. Install & Setup</a>
+                <a href="#chapter-6" class="toc-link">6. First Workflow</a>
+                <a href="#chapter-7" class="toc-link">7. Image & Container</a>
+                <a href="#chapter-8" class="toc-link">8. Ports & Lifecycle</a>
+                <div class="toc-group-title">Workflows</div>
+                <a href="#chapter-9" class="toc-link">9. Dockerfile & Layers</a>
+                <a href="#chapter-10" class="toc-link">10. Persisting Data</a>
+                <a href="#chapter-11" class="toc-link">11. Networking</a>
+                <a href="#chapter-12" class="toc-link">12. Multi-container</a>
+                <a href="#chapter-13" class="toc-link">13. Docker Compose</a>
+                <a href="#chapter-14" class="toc-link">14. Beginner Workflow</a>
+                <div class="toc-group-title">Reference & Troubleshooting</div>
+                <a href="#chapter-15" class="toc-link">15. Best Practices</a>
+                <a href="#chapter-16" class="toc-link">16. Common Errors</a>
+                <a href="#chapter-17" class="toc-link">17. Command Cheat Sheet</a>
+                <a href="#chapter-18" class="toc-link">18. Glossary</a>
+                <div class="toc-group-title">Cloud & AI Agent Track</div>
+                <a href="#chapter-19" class="toc-link">19. Cloud Deployment</a>
+                <a href="#chapter-20" class="toc-link">20. AWS ECR & App Runner</a>
+                <a href="#chapter-21" class="toc-link">21. Containerizing AI Agents</a>
+                <a href="#chapter-22" class="toc-link">22. Deploying Research Agents</a>
+            </nav>
+        </aside>
+
+        <!-- Main Content Panel -->
+        <main class="content" id="content">
+            <div class="content-container">
+                
+                <!-- Hero Section Placeholder -->
+                <section class="hero" id="hero">
+                    <span class="hero-tag">System Engineering</span>
+                    <h1>Docker for Windows<br>& WSL2</h1>
+                    <p class="hero-lead">An editorial companion handbook for AI Engineers & Developers: Setup, Optimization, & Native Integration.</p>
+                    <div class="hero-meta">
+                        <span>Author: Senior AI Assistant</span>
+                        <span>Date: June 2026</span>
+                        <span>Target: Windows 11 / WSL2 Ubuntu</span>
+                    </div>
+                </section>
+
+                <!-- Chapters/Sections Container -->
+                <div class="chapter-container" id="chapterContainer">
+                    <!-- Chapter 1: Hero & Handbook Promise -->
+                    <section id="chapter-1" class="chapter-section">
+                        <h2>Chương 1: Cam kết của Sổ tay & Giới thiệu Tổng quan</h2>
+                        <div class="chapter-content">
+                            <p>Chào mừng bạn đến với cẩm nang Docker chuyên sâu dành riêng cho kỹ sư AI và lập trình viên hoạt động trên môi trường Windows kết hợp với WSL2 Ubuntu. Trong kỷ nguyên của trí tuệ nhân tạo và học máy, việc thiết lập một `development environment - môi trường phát triển` nhất quán, hiệu quả và có khả năng truy cập trực tiếp vào phần cứng như card đồ họa (GPU) là vô cùng quan trọng.</p>
+                            
+                            <p>Sổ tay này được thiết kế để dẫn dắt bạn qua từng bước từ các khái niệm nền tảng đến các kỹ thuật thực chiến nâng cao, giúp bạn làm chủ Docker một cách nhanh chóng và chuyên nghiệp.</p>
+
+                            <div class="feature-card">
+                                <div class="feature-card-title">Tại sao lại tập trung vào Windows + WSL2 Ubuntu?</div>
+                                <p>Windows cung cấp một giao diện người dùng thân thiện và hệ sinh thái ứng dụng văn phòng phong phú. Tuy nhiên, phần lớn các công cụ và thư viện AI/ML mạnh mẽ nhất (như PyTorch, TensorFlow) lại được tối ưu hóa tốt nhất trên Linux. WSL2 (Windows Subsystem for Linux 2) chính là chiếc cầu nối hoàn hảo, cho phép chạy một hệ phân phối Linux thực thụ trực tiếp trong Windows mà không cần sử dụng một giải pháp cồng kềnh như `virtual machine - máy ảo` truyền thống.</p>
+                                <p>Nhờ có WSL2, Docker có thể chạy ở chế độ native với hiệu năng gần như tương đương với Linux thực tế, đồng thời hỗ trợ GPU acceleration thông qua NVIDIA CUDA để huấn luyện các mô hình học sâu.</p>
+                            </div>
+
+                            <p><strong>Cam kết của Sổ tay (Handbook Promise):</strong></p>
+                            <p>Sau khi hoàn thành cuốn sổ tay này, bạn sẽ:</p>
+                            <ul>
+                                <li>Hiểu rõ nguyên lý hoạt động sâu bên trong của Docker.</li>
+                                <li>Thiết lập thành công và tối ưu hóa Docker Desktop tích hợp WSL2 Ubuntu với `input/output speed - tốc độ nhập/xuất` dữ liệu cao nhất.</li>
+                                <li>Thành thạo các câu lệnh quản lý `container (vùng chạy cô lập)`, `image (ảnh đóng gói)`, `volume (vùng lưu dữ liệu)` và `network (mạng)`.</li>
+                                <li>Triển khai các ứng dụng đa container phức tạp bằng Docker Compose.</li>
+                            </ul>
+                        </div>
+                    </section>
+
+                    <!-- Chapter 2: What is Docker? -->
+                    <section id="chapter-2" class="chapter-section">
+                        <h2>Chương 2: Docker là gì? Định nghĩa & Sức mạnh của Container hóa</h2>
+                        <div class="chapter-content">
+                            <p>Docker là một nền tảng mã nguồn mở giúp tự động hóa quá trình đóng gói, phân phối và khởi chạy ứng dụng dưới dạng các `container (vùng chạy cô lập)` độc lập. Nó giải quyết triệt để lỗi kinh điển "chạy trên máy tôi thì được nhưng lên server lại lỗi".</p>
+                            
+                            <p>Hãy tưởng tượng Docker giống như các container vận chuyển tiêu chuẩn hóa trong ngành hàng hải. Trước khi có container chuẩn hóa, việc xếp dỡ các loại hàng hóa khác nhau (gạo, ôtô, chất lỏng) lên tàu rất phức tạp và dễ hư hỏng. Container tiêu chuẩn hóa đã giải quyết vấn đề đó bằng cách đóng gói mọi thứ vào các hộp thép có cùng kích thước, dễ dàng xếp chồng và di chuyển bởi bất kỳ con tàu hay bến cảng nào. Tương tự, Docker đóng gói toàn bộ mã nguồn của ứng dụng cùng với các dependencies (thư viện phụ thuộc), thư viện hệ thống và cấu hình vào một thực thể duy nhất gọi là `image (ảnh đóng gói)`.</p>
+
+                            <h3>Docker Engine là gì?</h3>
+                            <p>Docker Engine là trái tim của hệ thống Docker. Đây là một ứng dụng client-server (mô hình khách - chủ) gồm ba thành phần chính:</p>
+                            <ol>
+                                <li><strong>Docker Daemon (dockerd)</strong>: Một `daemon (tiến trình nền)` chạy liên tục trên hệ điều hành máy chủ, chịu trách nhiệm quản lý các đối tượng của Docker như image, container, network và volume. Nó lắng nghe các yêu cầu thông qua Docker Engine API.</li>
+                                <li><strong>REST API</strong>: Một giao diện lập trình ứng dụng chỉ định các điểm cuối (endpoints) mà các chương trình khác có thể sử dụng để giao tiếp và ra lệnh cho Docker daemon.</li>
+                                <li><strong>Docker CLI (docker)</strong>: `command line interface - giao diện dòng lệnh` cho phép người dùng gõ lệnh để tương tác với Docker daemon. CLI sử dụng REST API để gửi lệnh đến daemon.</li>
+                            </ol>
+
+                            <div class="callout note">
+                                <div class="callout-body">
+                                    <div class="callout-title">Tại sao các đội ngũ phát triển lại lựa chọn Container hóa (Containerization)?</div>
+                                    <div>
+                                        <ul>
+                                            <li><strong>Tính nhất quán giữa các môi trường (Environment Consistency)</strong>: Một container chạy tốt trên máy của lập trình viên chắc chắn sẽ hoạt động y hệt trên máy chủ thử nghiệm và `production environment - môi trường vận hành`.</li>
+                                            <li><strong>Tiết kiệm tài nguyên (Resource Efficiency)</strong>: Không giống như máy ảo, các container chia sẻ chung nhân hệ điều hành của máy chủ nên khởi động trong vài mili giây và tiêu tốn cực kỳ ít bộ nhớ RAM và CPU.</li>
+                                            <li><strong>Kiến trúc hướng dịch vụ nhỏ (Microservices Architecture)</strong>: Docker cho phép phân rã một ứng dụng cồng kềnh thành các dịch vụ độc lập, giúp dễ dàng nâng cấp, bảo trì và mở rộng quy mô.</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- Chapter 3: Container vs Virtual Machine -->
+                    <section id="chapter-3" class="chapter-section">
+                        <h2>Chương 3: So sánh Container và Máy ảo (Container vs Virtual Machine)</h2>
+                        <div class="chapter-content">
+                            <p>Để hiểu rõ tại sao Docker lại nhẹ và nhanh đến vậy, chúng ta cần so sánh nó với `virtual machine - máy ảo` (VM) truyền thống. Sự khác biệt cốt lõi nằm ở cách thức quản lý tài nguyên và chia sẻ nhân hệ điều hành.</p>
+                            
+                            <p><strong>Virtual Machine (Máy ảo)</strong>: Chạy trên nền tảng của một `hypervisor - trình quản lý máy ảo` (ví dụ: VMware, VirtualBox, Hyper-V). Mỗi VM yêu cầu một hệ điều hành khách (Guest OS) riêng biệt, hoàn chỉnh với nhân hệ điều hành, trình điều khiển thiết bị (drivers), thư viện và toàn bộ các tiến trình hệ thống đi kèm. Điều này khiến VM rất nặng (thường từ vài GB đến vài chục GB) và khởi động rất chậm.</p>
+
+                            <p><strong>Docker Container (Vùng chạy cô lập)</strong>: Chạy trực tiếp trên `host operating system - hệ điều hành máy chủ` và chia sẻ chung `kernel - nhân` của hệ điều hành máy chủ. Các container được cô lập với nhau thông qua các tính năng có sẵn trong nhân Linux như namespaces (để cô lập không gian tên tiến trình, mạng, người dùng) và control groups (cgroups - để giới hạn tài nguyên CPU, RAM). Nhờ vậy, container cực kỳ nhẹ (chỉ vài MB đến vài trăm MB) và khởi động gần như ngay lập tức.</p>
+
+                            <h3>Bảng so sánh chi tiết</h3>
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Đặc tính</th>
+                                        <th>Virtual Machine (Máy ảo)</th>
+                                        <th>Docker Container (Vùng chạy cô lập)</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td><strong>Kiến trúc (Architecture)</strong></td>
+                                        <td>Mỗi VM có hệ điều hành khách (Guest OS) đầy đủ và chạy trên Hypervisor.</td>
+                                        <td>Chia sẻ chung nhân hệ điều hành máy chủ (Host OS kernel). Không cần Guest OS.</td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>Hiệu năng (Performance)</strong></td>
+                                        <td>Hiệu năng thấp hơn do hao phí tài nguyên chạy hệ điều hành khách.</td>
+                                        <td>Hiệu năng cao, gần như tương đương với ứng dụng chạy native trên máy chủ.</td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>Dung lượng (Storage)</strong></td>
+                                        <td>Nặng (vài GB đến hàng chục GB) cho mỗi máy ảo.</td>
+                                        <td>Rất nhẹ (vài MB đến vài trăm MB) do chỉ chứa ứng dụng và thư viện cần thiết.</td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>Thời gian khởi động</strong></td>
+                                        <td>Chậm (vài chục giây đến vài phút) để nạp xong hệ điều hành.</td>
+                                        <td>Nhanh (vài phần mười giây hoặc vài mili giây).</td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>Khả năng cô lập</strong></td>
+                                        <td>Cô lập hoàn toàn ở cấp độ phần cứng thông qua Hypervisor (rất an toàn).</td>
+                                        <td>Cô lập ở cấp độ tiến trình thông qua Kernel Namespaces & Cgroups (an toàn cao).</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+
+                            <h3>Sơ đồ kiến trúc (Architectural Diagram)</h3>
+                            <p>Dưới đây là sơ đồ so sánh trực quan kiến trúc giữa Virtual Machine và Docker Container:</p>
+                            
+                            <div class="mermaid">
+                            graph TD
+                                subgraph "Virtual Machine Architecture"
+                                    VM_AppA["App A"] --> VM_LibsA["Guest Libs"]
+                                    VM_AppB["App B"] --> VM_LibsB["Guest Libs"]
+                                    VM_LibsA --> VM_OS1["Guest OS 1 (Linux/Win)"]
+                                    VM_LibsB --> VM_OS2["Guest OS 2 (Linux/Win)"]
+                                    VM_OS1 --> VM_Hypervisor["Hypervisor (Type 1/2)"]
+                                    VM_OS2 --> VM_Hypervisor["Hypervisor (Type 1/2)"]
+                                    VM_Hypervisor --> VM_HostOS["Host OS (Windows)"]
+                                    VM_HostOS --> VM_Hardware["Physical Infrastructure"]
+                                end
+
+                                subgraph "Docker Container Architecture"
+                                    Doc_AppA["App A"] --> Doc_LibsA["Libs/Bins"]
+                                    Doc_AppB["App B"] --> Doc_LibsB["Libs/Bins"]
+                                    Doc_LibsA --> Doc_Engine["Docker Engine (Daemon)"]
+                                    Doc_LibsB --> Doc_Engine
+                                    Doc_Engine --> Doc_HostOS["Host OS with Linux Kernel (WSL2)"]
+                                    Doc_HostOS --> Doc_Hardware["Physical Infrastructure"]
+                                end
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- Chapter 4: Docker Ecosystem -->
+                    <section id="chapter-4" class="chapter-section">
+                        <h2>Chương 4: Hệ sinh thái Docker (Docker Ecosystem)</h2>
+                        <div class="chapter-content">
+                            <p>Docker không chỉ là một công cụ đơn lẻ mà là cả một hệ sinh thái gồm nhiều thành phần phối hợp chặt chẽ với nhau để tạo nên một quy trình quản lý container hoàn chỉnh:</p>
+
+                            <div class="accordion">
+                                <div class="accordion-header">
+                                    <span>1. Docker Engine (Runtime Cốt Lõi)</span>
+                                    <span class="accordion-icon">▼</span>
+                                </div>
+                                <div class="accordion-content">
+                                    <p>Bộ công cụ runtime cốt lõi chạy trực tiếp trên hệ điều hành máy chủ, chịu trách nhiệm xây dựng (build), chạy (run) và phân phối các container.</p>
+                                </div>
+                            </div>
+
+                            <div class="accordion">
+                                <div class="accordion-header">
+                                    <span>2. Docker Desktop (Ứng Dụng GUI)</span>
+                                    <span class="accordion-icon">▼</span>
+                                </div>
+                                <div class="accordion-content">
+                                    <p>Ứng dụng giao diện đồ họa thân thiện, dễ cài đặt trên Windows và macOS. Nó tích hợp sẵn Docker Engine, Docker CLI, Docker Compose, Kubernetes, và một giao diện trực quan để quản lý container, image, volume và network mà không cần gõ lệnh.</p>
+                                </div>
+                            </div>
+
+                            <div class="accordion">
+                                <div class="accordion-header">
+                                    <span>3. Docker CLI (Giao Diện Dòng Lệnh)</span>
+                                    <span class="accordion-icon">▼</span>
+                                </div>
+                                <div class="accordion-content">
+                                    <p>Công cụ dòng lệnh giúp lập trình viên giao tiếp và gửi yêu cầu điều khiển đến Docker Daemon thông qua REST API.</p>
+                                </div>
+                            </div>
+
+                            <div class="accordion">
+                                <div class="accordion-header">
+                                    <span>4. Docker Hub & Registry (Kho Lưu Trữ Image)</span>
+                                    <span class="accordion-icon">▼</span>
+                                </div>
+                                <div class="accordion-content">
+                                    <p>`registry (kho lưu trữ)` công cộng được lưu trữ trên đám mây bởi chính Docker. Đây là nơi chứa hàng triệu image có sẵn từ hệ điều hành (Ubuntu, Alpine), cơ sở dữ liệu (PostgreSQL, MongoDB, Redis) đến các môi trường lập trình (Python, Node.js, Go). Ngoài ra, các tổ chức có thể tự dựng các private registry riêng tư để bảo mật thông tin.</p>
+                                </div>
+                            </div>
+
+                            <div class="accordion">
+                                <div class="accordion-header">
+                                    <span>5. Docker Compose (Quản Lý Đa Container)</span>
+                                    <span class="accordion-icon">▼</span>
+                                </div>
+                                <div class="accordion-content">
+                                    <p>Công cụ định nghĩa và chạy các ứng dụng Docker đa container. Bằng cách sử dụng một tệp tin cấu hình YAML duy nhất với tên hiện đại (modern name) là <code>compose.yaml</code> (hoặc tên cũ legacy name là <code>docker-compose.yml</code>), bạn có thể khởi chạy toàn bộ hệ thống gồm web server (máy chủ web), database (cơ sở dữ liệu), cache (bộ nhớ đệm) và hàng loạt dịch vụ khác chỉ bằng một câu lệnh duy nhất.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- Chapter 5: Install Docker on Windows + WSL2 Ubuntu -->
+                    <section id="chapter-5" class="chapter-section">
+                        <h2>Chương 5: Cài đặt Docker trên Windows 11 & Tích hợp WSL2 Ubuntu</h2>
+                        <div class="chapter-content">
+                            <p>Để tối ưu hóa hiệu năng phát triển trên Windows, chúng ta sử dụng WSL 2 làm engine vận hành chính cho Docker thay vì giải pháp ảo hóa Hyper-V truyền thống. Dưới đây là các bước thiết lập và tối ưu hệ thống chi tiết.</p>
+
+                            <h3>Các bước thiết lập và kích hoạt WSL2 Integration</h3>
+                            <ol>
+                                <li><strong>Kích hoạt WSL 2 trên Windows</strong>: Mở PowerShell với quyền Administrator và chạy câu lệnh <code>wsl --install</code>. Khởi động lại máy tính khi được yêu cầu. Cài đặt hệ phân phối Ubuntu từ Microsoft Store.</li>
+                                <li><strong>Cài đặt Docker Desktop</strong>: Tải bộ cài đặt từ trang chủ Docker. Trong quá trình cài đặt, hãy tích chọn mục <em>Use WSL 2 instead of Hyper-V (recommended)</em>.</li>
+                                <li><strong>Kích hoạt WSL 2 Integration</strong>:
+                                    <ul>
+                                        <li>Mở ứng dụng Docker Desktop trên Windows.</li>
+                                        <li>Vào <strong>Settings</strong> (biểu tượng bánh răng) &gt; <strong>General</strong> &gt; đảm bảo đã tích chọn <strong>Use the WSL 2 based engine</strong>.</li>
+                                        <li>Vào <strong>Resources</strong> &gt; <strong>WSL integration</strong> &gt; Kích hoạt công tắc cho bản phân phối Ubuntu của bạn (ví dụ <code>Ubuntu</code>). Nhấp <strong>Apply & Restart</strong>.</li>
+                                    </ul>
+                                </li>
+                            </ol>
+
+                            <h3>Cấu hình giới hạn tài nguyên hệ thống thông qua .wslconfig</h3>
+                            <p>Theo mặc định, WSL2 có thể tiêu tốn tới 75% lượng bộ nhớ RAM của máy chủ Windows để làm bộ đệm, dẫn đến tình trạng máy chủ bị đơ, giật lag khi Docker chạy các tác vụ nặng. Để khắc phục điều này, ta cần tạo tệp cấu hình <code>.wslconfig</code> trong thư mục người dùng Windows (ví dụ: <code>C:\Users\Username\.wslconfig</code>).</p>
+
+                            <div class="code-panel">
+                                <div class="code-header">
+                                    <span class="code-lang">ini</span>
+                                    <button class="copy-btn" onclick="copyCode(this, 'code-wslconfig')">Copy</button>
+                                </div>
+                                <pre><code id="code-wslconfig">[wsl2]
+memory=8GB
+processors=4
+swap=2GB
+localhostForwarding=true</code></pre>
+                            </div>
+                            <p>Đoạn mã trên đại diện cho cấu hình hệ thống giới hạn WSL2 chỉ sử dụng tối đa 8GB bộ nhớ RAM và 4 nhân CPU từ máy chủ vật lý, giúp ngăn ngừa tình trạng cạn kiệt tài nguyên hệ thống trên hệ điều hành Windows.</p>
+
+                            <div class="callout important">
+                                <div class="callout-icon">⚠️</div>
+                                <div class="callout-body">
+                                    <div class="callout-title">Nguyên tắc vàng về tốc độ nhập/xuất (Crucial I/O Best Practice)</div>
+                                    <div>
+                                        <p>Tuyệt đối KHÔNG lưu trữ mã nguồn dự án của bạn trên hệ thống tệp Windows (ví dụ ở <code>/mnt/c/Users/...</code>) rồi mount vào Docker container chạy trên WSL2. Do sự khác biệt về kiến trúc hệ thống tệp giữa NTFS (Windows) và ext4 (Linux), việc đọc/ghi dữ liệu xuyên biên giới thông qua giao thức 9p sẽ khiến `input/output speed - tốc độ nhập/xuất` dữ liệu giảm tới 10-20 lần!</p>
+                                        <p><strong>Giải pháp</strong>: Luôn lưu dự án trong hệ thống tệp gốc của Linux trong WSL2 (ví dụ tại thư mục cá nhân <code>~/projects/</code>). Bạn vẫn có thể chỉnh sửa mã nguồn này từ Windows bằng cách mở VS Code và cài đặt tiện ích mở rộng <strong>WSL</strong>, sau đó gõ <code>code .</code> ngay trong terminal của Ubuntu.</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- Chapter 6: First Container Workflow -->
+                    <section id="chapter-6" class="chapter-section">
+                        <h2>Chương 6: Quy trình làm việc với Container đầu tiên (First Container Workflow)</h2>
+                        <div class="chapter-content">
+                            <p>Chúng ta sẽ thực hành chạy container đầu tiên của mình thông qua CLI của WSL2 Ubuntu và tìm hiểu chi tiết những gì diễn ra bên dưới hệ thống.</p>
+
+                            <h3>Các câu lệnh thao tác cơ bản</h3>
+                            <p>Hãy mở terminal Ubuntu trong WSL2 và thực thi các câu lệnh sau:</p>
+
+                            <div class="code-panel">
+                                <div class="code-header">
+                                    <span class="code-lang">bash</span>
+                                    <button class="copy-btn" onclick="copyCode(this, 'code-workflow')">Copy</button>
+                                </div>
+                                <pre><code id="code-workflow"># 1. Chạy container hello-world để kiểm tra cài đặt
+docker run hello-world
+
+# 2. Xem danh sách các container đang hoạt động
+docker ps
+
+# 3. Xem toàn bộ danh sách các container (bao gồm cả các container đã dừng)
+docker ps -a
+
+# 4. Dừng một container đang chạy
+docker stop [container_id_or_name]
+
+# 5. Xóa một container đã dừng khỏi hệ thống
+docker rm [container_id_or_name]</code></pre>
+                            </div>
+                            <p>Các câu lệnh trên lần lượt thực hiện việc tải và chạy container thử nghiệm, liệt kê danh sách container đang chạy và đã dừng, dừng hoạt động của một container và xóa container đó khỏi bộ nhớ đĩa.</p>
+
+                            <h3>Cơ chế hoạt động bên trong (Internal Mechanics) của docker run</h3>
+                            <p>Khi bạn gõ lệnh <code>docker run hello-world</code> trong terminal, một chuỗi các sự kiện phức tạp sẽ diễn ra ở hậu trường:</p>
+                            <ol>
+                                <li><strong>Yêu cầu từ Client</strong>: Docker CLI dịch câu lệnh của bạn và gửi một yêu cầu API REST đến Docker Daemon (<code>dockerd</code>) đang chạy ngầm trên máy chủ.</li>
+                                <li><strong>Kiểm tra cục bộ</strong>: Docker Daemon nhận yêu cầu tạo container từ image <code>hello-world</code>. Nó sẽ tìm kiếm trong local cache (kho lưu trữ cục bộ) xem đã có image nào tên là <code>hello-world:latest</code> chưa.</li>
+                                <li><strong>Tải về từ Registry</strong>: Nếu không tìm thấy ở local, Docker Daemon sẽ tự động kết nối tới Docker Hub để tải (pull) các lớp tệp tin của image <code>hello-world</code> về máy.</li>
+                                <li><strong>Tạo và Cấp phát</strong>: Sau khi tải xong image, Daemon sẽ tạo một `container (vùng chạy cô lập)` mới từ image này. Nó cấp phát một hệ thống tệp tin ghi được (read-write layer) phía trên các lớp read-only của image, đồng thiết lập môi trường mạng cô lập và cấp phát IP nội bộ cho container.</li>
+                                <li><strong>Khởi chạy tiến trình</strong>: Daemon khởi chạy tiến trình chính của container. Trong trường hợp của <code>hello-world</code>, tiến trình này chỉ đơn giản là in ra một đoạn văn bản chào mừng lên màn hình stdout.</li>
+                                <li><strong>Chuyển tiếp kết quả</strong>: Docker Daemon thu thập luồng dữ liệu đầu ra từ container và chuyển tiếp ngược lại cho Docker CLI để hiển thị lên màn hình terminal của bạn.</li>
+                                <li><strong>Kết thúc vòng đời</strong>: Khi tiến trình in văn bản hoàn thành, tiến trình chính kết thúc. Container tự động chuyển sang trạng thái Stopped (Đã dừng) nhưng dữ liệu của container vẫn tồn tại trên ổ đĩa cho đến khi bạn chạy lệnh <code>docker rm</code>.</li>
+                            </ol>
+                        </div>
+                    </section>
+
+                    <!-- Chapter 7: Image and Container Fundamentals -->
+                    <section id="chapter-7" class="chapter-section">
+                        <h2>Chương 7: Kiến thức cơ bản về Image và Container (Image & Container Fundamentals)</h2>
+                        <div class="chapter-content">
+                            <p>Để làm việc hiệu quả với Docker, bạn cần nắm vững các thao tác quản lý image và container hàng ngày, đồng thời phân biệt được những nhóm lệnh thường dùng và ít dùng.</p>
+
+                            <h3>Các câu lệnh quản lý hàng ngày</h3>
+                            <p>Dưới đây là tập hợp các lệnh cơ bản giúp bạn làm việc trực tiếp với image và container:</p>
+
+                            <div class="code-panel">
+                                <div class="code-header">
+                                    <span class="code-lang">bash</span>
+                                    <button class="copy-btn" onclick="copyCode(this, 'code-fundamentals')">Copy</button>
+                                </div>
+                                <pre><code id="code-fundamentals"># Tìm kiếm image trên Docker Hub
+docker search python
+
+# Tải image về máy cục bộ
+docker pull python:3.10-slim
+
+# Chạy container với các cờ (flags) quan trọng
+docker run -it -d --name my-python-app --rm python:3.10-slim bash
+
+# Thực thi lệnh mới bên trong container đang chạy
+docker exec -it my-python-app pip install numpy
+
+# Xem nhật ký (logs) xuất ra của container
+docker logs -f my-python-app
+
+# Kiểm tra siêu dữ liệu (metadata) chi tiết của container
+docker inspect my-python-app
+
+# Đặt nhãn mới (tag) cho image
+docker tag python:3.10-slim my-registry.com/my-python:v1</code></pre>
+                            </div>
+                            <p>Các lệnh trên thể hiện đầy đủ quy trình từ tìm kiếm, tải image, khởi chạy container ở `detached mode - chế độ chạy ngầm` với các cờ cấu hình terminal, thực thi lệnh bổ sung ở `interactive mode - chế độ tương tác`, theo dõi nhật ký, kiểm tra cấu hình và đặt thẻ phân bản cho image.</p>
+
+                            <h3>Giải thích chi tiết các cờ (flags) của lệnh docker run:</h3>
+                            <ul>
+                                <li><code>-i</code> (<code>--interactive</code>): Giữ luồng nhập chuẩn (stdin) mở để bạn có thể gửi dữ liệu nhập vào container.</li>
+                                <li><code>-t</code> (<code>--tty</code>): Cấp phát một terminal ảo (pseudo-TTY) giúp giao diện terminal hiển thị đẹp mắt, hỗ trợ màu sắc và các phím tắt.</li>
+                                <li><code>-d</code> (<code>--detach</code>): Chạy container ở chế độ chạy ngầm, trả lại quyền điều khiển terminal cho bạn ngay lập tức.</li>
+                                <li><code>--name</code>: Đặt tên dễ nhớ cho container thay vì để Docker tự sinh tên ngẫu nhiên.</li>
+                                <li><code>-h</code> (<code>--hostname</code>): Thiết lập tên máy chủ (hostname) bên trong container.</li>
+                                <li><code>--rm</code>: Tự động xóa sạch container (bao gồm cả phân vùng ghi được) ngay sau khi container dừng hoạt động, tránh lãng phí ổ cứng.</li>
+                            </ul>
+
+                            <h3>Các lệnh ít khi sử dụng (Rarely-used Commands)</h3>
+                            <p>Có một số lệnh mặc dù tồn tại trong Docker nhưng rất ít khi được dùng trong quy trình làm việc hiện đại:</p>
+                            <ul>
+                                <li><code>docker commit [container_id] [new_image_name]</code>: Tạo một image mới từ những thay đổi hiện tại của một container đang chạy.</li>
+                                <li><code>docker save -o [file_name].tar [image_name]</code>: Xuất một image ra thành tệp lưu trữ nén định dạng <code>.tar</code>.</li>
+                                <li><code>docker load -i [file_name].tar</code>: Nhập một image vào local từ một tệp <code>.tar</code> có sẵn.</li>
+                            </ul>
+
+                            <div class="callout note">
+                                <div class="callout-body">
+                                    <div class="callout-title">Tại sao Dockerfile luôn được ưu tiên hơn docker commit?</div>
+                                    <div>
+                                        <p>Trong thực tế phát triển chuyên nghiệp, việc dùng <code>docker commit</code> để tạo image bị coi là một anti-pattern vì những lý do sau:</p>
+                                        <ol>
+                                            <li><strong>Không thể tái lập (No Reproducibility)</strong>: Image tạo ra từ commit là một "hộp đen". Không ai biết chính xác bạn đã cài đặt những gì, cấu hình ra sao bên trong container trước khi commit.</li>
+                                            <li><strong>Dung lượng khổng lồ (Image Bloat)</strong>: Việc sửa đổi và commit thủ công thường tạo ra nhiều lớp tệp tin rác không cần thiết, làm tăng kích thước image lên gấp nhiều lần.</li>
+                                            <li><strong>Thiếu quản lý phiên bản (No Version Control)</strong>: Bạn không thể đưa quy trình tạo image thủ công vào Git để theo dõi lịch sử thay đổi hoặc tích hợp vào hệ thống CI/CD tự động.</li>
+                                        </ol>
+                                        <p>Thay vào đó, lập trình viên sử dụng <strong>Dockerfile</strong> - một tệp cấu hình dạng văn bản thuần chứa danh sách các câu lệnh tuần tự để xây dựng image. Dockerfile giúp quy trình xây dựng image trở nên minh bạch, có thể đưa vào Git, tự động hóa 100% và tối ưu hóa kích thước nhờ cơ chế cache từng lớp.</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- Chapter 8: Ports, Processes, and Lifecycle -->
+                    <section id="chapter-8" class="chapter-section">
+                        <h2>Chương 8: Cổng, Tiến trình và Vòng đời Container (Ports, Processes, and Lifecycle)</h2>
+                        <div class="chapter-content">
+                            <p>Để vận hành container trong môi trường mạng và quản lý chúng hiệu quả, bạn cần hiểu sâu về cách ánh xạ cổng, cơ chế cô lập tiến trình của hệ điều hành và các trạng thái vòng đời của một container.</p>
+
+                            <h3>Port Mapping (Ánh xạ cổng) chi tiết</h3>
+                            <p>Mặc định, các container chạy trong một mạng ảo cô lập và không thể truy cập trực tiếp từ máy chủ Windows hoặc mạng bên ngoài. Để cho phép lưu lượng mạng đi vào container, chúng ta phải sử dụng tính năng `port mapping - ánh xạ cổng` thông qua tham số <code>-p host_port:container_port</code>.</p>
+
+                            <div class="code-panel">
+                                <div class="code-header">
+                                    <span class="code-lang">bash</span>
+                                    <button class="copy-btn" onclick="copyCode(this, 'code-ports')">Copy</button>
+                                </div>
+                                <pre><code id="code-ports"># Ánh xạ cổng 8080 của máy chủ vào cổng 80 bên trong container Nginx
+docker run -d -p 8080:80 --name my-web-server nginx</code></pre>
+                            </div>
+                            <p>Khi người dùng truy cập địa chỉ <code>http://localhost:8080</code> trên trình duyệt web của Windows, Docker Engine sẽ nhận tín hiệu tại cổng 8080 của máy chủ và sử dụng cơ chế định tuyến mạng để chuyển tiếp toàn bộ lưu lượng này tới cổng 80 bên trong container Nginx đang chạy.</p>
+
+                            <h3>Cô lập tiến trình (Process Isolation)</h3>
+                            <p>Mỗi container Docker thực chất chỉ là một nhóm các tiến trình chạy trực tiếp trên `kernel - nhân` Linux của WSL2, nhưng bị cô lập thông qua các cơ chế cốt lõi của nhân Linux:</p>
+                            <ul>
+                                <li><strong>Namespaces</strong>: Giúp container sở hữu không gian tên riêng độc lập. Nó có bảng tiến trình riêng (PID namespace bắt đầu từ 1), card mạng riêng (NET namespace), hệ thống tệp tin riêng (MNT namespace).</li>
+                                <li><strong>Control Groups (cgroups)</strong>: Giới hạn phần cứng. Nếu container chạy vượt quá giới hạn tài nguyên bộ nhớ RAM được cấp phép, nhân Linux sẽ kích hoạt bộ giết tiến trình (OOM Killer) để chấm dứt container đó ngay lập tức nhằm bảo vệ sự ổn định của hệ thống máy chủ.</li>
+                            </ul>
+
+                            <h3>Vòng đời của Container (Container Lifecycle Transitions)</h3>
+                            <p>Một container di chuyển qua nhiều trạng thái khác nhau trong suốt `container lifecycle - vòng đời của vùng chạy` của nó:</p>
+                            
+                            <div class="feature-card">
+                                <div class="feature-card-title">Các trạng thái chính trong vòng đời:</div>
+                                <ul>
+                                    <li><strong>Created (Đã tạo)</strong>: Container đã được khởi tạo từ image (cấp phát hệ thống tệp tin ghi được, cấu hình mạng) nhưng tiến trình chính chưa chạy. Lệnh kích hoạt: <code>docker create</code>.</li>
+                                    <li><strong>Running (Đang hoạt động)</strong>: Tiến trình chính của container đang chạy tích cực. Lệnh kích hoạt: <code>docker start</code> hoặc <code>docker run</code>.</li>
+                                    <li><strong>Stopped (Đã dừng)</strong>: Tiến trình chính nhận được tín hiệu kết thúc (SIGTERM/SIGKILL) và dừng lại. RAM được giải phóng nhưng dữ liệu trên đĩa vẫn được giữ lại. Lệnh kích hoạt: <code>docker stop</code>.</li>
+                                    <li><strong>Exited (Đã thoát)</strong>: Container đã dừng do tiến trình chính tự kết thúc (hoàn thành công việc hoặc gặp lỗi).</li>
+                                    <li><strong>Paused (Tạm ngưng)</strong>: Toàn bộ tiến trình bị đóng băng trạng thái CPU. Container không tiêu thụ CPU nhưng vẫn giữ nguyên dung lượng RAM. Lệnh kích hoạt: <code>docker pause</code> / <code>docker unpause</code>.</li>
+                                    <li><strong>Deleted (Đã xóa)</strong>: Container bị hủy bỏ hoàn toàn khỏi ổ đĩa. Lệnh kích hoạt: <code>docker rm</code>.</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- Chapter 9: Dockerfile and Image Layers -->
+                    <section id="chapter-9" class="chapter-section">
+                        <h2>Chương 9: Dockerfile và Image Layers (Dockerfile & Image Layers)</h2>
+                        <div class="chapter-content">
+                            <p>Để tự động hóa quy trình đóng gói ứng dụng, Docker sử dụng <code>Dockerfile - tệp công thức build image</code>. Đây là một tệp văn bản chứa các chỉ thị tuần tự để xây dựng một <code>image (ảnh đóng gói)</code> hoàn chỉnh.</p>
+                            
+                            <p>Khi Docker build một image, mỗi chỉ thị trong Dockerfile sẽ tạo ra một <code>image layers - các lớp của image</code>. Các lớp này được xếp chồng lên nhau và có tính chất <strong>bất biến (layer immutability)</strong>. Khi một lớp đã được tạo ra, nó không bao giờ thay đổi. Nếu bạn sửa đổi mã nguồn hoặc cấu hình và build lại, Docker sẽ tái sử dụng các lớp cũ không thay đổi từ <strong>bộ nhớ đệm xây dựng (building cache)</strong>, giúp tăng tốc độ build đáng kể.</p>
+
+                            <div class="callout note">
+                                <div class="callout-body">
+                                    <div class="callout-title">Cơ chế Layer Immutability & Building Cache</div>
+                                    <div>
+                                        <p>Docker sử dụng hệ thống tệp tin dạng Union File System (UnionFS). Các <code>image layers - các lớp của image</code> là các lớp chỉ đọc (read-only layers). Khi chạy một <code>container (vùng chạy cô lập)</code>, Docker chỉ thêm một lớp mỏng cho phép ghi (read-write layer) ở trên cùng.</p>
+                                        <p>Trong quá trình build, nếu một chỉ thị không thay đổi và các tệp tin liên quan (được copy) không có sự biến động, Docker sẽ dùng lại lớp cache. Tuy nhiên, nếu một lớp bị thay đổi (ví dụ: code thay đổi làm chỉ thị COPY phát hiện sự khác biệt), toàn bộ các lớp phía sau nó sẽ bị mất cache và phải chạy lại từ đầu. Do đó, quy tắc vàng là đặt các chỉ thị ít thay đổi (như cài đặt thư viện) ở phía trên và các chỉ thị hay thay đổi (như copy mã nguồn) ở dưới cùng.</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <h3>Ví dụ Dockerfile hoàn chỉnh cho Python FastAPI</h3>
+                            <p>Dưới đây là một cấu trúc Dockerfile tối ưu cho ứng dụng FastAPI sử dụng <code>python:3.10-slim</code> làm base image:</p>
+
+                            <div class="code-panel">
+                                <div class="code-header">
+                                    <span class="code-lang">dockerfile</span>
+                                    <button class="copy-btn" onclick="copyCode(this, 'code-dockerfile-fastapi')">Copy</button>
+                                </div>
+                                <pre><code id="code-dockerfile-fastapi"># Use an official Python runtime as a parent image
+FROM python:3.10-slim
+
+# Set the working directory in the container
+WORKDIR /app
+
+# Set environment variables to prevent Python from writing pyc files and buffering stdout/stderr
+ENV PYTHONDONTWRITEBYTECODE=1
+ENV PYTHONUNBUFFERED=1
+
+# Define build-time argument for app version
+ARG APP_VERSION=1.0.0
+
+# Expose the port the app runs on
+EXPOSE 8000
+
+# Install system dependencies (build-essential for compiling C extensions if any)
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    build-essential \
+    && rm -rf /var/lib/apt/lists/*
+
+# Copy only the requirements file first to leverage build cache
+COPY requirements.txt .
+
+# Install Python packages
+RUN pip install --no-cache-dir -r requirements.txt
+
+# Copy the rest of the application code
+COPY . .
+
+# Set a mount point for app logs
+VOLUME /app/logs
+
+# Define default command to run the application using Uvicorn
+CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]</code></pre>
+                            </div>
+                            <p>Đoạn mã trên mô tả quy trình xây dựng image cho ứng dụng Python FastAPI, bắt đầu từ việc khai báo base image siêu nhẹ, thiết lập thư mục làm việc, cài đặt thư viện hệ thống và thư viện Python, sau đó sao chép toàn bộ mã nguồn và thiết lập câu lệnh khởi động ứng dụng web.</p>
+
+                            <h3>Giải thích chi tiết các chỉ thị Dockerfile chính:</h3>
+                            <ul>
+                                <li><strong>FROM</strong>: Chỉ định base image (ảnh đóng gói cơ sở) khởi đầu cho quá trình build. Mọi Dockerfile đều phải bắt đầu bằng lệnh này.</li>
+                                <li><strong>WORKDIR</strong>: Thiết lập thư mục làm việc mặc định bên trong <code>container (vùng chạy cô lập)</code>. Nếu thư mục chưa tồn tại, Docker sẽ tự động tạo ra.</li>
+                                <li><strong>COPY</strong>: Sao chép tệp tin hoặc thư mục từ hệ điều hành máy chủ vào trong hệ thống tệp tin của <code>container (vùng chạy cô lập)</code>.</li>
+                                <li><strong>RUN</strong>: Thực thi một câu lệnh trong quá trình build (ví dụ cài đặt gói phần mềm). Lệnh này sẽ tạo ra một lớp image mới chứa kết quả thực thi.</li>
+                                <li><strong>CMD</strong>: Chỉ định câu lệnh mặc định sẽ chạy khi <code>container (vùng chạy cô lập)</code> được khởi động. Chỉ có thể có một lệnh CMD trong Dockerfile, nếu khai báo nhiều thì lệnh cuối cùng sẽ đè lên các lệnh trước.</li>
+                                <li><strong>ENTRYPOINT</strong>: Cấu hình container chạy như một file thực thi. Các tham số truyền vào từ CLI sau lệnh chạy container sẽ được nối tiếp vào sau chỉ thị ENTRYPOINT.</li>
+                                <li><strong>EXPOSE</strong>: Khai báo cổng mà container sẽ lắng nghe khi chạy. Đây chỉ là một chỉ dẫn mang tính tài liệu (metadata), không tự động mở cổng ra máy host nếu không dùng cờ ánh xạ cổng.</li>
+                                <li><strong>ENV</strong>: Thiết lập các biến môi trường bên trong container. Các biến này có giá trị tồn tại cả trong lúc build lẫn lúc container đang chạy.</li>
+                                <li><strong>ARG</strong>: Định nghĩa các biến số chỉ được sử dụng trong quá trình build image. Người dùng có thể truyền giá trị cho biến này thông qua cờ <code>--build-arg</code> khi chạy lệnh build.</li>
+                                <li><strong>VOLUME</strong>: Tạo ra một điểm gắn kết (mount point) với hệ thống tệp tin bên ngoài để lưu trữ dữ liệu bền vững, độc lập với vòng đời của container.</li>
+                            </ul>
+                        </div>
+                    </section>
+
+                    <!-- Chapter 10: Persisting Data: Volumes and Bind Mounts -->
+                    <section id="chapter-10" class="chapter-section">
+                        <h2>Chương 10: Lưu trữ Dữ liệu Bền vững: Volumes và Bind Mounts</h2>
+                        <div class="chapter-content">
+                            <p>Theo mặc định, hệ thống lưu trữ bên trong một <code>container (vùng chạy cô lập)</code> là hệ thống lưu trữ tạm thời (ephemeral storage). Khi container bị xóa, toàn bộ dữ liệu được ghi trên lớp ghi (read-write layer) của nó sẽ biến mất vĩnh viễn. Để lưu trữ dữ liệu bền vững, Docker cung cấp hai giải pháp chính: <code>named volume - vùng lưu dữ liệu do Docker quản lý</code> và <code>bind mount - ánh xạ thư mục thật từ host</code>.</p>
+
+                            <h3>So sánh Named Volume và Bind Mount</h3>
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Đặc tính</th>
+                                        <th>Named Volume (Vùng lưu do Docker quản lý)</th>
+                                        <th>Bind Mount (Ánh xạ thư mục thật từ host)</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td><strong>Vị trí lưu trữ</strong></td>
+                                        <td>Docker quản lý trực tiếp trong phân vùng riêng trên ổ đĩa máy host (trên WSL2 là <code>/var/lib/docker/volumes/</code>).</td>
+                                        <td>Một đường dẫn cụ thể, tùy ý nằm trên hệ thống tệp tin của máy host (ví dụ: <code>/home/user/app</code>).</td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>Hiệu năng I/O</strong></td>
+                                        <td>Tối ưu nhất, đạt <code>input/output speed - tốc độ nhập/xuất</code> tối đa trên môi trường Linux/WSL2 ext4.</td>
+                                        <td>Chậm hơn nếu mount chéo từ Windows NTFS sang WSL2 Linux do giới hạn giao thức truyền tải.</td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>Mức độ cô lập</strong></td>
+                                        <td>Cô lập an toàn. Các tiến trình ngoài Docker khó can thiệp trực tiếp vào thư mục lưu trữ này.</td>
+                                        <td>Phụ thuộc hoàn toàn vào quyền truy cập tệp tin của hệ điều hành máy host. Dễ bị thay đổi ngoài ý muốn.</td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>Trường hợp sử dụng (Use Cases)</strong></td>
+                                        <td>Thích hợp cho cơ sở dữ liệu (PostgreSQL, MySQL) trong <code>production environment - môi trường vận hành</code> đòi hỏi an toàn và tốc độ I/O cao.</td>
+                                        <td>Cực kỳ hữu ích trong <code>development environment - môi trường phát triển</code> để mount mã nguồn từ máy host vào container, giúp áp dụng cơ chế cập nhật nóng (hot-reloading).</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+
+                            <h3>Sơ đồ Phân vùng Lưu trữ Dữ liệu (Storage Zones Diagram)</h3>
+                            <p>Dưới đây là sơ đồ minh họa cách dữ liệu được liên kết giữa máy host và hệ thống tệp tin của container:</p>
+
+                            <div class="mermaid">
+                            graph TD
+                                subgraph HostSystem["Host Filesystem (Windows/WSL2)"]
+                                    subgraph UserWorkspace["User Workspace Folder"]
+                                        SrcCode["Source Code (app.py, main.py)"]
+                                    end
+                                    subgraph DockerStorage["Docker Internal Storage (/var/lib/docker/)"]
+                                        VolStore["Named Volumes (db_data)"]
+                                    end
+                                end
+
+                                subgraph ContainerSystem["Container Filesystem Storage Zones"]
+                                    RWLayer["Temporary Read-Write Layer (Ephemeral)"]
+                                    TargetApp["/app (Mount Target)"]
+                                    TargetData["/var/lib/postgresql/data (Mount Target)"]
+                                end
+
+                                SrcCode -- "Bind Mount (-v /src:/app)" --> TargetApp
+                                VolStore -- "Volume Mount (--mount source=db_data,target=...)" --> TargetData
+                                RWLayer -.->|"Saves temporary files"| RWLayer
+                            </div>
+
+                            <h3>Các câu lệnh quản lý Volume</h3>
+                            <p>Mở terminal WSL2 và sử dụng các lệnh sau để quản lý các volume trong hệ thống:</p>
+
+                            <div class="code-panel">
+                                <div class="code-header">
+                                    <span class="code-lang">bash</span>
+                                    <button class="copy-btn" onclick="copyCode(this, 'code-volume-cmds')">Copy</button>
+                                </div>
+                                <pre><code id="code-volume-cmds"># 1. Liệt kê toàn bộ các volume đang có trên hệ thống
+docker volume ls
+
+# 2. Tạo một volume mới với tên tự chọn
+docker volume create my-db-data
+
+# 3. Xem thông tin cấu hình và đường dẫn chi tiết của volume
+docker volume inspect my-db-data
+
+# 4. Xóa một volume cụ thể (volume phải không được sử dụng bởi container nào)
+docker volume rm my-db-data
+
+# 5. Dọn dẹp và xóa sạch tất cả các volume không sử dụng để giải phóng đĩa
+docker volume prune</code></pre>
+                            </div>
+                            <p>Hệ lệnh trên cho phép kiểm tra danh sách vùng dữ liệu, khởi tạo vùng dữ liệu mới, truy xuất cấu hình đĩa chi tiết và dọn dẹp các phân vùng thừa để tối ưu bộ nhớ.</p>
+
+                            <h3>Cú pháp Mount dữ liệu: -v so với --mount</h3>
+                            <p>Để gắn kết dữ liệu vào container khi khởi chạy, Docker hỗ trợ hai cú pháp: <code>-v</code> (hoặc <code>--volume</code>) và <code>--mount</code>.</p>
+                            <ul>
+                                <li><strong>Cú pháp <code>-v</code> (viết tắt)</strong>: Kết hợp tất cả cấu hình trong một chuỗi ký tự phân cách bằng dấu hai chấm (ví dụ: <code>-v my-vol:/app/data</code>). Cú pháp này ngắn gọn nhưng dễ gây nhầm lẫn nếu đường dẫn chứa ký tự đặc biệt, và nếu volume chưa tồn tại Docker sẽ tự động tạo một thư mục trống cho bạn.</li>
+                                <li><strong>Cú pháp <code>--mount</code> (khuyên dùng)</strong>: Sử dụng các cặp khóa-giá trị (key-value) phân tách bằng dấu phẩy, giúp cú pháp trở nên tường minh, dễ đọc và dễ gỡ lỗi hơn. Nếu volume chỉ định không tồn tại, Docker sẽ báo lỗi ngay lập tức thay vì âm thầm tạo thư mục rác.</li>
+                            </ul>
+
+                            <div class="code-panel">
+                                <div class="code-header">
+                                    <span class="code-lang">bash</span>
+                                    <button class="copy-btn" onclick="copyCode(this, 'code-mount-syntax')">Copy</button>
+                                </div>
+                                <pre><code id="code-mount-syntax"># Khởi chạy container PostgreSQL sử dụng cú pháp --mount (Khuyên dùng)
+docker run -d \
+  --name production-postgres \
+  --mount type=volume,source=my-db-data,target=/var/lib/postgresql/data \
+  -e POSTGRES_PASSWORD=my_secure_password \
+  postgres:15-alpine
+
+# Khởi chạy container sử dụng cú pháp -v truyền thống
+docker run -d \
+  --name development-nginx \
+  -v /home/user/my-project:/usr/share/nginx/html \
+  nginx:alpine</code></pre>
+                            </div>
+                            <p>Khối mã trên thể hiện hai cách thức mount dữ liệu: sử dụng --mount tường minh để liên kết volume hệ thống vào container PostgreSQL và sử dụng -v để ánh xạ trực tiếp thư mục mã nguồn từ máy host vào container web server Nginx.</p>
+                        </div>
+                    </section>
+
+                    <!-- Chapter 11: Docker Networking -->
+                    <section id="chapter-11" class="chapter-section">
+                        <h2>Chương 11: Mạng trong Docker (Docker Networking)</h2>
+                        <div class="chapter-content">
+                            <p>Docker cung cấp cơ chế ảo hóa <code>network (mạng)</code> để các container có thể giao tiếp an toàn với nhau hoặc kết nối ra internet bên ngoài. Hiểu rõ kiến trúc mạng giúp bạn cấu hình chính xác cách kết nối giữa các thành phần ứng dụng.</p>
+
+                            <h3>Các Driver Mạng mặc định (Network Drivers)</h3>
+                            <ul>
+                                <li><strong>Bridge Network (Mạng cầu)</strong>: Đây là driver mạng mặc định. Khi bạn khởi chạy container mà không chỉ định mạng, nó sẽ kết nối vào mạng bridge mặc định. Các container trong mạng bridge này có thể kết nối internet nhưng chỉ có thể giao tiếp trực tiếp với nhau thông qua địa chỉ IP ảo nội bộ (thường có dạng <code>172.17.x.x</code>).</li>
+                                <li><strong>Host Network (Mạng máy chủ)</strong>: Gỡ bỏ toàn bộ sự cô lập về mạng giữa container và máy host. Container sẽ sử dụng trực tiếp card mạng và các cổng của máy host (ví dụ: container chạy ứng dụng lắng nghe cổng 80 sẽ xuất trực tiếp trên cổng 80 của máy host mà không cần cấu hình ánh xạ cổng).</li>
+                                <li><strong>None Network (Không dùng mạng)</strong>: Cô lập hoàn toàn container khỏi mọi kết nối mạng. Container sẽ không có card mạng ngoài loopback (localhost), thích hợp cho các tác vụ tính toán offline cần độ bảo mật cực cao.</li>
+                            </ul>
+
+                            <div class="callout note">
+                                <div class="callout-body">
+                                    <div class="callout-title">Sức mạnh của Custom Bridge Network & DNS Server tích hợp</div>
+                                    <div>
+                                        <p>Khi bạn tự tạo một mạng cầu tùy chỉnh (custom bridge network), Docker sẽ kích hoạt một <strong>DNS server nội bộ</strong>. DNS server này cho phép các container tự động nhận diện và phân giải tên miền (DNS resolution) dựa trên tên của container (container name) thay vì địa chỉ IP ảo.</p>
+                                        <p>Ví dụ: Bạn có container ứng dụng tên là <code>web-app</code> và container cơ sở dữ liệu tên là <code>db-server</code> cùng tham gia mạng <code>app-net</code>. Từ bên trong container <code>web-app</code>, bạn có thể kết nối trực tiếp đến database thông qua chuỗi kết nối <code>postgresql://db-server:5432</code> mà không cần biết IP của database là gì.</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <h3>Các câu lệnh quản lý Mạng</h3>
+                            <p>Sử dụng các câu lệnh sau để giám sát và thiết lập cấu hình mạng ảo:</p>
+
+                            <div class="code-panel">
+                                <div class="code-header">
+                                    <span class="code-lang">bash</span>
+                                    <button class="copy-btn" onclick="copyCode(this, 'code-network-cmds')">Copy</button>
+                                </div>
+                                <pre><code id="code-network-cmds"># 1. Liệt kê tất cả các mạng ảo đang tồn tại
+docker network ls
+
+# 2. Tạo một mạng cầu ảo tùy chỉnh mới
+docker network create my-custom-network
+
+# 3. Xem chi tiết thông tin mạng (bao gồm danh sách container đang kết nối)
+docker network inspect my-custom-network
+
+# 4. Xóa một mạng ảo tùy chỉnh khỏi hệ thống
+docker network rm my-custom-network</code></pre>
+                            </div>
+                            <p>Các lệnh trên giúp lập trình viên kiểm tra danh sách kết nối mạng, tạo phân vùng mạng độc lập, giám sát các container trong mạng và xóa bỏ các cấu hình mạng không còn sử dụng.</p>
+
+                            <h3>Ví dụ thực tế: Kết nối 2 container trên một Custom Network</h3>
+                            <p>Chúng ta sẽ thực hiện khởi chạy một container cơ sở dữ liệu PostgreSQL và một container ứng dụng Python kết nối với nhau thông qua mạng cầu tùy chỉnh:</p>
+
+                            <div class="code-panel">
+                                <div class="code-header">
+                                    <span class="code-lang">bash</span>
+                                    <button class="copy-btn" onclick="copyCode(this, 'code-network-example')">Copy</button>
+                                </div>
+                                <pre><code id="code-network-example"># Bước 1: Tạo mạng cầu ảo tùy chỉnh tên là 'app-bridge'
+docker network create app-bridge
+
+# Bước 2: Chạy container cơ sở dữ liệu PostgreSQL kết nối vào mạng 'app-bridge'
+docker run -d \
+  --name db-container \
+  --network app-bridge \
+  -e POSTGRES_USER=my_user \
+  -e POSTGRES_PASSWORD=my_secret_password \
+  -e POSTGRES_DB=app_db \
+  postgres:15-alpine
+
+# Bước 3: Chạy container ứng dụng Python kết nối vào cùng mạng 'app-bridge'
+# Lưu ý: Ứng dụng kết nối tới db qua host là 'db-container'
+docker run -it --rm \
+  --name app-container \
+  --network app-bridge \
+  python:3.10-slim \
+  python -c "import socket; print('Connected successfully!' if socket.create_connection(('db-container', 5432), timeout=5) else 'Failed')"</code></pre>
+                            </div>
+                            <p>Đoạn script trên tạo ra mạng cầu ảo tùy chỉnh, khởi chạy database Postgres trong mạng này, và sau đó chạy một container Python tạm thời để kiểm tra kết nối mạng đến Postgres bằng cách phân giải trực tiếp hostname <code>db-container</code>.</p>
+                        </div>
+                    </section>
+
+                    <!-- Chapter 12: Multi-container Applications -->
+                    <section id="chapter-12" class="chapter-section">
+                        <h2>Chương 12: Ứng dụng đa Container (Multi-container Applications)</h2>
+                        <div class="chapter-content">
+                            <p>Trong kiến trúc phần mềm hiện đại, việc đóng gói toàn bộ hệ thống (gồm mã nguồn ứng dụng, cơ sở dữ liệu, bộ nhớ đệm, hàng đợi công việc) vào trong một <code>container (vùng chạy cô lập)</code> duy nhất là một sai lầm nghiêm trọng (anti-pattern). Thay vào đó, chúng ta áp dụng mô hình thiết kế <strong>dịch vụ nhỏ tách biệt (decoupled microservices pattern)</strong>.</p>
+
+                            <div class="feature-card">
+                                <div class="feature-card-title">Nguyên tắc: Mỗi container chỉ chạy một tiến trình chính duy nhất</div>
+                                <p>Triết lý cốt lõi của Docker là "một container chịu trách nhiệm cho một tiến trình chính duy nhất" (one main process per container). Điều này mang lại những lợi ích vượt trội:</p>
+                                <ul>
+                                    <li><strong>Cô lập lỗi (Fault Isolation)</strong>: Nếu tiến trình ứng dụng web gặp lỗi rò rỉ bộ nhớ hoặc bị sập, tiến trình cơ sở dữ liệu chạy ở container khác vẫn hoàn toàn hoạt động bình thường, bảo toàn dữ liệu tránh bị hỏng hóc.</li>
+                                    <li><strong>Khả năng co giãn độc lập (Horizontal Scaling)</strong>: Khi lượng truy cập tăng cao, bạn có thể dễ dàng nhân bản (scale) ứng dụng web thành 5 hay 10 container chạy song song mà không cần phải nhân bản cơ sở dữ liệu - thành phần vốn tiêu tốn rất nhiều tài nguyên phần cứng.</li>
+                                    <li><strong>Tái sử dụng Image linh hoạt</strong>: Bạn có thể sử dụng các image cơ sở dữ liệu chuẩn hóa do nhà phát hành cung cấp trực tiếp trên Docker Hub (như PostgreSQL, Redis, Nginx) thay vì phải tự viết script cài đặt thủ công các dịch vụ này chồng chéo lên nhau.</li>
+                                    <li><strong>Quản lý nhật ký rõ ràng (Clean Logging)</strong>: Khi mỗi container chỉ có một tiến trình chính (PID 1), luồng stdout/stderr của container đó sẽ chỉ phản ánh duy nhất hoạt động của tiến trình này, giúp công tác theo dõi và xử lý lỗi (troubleshooting) cực kỳ dễ dàng.</li>
+                                </ul>
+                            </div>
+
+                            <p>Mặc dù việc phân tách các thành phần thành các container độc lập là tối ưu, thách thức đặt ra là làm thế nào để quản lý vòng đời, cấu hình mạng và lưu trữ của hàng loạt container này một cách đồng bộ. Việc gõ hàng chục dòng lệnh <code>docker run</code> thủ công cho mỗi lần khởi động hệ thống là không khả thi. Để giải quyết bài toán này, Docker cung cấp công cụ <strong>Docker Compose</strong>.</p>
+                        </div>
+                    </section>
+
+                    <!-- Chapter 13: Docker Compose -->
+                    <section id="chapter-13" class="chapter-section">
+                        <h2>Chương 13: Docker Compose - Quản lý Phối hợp Đa Container</h2>
+                        <div class="chapter-content">
+                            <p>Docker Compose là công cụ giúp bạn định nghĩa và khởi chạy hệ thống ứng dụng gồm nhiều <code>container (vùng chạy cô lập)</code> thông qua một tệp cấu hình duy nhất viết bằng ngôn ngữ YAML. Phiên bản hiện đại của Docker khuyến nghị sử dụng tên tệp là <code>compose.yaml</code> thay vì định dạng cũ <code>docker-compose.yml</code>.</p>
+
+                            <h3>Các thành phần cốt lõi của compose.yaml</h3>
+                            <ul>
+                                <li><strong>services (dịch vụ)</strong>: Định nghĩa các container mà bạn muốn khởi chạy. Mỗi dịch vụ sẽ chứa các thông tin cấu hình như build image, ports, environments, volumes và networks.</li>
+                                <li><strong>ports (cổng)</strong>: Thiết lập cấu hình <code>port mapping - ánh xạ cổng</code> từ máy host vào container.</li>
+                                <li><strong>environment (biến môi trường)</strong>: Khai báo các biến môi trường sẽ được truyền vào container khi khởi chạy.</li>
+                                <li><strong>volumes (vùng dữ liệu)</strong>: Khai báo các điểm gắn kết lưu trữ dữ liệu bền vững.</li>
+                                <li><strong>networks (mạng ảo)</strong>: Khấu hình các mạng cầu ảo chung để các dịch vụ có thể liên lạc với nhau.</li>
+                            </ul>
+
+                            <h3>Tệp compose.yaml hoàn chỉnh liên kết FastAPI và PostgreSQL</h3>
+                            <p>Dưới đây là một tệp cấu hình <code>compose.yaml</code> thực chiến, tích hợp ứng dụng FastAPI (từ Chương 9) và cơ sở dữ liệu PostgreSQL sử dụng volume bền vững và mạng cầu ảo:</p>
+
+                            <div class="code-panel">
+                                <div class="code-header">
+                                    <span class="code-lang">yaml</span>
+                                    <button class="copy-btn" onclick="copyCode(this, 'code-compose-yaml')">Copy</button>
+                                </div>
+                                <pre><code id="code-compose-yaml">services:
+  # Dịch vụ ứng dụng FastAPI (FastAPI Web Application service)
+  web-app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: fastapi-web-app
+    ports:
+      - "8000:8000"
+    environment:
+      - DATABASE_URL=postgresql://postgres_user:secure_pwd@db-service:5432/app_db
+    depends_on:
+      db-service:
+        condition: service_healthy
+    networks:
+      - app-network
+    volumes:
+      - .:/app
+
+  # Dịch vụ cơ sở dữ liệu PostgreSQL (PostgreSQL Database service)
+  db-service:
+    image: postgres:15-alpine
+    container_name: postgres-database
+    environment:
+      - POSTGRES_USER=postgres_user
+      - POSTGRES_PASSWORD=secure_pwd
+      - POSTGRES_DB=app_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - db-volume:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres_user -d app_db"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    networks:
+      - app-network
+
+# Định nghĩa volume lưu trữ bền vững ngoài container (Persistent volume definition)
+volumes:
+  db-volume:
+    name: pg_app_data
+
+# Định nghĩa mạng cầu ảo nội bộ (Internal bridge network definition)
+networks:
+  app-network:
+    driver: bridge</code></pre>
+                            </div>
+                            <p>Tệp tin YAML trên định nghĩa hệ thống gồm hai dịch vụ: dịch vụ web-app được tự động build từ mã nguồn local và lắng nghe cổng 8000, dịch vụ db-service sử dụng ảnh đóng gói PostgreSQL chính thức, cấu hình phân vùng dữ liệu bền vững và kết nối chung qua một mạng cầu ảo.</p>
+
+                            <h3>Giải thích chi tiết từng dòng cấu hình (Line-by-line Annotations)</h3>
+                            <ul>
+                                <li><code>services:</code>: Bắt đầu khai báo danh sách các container thành phần trong hệ thống.</li>
+                                <li><code>web-app:</code>: Tên của dịch vụ thứ nhất (ứng dụng FastAPI). Tên này cũng đóng vai trò là một hostname nội bộ.</li>
+                                <li><code>build:</code>: Cấu hình build image từ Dockerfile cục bộ. <code>context: .</code> nghĩa là thư mục hiện tại, và <code>dockerfile: Dockerfile</code> là tên file công thức.</li>
+                                <li><code>ports: - "8000:8000"</code>: Ánh xạ cổng 8000 trên máy host vào cổng 8000 của container <code>web-app</code>.</li>
+                                <li><code>environment:</code>: Khai báo biến môi trường. Biến <code>DATABASE_URL</code> sử dụng hostname <code>db-service</code> để kết nối tới database.</li>
+                                <li><code>depends_on: db-service: condition: service_healthy</code>: 
+                                    <p><strong>Cơ chế quan trọng:</strong> Mặc định, <code>depends_on</code> chỉ đảm bảo Docker Engine sẽ khởi chạy container <code>db-service</code> trước container <code>web-app</code> về mặt tiến trình, chứ <em>không</em> đảm bảo cơ sở dữ liệu bên trong đã hoàn tất khởi tạo và sẵn sàng (ready) nhận kết nối. Điều này thường dẫn đến việc ứng dụng web bị lỗi kết nối và sập ngay khi khởi động.</p>
+                                    <p>Bằng cách sử dụng cú pháp mở rộng với điều kiện <code>condition: service_healthy</code> kết hợp với cấu hình <code>healthcheck</code> trong <code>db-service</code>, Docker Compose sẽ đảm bảo container <code>web-app</code> chỉ thực sự được khởi chạy khi cơ sở dữ liệu đã báo cáo trạng thái hoàn toàn sẵn sàng nhận kết nối.</p>
+                                </li>
+                                <li><code>volumes: - .:/app</code>: Thực hiện <code>bind mount - ánh xạ thư mục thật từ host</code> từ thư mục hiện tại trên host vào thư mục <code>/app</code> trong container, giúp đồng bộ mã nguồn để phát triển hot-reloading.</li>
+                                <li><code>db-service:</code>: Tên dịch vụ thứ hai (PostgreSQL).</li>
+                                <li><code>image: postgres:15-alpine</code>: Thay vì build từ Dockerfile, Docker sẽ tải trực tiếp image Postgres siêu nhẹ từ Docker Hub.</li>
+                                <li><code>volumes: - db-volume:/var/lib/postgresql/data</code>: Mount <code>named volume - vùng lưu dữ liệu do Docker quản lý</code> tên là <code>db-volume</code> vào thư mục lưu trữ dữ liệu mặc định của Postgres bên trong container để bảo toàn dữ liệu database.</li>
+                                <li><code>volumes: db-volume: name: pg_app_data</code>: Khai báo với Docker Engine tạo và quản lý một volume vật lý bền vững có tên là <code>pg_app_data</code>.</li>
+                                <li><code>networks: app-network: driver: bridge</code>: Khởi tạo mạng cầu ảo tùy chỉnh tên là <code>app-network</code> sử dụng driver bridge mặc định.</li>
+                            </ul>
+
+                            <div class="callout note">
+                                <div class="callout-body">
+                                    <div class="callout-title">Các câu lệnh điều khiển Docker Compose cơ bản</div>
+                                    <div>
+                                        <p>Mở terminal tại thư mục chứa file <code>compose.yaml</code> và thực thi:</p>
+                                        <ul>
+                                            <li><code>docker compose up -d</code>: Khởi tạo và chạy toàn bộ hệ thống ở chế độ chạy ngầm (detached mode).</li>
+                                            <li><code>docker compose ps</code>: Xem trạng thái hoạt động của các container do compose quản lý.</li>
+                                            <li><code>docker compose logs -f</code>: Theo dõi luồng logs tổng hợp từ tất cả các container trong thời gian thực.</li>
+                                            <li><code>docker compose down</code>: Dừng và xóa sạch các container, mạng ảo được tạo bởi compose (nhưng giữ nguyên dữ liệu trong volume).</li>
+                                            <li><code>docker compose down -v</code>: Dừng hệ thống đồng thời xóa sạch toàn bộ các container và cả các volume dữ liệu đi kèm.</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- Chapter 14: Workflow for Beginners -->
+                    <section id="chapter-14" class="chapter-section">
+                        <h2>Chương 14: Quy trình làm việc cho người mới bắt đầu (Workflow for Beginners)</h2>
+                        <div class="chapter-content">
+                            <p>Để giúp những người mới bắt đầu có một quy trình phát triển phần mềm mượt mà, hiệu quả và không gặp lỗi trên môi trường Windows + WSL2, dưới đây là luồng làm việc thực tế được tối ưu hóa:</p>
+
+                            <ol>
+                                <li>
+                                    <strong>Lập trình Cục bộ (Local Coding) trên WSL2</strong>:
+                                    <p>Tạo thư mục dự án của bạn nằm hoàn toàn trong hệ thống tệp tin gốc của Linux WSL2 (ví dụ: <code>~/projects/my-web-app/</code>). Mở dự án bằng VS Code từ Windows thông qua tích hợp WSL. Viết mã nguồn ứng dụng của bạn (ví dụ: file <code>main.py</code> của FastAPI).</p>
+                                </li>
+                                <li>
+                                    <strong>Thiết lập Dockerfile (Dockerfile Setup)</strong>:
+                                    <p>Viết một <code>Dockerfile - tệp công thức build image</code> tối ưu nằm ở gốc dự án. Định nghĩa cách thức cài đặt môi trường chạy ứng dụng, khai báo cổng, và lệnh khởi chạy máy chủ phát triển (ví dụ: chạy Uvicorn với flag <code>--reload</code>).</p>
+                                </li>
+                                <li>
+                                    <strong>Định nghĩa Compose (Compose Definition)</strong>:
+                                    <p>Tạo tệp <code>compose.yaml</code> ở gốc dự án để mô tả mối liên kết giữa ứng dụng web và cơ sở dữ liệu. Sử dụng <code>named volume - vùng lưu dữ liệu do Docker quản lý</code> cho dữ liệu PostgreSQL để đảm bảo hiệu năng I/O tốt nhất.</p>
+                                </li>
+                                <li>
+                                    <strong>Cấu hình cập nhật nóng bằng Bind Mounts (Hot-reloading with Bind Mounts)</strong>:
+                                    <p>Trong tệp <code>compose.yaml</code>, tại cấu hình của dịch vụ ứng dụng web, hãy ánh xạ thư mục hiện tại của máy host vào thư mục làm việc của container (ví dụ: <code>- .:/app</code>). Vì tệp tin được liên kết trực tiếp, khi bạn chỉnh sửa và lưu tệp code trong VS Code trên Windows, các thay đổi sẽ ngay lập tức xuất hiện bên trong container. Máy chủ Uvicorn phát hiện thay đổi và reload ứng dụng trong tích tắc mà không cần bạn phải build lại image.</p>
+                                </li>
+                            </ol>
+
+                            <div class="callout important">
+                                <div class="callout-icon">💡</div>
+                                <div class="callout-body">
+                                    <div class="callout-title">Quy trình vận hành hàng ngày (Daily Run Loop)</div>
+                                    <div>
+                                        <ol>
+                                            <li>Bật Docker Desktop trên Windows.</li>
+                                            <li>Mở terminal Ubuntu WSL2, di chuyển tới thư mục dự án: <code>cd ~/projects/my-web-app/</code>.</li>
+                                            <li>Chạy hệ thống lên: <code>docker compose up -d</code>.</li>
+                                            <li>Lập trình mã nguồn thoải mái trên VS Code, lưu file và kiểm tra kết quả ngay lập tức trên trình duyệt tại địa chỉ <code>http://localhost:8000</code>.</li>
+                                            <li>Kết thúc buổi làm việc, tắt hệ thống để giải phóng tài nguyên máy tính: <code>docker compose down</code>.</li>
+                                        </ol>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- Chapter 15: Best Practices -->
+                    <section id="chapter-15" class="chapter-section">
+                        <h2>Chương 15: Các thực hành tốt nhất (Best Practices)</h2>
+                        <div class="chapter-content">
+                            <p>Khi phát triển ứng dụng bằng Docker, việc viết một <code>Dockerfile - tệp công thức build image</code> tối ưu là tối quan trọng. Điều này giúp tăng tốc độ build, giảm thiểu băng thông mạng khi pull/push và nâng cao tính bảo mật cho hệ thống. Dưới đây là 5 quy tắc thực tế vàng để tối ưu hóa:</p>
+
+                            <ol>
+                                <li>
+                                    <strong>Giảm thiểu số lượng lớp layer (minimizing layers - giảm thiểu số lượng lớp)</strong>:
+                                    <p>Mỗi chỉ lệnh trong Dockerfile như <code>RUN</code>, <code>COPY</code>, và <code>ADD</code> sẽ tạo ra một <code>layer (lớp)</code> vật lý mới. Càng nhiều lớp, dung lượng và thời gian tải của <code>image (ảnh đóng gói)</code> càng tăng. Hãy gộp các câu lệnh cài đặt hệ thống có liên quan lại với nhau bằng các ký tự nối lệnh <code>&&</code> và ngắt dòng <code>\</code>.</p>
+                                </li>
+                                <li>
+                                    <strong>Sử dụng tệp .dockerignore (dockerignore file - tệp tin loại trừ khi build)</strong>:
+                                    <p>Tương tự như <code>.gitignore</code>, tệp tin này định nghĩa các đường dẫn thư mục và tệp tin cục bộ mà bạn không muốn gửi vào <code>build context - ngữ cảnh xây dựng</code> của Docker Engine. Việc loại bỏ các thư mục nặng như <code>node_modules</code>, <code>.git</code>, hoặc <code>.venv</code> sẽ giúp quá trình gửi dữ liệu lên Docker Daemon diễn ra trong nháy mắt.</p>
+                                </li>
+                                <li>
+                                    <strong>Tách biệt bí mật/khóa API khỏi image (separating secrets/API keys from images - tách biệt thông tin nhạy cảm khỏi ảnh đóng gói)</strong>:
+                                    <p>Tuyệt đối không lưu trữ cứng (hardcode) mật khẩu, token, hoặc API key bên trong Dockerfile hoặc mã nguồn của image. Điều này có thể dẫn đến việc lộ lọt thông tin nhạy cảm khi chia sẻ image công khai. Hãy sử dụng <code>environment variables - biến môi trường</code> được định nghĩa bên ngoài hoặc cơ chế Docker Secrets để nạp chúng vào runtime của <code>container (vùng chạy cô lập)</code>.</p>
+                                </li>
+                                <li>
+                                    <strong>Sử dụng các image cơ sở siêu nhẹ (using slim base images - sử dụng các ảnh nền tối giản)</strong>:
+                                    <p>Tránh sử dụng các image nền mặc định quá cồng kềnh nếu không cần thiết. Thay vì dùng image <code>python:3.10</code> đầy đủ (dung lượng thô lên tới hơn 900MB), hãy cân nhắc các phiên bản tối giản như <code>python:3.10-slim</code> (chỉ khoảng 120MB) hoặc <code>python:3.10-alpine</code> (dưới 50MB) để hạn chế tối đa các lỗ hổng bảo mật tiềm ẩn và tăng tốc độ tải.</p>
+                                </li>
+                                <li>
+                                    <strong>Tối ưu hóa thứ tự các lớp để tái sử dụng cache (optimizing layer order for cache reuse - tối ưu thứ tự các lớp để sử dụng lại bộ nhớ đệm)</strong>:
+                                    <p>Docker xây dựng image từ trên xuống dưới và sẽ sử dụng lại <code>build cache - bộ nhớ đệm xây dựng</code> cho các dòng lệnh chưa thay đổi. Hãy đặt các bước ít thay đổi (ví dụ: khai báo thư mục làm việc, cài đặt dependencies hệ thống) lên trên cùng, và đặt các bước thường xuyên thay đổi (ví dụ: sao chép mã nguồn ứng dụng liên tục được chỉnh sửa) ở dưới cùng.</p>
+                                </li>
+                            </ol>
+
+                            <div class="callout note">
+                                <div class="callout-icon">💡</div>
+                                <div class="callout-body">
+                                    <div class="callout-title">So sánh cấu trúc Dockerfile: Chưa tối ưu vs Đã tối ưu</div>
+                                    <div>
+                                        <p>Dưới đây là sự khác biệt trực quan giữa cách viết Dockerfile của người mới bắt đầu (chưa tối ưu) và kỹ sư có kinh nghiệm (đã tối ưu):</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <h4>1. Ví dụ Dockerfile chưa tối ưu (Unoptimized Dockerfile)</h4>
+                            <div class="code-panel">
+                                <div class="code-header">
+                                    <span class="code-lang">dockerfile</span>
+                                    <button class="copy-btn" onclick="copyCode(this, 'code-dockerfile-unoptimized')">Copy</button>
+                                </div>
+                                <pre><code id="code-dockerfile-unoptimized">FROM python:3.10
+# Copy all project files first (including codebase and node_modules)
+COPY . /app
+WORKDIR /app
+# Installing dependencies runs every time codebase changes because cache is busted
+RUN pip install -r requirements.txt
+CMD ["python", "app.py"]</code></pre>
+                            </div>
+                            <p>Đoạn mã trên thể hiện một Dockerfile chưa tối ưu vì sử dụng base image gốc dung lượng lớn và thực hiện copy toàn bộ tệp nguồn trước khi cài đặt dependencies, khiến build cache bị mất tác dụng mỗi khi chỉnh sửa code.</p>
+
+                            <h4>2. Ví dụ Dockerfile đã tối ưu (Optimized Dockerfile)</h4>
+                            <div class="code-panel">
+                                <div class="code-header">
+                                    <span class="code-lang">dockerfile</span>
+                                    <button class="copy-btn" onclick="copyCode(this, 'code-dockerfile-optimized')">Copy</button>
+                                </div>
+                                <pre><code id="code-dockerfile-optimized">FROM python:3.10-slim
+WORKDIR /app
+# Copy only dependencies file first to leverage caching
+COPY requirements.txt .
+# Run pip install without caching local packages downloaded to reduce image size
+RUN pip install --no-cache-dir -r requirements.txt
+# Copy the rest of the application files (highly volatile)
+COPY . .
+CMD ["python", "app.py"]</code></pre>
+                            </div>
+                            <p>Đoạn mã trên thể hiện Dockerfile đã tối ưu sử dụng base image siêu nhẹ và chia nhỏ quá trình sao chép để tận dụng tối đa build cache của các lớp thư viện độc lập.</p>
+                        </div>
+                    </section>
+
+                    <!-- Chapter 16: Common Errors and How to Read Them -->
+                    <section id="chapter-16" class="chapter-section">
+                        <h2>Chương 16: Các lỗi thường gặp và cách xử lý (Common Errors and How to Read Them)</h2>
+                        <div class="chapter-content">
+                            <p>Dưới đây là 5 lỗi kinh điển mà bất kỳ người mới bắt đầu nào trên môi trường Windows và WSL2 cũng sẽ gặp phải ít nhất một lần. Hãy học cách đọc thông báo lỗi và xử lý chúng một cách nhanh chóng:</p>
+
+                            <div class="accordion">
+                                <div class="accordion-header">
+                                    <span>Lỗi 1: Xung đột cấp phát cổng (port is already allocated - cổng đã được cấp phát)</span>
+                                    <span class="accordion-icon">▼</span>
+                                </div>
+                                <div class="accordion-content">
+                                    <p><strong>Thông báo lỗi đặc trưng:</strong></p>
+                                    <p><code>Error response from daemon: Ports are not available: exposing port TCP 0.0.0.0:8080 -> 0.0.0.0:0: listen tcp 0.0.0.0:8080: bind: address already in use</code></p>
+                                    
+                                    <p><strong>Nguyên nhân:</strong></p>
+                                    <p>Cổng mạng trên máy host Windows mà bạn muốn ánh xạ vào container đang bị một ứng dụng khác (như SQL Server cài trực tiếp, máy chủ web IIS hoặc một container cũ chạy ngầm) chiếm quyền sử dụng.</p>
+                                    
+                                    <p><strong>Cách khắc phục:</strong></p>
+                                    <p>1. Tìm ra tiến trình đang chiếm dụng cổng trên Windows bằng Command Prompt (CMD) với quyền Administrator:</p>
+                                    <div class="code-panel">
+                                        <div class="code-header">
+                                            <span class="code-lang">cmd</span>
+                                            <button class="copy-btn" onclick="copyCode(this, 'code-error-port-check')">Copy</button>
+                                        </div>
+                                        <pre><code id="code-error-port-check">netstat -ano | findstr :8080</code></pre>
+                                    </div>
+                                    <p>Lệnh trên thực hiện tìm kiếm mã định danh PID của tiến trình đang lắng nghe tại cổng 8080 trên Windows.</p>
+                                    
+                                    <p>2. Dừng tiến trình đó thông qua Task Manager hoặc đổi cổng ánh xạ bên ngoài của container sang cổng khác trống hơn (ví dụ sửa từ <code>-p 8080:80</code> thành <code>-p 8081:80</code>).</p>
+                                </div>
+                            </div>
+
+                            <div class="accordion">
+                                <div class="accordion-header">
+                                    <span>Lỗi 2: Không thể kết nối tới Docker daemon (cannot connect to the Docker daemon - không thể kết nối tới trình nền quản lý Docker)</span>
+                                    <span class="accordion-icon">▼</span>
+                                </div>
+                                <div class="accordion-content">
+                                    <p><strong>Thông báo lỗi đặc trưng:</strong></p>
+                                    <p><code>Cannot connect to the Docker daemon at unix:///var/run/docker.sock. Is the docker daemon running?</code></p>
+                                    
+                                    <p><strong>Nguyên nhân:</strong></p>
+                                    <p>Docker CLI trên môi trường WSL2 không thể tìm thấy hoặc giao tiếp với dịch vụ nền Docker Engine. Điều này xảy ra do Docker Desktop trên Windows chưa khởi động, hoặc cấu hình đồng bộ hóa môi trường giữa Windows và WSL2 bị tắt.</p>
+                                    
+                                    <p><strong>Cách khắc phục:</strong></p>
+                                    <ul>
+                                        <li>Đảm bảo ứng dụng <strong>Docker Desktop</strong> trên Windows đang chạy (biểu tượng cá voi ở khay hệ thống sáng màu xanh lá).</li>
+                                        <li>Mở Docker Desktop > click vào biểu tượng bánh răng <strong>Settings</strong> > chọn mục <strong>Resources</strong> > <strong>WSL Integration</strong> và đảm bảo rằng bản phân phối Ubuntu của bạn đã được gạt nút bật (Enabled).</li>
+                                        <li>Khởi động lại dịch vụ Docker Desktop nếu cần thiết.</li>
+                                    </ul>
+                                </div>
+                            </div>
+
+                            <div class="accordion">
+                                <div class="accordion-header">
+                                    <span>Lỗi 3: Container dừng ngay lập tức sau khi khởi chạy (container exits immediately upon starting - vùng chạy cô lập thoát ngay lập tức khi khởi chạy)</span>
+                                    <span class="accordion-icon">▼</span>
+                                </div>
+                                <div class="accordion-content">
+                                    <p><strong>Dấu hiệu:</strong></p>
+                                    <p>Bạn chạy lệnh <code>docker run -d my-app</code>, hệ thống trả về mã hash container, nhưng khi chạy lệnh <code>docker ps</code> thì danh sách trống rỗng. Chạy <code>docker ps -a</code> thì thấy container có trạng thái <code>Exited (1)</code> hoặc <code>Exited (0)</code>.</p>
+                                    
+                                    <p><strong>Nguyên nhân:</strong></p>
+                                    <ul>
+                                        <li>Ứng dụng chính được chỉ định ở lệnh <code>CMD</code> hoặc <code>ENTRYPOINT</code> gặp lỗi nghiêm trọng (crash) khi khởi động (lỗi code, thiếu biến môi trường, lỗi kết nối DB).</li>
+                                        <li>Container không có một tiến trình chạy nền liên tục (foreground service), dẫn đến việc Docker Engine tự động tắt container vì coi như nhiệm vụ đã hoàn thành.</li>
+                                    </ul>
+                                    
+                                    <p><strong>Cách khắc phục:</strong></p>
+                                    <p>1. Xem log lỗi đầu ra của container bị dừng để xác định nguyên nhân chi tiết:</p>
+                                    <div class="code-panel">
+                                        <div class="code-header">
+                                            <span class="code-lang">bash</span>
+                                            <button class="copy-btn" onclick="copyCode(this, 'code-error-logs')">Copy</button>
+                                        </div>
+                                        <pre><code id="code-error-logs">docker logs &lt;container_id_or_name&gt;</code></pre>
+                                    </div>
+                                    <p>Lệnh trên hiển thị toàn bộ nhật ký ghi nhận từ luồng ra tiêu chuẩn stdout/stderr của container đã thoát.</p>
+                                    
+                                    <p>2. Đảm bảo cấu hình biến môi trường chính xác trong tệp tin Compose hoặc lệnh chạy. Nếu bạn chỉ muốn chạy một hệ điều hành trống để tương tác thử nghiệm, hãy bật chế độ tương tác bằng cờ <code>-it</code> (ví dụ: <code>docker run -it ubuntu bash</code>).</p>
+                                </div>
+                            </div>
+
+                            <div class="accordion">
+                                <div class="accordion-header">
+                                    <span>Lỗi 4: Từ chối quyền truy cập socket trên Linux/WSL2 (permission denied on Linux socket/WSL2 - từ chối quyền truy cập socket trên Linux/WSL2)</span>
+                                    <span class="accordion-icon">▼</span>
+                                </div>
+                                <div class="accordion-content">
+                                    <p><strong>Thông báo lỗi đặc trưng:</strong></p>
+                                    <p><code>permission denied while trying to connect to the Docker daemon socket at unix:///var/run/docker.sock</code></p>
+                                    
+                                    <p><strong>Nguyên nhân:</strong></p>
+                                    <p>Tệp tin socket giao tiếp của Docker nằm tại đường dẫn <code>/var/run/docker.sock</code> yêu cầu quyền quản trị root để truy cập. User thông thường trên Ubuntu WSL2 không có quyền ghi vào tệp này nếu không nằm trong nhóm người dùng <code>docker</code>.</p>
+                                    
+                                    <p><strong>Cách khắc phục:</strong></p>
+                                    <p>1. Thêm tài khoản người dùng hiện tại của bạn vào nhóm đặc quyền <code>docker</code> trên môi trường WSL2:</p>
+                                    <div class="code-panel">
+                                        <div class="code-header">
+                                            <span class="code-lang">bash</span>
+                                            <button class="copy-btn" onclick="copyCode(this, 'code-error-wsl2-perm')">Copy</button>
+                                        </div>
+                                        <pre><code id="code-error-wsl2-perm">sudo usermod -aG docker $USER</code></pre>
+                                    </div>
+                                    <p>Lệnh trên thực hiện thêm tài khoản người dùng WSL2 hiện tại vào nhóm quản lý docker để không cần dùng lệnh sudo mỗi khi tương tác.</p>
+                                    
+                                    <p>2. Cập nhật nhóm quyền mới ngay lập tức mà không cần đăng nhập lại:</p>
+                                    <div class="code-panel">
+                                        <div class="code-header">
+                                            <span class="code-lang">bash</span>
+                                            <button class="copy-btn" onclick="copyCode(this, 'code-error-newgrp')">Copy</button>
+                                        </div>
+                                        <pre><code id="code-error-newgrp">newgrp docker</code></pre>
+                                    </div>
+                                    <p>Lệnh trên áp dụng ngay lập tức nhóm quyền mới cho phiên làm việc hiện tại của terminal.</p>
+                                </div>
+                            </div>
+
+                            <div class="accordion">
+                                <div class="accordion-header">
+                                    <span>Lỗi 5: Dữ liệu biến mất sau khi xóa container (data disappeared after container removal - dữ liệu biến mất sau khi xóa vùng chạy cô lập)</span>
+                                    <span class="accordion-icon">▼</span>
+                                </div>
+                                <div class="accordion-content">
+                                    <p><strong>Dấu hiệu:</strong></p>
+                                    <p>Dữ liệu cơ sở dữ liệu (ví dụ: bảng MySQL, bài đăng ứng dụng) hoàn toàn biến mất sau khi bạn thực hiện xóa container cũ để nâng cấp phiên bản mới.</p>
+                                    
+                                    <p><strong>Nguyên nhân:</strong></p>
+                                    <p>Bạn đã không ánh xạ dữ liệu ra ngoài máy host mà ghi trực tiếp dữ liệu vào <code>writable layer - lớp ghi được</code> tạm thời của container. Khi container bị xóa bằng lệnh <code>docker rm</code>, lớp ghi tạm này sẽ bị hệ thống dọn sạch hoàn toàn.</p>
+                                    
+                                    <p><strong>Cách khắc phục:</strong></p>
+                                    <p>Sử dụng cơ chế lưu trữ bền vững <code>volume (vùng lưu dữ liệu)</code> hoặc <code>bind mount - liên kết thư mục</code> để tách biệt vòng đời dữ liệu khỏi vòng đời của container. Ví dụ cấu hình trong tệp tin <code>compose.yaml</code>:</p>
+                                    <div class="code-panel">
+                                        <div class="code-header">
+                                            <span class="code-lang">yaml</span>
+                                            <button class="copy-btn" onclick="copyCode(this, 'code-error-volume-compose')">Copy</button>
+                                        </div>
+                                        <pre><code id="code-error-volume-compose">services:
+  db:
+    image: postgres:15-alpine
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+volumes:
+  pgdata:</code></pre>
+                                    </div>
+                                    <p>Đoạn mã trên định nghĩa một <code>named volume - vùng lưu dữ liệu do Docker quản lý</code> có tên là pgdata liên kết trực tiếp vào thư mục lưu trữ cốt lõi của PostgreSQL bên trong container, đảm bảo dữ liệu không bị xóa bỏ khi container được nâng cấp hoặc làm mới.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- Chapter 17: Command Cheat Sheet -->
+                    <section id="chapter-17" class="chapter-section">
+                        <h2>Chương 17: Bảng tra cứu lệnh nhanh (Command Cheat Sheet)</h2>
+                        <div class="chapter-content">
+                            <p>Dưới đây là cẩm nang tra cứu nhanh các câu lệnh Docker phổ biến nhất được phân loại theo từng nhóm đối tượng tài nguyên cụ thể để giúp bạn thao tác nhanh chóng trên terminal:</p>
+
+                            <h3>1. Quản lý Image (Image Management)</h3>
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Câu lệnh (Command)</th>
+                                        <th>Ý nghĩa & Giải thích tiếng Việt</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td><code>docker build -t &lt;name&gt;:&lt;tag&gt; .</code></td>
+                                        <td>Xây dựng một <code>image (ảnh đóng gói)</code> mới từ <code>Dockerfile - tệp công thức build image</code> nằm ở thư mục hiện tại.</td>
+                                    </tr>
+                                    <tr>
+                                        <td><code>docker images</code></td>
+                                        <td>Liệt kê toàn bộ các <code>image (ảnh đóng gói)</code> hiện đang lưu trữ trên máy host.</td>
+                                    </tr>
+                                    <tr>
+                                        <td><code>docker rmi &lt;image_id&gt;</code></td>
+                                        <td>Xóa bỏ một <code>image (ảnh đóng gói)</code> khỏi ổ cứng máy host (chỉ thực hiện được khi không có container nào đang sử dụng image này).</td>
+                                    </tr>
+                                    <tr>
+                                        <td><code>docker pull &lt;image_name&gt;</code></td>
+                                        <td>Tải một <code>image (ảnh đóng gói)</code> từ <code>registry (kho lưu trữ)</code> Docker Hub về bộ lưu trữ cục bộ.</td>
+                                    </tr>
+                                    <tr>
+                                        <td><code>docker image prune</code></td>
+                                        <td>Xóa sạch toàn bộ các <code>image (ảnh đóng gói)</code> rác không còn được gắn thẻ tag (dangling images).</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+
+                            <h3>2. Quản lý Container (Container Management)</h3>
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Câu lệnh (Command)</th>
+                                        <th>Ý nghĩa & Giải thích tiếng Việt</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td><code>docker run -d -p &lt;host_port&gt;:&lt;container_port&gt; --name &lt;name&gt; &lt;image&gt;</code></td>
+                                        <td>Tạo mới và khởi chạy một <code>container (vùng chạy cô lập)</code> từ <code>image (ảnh đóng gói)</code> ở chế độ chạy ngầm (detached mode) và chuyển tiếp cổng.</td>
+                                    </tr>
+                                    <tr>
+                                        <td><code>docker ps</code></td>
+                                        <td>Liệt kê danh sách các <code>container (vùng chạy cô lập)</code> đang ở trạng thái hoạt động (running).</td>
+                                    </tr>
+                                    <tr>
+                                        <td><code>docker ps -a</code></td>
+                                        <td>Hiển thị toàn bộ danh sách <code>container (vùng chạy cô lập)</code> trong hệ thống bao gồm cả các container đã dừng.</td>
+                                    </tr>
+                                    <tr>
+                                        <td><code>docker stop &lt;container_id&gt;</code></td>
+                                        <td>Gửi tín hiệu dừng an toàn tới một <code>container (vùng chạy cô lập)</code> đang chạy.</td>
+                                    </tr>
+                                    <tr>
+                                        <td><code>docker rm &lt;container_id&gt;</code></td>
+                                        <td>Xóa bỏ vĩnh viễn một <code>container (vùng chạy cô lập)</code> đã dừng hoạt động.</td>
+                                    </tr>
+                                    <tr>
+                                        <td><code>docker logs &lt;container_id&gt;</code></td>
+                                        <td>Xem toàn bộ thông tin logs đầu ra ghi nhận từ container.</td>
+                                    </tr>
+                                    <tr>
+                                        <td><code>docker exec -it &lt;container_id&gt; bash</code></td>
+                                        <td>Truy cập trực tiếp vào <code>interactive mode - chế độ tương tác</code> dòng lệnh bash bên trong container đang chạy.</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+
+                            <h3>3. Quản lý Volume (Volume Management)</h3>
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Câu lệnh (Command)</th>
+                                        <th>Ý nghĩa & Giải thích tiếng Việt</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td><code>docker volume create &lt;volume_name&gt;</code></td>
+                                        <td>Khởi tạo một <code>volume (vùng lưu dữ liệu)</code> hoàn toàn mới do Docker quản lý.</td>
+                                    </tr>
+                                    <tr>
+                                        <td><code>docker volume ls</code></td>
+                                        <td>Liệt kê toàn bộ các <code>volume (vùng lưu dữ liệu)</code> hiện có trên máy host.</td>
+                                    </tr>
+                                    <tr>
+                                        <td><code>docker volume inspect &lt;volume_name&gt;</code></td>
+                                        <td>Xem thông tin chi tiết cấu hình và đường dẫn lưu trữ vật lý của <code>volume (vùng lưu dữ liệu)</code>.</td>
+                                    </tr>
+                                    <tr>
+                                        <td><code>docker volume rm &lt;volume_name&gt;</code></td>
+                                        <td>Xóa bỏ một <code>volume (vùng lưu dữ liệu)</code> không còn sử dụng.</td>
+                                    </tr>
+                                    <tr>
+                                        <td><code>docker volume prune</code></td>
+                                        <td>Xóa sạch toàn bộ các <code>volume (vùng lưu dữ liệu)</code> mồ côi (không liên kết với bất kỳ container nào) để giải phóng ổ cứng.</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+
+                            <h3>4. Quản lý Network (Network Management)</h3>
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Câu lệnh (Command)</th>
+                                        <th>Ý nghĩa & Giải thích tiếng Việt</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td><code>docker network create &lt;network_name&gt;</code></td>
+                                        <td>Khởi tạo một <code>network (mạng)</code> ảo cục bộ để các container tự do kết nối và giao tiếp.</td>
+                                    </tr>
+                                    <tr>
+                                        <td><code>docker network ls</code></td>
+                                        <td>Hiển thị danh sách các mạng ảo hiện có trong Docker Engine.</td>
+                                    </tr>
+                                    <tr>
+                                        <td><code>docker network connect &lt;network&gt; &lt;container&gt;</code></td>
+                                        <td>Kết nối trực tiếp một container đang chạy vào một mạng ảo xác định.</td>
+                                    </tr>
+                                    <tr>
+                                        <td><code>docker network disconnect &lt;network&gt; &lt;container&gt;</code></td>
+                                        <td>Ngắt kết nối của một container ra khỏi mạng ảo đã tham gia.</td>
+                                    </tr>
+                                    <tr>
+                                        <td><code>docker network rm &lt;network_name&gt;</code></td>
+                                        <td>Xóa bỏ một <code>network (mạng)</code> ảo ra khỏi hệ thống.</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+
+                            <h3>5. Quản lý Docker Compose (Compose Management)</h3>
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Câu lệnh (Command)</th>
+                                        <th>Ý nghĩa & Giải thích tiếng Việt</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td><code>docker compose up -d</code></td>
+                                        <td>Tải image, khởi tạo mạng ảo, tạo volume và chạy toàn bộ ứng dụng đa dịch vụ ngầm.</td>
+                                    </tr>
+                                    <tr>
+                                        <td><code>docker compose down</code></td>
+                                        <td>Dừng hoạt động và xóa sạch các container, mạng ảo được tạo bởi compose của dự án hiện tại.</td>
+                                    </tr>
+                                    <tr>
+                                        <td><code>docker compose down -v</code></td>
+                                        <td>Tương tự như down, nhưng dọn dẹp và xóa sạch cả các <code>volume (vùng lưu dữ liệu)</code> đi kèm để reset hệ thống.</td>
+                                    </tr>
+                                    <tr>
+                                        <td><code>docker compose logs -f</code></td>
+                                        <td>Theo dõi trực tiếp logs của toàn bộ các dịch vụ đang chạy trong dự án Compose.</td>
+                                    </tr>
+                                    <tr>
+                                        <td><code>docker compose ps</code></td>
+                                        <td>Xem trạng thái chi tiết của tất cả các container thuộc dự án Compose hiện hành.</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </section>
+
+                    <!-- Chapter 18: Glossary -->
+                    <section id="chapter-18" class="chapter-section">
+                        <h2>Chương 18: Thuật ngữ ôn tập (Glossary)</h2>
+                        <div class="chapter-content">
+                            <p>Để củng cố lại toàn bộ kiến thức cẩm nang, dưới đây là danh sách tổng hợp các thuật ngữ cốt lõi được định nghĩa chi tiết và dịch nghĩa sang tiếng Việt tương đương, được chia theo từng nhóm chủ đề lớn:</p>
+
+                            <div class="accordion">
+                                <div class="accordion-header">
+                                    <span>1. Nhóm thành phần cốt lõi (Core Artifacts)</span>
+                                    <span class="accordion-icon">▼</span>
+                                </div>
+                                <div class="accordion-content">
+                                    <table>
+                                        <thead>
+                                            <tr>
+                                                <th>Thuật ngữ (Term)</th>
+                                                <th>Định nghĩa & Nghĩa tiếng Việt</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr>
+                                                <td><code>image (ảnh đóng gói)</code></td>
+                                                <td>Một gói dữ liệu chỉ đọc, đóng vai trò làm khuôn mẫu chứa toàn bộ mã nguồn, thư viện hệ thống và cấu hình cần thiết để khởi chạy một ứng dụng.</td>
+                                            </tr>
+                                            <tr>
+                                                <td><code>container (vùng chạy cô lập)</code></td>
+                                                <td>Một thực thể hoạt động được sinh ra từ image. Nó chạy hoàn toàn biệt lập với môi trường xung quanh, giúp bảo vệ ứng dụng khỏi xung đột.</td>
+                                            </tr>
+                                            <tr>
+                                                <td><code>volume (vùng lưu dữ liệu)</code></td>
+                                                <td>Cơ chế lưu trữ dữ liệu vĩnh viễn được quản lý bởi Docker, nằm bên ngoài hệ thống file của container để bảo toàn dữ liệu khi xóa container.</td>
+                                            </tr>
+                                            <tr>
+                                                <td><code>network (mạng)</code></td>
+                                                <td>Hệ thống liên kết và điều hướng giao tiếp giữa các container với nhau và giữa các container với môi trường mạng bên ngoài máy host.</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+
+                            <div class="accordion">
+                                <div class="accordion-header">
+                                    <span>2. Nhóm Xây dựng và Cấu hình (Build and Configuration)</span>
+                                    <span class="accordion-icon">▼</span>
+                                </div>
+                                <div class="accordion-content">
+                                    <table>
+                                        <thead>
+                                            <tr>
+                                                <th>Thuật ngữ (Term)</th>
+                                                <th>Định nghĩa & Nghĩa tiếng Việt</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr>
+                                                <td><code>Dockerfile - tệp công thức build image</code></td>
+                                                <td>Tệp văn bản thuần chứa danh sách các chỉ lệnh tuần tự giúp Docker Engine tự động xây dựng nên một image hoàn chỉnh.</td>
+                                            </tr>
+                                            <tr>
+                                                <td><code>build cache - bộ nhớ đệm xây dựng</code></td>
+                                                <td>Cơ chế lưu trữ lại kết quả của các bước build Dockerfile trước đó để tái sử dụng, giúp tăng tốc đáng kể thời gian build ở những lần sau.</td>
+                                            </tr>
+                                            <tr>
+                                                <td><code>build context - ngữ cảnh xây dựng</code></td>
+                                                <td>Toàn bộ các tệp tin và thư mục cục bộ được gửi từ client lên Docker Daemon để phục vụ cho việc build image.</td>
+                                            </tr>
+                                            <tr>
+                                                <td><code>base image - ảnh đóng gói nền</code></td>
+                                                <td>Image cơ sở được khai báo ở dòng lệnh <code>FROM</code> đầu tiên của Dockerfile để làm nền tảng xây dựng các layer phía trên.</td>
+                                            </tr>
+                                            <tr>
+                                                <td><code>multi-stage build - xây dựng nhiều giai đoạn</code></td>
+                                                <td>Kỹ thuật build nâng cao sử dụng nhiều câu lệnh <code>FROM</code> trong một Dockerfile để lọc bỏ các tệp tin build thừa, giữ lại thành phẩm chạy tối giản nhất.</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+
+                            <div class="accordion">
+                                <div class="accordion-header">
+                                    <span>3. Nhóm Thực thi và Lưu trữ (Execution and Storage)</span>
+                                    <span class="accordion-icon">▼</span>
+                                </div>
+                                <div class="accordion-content">
+                                    <table>
+                                        <thead>
+                                            <tr>
+                                                <th>Thuật ngữ (Term)</th>
+                                                <th>Định nghĩa & Nghĩa tiếng Việt</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr>
+                                                <td><code>bind mount - liên kết thư mục</code></td>
+                                                <td>Phương thức liên kết trực tiếp một đường dẫn thư mục cụ thể trên máy host vật lý vào bên trong container (thường dùng cho code khi code-reload).</td>
+                                            </tr>
+                                            <tr>
+                                                <td><code>named volume - vùng lưu dữ liệu do Docker quản lý</code></td>
+                                                <td>Một volume có tên định danh rõ ràng, được Docker tự động quản lý vị trí lưu trữ thực tế trên ổ cứng nhằm mang lại hiệu năng tối đa.</td>
+                                            </tr>
+                                            <tr>
+                                                <td><code>port forwarding - chuyển tiếp cổng</code></td>
+                                                <td>Cơ chế ánh xạ một cổng mạng từ máy host vào bên trong cổng mạng của container để bên ngoài có thể truy cập được ứng dụng dịch vụ.</td>
+                                            </tr>
+                                            <tr>
+                                                <td><code>interactive mode - chế độ tương tác</code></td>
+                                                <td>Chế độ chạy container cho phép liên kết trực tiếp luồng nhập/xuất (stdin/stdout) với terminal của máy host (cờ <code>-it</code>).</td>
+                                            </tr>
+                                            <tr>
+                                                <td><code>detached mode - chế độ chạy ngầm</code></td>
+                                                <td>Chế độ khởi chạy container chạy ẩn trong nền hệ thống mà không chiếm quyền điều khiển của terminal hiện hành (cờ <code>-d</code>).</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+
+                            <div class="accordion">
+                                <div class="accordion-header">
+                                    <span>4. Nhóm Điều phối dịch vụ (Orchestration)</span>
+                                    <span class="accordion-icon">▼</span>
+                                </div>
+                                <div class="accordion-content">
+                                    <table>
+                                        <thead>
+                                            <tr>
+                                                <th>Thuật ngữ (Term)</th>
+                                                <th>Định nghĩa & Nghĩa tiếng Việt</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr>
+                                                <td><code>compose file - tệp cấu hình Compose</code></td>
+                                                <td>Tệp cấu hình định dạng YAML (thường đặt tên là <code>compose.yaml</code>) mô tả cấu trúc, cài đặt liên kết của toàn bộ hệ thống đa dịch vụ.</td>
+                                            </tr>
+                                            <tr>
+                                                <td><code>service (dịch vụ ứng dụng)</code></td>
+                                                <td>Một khai báo dịch vụ trong compose đại diện cho một hoặc nhiều container chạy song song có cùng chung cấu hình hoạt động.</td>
+                                            </tr>
+                                            <tr>
+                                                <td><code>scaling (mở rộng số lượng bản sao)</code></td>
+                                                <td>Hành vi tăng hoặc giảm số lượng thực thể container giống nhau chạy song song của một dịch vụ nhằm chia sẻ tải trọng.</td>
+                                            </tr>
+                                            <tr>
+                                                <td><code>recreate (tái thiết lập container)</code></td>
+                                                <td>Hành vi của Docker Compose tự động hủy container cũ và dựng lên một container mới hoàn toàn khi phát hiện cấu hình hoặc image có sự thay đổi.</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- Chapter 19: Advanced Track: Docker for Cloud Deployment -->
+                    <section id="chapter-19" class="chapter-section">
+                        <h2>Chương 19: Đường chạy Nâng cao: Docker trong Triển khai Điện toán Đám mây (Docker for Cloud Deployment)</h2>
+                        <div class="chapter-content">
+                            <p>Khi ứng dụng đã sẵn sàng chạy ổn định ở `local environment - môi trường cục bộ`, bước tiếp theo là thực hiện `cloud deployment - triển khai trên đám mây`. Việc dịch chuyển từ máy tính cá nhân lên hạ tầng đám mây mang lại nhiều thách thức do sự khác biệt cơ bản về mặt kiến trúc.</p>
+
+                            <h3>So sánh hành vi của container: Local vs Cloud</h3>
+                            <p>Để triển khai thành công, lập trình viên cần hiểu rõ sự khác biệt giữa `local container behavior - hành vi container ở môi trường cục bộ` và `cloud container behavior - hành vi container ở môi trường đám mây`:</p>
+                            
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Đặc tính (Feature)</th>
+                                        <th>Môi trường cục bộ (Local Environment)</th>
+                                        <th>Môi trường đám mây (Cloud Environment)</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td><strong>Hạ tầng lưu trữ (Storage)</strong></td>
+                                        <td>Sử dụng ổ cứng vật lý trực tiếp, dữ liệu được gắn kết lâu dài qua `bind mount - liên kết thư mục` hoặc `named volume - vùng lưu dữ liệu do Docker quản lý`.</td>
+                                        <td>Sử dụng `ephemeral storage - lưu trữ tạm thời`. Dữ liệu ghi trực tiếp trong `container (vùng chạy cô lập)` sẽ bị xóa sạch khi container khởi động lại hoặc chuyển đổi host.</td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>Địa chỉ mạng (Networking)</strong></td>
+                                        <td>Truy cập trực tiếp thông qua cổng <code>localhost (máy cục bộ)</code> hoặc địa chỉ IP tĩnh nội bộ của WSL2.</td>
+                                        <td>Đứng sau các dịch vụ định tuyến phức tạp như `load balancer - bộ cân bằng tải`, tường lửa và cổng kết nối mạng riêng ảo.</td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>Cấu hình tài nguyên (Resources)</strong></td>
+                                        <td>Phụ thuộc vào tài nguyên vật lý của máy tính cá nhân (RAM, CPU, GPU cục bộ).</td>
+                                        <td>Được cấp phát động, tự động co giãn dựa trên `scaling configuration - cấu hình tự động mở rộng quy mô`.</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+
+                            <h3>Cấu hình thời gian chạy & Biến môi trường (Runtime Configuration & Environment Variables)</h3>
+                            <p>Một nguyên tắc tối kị trong phát triển ứng dụng hiện đại là đóng gói cứng (hardcode) các cấu hình (như cổng kết nối, chuỗi kết nối cơ sở dữ liệu, API key) vào trong `image (ảnh đóng gói)`. Thay vào đó, ta sử dụng `runtime configuration - cấu hình thời gian chạy` dựa trên `environment variable - biến môi trường`.</p>
+                            <p>Bằng cách sử dụng các `environment variable - biến môi trường`, một `image (ảnh đóng gói)` duy nhất có thể được tái sử dụng linh hoạt trên nhiều môi trường khác nhau: từ máy cá nhân của lập trình viên, máy chủ thử nghiệm (staging), cho đến hệ thống vận hành thực tế (production).</p>
+
+                            <h3>Cổng kết nối mở ra ngoài & Cơ chế ghi nhận nhật ký (Exposed Ports & Logging)</h3>
+                            <p>Khi chạy trên đám mây, `container (vùng chạy cô lập)` chỉ cần khai báo một `exposed port - cổng kết nối được mở ra ngoài` (ví dụ cổng <code>8000</code>). Hạ tầng đám mây sẽ chịu trách nhiệm chuyển tiếp traffic từ các cổng tiêu chuẩn (80 cho HTTP, 443 cho HTTPS) vào cổng nội bộ này.</p>
+                            
+                            <div class="callout important">
+                                <div class="callout-icon">⚠️</div>
+                                <div class="callout-body">
+                                    <div class="callout-title">Nguyên tắc ghi log trên Cloud (Cloud Logging Best Practice)</div>
+                                    <div>
+                                        <p>Vì container trên đám mây hoạt động trên cơ chế `ephemeral storage - lưu trữ tạm thời`, tuyệt đối không được ghi nhật ký hoạt động (logs) vào tệp tin tĩnh bên trong container. Nếu làm vậy, log sẽ biến mất khi container gặp sự cố hoặc được cập nhật.</p>
+                                        <p><strong>Giải pháp</strong>: Toàn bộ `logging mechanism - cơ chế ghi nhận nhật ký` của ứng dụng phải xuất log trực tiếp ra `standard output (luồng xuất chuẩn - stdout)` và `standard error (luồng lỗi chuẩn - stderr)`. Dịch vụ đám mây sẽ tự động thu thập các luồng này và đẩy về các công cụ quản lý log tập trung.</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- Chapter 20: Deploying Dockerized AI Apps to AWS with ECR and App Runner -->
+                    <section id="chapter-20" class="chapter-section">
+                        <h2>Chương 20: Triển khai Ứng dụng AI Hóa Container lên AWS với ECR (Dịch vụ Thay thế: AWS Fargate / App Runner)</h2>
+                        <div class="chapter-content">
+                            <div class="callout warning">
+                                <div class="callout-icon">⚠️</div>
+                                <div class="callout-body">
+                                    <div class="callout-title">Cảnh báo quan trọng về dịch vụ AWS App Runner:</div>
+                                    <div>
+                                        <p>Theo tài liệu chính thức từ AWS, dịch vụ AWS App Runner <strong>không còn mở cho khách hàng mới đăng ký</strong> (no longer open to new customers). Để đảm bảo tính bền vững và hiện đại cho các dự án triển khai mới:</p>
+                                        <ul>
+                                            <li><strong>Đối với người dùng mới:</strong> Hãy sử dụng dịch vụ <strong>Amazon ECS (Elastic Container Service) kết hợp với AWS Fargate</strong> làm luồng triển khai mặc định hiện đại và lâu dài. Quy trình build và đẩy image lên AWS ECR trong hướng dẫn dưới đây hoàn toàn trùng khớp; bạn chỉ cần cấu hình ECS Fargate Task Definition trỏ đến URI của ECR image thay vì tạo dịch vụ App Runner.</li>
+                                            <li><strong>Đối với người dùng cũ (đã active App Runner trước đó):</strong> Bạn vẫn có thể tham khảo luồng cấu hình App Runner được giữ lại trong tài liệu này làm mẫu tham khảo nhanh.</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <p>Để đưa một ứng dụng AI đã được đóng gói container lên đám mây AWS, quy trình chuẩn hóa bao gồm việc đẩy `image (ảnh đóng gói)` lên AWS ECR (`Amazon Elastic Container Registry - kho lưu trữ ảnh đóng gói container của AWS`), sau đó kéo ảnh chạy serverless thông qua <strong>AWS Fargate (trong Amazon ECS)</strong> hoặc <strong>AWS App Runner</strong> (nếu tài khoản của bạn đã được kích hoạt trước đó). Quy trình này giúp tự động hóa từ việc lưu trữ image đến vận hành thực tế mà không cần quản lý máy chủ vật lý.</p>
+
+                            <h3>Các bước đẩy ảnh đóng gói lên Amazon ECR</h3>
+                            <p>Dưới đây là các câu lệnh chính xác thực thi trên terminal WSL2 Ubuntu để đăng nhập và đẩy `image (ảnh đóng gói)` lên AWS ECR:</p>
+
+                            <ol>
+                                <li>
+                                    <p><strong>Tạo repository chứa image trên AWS ECR</strong>:</p>
+                                    <div class="code-panel">
+                                        <div class="code-header">
+                                            <span class="code-lang">bash</span>
+                                            <button class="copy-btn" onclick="copyCode(this, 'code-aws-create-repo')">Copy</button>
+                                        </div>
+                                        <pre><code id="code-aws-create-repo">aws ecr create-repository --repository-name my-ai-research-agent --region ap-southeast-1</code></pre>
+                                    </div>
+                                    <p>Đoạn mã trên gửi yêu cầu đến AWS để tạo một `repository (kho chứa)` mới có tên <code>my-ai-research-agent</code> tại khu vực Singapore (<code>ap-southeast-1</code>).</p>
+                                </li>
+
+                                <li>
+                                    <p><strong>Xác thực Docker CLI với AWS ECR (Authenticate using get-login-password)</strong>:</p>
+                                    <div class="code-panel">
+                                        <div class="code-header">
+                                            <span class="code-lang">bash</span>
+                                            <button class="copy-btn" onclick="copyCode(this, 'code-aws-auth')">Copy</button>
+                                        </div>
+                                        <pre><code id="code-aws-auth">aws ecr get-login-password --region ap-southeast-1 | docker login --username AWS --password-stdin 123456789012.dkr.ecr.ap-southeast-1.amazonaws.com</code></pre>
+                                    </div>
+                                    <p>Đoạn mã trên sử dụng lệnh <code>get-login-password</code> để lấy mã thông báo xác thực dùng một lần từ AWS, sau đó truyền qua pipe (<code>|</code>) để đăng nhập vào Docker Registry bảo mật của AWS. Hãy thay thế <code>123456789012</code> bằng ID tài khoản AWS thực tế của bạn.</p>
+                                </li>
+
+                                <li>
+                                    <p><strong>Gắn nhãn (Tagging) local image</strong>:</p>
+                                    <div class="code-panel">
+                                        <div class="code-header">
+                                            <span class="code-lang">bash</span>
+                                            <button class="copy-btn" onclick="copyCode(this, 'code-aws-tag')">Copy</button>
+                                        </div>
+                                        <pre><code id="code-aws-tag">docker tag my-ai-research-agent:latest 123456789012.dkr.ecr.ap-southeast-1.amazonaws.com/my-ai-research-agent:latest</code></pre>
+                                    </div>
+                                    <p>Đoạn mã trên tạo một thẻ nhãn mới cho `image (ảnh đóng gói)` từ tên cục bộ <code>my-ai-research-agent:latest</code> trỏ trực tiếp đến địa chỉ kho chứa trên AWS ECR vừa đăng ký.</p>
+                                </li>
+
+                                <li>
+                                    <p><strong>Đẩy (Pushing) image lên ECR</strong>:</p>
+                                    <div class="code-panel">
+                                        <div class="code-header">
+                                            <span class="code-lang">bash</span>
+                                            <button class="copy-btn" onclick="copyCode(this, 'code-aws-push')">Copy</button>
+                                        </div>
+                                        <pre><code id="code-aws-push">docker push 123456789012.dkr.ecr.ap-southeast-1.amazonaws.com/my-ai-research-agent:latest</code></pre>
+                                    </div>
+                                    <p>Đoạn mã trên thực hiện tải toàn bộ các lớp dữ liệu của `image (ảnh đóng gói)` từ máy cục bộ lên AWS ECR. Các lớp dữ liệu trùng lặp với thư viện chuẩn sẽ được tối ưu tải lên tự động.</p>
+                                </li>
+                            </ol>
+
+                            <h3>Cấu hình vận hành trên AWS App Runner</h3>
+                            <p>Khi `image (ảnh đóng gói)` đã nằm an toàn trên AWS ECR, ta tiến hành cấu hình AWS App Runner để tự động tạo `instance (thực thể chạy)` và vận hành dịch vụ:</p>
+                            
+                            <div class="accordion">
+                                <div class="accordion-header">
+                                    <span>1. Tự động kéo ảnh đóng gói (Pulling Image & Auto Deploy)</span>
+                                    <span class="accordion-icon">▼</span>
+                                </div>
+                                <div class="accordion-content">
+                                    <p>Trong giao diện AWS App Runner Console, chọn nguồn cấp dữ liệu là ECR. Cung cấp đường dẫn ảnh đóng gói (URI ECR). Bạn có thể kích hoạt tùy chọn <strong>Automatic Deployment</strong>: mỗi khi có phiên bản image mới được đẩy lên thẻ <code>latest</code>, App Runner sẽ tự động kéo về và chạy quy trình nâng cấp không gián đoạn (zero-downtime deployment).</p>
+                                </div>
+                            </div>
+
+                            <div class="accordion">
+                                <div class="accordion-header">
+                                    <span>2. Ánh xạ cổng kết nối (Port Mapping & Networking)</span>
+                                    <span class="accordion-icon">▼</span>
+                                </div>
+                                <div class="accordion-content">
+                                    <p>App Runner yêu cầu bạn khai báo cổng kết nối mà container của bạn đang lắng nghe để phục vụ các yêu cầu HTTP. Ví dụ, nếu ứng dụng Python FastAPI chạy trên cổng <code>8000</code>, ta điền cổng <code>8000</code> vào cấu hình App Runner. Dịch vụ đám mây sẽ tự động cấu hình bộ cân bằng tải công cộng để định tuyến các cuộc gọi HTTPS ngoài internet (cổng 443) đi thẳng vào cổng <code>8000</code> của container.</p>
+                                </div>
+                            </div>
+
+                            <div class="accordion">
+                                <div class="accordion-header">
+                                    <span>3. Cấu hình tự động co giãn (Scaling Configuration)</span>
+                                    <span class="accordion-icon">▼</span>
+                                </div>
+                                <div class="accordion-content">
+                                    <p>Bạn có thể cấu hình `scaling configuration - cấu hình tự động mở rộng quy mô` dựa trên số lượng request đồng thời (Concurrency limit). Ví dụ, nếu quy định tối đa 100 kết nối đồng thời trên mỗi instance, khi lưu lượng truy cập tăng vọt vượt ngưỡng, App Runner sẽ tự động nhân bản thêm các container instances mới chạy song song để gánh tải. Khi lưu lượng giảm, hệ thống sẽ tự động tắt bớt để giảm chi phí.</p>
+                                </div>
+                            </div>
+
+                            <div class="accordion">
+                                <div class="accordion-header">
+                                    <span>4. Tiêm biến môi trường chứa khóa API (Injecting Environment Variables)</span>
+                                    <span class="accordion-icon">▼</span>
+                                </div>
+                                <div class="accordion-content">
+                                    <p>Thay vì lưu khóa bí mật trong mã nguồn, ta cấu hình chúng trực tiếp trong mục <strong>Environment Variables</strong> của App Runner. Các `API key environment variables - biến môi trường chứa khóa truy cập API` như <code>GEMINI_API_KEY</code> sẽ được hệ thống mã hóa và tiêm trực tiếp vào môi trường thực thi của container một cách an toàn nhất.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- Chapter 21: Containerizing AI Agents with Docker for Cloud Deployment -->
+                    <section id="chapter-21" class="chapter-section">
+                        <h2>Chương 21: Đóng gói Tác nhân Trí tuệ Nhân tạo với Docker trong Triển khai Đám mây</h2>
+                        <div class="chapter-content">
+                            <p>Một `containerized AI agent - tác nhân trí tuệ nhân tạo được đóng gói trong container` có các đặc điểm hoạt động rất đặc thù so với các microservices truyền thống. Tác nhân AI thường thực hiện các tác vụ nặng về tính toán, duy trì trạng thái hội thoại dài hạn và tương tác liên tục với các mô hình ngôn ngữ lớn (LLM) bên ngoài.</p>
+
+                            <h3>Kiến trúc cấu trúc của tác nhân AI trong Container</h3>
+                            <p>Để hoạt động ổn định trên môi trường đám mây, một tác nhân AI cần có cấu trúc chuẩn hóa gồm các thành phần sau:</p>
+
+                            <div class="feature-card">
+                                <div class="feature-card-title">1. Giao diện máy chủ ứng dụng (App Server Interface)</div>
+                                <p>Sử dụng các framework lập trình web bất đồng bộ như FastAPI phối hợp với máy chủ ASGI Uvicorn. Việc sử dụng `asynchronous programming - lập trình bất đồng bộ` là bắt buộc vì tác nhân AI dành phần lớn thời gian để chờ đợi kết quả trả về (I/O bound) từ các API mô hình lớn của Google hay OpenAI.</p>
+                            </div>
+
+                            <div class="feature-card">
+                                <div class="feature-card-title">2. Quản lý thư viện phụ thuộc (Dependency Management)</div>
+                                <p>Khai báo rõ ràng tất cả `dependency (thư viện phụ thuộc)` cần thiết cho việc vận hành tác nhân AI như thư viện kết nối mô hình (<code>google-generativeai</code>), thư viện xử lý dữ liệu (<code>pydantic</code>), thư viện kết nối mạng bất đồng bộ (<code>httpx</code>) vào tệp tin cấu hình. Việc khóa chặt phiên bản thư viện ngăn ngừa các lỗi không tương thích runtime khi build image.</p>
+                            </div>
+
+                            <div class="feature-card">
+                                <div class="feature-card-title">3. Quản lý biến môi trường chứa khóa truy cập API (API Key Environment Variables)</div>
+                                <p>Các tác nhân AI luôn yêu cầu các `API key environment variables - biến môi trường chứa khóa truy cập API` để xác thực với nhà cung cấp dịch vụ LLM. Các biến này phải được đọc động bằng thư viện <code>os.getenv</code> khi khởi chạy ứng dụng. Tuyệt đối không được nhúng cứng khóa bảo mật vào Dockerfile hay mã nguồn dự án để tránh rò rỉ thông tin.</p>
+                            </div>
+
+                            <div class="feature-card">
+                                <div class="feature-card-title">4. Quyền truy cập mạng (Network Access Requirements)</div>
+                                <p>Tác nhân AI cần `network access - quyền truy cập mạng` chiều đi (Egress internet access) thông suốt để giao tiếp với các API của bên thứ ba, thực hiện các công cụ tìm kiếm web (web search tools) hoặc thu thập dữ liệu trực tuyến. Cấu hình bảo mật mạng trên đám mây phải cho phép container kết nối ra ngoài internet.</p>
+                            </div>
+
+                            <div class="feature-card">
+                                <div class="feature-card-title">5. Yêu cầu lưu trữ dữ liệu bền vững (Persistency Requirements)</div>
+                                <p>Do container đám mây mang đặc tính `ephemeral storage - lưu trữ tạm thời`, mọi `persistency requirement - yêu cầu lưu trữ dữ liệu bền vững` (như lịch sử chat của người dùng, cơ sở dữ liệu vector lưu tài liệu tham khảo) không được phép ghi trực tiếp lên ổ đĩa của container. Mọi dữ liệu này phải được ghi nhận vào các dịch vụ lưu trữ bên ngoài như RDS, DynamoDB hoặc các dịch vụ Vector Database đám mây (Pinecone/Qdrant Cloud).</p>
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- Chapter 22: Deploying AI Research Agents with Docker, ECR, and App Runner -->
+                    <section id="chapter-22" class="chapter-section">
+                        <h2>Chương 22: Triển khai Tác nhân Nghiên cứu AI với Docker, ECR (Mẫu Tham Khảo Triển Khai - Illustrative Example)</h2>
+                        <div class="chapter-content">
+                            <p>Để hoàn thiện cẩm nang này, chúng ta sẽ phân tích một mẫu tham khảo triển khai (illustrative example - ví dụ minh họa) của một ứng dụng tác nhân nghiên cứu AI (AI Research Agent) bằng Python FastAPI. Mô hình tham khảo này cung cấp một `endpoint (điểm cuối kết nối)` <code>/api/chat</code> thực hiện chuỗi tư duy suy luận gồm 3 bước và gọi API Google Gemini thực tế (yêu cầu nạp biến môi trường khóa API thật). Đi kèm là một `production-ready Dockerfile - tệp công thức build image tối ưu cho môi trường vận hành` được thiết kế để làm khuôn mẫu tham khảo tối giản hóa dung lượng và nâng cao bảo mật.</p>
+
+                            <h3>Mã nguồn ứng dụng Python FastAPI (main.py) - Mẫu Tham Khảo Triển Khai</h3>
+                            <p>Dưới đây là khung mã nguồn đầy đủ của ứng dụng để làm cấu trúc tham khảo triển khai:</p>
+
+                            <div class="code-panel">
+                                <div class="code-header">
+                                    <span class="code-lang">python</span>
+                                    <button class="copy-btn" onclick="copyCode(this, 'code-fastapi-app')">Copy</button>
+                                </div>
+                                <pre><code id="code-fastapi-app">import os
+import logging
+import httpx
+from fastapi import FastAPI, HTTPException, status
+from pydantic import BaseModel, Field
+from typing import List, Optional
+
+# Cấu hình logging để xuất log ra luồng xuất chuẩn (stdout) phục vụ Cloud Logging
+logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
+logger = logging.getLogger(__name__)
+
+app = FastAPI(
+    title="AI Research Agent API",
+    description="Production-ready FastAPI AI Agent simulating reasoning steps and integrating Gemini API.",
+    version="1.0.0"
+)
+
+# Khai báo cấu trúc dữ liệu đầu vào sử dụng Pydantic
+class ChatRequest(BaseModel):
+    message: str = Field(..., description="The research topic or message for the AI Agent", example="Explain Docker container lifecycle in simple terms.")
+    session_id: Optional[str] = Field(None, description="Unique identifier for the chat session", example="session-123")
+
+# Khai báo cấu trúc bước suy luận (Thinking Step)
+class ThinkingStep(BaseModel):
+    step: int
+    title: str
+    content: str
+
+# Khai báo cấu trúc dữ liệu trả về cho client
+class ChatResponse(BaseModel):
+    session_id: str
+    response: str
+    thinking_steps: List[ThinkingStep]
+    model_used: str
+
+@app.get("/")
+def read_root():
+    """Endpoint dùng để kiểm tra trạng thái hoạt động của container (Health Check)"""
+    return {"status": "healthy", "service": "AI Research Agent"}
+
+@app.post("/api/chat", response_model=ChatResponse, status_code=status.HTTP_200_OK)
+async def chat_endpoint(request: ChatRequest):
+    """Endpoint xử lý logic trò chuyện và chuỗi suy luận của tác nhân AI"""
+    logger.info(f"Processing request for session: {request.session_id}")
+    
+    # Bước suy luận 1 (Thinking Step 1): Lập kế hoạch phân tích yêu cầu của người dùng
+    step1 = ThinkingStep(
+        step=1,
+        title="Query Intent Parsing & Research Strategy Formulation",
+        content=f"Analyzing user query: '{request.message}'. Mapping out key topics. Formulating plan to fetch relevant context and model the output structure."
+    )
+    
+    # Bước suy luận 2 (Thinking Step 2): Tổng hợp kiến thức và xây dựng nội dung cốt lõi
+    step2 = ThinkingStep(
+        step=2,
+        title="Information Synthesis & Deep Reasoning",
+        content="Processing conceptual definitions. Structuring the explanation framework. Generating detailed response components for Docker execution lifecycle."
+    )
+
+    # Lấy API Key từ biến môi trường của container
+    api_key = os.getenv("GEMINI_API_KEY")
+    model_used = "gemini-1.5-flash (Simulated)"
+    final_answer = ""
+    
+    # Bước suy luận 3 (Thinking Step 3): Gọi mô hình ngôn ngữ lớn để sinh câu trả lời
+    if api_key:
+        model_used = "gemini-1.5-flash"
+        url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key={api_key}"
+        headers = {"Content-Type": "application/json"}
+        payload = {
+            "contents": [{
+                "parts": [{
+                    "text": f"You are a Senior DevOps Engineer and AI Architect. Provide a detailed, professional answer to: {request.message}"
+                }]
+            }]
+        }
+        
+        try:
+            logger.info("Initiating request to Google Gemini API...")
+            async with httpx.AsyncClient(timeout=30.0) as client:
+                response = await client.post(url, json=payload, headers=headers)
+                
+                if response.status_code == 200:
+                    res_data = response.json()
+                    final_answer = res_data["candidates"][0]["content"]["parts"][0]["text"]
+                    logger.info("Successfully fetched response from Gemini API.")
+                else:
+                    logger.warning(f"Gemini API returned an error code: {response.status_code}. Executing fallback response.")
+                    final_answer = f"[Fallback Response] Gemini API returned error: {response.text}. Prompt query: {request.message}"
+        except Exception as e:
+            logger.error(f"Failed to communicate with Gemini API due to exception: {str(e)}")
+            final_answer = f"[Fallback Response] Connection failed. Query: {request.message}"
+    else:
+        logger.info("GEMINI_API_KEY is not defined. Initiating local simulator mode.")
+        final_answer = (
+            f"Hello! This is a simulation response because no GEMINI_API_KEY environment variable was detected. "
+            f"Your request was: '{request.message}'. "
+            f"Please configure your GEMINI_API_KEY in the AWS App Runner environment variables to connect this agent to the live Google Gemini API."
+        )
+
+    step3 = ThinkingStep(
+        step=3,
+        title="Response Refinement & Formatting",
+        content="Refining markdown layout, structuring code blocks, and returning final answer response to the caller client."
+    )
+
+    return ChatResponse(
+        session_id=request.session_id or "default-session",
+        response=final_answer,
+        thinking_steps=[step1, step2, step3],
+        model_used=model_used
+    )
+</code></pre>
+                            </div>
+                            <p>Đoạn mã Python trên khởi tạo một ứng dụng FastAPI có hai đường dẫn truy cập. Hàm <code>read_root</code> xử lý yêu cầu GET tại gốc (/) để hệ thống kiểm tra sức khỏe của container. Hàm <code>chat_endpoint</code> xử lý yêu cầu POST gửi tới <code>/api/chat</code>, thực hiện giả lập chuỗi suy luận 3 bước (Thinking Steps) và gọi API thực tế tới dịch vụ Gemini của Google thông qua thư viện kết nối không đồng bộ <code>httpx</code>.</p>
+
+                            <h3>Tệp cấu hình thư viện phụ thuộc (requirements.txt)</h3>
+                            <p>Khai báo chính xác các thư viện cần cài đặt cho ứng dụng:</p>
+                            
+                            <div class="code-panel">
+                                <div class="code-header">
+                                    <span class="code-lang">text</span>
+                                    <button class="copy-btn" onclick="copyCode(this, 'code-requirements')">Copy</button>
+                                </div>
+                                <pre><code id="code-requirements">fastapi==0.111.0
+uvicorn==0.30.1
+pydantic==2.7.4
+httpx==0.27.0</code></pre>
+                            </div>
+                            <p>Đoạn mã trên chỉ định cụ thể các `dependency (thư viện phụ thuộc)` và phiên bản tương ứng để cài đặt trong `image (ảnh đóng gói)`, đảm bảo không xảy ra hiện tượng xung đột thư viện lúc runtime.</p>
+
+                            <h3>Tệp công thức build image tối ưu (Dockerfile)</h3>
+                            <p>Dưới đây là tệp công thức build tối ưu cho môi trường cloud deployment:</p>
+
+                            <div class="code-panel">
+                                <div class="code-header">
+                                    <span class="code-lang">dockerfile</span>
+                                    <button class="copy-btn" onclick="copyCode(this, 'code-dockerfile')">Copy</button>
+                                </div>
+                                <pre><code id="code-dockerfile"># Giai đoạn 1: Build dependencies bằng multi-stage build để giảm dung lượng
+FROM python:3.11-slim as builder
+
+ENV PYTHONDONTWRITEBYTECODE=1
+ENV PYTHONUNBUFFERED=1
+
+WORKDIR /app
+
+# Cài đặt thư viện hệ thống cần thiết cho việc cài đặt gói
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    build-essential \
+    && rm -rf /var/lib/apt/lists/*
+
+COPY requirements.txt .
+RUN pip install --no-cache-dir --prefix=/install -r requirements.txt
+
+# Giai đoạn 2: Stage chạy cuối cùng siêu gọn nhẹ (Production Environment)
+FROM python:3.11-slim
+
+ENV PYTHONDONTWRITEBYTECODE=1
+ENV PYTHONUNBUFFERED=1
+
+WORKDIR /app
+
+# Sao chép các package đã được biên dịch từ giai đoạn builder
+COPY --from=builder /install /usr/local
+COPY main.py .
+
+# Tạo một user non-root để chạy container nhằm đảm bảo an toàn bảo mật thông tin
+RUN useradd -u 1001 appuser && chown -R appuser:appuser /app
+USER appuser
+
+# Khai báo cổng kết nối container sẽ lắng nghe lúc runtime
+EXPOSE 8000
+
+# Lệnh khởi chạy ứng dụng thông qua Uvicorn server
+CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]</code></pre>
+                            </div>
+                            <p>Đoạn mã trên sử dụng kỹ thuật `multi-stage build - xây dựng nhiều giai đoạn` để phân tách quá trình biên dịch thư viện (builder) ra khỏi sản phẩm chạy cuối cùng. Phương pháp này giúp loại bỏ hoàn toàn các tệp tin rác phát sinh trong lúc cài đặt thư viện, giảm dung lượng `image (ảnh đóng gói)` xuống mức tối thiểu. Đồng thời, cấu hình khởi tạo một `non-root user (người dùng không có quyền quản trị)` có tên là <code>appuser</code> để chạy container, ngăn ngừa các cuộc tấn công chiếm quyền điều khiển hệ thống máy chủ đám mây.</p>
+
+                            <h3>Sơ đồ luồng triển khai (Deployment Flow Diagram)</h3>
+                            <p>Dưới đây là sơ đồ Mermaid biểu diễn chi tiết `deployment flow - quy trình triển khai` từ máy local của nhà phát triển lên AWS ECR và kết thúc tại môi trường vận hành đám mây AWS ECS Fargate (hoặc AWS App Runner):</p>
+
+                            <div class="mermaid">
+                            graph TD
+                                subgraph "1. Local Development Environment (WSL2 Ubuntu)"
+                                    A["Write FastAPI AI Agent (main.py)"] --> B["Define requirements.txt"]
+                                    B --> C["Write production-ready Dockerfile"]
+                                    C --> D["Build Local Image: docker build -t my-ai-agent ."]
+                                end
+
+                                subgraph "2. AWS Container Registry (ECR)"
+                                    E["Create ECR Repository: aws ecr create-repository"] --> F["Authenticate Docker CLI: aws ecr get-login-password | docker login"]
+                                    D --> F
+                                    F --> G["Tag Image to ECR format: docker tag my-ai-agent registry_url"]
+                                    G --> H["Push Image to AWS ECR: docker push registry_url"]
+                                end
+
+                                subgraph "3. Production Running (AWS ECS Fargate / App Runner)"
+                                    I["ECS Fargate / App Runner Service"] --> J["Pull target Image from AWS ECR"]
+                                    H --> J
+                                    J --> K["Inject secure variables: GEMINI_API_KEY"]
+                                    K --> L["Map external HTTPS port: Port 443 to Port 8000"]
+                                    L --> M["Run App Container with Auto Scaling"]
+                                end
+
+                                style A fill:#fbf1ed,stroke:#cc785c,stroke-width:2px
+                                style D fill:#fbf1ed,stroke:#cc785c,stroke-width:2px
+                                style H fill:#edf5f9,stroke:#4a7a96,stroke-width:2px
+                                style M fill:#edf5f9,stroke:#4a7a96,stroke-width:2px
+                            </div>
+                            <p>Sơ đồ trên mô tả quy trình khép kín: Lập trình viên thiết lập mã nguồn và Dockerfile trên môi trường cục bộ WSL2 Ubuntu, sau đó sử dụng AWS CLI để tạo kho lưu trữ và xác thực thông qua lệnh <code>get-login-password</code> trước khi tag và push `image (ảnh đóng gói)` lên AWS ECR. Cuối cùng, dịch vụ vận hành đám mây <strong>AWS ECS Fargate</strong> (khuyến nghị cho tài khoản mới) hoặc <strong>AWS App Runner</strong> (dành cho tài khoản cũ đã active) sẽ tự động kéo ảnh từ ECR về, cấu hình bảo mật truyền biến môi trường chứa khóa API, thiết lập định tuyến ánh xạ cổng kết nối và khởi chạy ứng dụng với khả năng co giãn tự động theo tải thực tế.</p>
+                        </div>
+                    </section>
+                </div>
+
+            </div>
+        </main>
+    </div>
+
+    <!-- Reusable JS Script for Interactive Elements (TOC, Search, Accordion, Progress, Copy Code) -->
+    <script>
+        // Scroll Progress Indicator
+        window.addEventListener('scroll', () => {
+            const winScroll = document.documentElement.scrollTop || document.body.scrollTop;
+            const height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+            const scrolled = height > 0 ? (winScroll / height) * 100 : 0;
+            const progressBar = document.getElementById('progressBar');
+            if (progressBar) {
+                progressBar.style.width = scrolled + '%';
+            }
+        });
+
+        // Mobile Menu Toggle
+        const menuToggle = document.getElementById('menuToggle');
+        const toc = document.getElementById('toc');
+        if (menuToggle && toc) {
+            menuToggle.addEventListener('click', (e) => {
+                e.stopPropagation();
+                toc.classList.toggle('mobile-open');
+                menuToggle.textContent = toc.classList.contains('mobile-open') ? '✕' : '☰';
+            });
+
+            // Close sidebar when clicking outside on mobile
+            document.addEventListener('click', (e) => {
+                if (toc.classList.contains('mobile-open') && !toc.contains(e.target) && e.target !== menuToggle) {
+                    toc.classList.remove('mobile-open');
+                    menuToggle.textContent = '☰';
+                }
+            });
+        }
+
+        // Accordion Toggle Logic
+        document.addEventListener('click', (e) => {
+            const header = e.target.closest('.accordion-header');
+            if (header) {
+                const accordion = header.parentElement;
+                if (accordion) {
+                    accordion.classList.toggle('open');
+                }
+            }
+        });
+
+        // Copy Code Functionality
+        async function copyCode(btn, codeId) {
+            const codeBlock = document.getElementById(codeId);
+            if (!codeBlock) return;
+            const textToCopy = codeBlock.innerText;
+            try {
+                await navigator.clipboard.writeText(textToCopy);
+                const originalText = btn.textContent;
+                btn.textContent = 'Copied!';
+                btn.style.borderColor = 'var(--color-note)';
+                setTimeout(() => {
+                    btn.textContent = originalText;
+                    btn.style.borderColor = '';
+                }, 2000);
+            } catch (err) {
+                console.error('Failed to copy: ', err);
+            }
+        }
+
+        // Active TOC Link on Scroll
+        const sections = document.querySelectorAll('section[id], section.hero');
+        const tocLinks = document.querySelectorAll('.toc-nav .toc-link');
+
+        window.addEventListener('scroll', () => {
+            let current = 'hero'; // Default to hero when at the top
+            sections.forEach(section => {
+                const sectionTop = section.offsetTop;
+                // Only consider section if it is currently visible (not hidden by search)
+                if (section.style.display !== 'none' && window.pageYOffset >= sectionTop - 150) {
+                    current = section.getAttribute('id');
+                }
+            });
+
+            tocLinks.forEach(link => {
+                link.classList.remove('active');
+                if (link.getAttribute('href') === '#' + current) {
+                    link.classList.add('active');
+                }
+            });
+        });
+
+        // Live Search Filter & Dynamic TOC Update
+        const searchInput = document.getElementById('searchInput');
+        if (searchInput) {
+            searchInput.addEventListener('input', (e) => {
+                const term = e.target.value.toLowerCase().trim();
+                const allSections = document.querySelectorAll('.chapter-section, .hero');
+                const tocLinks = document.querySelectorAll('.toc-nav .toc-link');
+                
+                // Toggle sections based on query matching
+                allSections.forEach(sec => {
+                    const text = sec.innerText.toLowerCase();
+                    if (term === '' || text.includes(term)) {
+                        sec.style.display = 'block';
+                    } else {
+                        sec.style.display = 'none';
+                    }
+                });
+
+                // Toggle TOC links based on section visibility
+                tocLinks.forEach(link => {
+                    const targetId = link.getAttribute('href').substring(1);
+                    const targetSec = document.getElementById(targetId);
+                    if (targetSec) {
+                        if (targetSec.style.display === 'none') {
+                            link.style.display = 'none';
+                        } else {
+                            link.style.display = 'block';
+                        }
+                    }
+                });
+
+                // Toggle TOC group titles if all their respective links are hidden
+                const nav = document.querySelector('.toc-nav');
+                if (nav) {
+                    const children = Array.from(nav.children);
+                    let currentGroupTitle = null;
+                    let currentGroupLinks = [];
+
+                    children.forEach(child => {
+                        if (child.classList.contains('toc-group-title')) {
+                            if (currentGroupTitle) {
+                                const anyVisible = currentGroupLinks.some(link => link.style.display !== 'none');
+                                currentGroupTitle.style.display = anyVisible ? 'block' : 'none';
+                            }
+                            currentGroupTitle = child;
+                            currentGroupLinks = [];
+                        } else if (child.classList.contains('toc-link')) {
+                            currentGroupLinks.push(child);
+                        }
+                    });
+
+                    // Handle the last group
+                    if (currentGroupTitle) {
+                        const anyVisible = currentGroupLinks.some(link => link.style.display !== 'none');
+                        currentGroupTitle.style.display = anyVisible ? 'block' : 'none';
+                    }
+                }
+            });
+        }
+    </script>
+</body>
+</html>

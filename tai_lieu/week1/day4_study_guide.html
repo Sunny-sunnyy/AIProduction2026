@@ -497,11 +497,33 @@
       background: var(--surface-soft);
       border: 1px solid var(--hairline);
       border-radius: var(--radius-lg);
-      padding: 20px;
+      padding: 30px;
       margin-top: 14px;
       overflow-x: auto;
       display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 20px;
+    }
+
+    .diagram-container .mermaid {
+      width: 100%;
+      display: flex;
       justify-content: center;
+    }
+
+    /* Phóng to SVG của Mermaid giúp đọc chữ dễ hơn */
+    .diagram-container .mermaid svg {
+      max-width: 100% !important;
+      height: auto !important;
+    }
+
+    #vercel-chart svg {
+      min-width: 650px !important;
+    }
+
+    #aws-chart svg {
+      min-width: 1300px !important;
     }
 
     .footer {
@@ -556,7 +578,21 @@
         primaryBorderColor: '#e6dfd8',
         lineColor: '#cc785c',
         secondaryColor: '#faf9f5',
-        tertiaryColor: '#181715'
+        tertiaryColor: '#181715',
+        fontSize: '16px',
+        fontFamily: 'Inter, system-ui, sans-serif'
+      },
+      flowchart: {
+        nodeSpacing: 50,
+        rankSpacing: 60,
+        htmlLabels: true
+      },
+      sequence: {
+        actorFontSize: '15px',
+        noteFontSize: '14px',
+        messageFontSize: '13px',
+        boxWidth: 160,
+        boxHeight: 45
       }
     });
   </script>
@@ -723,21 +759,27 @@
           </div>
 
           <div class="diagram-container">
-            <div class="mermaid">
+            <div class="mermaid" id="vercel-chart">
               graph TD
-                subgraph Vercel PaaS (Week 1 Day 1-4)
-                  A[Next.js Client] -->|vercel --prod| B[Vercel Serverless Platform]
-                  B -->|Tự động cấu hình| C[SSL / CDN / Routing]
-                  B -->|Chạy API| D[Python Serverless Functions]
-                end
-                subgraph AWS IaaS (Starting Day 5)
-                  E[Next.js / FastAPI App] -->|Đóng gói| F[Docker Image]
-                  F -->|Đẩy lên| G[AWS ECR - Container Registry]
-                  G -->|Triển khai| H[AWS App Runner]
-                  I[AWS IAM - Identity Access] -->|Phân quyền bảo mật| H
-                  H -->|Chạy trên| J[AWS Cloud Infrastructure]
+                subgraph vercel["Vercel PaaS (Week 1 Day 1-4)"]
+                  A[Next.js Client] -->|vercel --prod| B["Vercel Serverless<br/>Platform"]
+                  B -->|Tự động cấu hình| C["SSL / CDN / Routing"]
+                  B -->|Chạy API| D["Python Serverless<br/>Functions"]
                 end
                 style B fill:#efe9de,stroke:#cc785c,stroke-width:2px;
+            </div>
+            
+            <div style="width: 100%; max-width: 1000px; border-top: 1px dashed var(--hairline); margin: 10px 0;"></div>
+            
+            <div class="mermaid" id="aws-chart">
+              graph TD
+                subgraph aws["AWS IaaS (Starting Day 5)"]
+                  E["Next.js /<br/>FastAPI App"] -->|Đóng gói| F[Docker Image]
+                  F -->|Đẩy lên| G["AWS ECR<br/>Container Registry"]
+                  G -->|Triển khai| H[AWS App Runner]
+                  I["AWS IAM<br/>Identity Access"] -->|Phân quyền bảo mật| H
+                  H -->|Chạy trên| J["AWS Cloud<br/>Infrastructure"]
+                end
                 style H fill:#efe9de,stroke:#cc785c,stroke-width:2px;
                 style I fill:#efe9de,stroke:#5db8a6,stroke-width:2px;
             </div>
@@ -790,25 +832,25 @@
               sequenceDiagram
                 autonumber
                 actor Doctor as Bác sĩ
-                participant FE as Next.js Client (/product)
-                participant BE as FastAPI Backend (/api)
+                participant FE as "Next.js Client (/product)"
+                participant BE as "FastAPI Backend (/api)"
                 participant OpenAI as OpenAI API
 
                 Doctor->>FE: Nhập tên bệnh nhân, Ngày khám & Ghi chú thô
                 Doctor->>FE: Click "Generate Summary"
                 FE->>FE: Lấy JWT Token từ Clerk Auth
-                FE->>BE: POST request /api (JWT + JSON payload)
+                FE->>BE: "POST request /api (JWT + JSON payload)"
                 Note over BE: Pydantic validate cấu trúc JSON đầu vào:<br/>patient_name (str)<br/>date_of_visit (str)<br/>notes (str)
-                alt Dữ liệu không hợp lệ (Ví dụ: thiếu tên bệnh nhân)
+                alt "Dữ liệu không hợp lệ (Ví dụ: thiếu tên bệnh nhân)"
                   BE-->>FE: HTTP 422 Unprocessable Entity
                   FE->>Doctor: Hiển thị lỗi form nhập liệu
                 end
                 BE->>BE: Kết hợp System Prompt & User Prompt y tế
-                BE->>OpenAI: Gọi completions API (stream=True)
+                BE->>OpenAI: "Gọi completions API (stream=True)"
                 loop Streaming SSE
                   OpenAI-->>BE: Trả về chunk văn bản
-                  BE->>FE: yield f"data: {text}\n\n"
-                  FE->>Doctor: Render kết quả Markdown (Tóm tắt, Next steps, Draft Email)
+                  BE->>FE: "yield f'data: {text}\n\n'"
+                  FE->>Doctor: "Render kết quả Markdown (Tóm tắt, Next steps, Draft Email)"
                 end
             </div>
           </div>
