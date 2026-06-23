@@ -746,7 +746,10 @@ graph LR
           </div>
 
           <h3 style="margin-top: 20px;">2. Sơ đồ Kiến trúc Đám mây AWS (AWS Production Architecture - Day 2)</h3>
-          <div class="diagram-container">
+          <div class="diagram-container" style="background: #ffffff; text-align: center; padding: 20px; border: 1px solid var(--hairline);">
+            <img src="deployment_architecture.png" alt="AWS Deployment Architecture" style="max-width: 100%; max-height: 500px; height: auto; border-radius: var(--radius-md); display: block; margin: 0 auto;">
+          </div>
+          <div class="diagram-container" style="margin-top: 10px;">
             <pre class="mermaid">
 graph TD
     User[Client Browser] -->|Load Static Web| CF[Amazon CloudFront CDN]
@@ -760,54 +763,115 @@ graph TD
 
           <h3 style="margin-top: 20px;">3. Quy trình chi tiết đầu-cuối bằng văn bản (End-to-End Workflow Walkthrough)</h3>
           <div class="card" style="margin-top: 10px;">
-            <p>Quy trình hoạt động xử lý hội thoại có lưu trữ bộ nhớ (Conversational Memory) cục bộ ở Day 1 được thực hiện qua các giai đoạn sau:</p>
+            <p>Quy trình hoạt động xử lý hội thoại có lưu trữ bộ nhớ (Conversational Memory) cục bộ ở Day 1 được thực hiện chi tiết qua các giai đoạn sau:</p>
             
-            <p><strong>Giai đoạn 1: Frontend Client gửi Request</strong></p>
+            <p><strong>Giai đoạn 1: Khởi động Hệ thống và Đọc cấu hình Persona (System Initialization & Config Load)</strong></p>
             <ol class="list">
-              <li>Người dùng nhập tin nhắn vào ô input trên trình duyệt và bấm gửi (hoặc nhấn phím Enter).</li>
-              <li>Hàm <code>sendMessage()</code> trong component [twin.tsx](file:///G:/AIProduction_t6_2026/production/week2/day1.md#L296) được kích hoạt.</li>
-              <li>Tin nhắn mới của người dùng được đóng gói thành một đối tượng <code>Message</code> và cập nhật trực tiếp vào React state <code>messages</code> thông qua <code>setMessages</code> để hiển thị lập tức lên UI.</li>
-              <li>Frontend gọi hàm <code>fetch('http://localhost:8000/chat', ...)</code> gửi HTTP POST request đến Backend API dưới định dạng JSON body chứa: <code>message</code> (nội dung tin nhắn) và <code>session_id</code> (lấy từ React state <code>sessionId</code>, nếu là tin nhắn đầu tiên thì giá trị này là rỗng).</li>
+              <li>Khi máy chủ backend FastAPI khởi chạy bằng lệnh <code>uv run uvicorn server:app --reload</code>, hàm <code>load_personality()</code> trong <a href="file:///G:/AIProduction_t6_2026/production/week2/day1.md#L200">server.py</a> được thực thi:
+                <ul>
+                  <li>Hàm mở tệp tin <code>backend/me.txt</code> dưới dạng đọc bằng câu lệnh <code>open("me.txt", "r", encoding="utf-8")</code> để nạp thông tin mô tả tính cách, tiểu sử của nhân vật đại diện.</li>
+                  <li>Nội dung tệp tin được đọc và xử lý loại bỏ khoảng trắng thừa thông qua phương thức <code>.strip()</code>, sau đó lưu trữ vào biến toàn cục <code>PERSONALITY</code> để làm System Prompt cho LLM.</li>
+                </ul>
+              </li>
+              <li>Hệ thống khởi tạo đường dẫn thư mục lưu trữ bộ nhớ cục bộ bằng cách gọi <code>MEMORY_DIR = Path("../memory")</code>. Lệnh <code>MEMORY_DIR.mkdir(exist_ok=True)</code> tự động tạo thư mục <code>memory</code> nằm ngang hàng với thư mục backend nếu thư mục này chưa tồn tại trên ổ đĩa.</li>
+              <li>Phía frontend Next.js được khởi chạy song song bằng lệnh <code>npm run dev</code> ở cổng 3000, tải trang tĩnh và sẵn sàng tiếp nhận tương tác của người dùng.</li>
             </ol>
 
-            <p style="margin-top: 12px;"><strong>Giai đoạn 2: Backend tiếp nhận và xử lý bộ nhớ</strong></p>
-            <ol class="list" start="5">
-              <li>FastAPI Server tiếp nhận request tại route [app.post("/chat")](file:///G:/AIProduction_t6_2026/production/week2/day1.md#L696) với schema <code>ChatRequest</code>.</li>
-              <li>Hệ thống kiểm tra <code>session_id</code> từ request. Nếu trống (lượt chat đầu tiên), backend sử dụng thư viện <code>uuid</code> để tạo một chuỗi định danh ngẫu nhiên phiên bản 4 thông qua lệnh <code>str(uuid.uuid4())</code>.</li>
-              <li>Backend gọi hàm <code>load_conversation(session_id)</code> để tìm kiếm tệp tin lịch sử:
+            <p style="margin-top: 12px;"><strong>Giai đoạn 2: Người dùng gửi tin nhắn từ Frontend (Client Interaction & Request Dispatch)</strong></p>
+            <ol class="list" start="4">
+              <li>Người dùng nhập văn bản vào ô input chat trên trình duyệt và nhấn phím Enter (kích hoạt sự kiện <code>onKeyDown</code> gọi hàm <code>handleKeyPress()</code>) hoặc nhấp chuột vào nút gửi.</li>
+              <li>Hàm <code>sendMessage()</code> trong component client <a href="file:///G:/AIProduction_t6_2026/production/week2/day1.md#L296">twin.tsx</a> được kích hoạt:
                 <ul>
-                  <li>Hàm này sử dụng thư viện <code>pathlib.Path</code> định vị tệp <code>../memory/{session_id}.json</code>.</li>
-                  <li>Nếu tệp tồn tại, nó mở tệp với mã hóa UTF-8 bằng <code>open(..., encoding="utf-8")</code> và sử dụng <code>json.load(f)</code> để giải tuần tự hóa (deserialize) nội dung tệp thành một danh sách (list) các tin nhắn cũ.</li>
-                  <li>Nếu tệp chưa tồn tại, nó trả về một mảng rỗng <code>[]</code>.</li>
+                  <li>Hàm kiểm tra điều kiện đầu vào: nếu chuỗi nhập vào rỗng <code>!input.trim()</code> hoặc trạng thái đang gửi tin nhắn <code>isLoading</code> là true, hàm sẽ ngắt thực thi ngay lập tức.</li>
+                  <li>Đóng gói nội dung chat thành một đối tượng dữ liệu kiểu <code>Message</code> chứa: <code>id</code> (lấy mốc thời gian mili-giây hiện tại), <code>role</code> (gán giá trị là <code>'user'</code>), <code>content</code> (lấy từ state <code>input</code>), và <code>timestamp</code> (lấy thời gian hiện tại).</li>
+                  <li>Cập nhật tin nhắn của người dùng vào giao diện bằng cách gọi hàm React state modifier <code>setMessages(prev => [...prev, userMessage])</code>, giúp tin nhắn hiện lên khung chat ngay lập tức để tối ưu hóa trải nghiệm người dùng.</li>
+                  <li>Gọi <code>setInput('')</code> để dọn trống ô nhập dữ liệu, đồng thời kích hoạt trạng thái tải <code>setIsLoading(true)</code> để hiển thị hiệu ứng bong bóng nhảy của dấu chấm lửng (bounce animation) thông báo AI đang xử lý.</li>
+                  <li>Sử dụng API <code>fetch('http://localhost:8000/chat', ...)</code> để thực hiện một HTTP POST request không đồng bộ tới backend. Trong body của request, dữ liệu được tuần tự hóa (serialize) thành chuỗi JSON chứa hai thuộc tính: <code>message</code> (nội dung text của user) và <code>session_id</code> (lấy từ React state <code>sessionId</code>; nếu là lượt nhắn đầu tiên của phiên chat, state này sẽ là một chuỗi rỗng và được truyền đi dưới dạng <code>undefined</code>).</li>
                 </ul>
               </li>
             </ol>
 
-            <p style="margin-top: 12px;"><strong>Giai đoạn 3: Gọi LLM suy luận với đầy đủ bối cảnh</strong></p>
-            <ol class="list" start="8">
-              <li>Backend khởi tạo danh sách tin nhắn gửi đi <code>messages</code> bắt đầu bằng System Prompt mô tả tính cách (Personality) được tải trước từ file <code>me.txt</code>.</li>
-              <li>Backend lặp qua mảng lịch sử trò chuyện <code>conversation</code> vừa tải từ file JSON và đẩy toàn bộ các tin nhắn cũ vào danh sách <code>messages</code>.</li>
-              <li>Backend đẩy tiếp tin nhắn hiện tại của người dùng (<code>request.message</code>) vào cuối danh sách <code>messages</code>. Điều này giúp LLM nhận được đầy đủ ngữ cảnh của cả cuộc hội thoại.</li>
-              <li>Backend dùng SDK OpenAI gọi API suy luận: <code>client.chat.completions.create(model="gpt-4o-mini", messages=messages)</code>.</li>
-              <li>OpenAI trả về đối tượng phản hồi chứa nội dung câu trả lời của AI.</li>
-            </ol>
-
-            <p style="margin-top: 12px;"><strong>Giai đoạn 4: Cập nhật lịch sử và lưu trữ</strong></p>
-            <ol class="list" start="13">
-              <li>Backend thêm tin nhắn hiện tại của user và phản hồi của trợ lý AI vào danh sách <code>conversation</code>.</li>
-              <li>Backend gọi hàm <code>save_conversation(session_id, conversation)</code>:
+            <p style="margin-top: 12px;"><strong>Giai đoạn 3: Backend tiếp nhận request và Khôi phục Lịch sử (Backend Dispatch & Memory Restoration)</strong></p>
+            <ol class="list" start="6">
+              <li>FastAPI tiếp nhận HTTP POST request tại endpoint route <a href="file:///G:/AIProduction_t6_2026/production/week2/day1.md#L696">@app.post("/chat")</a>. Dữ liệu đầu vào được tự động phân tích cú pháp (parsing) và đối chiếu với schema của lớp <code>ChatRequest</code> định nghĩa qua thư viện Pydantic.</li>
+              <li>Hệ thống thực hiện kiểm tra thuộc tính <code>request.session_id</code>:
                 <ul>
-                  <li>Hàm mở tệp <code>../memory/{session_id}.json</code> ở chế độ ghi đè (<code>"w"</code>) với mã hóa UTF-8.</li>
-                  <li>Nó gọi lệnh <code>json.dump(messages, f, indent=2, ensure_ascii=False)</code> để tuần tự hóa (serialize) dữ liệu xuống đĩa cứng. Tham số <code>indent=2</code> thụt lề dòng giúp dễ đọc, và <code>ensure_ascii=False</code> đảm bảo tiếng Việt unicode được hiển thị nguyên bản thay vì bị mã hóa thành ký tự escape (như \u00fa).</li>
+                  <li>Nếu thuộc tính này mang giá trị null hoặc rỗng (phiên trò chuyện hoàn toàn mới), backend sẽ tự động sinh một chuỗi định danh ngẫu nhiên phiên bản 4 có tính duy nhất toàn cầu thông qua thư viện UUID: <code>session_id = str(uuid.uuid4())</code>.</li>
+                  <li>Nếu thuộc tính này đã tồn tại giá trị được gửi lên từ client, backend giữ nguyên giá trị đó để tiếp tục cuộc đối thoại hiện hành.</li>
                 </ul>
               </li>
-              <li>FastAPI trả về HTTP response JSON chứa câu trả lời của AI và <code>session_id</code> (mới sinh hoặc kế thừa) về cho client.</li>
+              <li>Backend gọi hàm <code>load_conversation(session_id)</code> trong <a href="file:///G:/AIProduction_t6_2026/production/week2/day1.md#L659">server.py</a> để khôi phục bối cảnh lịch sử hội thoại:
+                <ul>
+                  <li>Hàm tạo đối tượng đường dẫn tệp tin: <code>file_path = MEMORY_DIR / f"{session_id}.json"</code>.</li>
+                  <li>Gọi phương thức <code>file_path.exists()</code> để kiểm tra xem tệp tin lưu trữ của phiên này đã có trên ổ đĩa cứng hay chưa.</li>
+                  <li>Nếu tệp tin đã tồn tại, hàm mở tệp tin bằng cấu trúc <code>with open(file_path, "r", encoding="utf-8") as f</code> and gọi <code>json.load(f)</code> để giải tuần tự hóa dữ liệu JSON thành một danh sách (list) các đối tượng tin nhắn cũ và trả về.</li>
+                  <li>Nếu tệp tin chưa tồn tại, hàm lập tức trả về một danh sách rỗng <code>[]</code>.</li>
+                </ul>
+              </li>
             </ol>
 
-            <p style="margin-top: 12px;"><strong>Giai đoạn 5: Frontend nhận kết quả và render UI</strong></p>
-            <ol class="list" start="16">
-              <li>Client Browser tiếp nhận response. Nếu state <code>sessionId</code> của React đang rỗng, nó sẽ cập nhật giá trị <code>sessionId</code> nhận được từ backend bằng <code>setSessionId(data.session_id)</code> để sử dụng cho các lượt chat kế tiếp.</li>
-              <li>Frontend đóng gói câu trả lời của AI thành đối tượng <code>Message</code> và cập nhật vào React state <code>messages</code> để hiển thị lên màn hình.</li>
+            <p style="margin-top: 12px;"><strong>Giai đoạn 4: Tổng hợp Ngữ cảnh và Thực hiện Suy luận LLM (Context Assembly & LLM Inference)</strong></p>
+            <ol class="list" start="9">
+              <li>Sau khi khôi phục danh sách lịch sử trò chuyện (biến <code>conversation</code>), backend bắt đầu kiến thiết mảng payload <code>messages</code> chuẩn để gửi đi cho OpenAI API:
+                <ul>
+                  <li>Phần tử đầu tiên luôn là tin nhắn cấu hình hệ thống: <code>{"role": "system", "content": PERSONALITY}</code> để định hình tính cách và hành vi phản hồi của trợ lý ảo.</li>
+                  <li>Lặp qua toàn bộ danh sách lịch sử <code>conversation</code> cũ và lần lượt đẩy (append) các tin nhắn trước đó vào mảng <code>messages</code> theo đúng trình tự thời gian.</li>
+                  <li>Cuối cùng, đẩy tin nhắn hiện tại của người dùng vào mảng: <code>messages.append({"role": "user", "content": request.message})</code>. Việc này đảm bảo mô hình LLM nhận được toàn bộ ngữ cảnh của cuộc trò chuyện trong lượt chat hiện hành.</li>
+                </ul>
+              </li>
+              <li>Backend gọi thư viện OpenAI client để thực hiện cuộc gọi API suy luận bất đồng bộ:
+                <pre><code>response = client.chat.completions.create(
+    model="gpt-4o-mini",
+    messages=messages
+)</code></pre>
+              </li>
+              <li>OpenAI nhận payload, tính toán suy luận bằng mô hình <code>gpt-4o-mini</code> và trả về kết quả. Backend trích xuất nội dung văn bản phản hồi bằng cách gán: <code>assistant_response = response.choices[0].message.content</code>.</li>
+            </ol>
+
+            <p style="margin-top: 12px;"><strong>Giai đoạn 5: Đồng bộ dữ liệu Lịch sử xuống đĩa cứng (Memory Synchronization & Disk Write)</strong></p>
+            <ol class="list" start="12">
+              <li>Backend cập nhật trạng thái hội thoại cục bộ của phiên chat hiện tại bằng cách append thêm tin nhắn hiện tại của người dùng và tin nhắn phản hồi vừa nhận được từ AI vào danh sách lịch sử:
+                <ul>
+                  <li><code>conversation.append({"role": "user", "content": request.message})</code></li>
+                  <li><code>conversation.append({"role": "assistant", "content": assistant_response})</code></li>
+                </ul>
+              </li>
+              <li>Backend gọi hàm <code>save_conversation(session_id, conversation)</code> trong <a href="file:///G:/AIProduction_t6_2026/production/week2/day1.md#L668">server.py</a> để đồng bộ cập nhật mới này xuống ổ đĩa cứng:
+                <ul>
+                  <li>Hàm mở tệp tin đích <code>../memory/{session_id}.json</code> ở chế độ ghi đè bằng câu lệnh <code>with open(file_path, "w", encoding="utf-8") as f</code>.</li>
+                  <li>Ghi dữ liệu danh sách tin nhắn xuống tệp tin qua lệnh <code>json.dump(messages, f, indent=2, ensure_ascii=False)</code>. Việc truyền tham số <code>indent=2</code> giúp định dạng file JSON thụt lề dễ theo dõi, và <code>ensure_ascii=False</code> cực kỳ quan trọng để đảm bảo các ký tự tiếng Việt unicode có dấu được ghi nguyên bản thay vì bị mã hóa thành ký tự escape (như \u00fa).</li>
+                </ul>
+              </li>
+              <li>Backend đóng gói dữ liệu phản hồi trả về qua HTTP Response dưới schema <code>ChatResponse</code> chứa câu trả lời của AI và <code>session_id</code> (để client lưu giữ cho các request sau).</li>
+            </ol>
+
+            <p style="margin-top: 12px;"><strong>Giai đoạn 6: Frontend tiếp nhận Response và Cập nhật Giao diện (Client-side Response Processing & UI Sync)</strong></p>
+            <ol class="list" start="15">
+              <li>Client Browser nhận được dữ liệu phản hồi từ Fetch API và thực hiện giải nén dữ liệu JSON: <code>const data = await response.json()</code>.</li>
+              <li>Kiểm tra React state <code>sessionId</code> hiện tại. Nếu state này đang rỗng, hàm thực hiện cập nhật lại ID phiên bằng lệnh <code>setSessionId(data.session_id)</code> để phục vụ cho việc gửi tin nhắn ở các lượt chat sau.</li>
+              <li>Đóng gói tin nhắn phản hồi của trợ lý ảo AI thành một đối tượng dữ liệu kiểu <code>Message</code> với <code>role</code> là <code>'assistant'</code>, <code>content</code> là <code>data.response</code> và cập nhật vào React state <code>messages</code> thông qua <code>setMessages(prev => [...prev, assistantMessage])</code>.</li>
+              <li>Sự thay đổi của React state <code>messages</code> kích hoạt hook <code>useEffect()</code> lắng nghe thay đổi này:
+                <ul>
+                  <li>Hook gọi hàm <code>scrollToBottom()</code>.</li>
+                  <li>Hàm này tham chiếu tới thẻ div định vị ở cuối danh sách tin nhắn thông qua <code>messagesEndRef.current</code> và thực thi phương thức <code>scrollIntoView({ behavior: 'smooth' })</code> để tự động cuộn mượt mà thanh cuộn của khung chat xuống tin nhắn mới nhất.</li>
+                </ul>
+              </li>
+              <li>Khối lệnh <code>finally</code> của hàm <code>sendMessage()</code> thực thi thiết lập <code>setIsLoading(false)</code> để ẩn hiệu ứng loading, hoàn tất chu trình hoạt động của lượt chat.</li>
+            </ol>
+            
+            <p style="margin-top: 16px; border-top: 1px solid var(--hairline); padding-top: 12px;"><strong>Quy trình bổ sung: Liệt kê các Phiên trò chuyện (Sessions Listing Walkthrough)</strong></p>
+            <ol class="list" start="20">
+              <li>Khi người dùng muốn xem danh sách hoặc thống kê các phiên chat hiện có, frontend sẽ thực hiện gọi một HTTP GET request tới endpoint <a href="file:///G:/AIProduction_t6_2026/production/week2/day1.md#L739">@app.get("/sessions")</a>.</li>
+              <li>Hàm xử lý <code>list_sessions()</code> tại backend được kích hoạt:
+                <ul>
+                  <li>Khởi tạo một danh sách rỗng <code>sessions = []</code> để chứa kết quả.</li>
+                  <li>Sử dụng vòng lặp duyệt qua toàn bộ các tệp tin có định dạng đuôi mở rộng <code>.json</code> nằm trong thư mục bộ nhớ bằng lệnh: <code>for file_path in MEMORY_DIR.glob("*.json")</code>.</li>
+                  <li>Với mỗi tệp tin quét được, backend lấy ID phiên bằng cách đọc thuộc tính <code>file_path.stem</code> (lấy phần tên tệp tin lược bỏ đi phần mở rộng <code>.json</code>).</li>
+                  <li>Mở tệp tin bằng <code>open(file_path, "r", encoding="utf-8")</code> và nạp dữ liệu bằng <code>json.load(f)</code>.</li>
+                  <li>Đẩy thông tin metadata của phiên chat vào danh sách kết quả, bao gồm: <code>session_id</code>, <code>message_count</code> (số lượng tin nhắn trong file bằng lệnh <code>len(conversation)</code>), và nội dung tin nhắn cuối cùng <code>last_message</code> (lấy từ phần tử cuối cùng của mảng nếu mảng không rỗng).</li>
+                  <li>Trả về kết quả dưới dạng JSON cho client để hiển thị danh sách lịch sử các phiên chat.</li>
+                </ul>
+              </li>
             </ol>
           </div>
         </section>
