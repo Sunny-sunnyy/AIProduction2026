@@ -1,0 +1,2923 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FastAPI Complete Handbook: Zero to Production & AI/LLM/RAG</title>
+    <!-- Google Fonts: Cormorant Garamond (Serif), Inter (Sans-serif), JetBrains Mono (Monospace) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    
+    <style>
+        /* Base Design System - Claude Warm Editorial Style */
+        :root {
+            --canvas: #faf9f5;
+            --ink: #141413;
+            --body: #3d3d3a;
+            --body-strong: #252523;
+            --primary: #cc785c; /* Coral Accent */
+            --primary-active: #a9583e;
+            --primary-disabled: #e6dfd8;
+            --surface-soft: #f5f0e8;
+            --surface-card: #efe9de;
+            --surface-cream-strong: #e8e0d2;
+            --surface-dark: #181715;
+            --surface-dark-soft: #1f1e1b;
+            --surface-dark-elevated: #252320;
+            --on-primary: #ffffff;
+            --on-dark: #faf9f5;
+            --on-dark-soft: #a09d96;
+            --hairline: #e6dfd8;
+            
+            /* Callout Colors */
+            --accent-teal: #5db8a6;
+            --accent-amber: #e8a55a;
+            --success: #5db872;
+            --warning: #d4a017;
+            --error: #c64545;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: var(--canvas);
+            color: var(--body);
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            font-size: 16px;
+            line-height: 1.65;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* Typography */
+        h1, h2, h3, h4 {
+            color: var(--ink);
+            font-family: 'Cormorant Garamond', Garamond, "Times New Roman", serif;
+            font-weight: 500;
+            letter-spacing: -0.02em;
+        }
+
+        h1 {
+            font-size: 3.5rem;
+            line-height: 1.1;
+            margin-bottom: 1.5rem;
+        }
+
+        h2 {
+            font-size: 2.2rem;
+            line-height: 1.2;
+            margin-top: 4.5rem;
+            margin-bottom: 1.2rem;
+            border-bottom: 1px solid var(--hairline);
+            padding-bottom: 0.5rem;
+        }
+
+        h3 {
+            font-size: 1.6rem;
+            line-height: 1.3;
+            margin-top: 2.5rem;
+            margin-bottom: 0.8rem;
+        }
+
+        h4 {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-top: 1.8rem;
+            margin-bottom: 0.5rem;
+        }
+
+        p {
+            margin-bottom: 1.2rem;
+        }
+
+        strong {
+            color: var(--body-strong);
+            font-weight: 600;
+        }
+
+        a {
+            color: var(--primary);
+            text-decoration: none;
+            transition: color 0.2s ease;
+        }
+
+        a:hover {
+            color: var(--primary-active);
+            text-decoration: underline;
+        }
+
+        /* Layout Structure */
+        .wrapper {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* Fixed Sidebar TOC */
+        aside.sidebar {
+            width: 320px;
+            background-color: var(--surface-soft);
+            border-right: 1px solid var(--hairline);
+            position: fixed;
+            top: 0;
+            bottom: 0;
+            left: 0;
+            overflow-y: auto;
+            padding: 2.5rem 1.5rem;
+            z-index: 100;
+        }
+
+        .brand-logo {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 2rem;
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--ink);
+        }
+
+        .brand-logo svg {
+            fill: var(--primary);
+            width: 24px;
+            height: 24px;
+        }
+
+        .toc-list {
+            list-style: none;
+        }
+
+        .toc-part {
+            margin-top: 1.8rem;
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: var(--primary);
+            font-weight: 600;
+        }
+
+        .toc-item {
+            margin-left: 0.5rem;
+            margin-top: 0.4rem;
+        }
+
+        .toc-item a {
+            color: var(--body);
+            font-size: 0.9rem;
+            display: block;
+            padding: 2px 0;
+        }
+
+        .toc-item a:hover,
+        .toc-item a.active {
+            color: var(--primary);
+            font-weight: 500;
+            text-decoration: none;
+        }
+
+        /* Main Content Panel */
+        main.content {
+            margin-left: 320px;
+            flex: 1;
+            padding: 4rem 3rem;
+            max-width: 1100px;
+            background-color: var(--canvas);
+        }
+
+        /* Header Hero Section */
+        header.hero {
+            margin-bottom: 4rem;
+            padding-bottom: 3rem;
+            border-bottom: 1px solid var(--hairline);
+        }
+
+        header.hero p.subtitle {
+            font-size: 1.35rem;
+            color: var(--body);
+            font-family: 'Cormorant Garamond', serif;
+            font-style: italic;
+            max-width: 850px;
+            margin-bottom: 2rem;
+        }
+
+        .badge-pill {
+            background-color: var(--surface-card);
+            color: var(--ink);
+            font-size: 0.8rem;
+            font-weight: 500;
+            padding: 4px 12px;
+            border-radius: 9999px;
+            display: inline-block;
+            margin-right: 0.5rem;
+        }
+
+        .badge-coral {
+            background-color: var(--primary);
+            color: var(--on-primary);
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            padding: 4px 12px;
+            border-radius: 9999px;
+            display: inline-block;
+        }
+
+        /* Custom Callout Components */
+        .callout {
+            border-left: 4px solid var(--hairline);
+            padding: 1.5rem;
+            margin: 2rem 0;
+            border-radius: 0 8px 8px 0;
+        }
+
+        .callout-title {
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            font-size: 0.95rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        /* Callout Types */
+        .callout.concept {
+            border-color: var(--accent-teal);
+            background-color: #f2faf9;
+        }
+        .callout.concept .callout-title { color: #2e7a6c; }
+
+        .callout.luu-y {
+            border-color: var(--accent-amber);
+            background-color: #fdfaf2;
+        }
+        .callout.luu-y .callout-title { color: #aa7432; }
+
+        .callout.pitfall {
+            border-color: var(--error);
+            background-color: #fdf5f5;
+        }
+        .callout.pitfall .callout-title { color: var(--error); }
+
+        .callout.best-practice {
+            border-color: var(--success);
+            background-color: #f5fbf6;
+        }
+        .callout.best-practice .callout-title { color: #3b884c; }
+
+        .callout.production-note {
+            border-color: var(--primary);
+            background-color: #fdf6f4;
+        }
+        .callout.production-note .callout-title { color: var(--primary); }
+
+        .callout.ai-note {
+            border-color: #8b5cf6;
+            background-color: #faf5ff;
+        }
+        .callout.ai-note .callout-title { color: #6d28d9; }
+
+        .callout.version-note {
+            border-color: var(--warning);
+            background-color: #fefdf0;
+        }
+        .callout.version-note .callout-title { color: #b28900; }
+
+        /* Code Window Card */
+        .code-window {
+            background-color: var(--surface-dark);
+            border-radius: 12px;
+            overflow: hidden;
+            margin: 2rem 0;
+            box-shadow: 0 4px 12px rgba(20, 20, 19, 0.05);
+        }
+
+        .code-header {
+            background-color: var(--surface-dark-elevated);
+            padding: 0.6rem 1.2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--surface-dark-soft);
+        }
+
+        .code-filename {
+            color: var(--on-dark-soft);
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.85rem;
+        }
+
+        .code-window pre {
+            padding: 1.5rem;
+            margin: 0;
+            overflow-x: auto;
+        }
+
+        .code-window code {
+            font-family: 'JetBrains Mono', 'ui-monospace', monospace;
+            font-size: 0.9rem;
+            color: var(--on-dark);
+            background: none;
+            padding: 0;
+            border-radius: 0;
+            white-space: pre;
+        }
+
+        /* In-text code decoration */
+        code {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.9em;
+            background-color: var(--surface-soft);
+            color: var(--ink);
+            padding: 2px 6px;
+            border-radius: 4px;
+        }
+
+        /* Code Explanation Block */
+        .code-explanation {
+            border: 1px solid var(--hairline);
+            border-radius: 8px;
+            padding: 1.5rem;
+            background-color: var(--surface-soft);
+            margin-top: -1rem;
+            margin-bottom: 2.5rem;
+        }
+
+        .explanation-title {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 1.35rem;
+            font-weight: 600;
+            color: var(--ink);
+            margin-bottom: 0.8rem;
+        }
+
+        .explanation-step {
+            margin-left: 1.2rem;
+            list-style-type: decimal;
+            margin-bottom: 1rem;
+        }
+
+        .explanation-step li {
+            margin-bottom: 0.5rem;
+        }
+
+        /* Request / Response samples */
+        .req-res-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 1.5rem;
+            margin: 1.5rem 0;
+        }
+
+        @media (min-width: 768px) {
+            .req-res-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+
+        .req-res-box {
+            background-color: var(--surface-dark-soft);
+            border-radius: 8px;
+            padding: 1.2rem;
+            border: 1px solid var(--surface-dark-elevated);
+        }
+
+        .req-res-title {
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            color: var(--on-dark-soft);
+            margin-bottom: 0.6rem;
+            letter-spacing: 0.05em;
+            font-weight: 600;
+        }
+
+        .req-res-box pre {
+            margin: 0;
+            overflow-x: auto;
+        }
+
+        .req-res-box code {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.85rem;
+            color: var(--on-dark);
+            background: none;
+            padding: 0;
+        }
+
+        /* Comparison Tables */
+        table.comparison-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 2rem 0;
+            background-color: var(--canvas);
+        }
+
+        table.comparison-table th, 
+        table.comparison-table td {
+            border: 1px solid var(--hairline);
+            padding: 0.8rem 1.2rem;
+            text-align: left;
+        }
+
+        table.comparison-table th {
+            background-color: var(--surface-soft);
+            color: var(--ink);
+            font-weight: 600;
+            font-family: 'Inter', sans-serif;
+            font-size: 0.95rem;
+        }
+
+        table.comparison-table td {
+            font-size: 0.95rem;
+        }
+
+        /* Recap Block */
+        .recap-block {
+            background-color: var(--surface-cream-strong);
+            padding: 1.5rem;
+            border-radius: 8px;
+            margin: 2.5rem 0;
+            border: 1px solid var(--hairline);
+        }
+
+        .recap-block p {
+            margin-bottom: 0;
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 1.2rem;
+            font-style: italic;
+            color: var(--ink);
+        }
+
+        /* Mini Project styling */
+        .project-card {
+            background-color: var(--surface-card);
+            border: 1px solid var(--hairline);
+            border-radius: 12px;
+            padding: 2.5rem;
+            margin: 3.5rem 0;
+        }
+
+        .project-header {
+            border-bottom: 2px solid var(--primary);
+            padding-bottom: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .project-tag {
+            font-size: 0.75rem;
+            background-color: var(--primary);
+            color: var(--on-primary);
+            padding: 2px 10px;
+            border-radius: 4px;
+            text-transform: uppercase;
+            font-weight: 600;
+            letter-spacing: 0.05em;
+            display: inline-block;
+            margin-bottom: 0.5rem;
+        }
+
+        .project-card h3 {
+            margin-top: 0;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 1024px) {
+            aside.sidebar {
+                width: 100%;
+                height: auto;
+                position: relative;
+                border-right: none;
+                border-bottom: 1px solid var(--hairline);
+            }
+
+            main.content {
+                margin-left: 0;
+                padding: 2rem 1.5rem;
+            }
+
+            .wrapper {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="wrapper">
+        <!-- Sidebar Navigation -->
+        <aside class="sidebar">
+            <div class="brand-logo">
+                <svg viewBox="0 0 24 24">
+                    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/>
+                </svg>
+                <span>FastAPI Handbook</span>
+            </div>
+            
+            <nav class="toc">
+                <ul class="toc-list">
+                    <li class="toc-part">Part A: FastAPI Foundations</li>
+                    <li class="toc-item"><a href="#chapter-1">Chương 1: FastAPI là gì?</a></li>
+                    <li class="toc-item"><a href="#chapter-2">Chương 2: HTTP và REST Basics</a></li>
+                    <li class="toc-item"><a href="#chapter-3">Chương 3: ASGI, WSGI & Async</a></li>
+                    <li class="toc-item"><a href="#chapter-4">Chương 4: Cài đặt & App đầu tiên</a></li>
+                    
+                    <li class="toc-part">Part B: Requests & Validation</li>
+                    <li class="toc-item"><a href="#chapter-5">Chương 5: Tạo Endpoint cơ bản</a></li>
+                    <li class="toc-item"><a href="#chapter-6">Chương 6: Path, Query & Body</a></li>
+                    <li class="toc-item"><a href="#chapter-7">Chương 7: Validation với Pydantic</a></li>
+                    <li class="toc-item"><a href="#chapter-8">Chương 8: Response Models</a></li>
+                    <li class="toc-item"><a href="#chapter-9">Chương 9: Error Handling</a></li>
+                    <li class="toc-item"><a href="#chapter-10">Chương 10: Headers, Forms, Files</a></li>
+                    
+                    <li class="toc-part">Part C: Application Structure</li>
+                    <li class="toc-item"><a href="#chapter-11">Chương 11: Dependency Injection</a></li>
+                    <li class="toc-item"><a href="#chapter-12">Chương 12: Bigger Apps & APIRouter</a></li>
+                    
+                    <li class="toc-part">Part D: Databases & CRUD</li>
+                    <li class="toc-item"><a href="#chapter-13">Chương 13: Database Foundations</a></li>
+                    <li class="toc-item"><a href="#chapter-14">Chương 14: CRUD Application</a></li>
+                    <li class="toc-item"><a href="#chapter-15">Chương 15: Alembic Migrations</a></li>
+                    
+                    <li class="toc-part">Part E: Security & Auth</li>
+                    <li class="toc-item"><a href="#chapter-16">Chương 16: Security Fundamentals</a></li>
+                    <li class="toc-item"><a href="#chapter-17">Chương 17: OAuth2 & JWT thực chiến</a></li>
+                    <li class="toc-item"><a href="#chapter-18">Chương 18: Middleware & CORS</a></li>
+                    
+                    <li class="toc-part">Part F: Realtime & Lifecycle</li>
+                    <li class="toc-item"><a href="#chapter-19">Chương 19: Lifespan & Events</a></li>
+                    <li class="toc-item"><a href="#chapter-20">Chương 20: Background, SSE & WebSockets</a></li>
+                    
+                    <li class="toc-part">Part G: Testing & Quality</li>
+                    <li class="toc-item"><a href="#chapter-21">Chương 21: Testing FastAPI Apps</a></li>
+                    <li class="toc-item"><a href="#chapter-22">Chương 22: Debugging & Quality</a></li>
+                    
+                    <li class="toc-part">Part H: Production Operations</li>
+                    <li class="toc-item"><a href="#chapter-23">Chương 23: Settings & Environment</a></li>
+                    <li class="toc-item"><a href="#chapter-24">Chương 24: Observability & Health</a></li>
+                    <li class="toc-item"><a href="#chapter-25">Chương 25: Deployment & Docker</a></li>
+                    <li class="toc-item"><a href="#chapter-26">Chương 26: Scaling Basics</a></li>
+                    
+                    <li class="toc-part">Part I: FastAPI for AI/RAG</li>
+                    <li class="toc-item"><a href="#chapter-27">Chương 27: AI/LLM/RAG Integration</a></li>
+                    <li class="toc-item"><a href="#chapter-28">Chương 28: 4 Dự án mẫu thực tế</a></li>
+                    
+                    <li class="toc-part">Part J: Mistakes & Roadmap</li>
+                    <li class="toc-item"><a href="#chapter-29">Chương 29: Sai lầm thường gặp</a></li>
+                    <li class="toc-item"><a href="#chapter-30">Chương 30: Best Practices & Lộ trình</a></li>
+                    
+                    <li class="toc-part">Phụ lục</li>
+                    <li class="toc-item"><a href="#appendix">Appendix & Glossary</a></li>
+                </ul>
+            </nav>
+        </aside>
+
+        <!-- Main Content Area -->
+        <main class="content">
+            <header class="hero">
+                <span class="badge-coral">Bản biên soạn chất lượng cao</span>
+                <span class="badge-pill">Dành cho Python Engineer</span>
+                <h1 style="margin-top: 1rem;">FastAPI Complete Handbook</h1>
+                <p class="subtitle">Từ số 0 đến vận hành sản phẩm thực tế, tích hợp các mô hình ngôn ngữ lớn (LLM) và hệ thống truy xuất thông tin tăng cường (RAG).</p>
+                <p style="color: var(--muted); font-size: 0.9rem;">Tài liệu hướng dẫn chuyên sâu bằng Tiếng Việt dành cho các kỹ sư phát triển backend và AI, bám sát tài liệu chính thức mới nhất.</p>
+            </header>
+
+            <!-- PART A: FASTAPI FOUNDATIONS -->
+            <section id="part-a">
+                <h1 style="font-size: 2.8rem; color: var(--primary); margin-top: 4rem;">Part A: FastAPI Foundations</h1>
+                
+                <!-- Chapter 1 -->
+                <div id="chapter-1" class="chapter">
+                    <h2>Chương 1: FastAPI là gì?</h2>
+                    <div class="callout concept">
+                        <div class="callout-title">Mục tiêu</div>
+                        <p>Hiểu được bản chất của framework FastAPI, các thành phần cấu tạo cốt lõi (Starlette và Pydantic) và sự khác biệt căn bản của nó so với các framework truyền thống như Django hay Flask.</p>
+                    </div>
+                    
+                    <h3>1. Bản chất và Sự phổ biến</h3>
+                    <p>FastAPI là một Python web framework hiện đại, hiệu năng cao để xây dựng các API, được viết dựa trên các gợi ý kiểu dữ liệu (standard Python type hints) của Python 3.8+. FastAPI kế thừa sức mạnh từ hai thư viện nền tảng:</p>
+                    <ul>
+                        <li><strong>Starlette:</strong> Đảm nhiệm phần xử lý web trực tiếp (routing, request/response, WebSocket), mang lại hiệu năng phi thường tương đương với Node.js và Go.</li>
+                        <li><strong>Pydantic:</strong> Đảm nhiệm phần quản lý cấu trúc dữ liệu, tự động chuyển đổi kiểu (data serialization) và xác thực dữ liệu đầu vào (data validation).</li>
+                    </ul>
+                    
+                    <h3>2. So sánh FastAPI, Flask và Django</h3>
+                    <p>Để giúp lập trình viên mới hiểu rõ hơn về bức tranh tổng thể, dưới đây là bảng so sánh chi tiết giữa ba ông lớn của thế giới Python Web:</p>
+                    <table class="comparison-table">
+                        <thead>
+                            <tr>
+                                <th>Tiêu chí</th>
+                                <th>FastAPI</th>
+                                <th>Flask</th>
+                                <th>Django</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>Kiểu kiến trúc</strong></td>
+                                <td>ASGI (Không đồng bộ mặc định)</td>
+                                <td>WSGI (Đồng bộ mặc định)</td>
+                                <td>WSGI / ASGI (Monolithic)</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Hiệu năng</strong></td>
+                                <td>Cực kỳ cao (Ngang Go/NodeJS)</td>
+                                <td>Trung bình</td>
+                                <td>Trung bình</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Validation</strong></td>
+                                <td>Tự động qua Pydantic</td>
+                                <td>Phải tự viết/thư viện ngoài</td>
+                                <td>Django Forms/DRF Serializers</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Tự động sinh tài liệu</strong></td>
+                                <td>Có sẵn (Swagger UI, ReDoc)</td>
+                                <td>Không</td>
+                                <td>Không (cần cài DRF-YASG)</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <div class="callout best-practice">
+                        <div class="callout-title">Khi nào nên chọn FastAPI?</div>
+                        <p>FastAPI là lựa chọn hoàn hảo khi bạn cần xây dựng API hướng dịch vụ microservices, ứng dụng có lưu lượng kết nối lớn cần cơ chế non-blocking (chat, streaming dữ liệu) hoặc các ứng dụng phục vụ mô hình AI/ML cần tính toán bất đồng bộ và kiểm soát dữ liệu đầu vào nghiêm ngặt.</p>
+                    </div>
+
+                    <div class="recap-block">
+                        <p>Recap: FastAPI = Starlette (Web/ASGI) + Pydantic (Validation) + Python Type Hints. Nó sinh ra để phát triển API nhanh gọn, có hiệu năng cực cao và tài liệu tự động.</p>
+                    </div>
+                </div>
+
+                <!-- Chapter 2 -->
+                <div id="chapter-2" class="chapter">
+                    <h2>Chương 2: HTTP và REST Basics</h2>
+                    <div class="callout concept">
+                        <div class="callout-title">Mục tiêu</div>
+                        <p>Trang bị kiến thức nền tảng về giao thức truyền dữ liệu siêu văn bản (HTTP) và nguyên lý kiến trúc RESTful API trước khi bắt tay vào triển khai thực tế.</p>
+                    </div>
+
+                    <h3>1. Request và Response trong HTTP</h3>
+                    <p>Trong thế giới Web, mọi giao dịch được thực hiện qua chu trình Request-Response giữa Client (trình duyệt, ứng dụng di động) và Server:</p>
+                    <ul>
+                        <li><strong>Request (Yêu cầu):</strong> Chứa HTTP Method (GET, POST...), Target URL, Headers (chứa metadata như Content-Type, Authorization), và Request Body (JSON payload).</li>
+                        <li><strong>Response (Phản hồi):</strong> Chứa HTTP Status Code (200 OK, 404 Not Found...), Headers và Response Body.</li>
+                    </ul>
+
+                    <h3>2. HTTP Methods và Tính bất biến (Idempotency)</h3>
+                    <p>Mỗi phương thức HTTP biểu thị hành động dự kiến đối với tài nguyên:</p>
+                    <ul>
+                        <li><strong>GET:</strong> Truy xuất dữ liệu (Bất biến - Idempotent).</li>
+                        <li><strong>POST:</strong> Tạo tài nguyên mới (Không bất biến).</li>
+                        <li><strong>PUT:</strong> Cập nhật toàn bộ tài nguyên (Bất biến).</li>
+                        <li><strong>PATCH:</strong> Cập nhật một phần tài nguyên (Không bất biến).</li>
+                        <li><strong>DELETE:</strong> Xóa tài nguyên (Bất biến).</li>
+                    </ul>
+
+                    <div class="callout luu-y">
+                        <div class="callout-title">Bất biến (Idempotent) là gì?</div>
+                        <p>Một phương thức được coi là bất biến nếu nhiều yêu cầu giống hệt nhau gửi lên server sẽ luôn đem lại kết quả giống như lần gửi đầu tiên, không làm thay đổi trạng thái tài nguyên của hệ thống nhiều lần.</p>
+                    </div>
+
+                    <h3>3. Truyền dữ liệu: Path vs Query vs Body</h3>
+                    <ul>
+                        <li><strong>Path Parameter:</strong> Dùng để định danh một tài nguyên cụ thể (Ví dụ: <code>/users/42</code> - lấy user có ID 42).</li>
+                        <li><strong>Query Parameter:</strong> Dùng để lọc, sắp xếp, hoặc phân trang tài nguyên (Ví dụ: <code>/users?limit=10&page=2</code>).</li>
+                        <li><strong>Request Body:</strong> Dùng để gửi payload phức tạp lên server, thường định dạng JSON (Ví dụ: Dữ liệu đăng ký tài khoản).</li>
+                    </ul>
+
+                    <div class="recap-block">
+                        <p>Recap: Thiết kế RESTful API chuẩn mực yêu cầu sử dụng đúng các HTTP Methods và phân biệt rõ khi nào truyền tham số qua Path, Query hoặc Request Body.</p>
+                    </div>
+                </div>
+
+                <!-- Chapter 3 -->
+                <div id="chapter-3" class="chapter">
+                    <h2>Chương 3: ASGI, WSGI & Async</h2>
+                    <div class="callout concept">
+                        <div class="callout-title">Mục tiêu</div>
+                        <p>Tìm hiểu cơ chế chạy bất đồng bộ của FastAPI, hiểu sự khác biệt giữa chuẩn giao tiếp cũ (WSGI) và chuẩn giao tiếp bất đồng bộ mới (ASGI).</p>
+                    </div>
+
+                    <h3>1. WSGI vs ASGI</h3>
+                    <p><strong>WSGI (Web Server Gateway Interface):</strong> Chuẩn giao tiếp đồng bộ (synchronous). Mỗi khi có request, web server sẽ phân bổ một luồng (thread) xử lý riêng. Nếu luồng đó thực hiện tác vụ I/O (như gọi DB, đọc file), nó sẽ bị chặn (block), không thể xử lý request khác.</p>
+                    <p><strong>ASGI (Asynchronous Server Gateway Interface):</strong> Bản nâng cấp của WSGI hỗ trợ xử lý bất đồng bộ (asynchronous), cho phép nhiều kết nối diễn ra đồng thời trên một luồng duy nhất (Event Loop). ASGI cực kỳ phù hợp cho WebSockets, Server-Sent Events, hoặc các tác vụ I/O kéo dài.</p>
+
+                    <h3>2. Vai trò của Uvicorn</h3>
+                    <p>Uvicorn là một web server ASGI siêu nhanh, đóng vai trò như một người trung chuyển tiếp nhận các kết nối mạng HTTP/WebSocket thô, sau đó chuyển giao chúng thành định dạng dữ liệu ASGI tiêu chuẩn để ứng dụng FastAPI có thể xử lý.</p>
+
+                    <h3>3. Viết code: def vs async def</h3>
+                    <p>Quy tắc vàng khi lập trình ứng dụng với FastAPI:</p>
+                    <ul>
+                        <li>Dùng <code>async def</code> khi trong logic xử lý của bạn có các lời gọi hàm I/O hỗ trợ async (có từ khóa <code>await</code>), hoặc khi bạn đang tương tác với các external API của các nhà cung cấp AI (như OpenAI, Anthropic) bằng thư viện HTTP client hỗ trợ async.</li>
+                        <li>Dùng <code>def</code> thông thường khi bạn gọi các thư viện đồng bộ cũ (như thư viện kết nối cơ sở dữ liệu đồng bộ cổ điển, đọc file bằng hàm mặc định của Python). FastAPI sẽ tự động chạy các hàm <code>def</code> này trên một luồng phụ riêng (Thread Pool) để không chặn Event Loop chính.</li>
+                    </ul>
+
+                    <div class="callout pitfall">
+                        <div class="callout-title">Lỗi nghiêm trọng: Dùng async def kèm thư viện chặn (Blocking)</div>
+                        <p>Nếu bạn định nghĩa hàm bằng <code>async def</code> nhưng bên trong lại gọi một hàm đồng bộ mất thời gian (ví dụ: <code>time.sleep(5)</code> hoặc gọi DB đồng bộ), Event Loop của toàn bộ ứng dụng sẽ bị đóng băng hoàn toàn. Mọi người dùng khác sẽ không thể truy cập hệ thống.</p>
+                    </div>
+
+                    <div class="recap-block">
+                        <p>Recap: Uvicorn là server ASGI thực thi ứng dụng. Sử dụng async def đúng cách để tối ưu hóa hiệu năng, giúp server xử lý hàng ngàn request đồng thời.</p>
+                    </div>
+                </div>
+
+                <!-- Chapter 4 -->
+                <div id="chapter-4" class="chapter">
+                    <h2>Chương 4: Cài đặt & App đầu tiên</h2>
+                    <div class="callout concept">
+                        <div class="callout-title">Mục tiêu</div>
+                        <p>Thiết lập môi trường làm việc hiện đại bằng công cụ quản lý package `uv`, viết mã nguồn cho ứng dụng đầu tiên và chạy thử nghiệm.</p>
+                    </div>
+
+                    <div class="callout version-note">
+                        <div class="callout-title">Version Note: CLI FastAPI mới nhất</div>
+                        <p>Trong các phiên bản FastAPI gần đây, bạn được khuyến khích sử dụng lệnh CLI chính thức của thư viện là <code>fastapi dev</code> (thay thế cho <code>uvicorn main:app --reload</code> trước đây) và <code>fastapi run</code> cho môi trường production.</p>
+                    </div>
+
+                    <h3>1. Cài đặt môi trường với `uv`</h3>
+                    <p>Chúng ta sẽ sử dụng công cụ quản lý package <code>uv</code> siêu tốc của astral. Chạy các lệnh sau trong Terminal:</p>
+                    <pre style="background: var(--surface-dark); color: var(--on-dark); padding: 1rem; border-radius: 6px; font-family: monospace;">
+# Tạo môi trường ảo
+uv venv
+# Kích hoạt môi trường ảo (Windows)
+.venv\Scripts\activate
+# Cài đặt fastapi và công cụ chạy server
+uv add fastapi uvicorn
+</pre>
+
+                    <h3>2. Code: Hello World App [C01]</h3>
+                    <div class="code-window">
+                        <div class="code-header">
+                            <span class="code-filename">main.py</span>
+                        </div>
+                        <pre><code>from fastapi import FastAPI
+
+# Khởi tạo instance ứng dụng FastAPI
+app = FastAPI(title="FastAPI Handbook Hello App")
+
+@app.get("/")
+async def root():
+    # Trả về một dictionary, FastAPI sẽ tự động chuyển thành JSON
+    return {"message": "Hello, FastAPI world!"}
+</code></pre>
+                    </div>
+
+                    <div class="code-explanation">
+                        <div class="explanation-title">Giải thích mã nguồn main.py</div>
+                        <ul>
+                            <li><strong>Mục tiêu:</strong> Tạo một API endpoint đơn giản nhất trả về dòng chữ chào mừng.</li>
+                            <li><strong>Luồng chạy:</strong> Khi server nhận request HTTP GET vào đường dẫn gốc <code>/</code>, hàm <code>root()</code> sẽ được thực thi bất đồng bộ và trả về một Python dictionary. FastAPI tự động chuyển đối tượng này sang định dạng JSON và trả về client kèm header <code>Content-Type: application/json</code>.</li>
+                        </ul>
+                    </div>
+
+                    <h3>3. Khởi chạy ứng dụng và truy cập API Docs</h3>
+                    <p>Để chạy ứng dụng ở chế độ phát triển (development), chạy lệnh sau:</p>
+                    <pre style="background: var(--surface-dark); color: var(--on-dark); padding: 1rem; border-radius: 6px; font-family: monospace;">
+fastapi dev main.py
+</pre>
+                    <p>Mở trình duyệt và truy cập các liên kết:</p>
+                    <ul>
+                        <li>Ứng dụng của bạn: <a href="http://127.0.0.1:8000" target="_blank">http://127.0.0.1:8000</a></li>
+                        <li>Tài liệu Swagger UI: <a href="http://127.0.0.1:8000/docs" target="_blank">http://127.0.0.1:8000/docs</a> (Cho phép chạy thử API trực tiếp)</li>
+                        <li>Tài liệu ReDoc: <a href="http://127.0.0.1:8000/redoc" target="_blank">http://127.0.0.1:8000/redoc</a></li>
+                        <li>OpenAPI Specification: <a href="http://127.0.0.1:8000/openapi.json" target="_blank">http://127.0.0.1:8000/openapi.json</a></li>
+                    </ul>
+
+                    <div class="recap-block">
+                        <p>Recap: Viết app cực nhanh với cú pháp `app = FastAPI()`, sử dụng decorator `@app.get("/")` để định tuyến và chạy nhanh bằng lệnh `fastapi dev`.</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- PART B: REQUESTS, RESPONSES AND VALIDATION -->
+            <section id="part-b">
+                <h1 style="font-size: 2.8rem; color: var(--primary); margin-top: 4rem;">Part B: Requests, Responses, and Validation</h1>
+
+                <!-- Chapter 5 -->
+                <div id="chapter-5" class="chapter">
+                    <h2>Chương 5: Tạo Endpoint cơ bản</h2>
+                    <div class="callout concept">
+                        <div class="callout-title">Mục tiêu</div>
+                        <p>Làm quen với các decorator định tuyến (routing) cơ bản để tiếp nhận các phương thức GET và POST, trả về các kiểu cấu trúc dữ liệu khác nhau.</p>
+                    </div>
+
+                    <h3>1. Cú pháp định tuyến (Route Decorators)</h3>
+                    <p>FastAPI hỗ trợ toàn bộ các phương thức HTTP thông qua các hàm decorator trực tiếp trên thực thể ứng dụng: `@app.get()`, `@app.post()`, `@app.put()`, `@app.delete()`...</p>
+
+                    <h3>2. Code: GET & POST Basics [C02]</h3>
+                    <div class="code-window">
+                        <div class="code-header">
+                            <span class="code-filename">routes_demo.py</span>
+                        </div>
+                        <pre><code>from fastapi import FastAPI
+from typing import List, Dict
+
+app = FastAPI()
+
+# Endpoint GET: Truy xuất thông tin danh sách sản phẩm
+@app.get("/products")
+async def get_products() -> List[Dict[str, float]]:
+    return [
+        {"id": 1.0, "price": 99.9},
+        {"id": 2.0, "price": 49.5}
+    ]
+
+# Endpoint POST: Nhận dữ liệu để tạo mới sản phẩm
+@app.post("/products")
+async def create_product(payload: Dict[str, str]):
+    # Xử lý tạo sản phẩm (ở đây mock phản hồi)
+    return {
+        "status": "created",
+        "product_name": payload.get("name")
+    }
+</code></pre>
+                    </div>
+
+                    <div class="code-explanation">
+                        <div class="explanation-title">Giải thích mã nguồn routes_demo.py</div>
+                        <ul>
+                            <li><strong>Mục tiêu:</strong> Tạo route GET để lấy danh sách sản phẩm và POST để tạo sản phẩm.</li>
+                            <li><strong>Cách chạy:</strong> Endpoint POST yêu cầu Client gửi dữ liệu định dạng JSON lên. FastAPI sẽ tự động phân giải request body thô thành một Python dictionary và đưa vào biến <code>payload</code>.</li>
+                        </ul>
+                    </div>
+
+                    <div class="recap-block">
+                        <p>Recap: Dùng `@app.get` cho các tác vụ lấy dữ liệu và `@app.post` khi cần gửi dữ liệu thô dạng JSON lên để tạo mới tài nguyên.</p>
+                    </div>
+                </div>
+
+                <!-- Chapter 6 -->
+                <div id="chapter-6" class="chapter">
+                    <h2>Chương 6: Path, Query & Body</h2>
+                    <div class="callout concept">
+                        <div class="callout-title">Mục tiêu</div>
+                        <p>Phân biệt và kết hợp linh hoạt ba nguồn truyền nhận dữ liệu phổ biến: Path Parameter, Query Parameter và Request Body.</p>
+                    </div>
+
+                    <h3>1. Định nghĩa kỹ thuật</h3>
+                    <ul>
+                        <li><strong>Path Parameter:</strong> Là một phần cố định của URL, được định vị bằng cặp ngoặc nhọn <code>{param}</code>.</li>
+                        <li><strong>Query Parameter:</strong> Các tham số tùy chọn hoặc bổ sung nằm sau dấu <code>?</code> trên URL.</li>
+                        <li><strong>Body:</strong> Dữ liệu JSON gửi ngầm trong request payload.</li>
+                    </ul>
+
+                    <h3>2. Code: Tích hợp Path, Query & Body [C03, C04, C05]</h3>
+                    <div class="code-window">
+                        <div class="code-header">
+                            <span class="code-filename">params_demo.py</span>
+                        </div>
+                        <pre><code>from fastapi import FastAPI
+from typing import Optional
+
+app = FastAPI()
+
+# Endpoint tổng hợp nhận cả 3 loại tham số
+@app.put("/items/{item_id}")
+async def update_item(
+    item_id: int,                      # Path parameter (bắt buộc)
+    q: Optional[str] = None,          # Query parameter (tùy chọn)
+    payload: dict = None              # Request body
+):
+    return {
+        "item_id": item_id,
+        "query_filter": q,
+        "updated_data": payload
+    }
+</code></pre>
+                    </div>
+
+                    <div class="code-explanation">
+                        <div class="explanation-title">Phân tích hoạt động của params_demo.py</div>
+                        <ul>
+                            <li><strong>Item ID:</strong> Kiểu <code>int</code>. Nếu client cố ý truyền chuỗi không thể convert thành số (ví dụ: `/items/abc`), FastAPI sẽ trả về lỗi HTTP 422 Validation Error ngay lập tức.</li>
+                            <li><strong>Tham số q:</strong> Là một Query Parameter tùy chọn vì có giá trị mặc định là <code>None</code>.</li>
+                        </ul>
+                    </div>
+
+                    <div class="req-res-grid">
+                        <div class="req-res-box">
+                            <div class="req-res-title">Request Example (PUT)</div>
+                            <pre><code>PUT /items/105?q=search_term
+Content-Type: application/json
+
+{
+  "name": "Sách lập trình Python",
+  "price": 250000
+}</code></pre>
+                        </div>
+                        <div class="req-res-box">
+                            <div class="req-res-title">Response Example</div>
+                            <pre><code>{
+  "item_id": 105,
+  "query_filter": "search_term",
+  "updated_data": {
+    "name": "Sách lập trình Python",
+    "price": 250000
+  }
+}</code></pre>
+                        </div>
+                    </div>
+
+                    <div class="recap-block">
+                        <p>Recap: FastAPI đủ thông minh để tự động phân tích: nếu biến trùng tên với định tuyến thì là Path param, nếu có kiểu dữ liệu nguyên thủy (primitive) thì là Query param, nếu là class phức tạp thì là Request Body.</p>
+                    </div>
+                </div>
+
+                <!-- Chapter 7 -->
+                <div id="chapter-7" class="chapter">
+                    <h2>Chương 7: Validation với Pydantic</h2>
+                    <div class="callout concept">
+                        <div class="callout-title">Mục tiêu</div>
+                        <p>Sử dụng thư viện Pydantic để định nghĩa các mô hình dữ liệu (schema) chặt chẽ, ràng buộc kiểu dữ liệu, chiều dài, giá trị tối thiểu/tối đa và cấu trúc lồng nhau.</p>
+                    </div>
+
+                    <div class="callout version-note">
+                        <div class="callout-title">Version Note: Pydantic v2 trong FastAPI mới</div>
+                        <p>FastAPI hiện tại đã sử dụng Pydantic v2. Khai báo schema kế thừa từ <code>pydantic.BaseModel</code>. Định nghĩa ràng buộc nâng cao sử dụng hàm <code>Field</code>.</p>
+                    </div>
+
+                    <h3>1. Khai báo BaseModel & Field Constraints</h3>
+                    <p>Pydantic bảo vệ ứng dụng của bạn tại "cửa ngõ". Nếu dữ liệu client gửi lên không đúng định dạng khai báo, request sẽ bị từ chối kèm mô tả lỗi chi tiết, giúp backend không bao giờ nhận dữ liệu "bẩn".</p>
+
+                    <h3>2. Code: Nested Model & Constraints [C06]</h3>
+                    <div class="code-window">
+                        <div class="code-header">
+                            <span class="code-filename">pydantic_models.py</span>
+                        </div>
+                        <pre><code>from fastapi import FastAPI
+from pydantic import BaseModel, Field, EmailStr
+from typing import List, Optional
+
+app = FastAPI()
+
+class Tag(BaseModel):
+    name: str = Field(..., min_length=2, max_length=20)
+    category: str
+
+class UserProfile(BaseModel):
+    email: EmailStr  # Tự động validate định dạng email hợp lệ
+    username: str = Field(..., min_length=3, description="Tên đăng nhập")
+    age: Optional[int] = Field(None, ge=18, le=100) # Tuổi từ 18 đến 100
+    tags: List[Tag] = []  # Nested model: Chứa danh sách các đối tượng Tag
+
+@app.post("/users/profile")
+async def create_profile(profile: UserProfile):
+    return {"message": "Dữ liệu hợp lệ!", "profile": profile}
+</code></pre>
+                    </div>
+
+                    <div class="code-explanation">
+                        <div class="explanation-title">Giải thích luồng chạy của pydantic_models.py</div>
+                        <ul>
+                            <li><strong>EmailStr:</strong> Yêu cầu cài thêm package <code>email-validator</code> để xác thực chuỗi email hợp lệ.</li>
+                            <li><strong>Field(..., min_length=3):</strong> Dấu ba chấm <code>...</code> biểu thị đây là trường bắt buộc (required).</li>
+                            <li><strong>Nested validation:</strong> Khi nhận dữ liệu, Pydantic duyệt qua danh sách `tags`, validate từng phần tử xem có đủ trường `name` và `category` hay không trước khi truyền đối tượng vào hàm xử lý chính.</li>
+                        </ul>
+                    </div>
+
+                    <div class="callout best-practice">
+                        <div class="callout-title">Best Practice: Tái sử dụng Schema</div>
+                        <p>Không dùng chung một Schema cho tất cả thao tác. Hãy tách biệt rõ ràng các schemas: <code>UserCreate</code> (cần mật khẩu), <code>UserRead</code> (không có mật khẩu), <code>UserUpdate</code> (tất cả các trường đều là Optional).</p>
+                    </div>
+
+                    <div class="recap-block">
+                        <p>Recap: Pydantic chuyển đổi kiểu và validate dữ liệu cực mạnh. Sử dụng nested model giúp mô tả các cấu trúc JSON phức tạp từ client một cách dễ dàng.</p>
+                    </div>
+                </div>
+
+                <!-- Chapter 8 -->
+                <div id="chapter-8" class="chapter">
+                    <h2>Chương 8: Response Models và Thiết kế Response</h2>
+                    <div class="callout concept">
+                        <div class="callout-title">Mục tiêu</div>
+                        <p>Sử dụng tham số `response_model` để ẩn các thông tin nhạy cảm của hệ thống trước khi gửi kết quả về cho client, đồng thời định nghĩa chuẩn hóa cấu trúc HTTP status codes.</p>
+                    </div>
+
+                    <h3>1. Tầm quan trọng của việc lọc dữ liệu</h3>
+                    <p>Thông thường, đối tượng người dùng lưu trong DB sẽ chứa mật khẩu đã băm (password hash) hoặc các token quản trị. Chúng ta tuyệt đối không được trả trực tiếp các thông tin này về phía người dùng cuối. <code>response_model</code> hoạt động như một màng lọc dữ liệu.</p>
+
+                    <h3>2. Code: Response Model & Filtering [C07]</h3>
+                    <div class="code-window">
+                        <div class="code-header">
+                            <span class="code-filename">response_demo.py</span>
+                        </div>
+                        <pre><code>from fastapi import FastAPI, status
+from pydantic import BaseModel, EmailStr
+from typing import Optional
+
+app = FastAPI()
+
+# Schema dữ liệu đầu vào (Client gửi lên)
+class UserIn(BaseModel):
+    username: str
+    email: EmailStr
+    password: str  # Chứa mật khẩu thô
+
+# Schema dữ liệu đầu ra (Server trả về)
+class UserOut(BaseModel):
+    username: str
+    email: EmailStr
+    is_active: bool = True  # Không chứa password
+
+@app.post("/users", response_model=UserOut, status_code=status.HTTP_201_CREATED)
+async def register_user(user: UserIn):
+    # Mock xử lý lưu vào Database
+    # Trả về toàn bộ thông tin (kèm password), FastAPI sẽ tự động lọc chỉ giữ lại trường trong UserOut
+    return {
+        "username": user.username,
+        "email": user.email,
+        "password": "hashed_secret_password_123",
+        "is_active": True
+    }
+</code></pre>
+                    </div>
+
+                    <div class="code-explanation">
+                        <div class="explanation-title">Giải thích luồng chạy response_demo.py</div>
+                        <ul>
+                            <li><strong>Mục tiêu:</strong> Tạo user và tự động ẩn mật khẩu ở phản hồi.</li>
+                            <li><strong>Cơ chế lọc:</strong> Hàm <code>register_user</code> trả về một dictionary chứa cả trường <code>password</code>. Nhưng vì chúng ta định nghĩa <code>response_model=UserOut</code> tại decorator, FastAPI sẽ parse dữ liệu qua <code>UserOut</code> và loại bỏ triệt để trường <code>password</code> trước khi trả về.</li>
+                            <li><strong>Status Code 201:</strong> Trả về mã 201 Created thay vì 200 mặc định, tuân thủ chặt chẽ REST API standard khi tạo mới tài nguyên.</li>
+                        </ul>
+                    </div>
+
+                    <div class="recap-block">
+                        <p>Recap: `response_model` là vũ khí bảo mật quan trọng của FastAPI giúp định hình chính xác cấu trúc dữ liệu trả về và bảo vệ thông tin mật.</p>
+                    </div>
+                </div>
+
+                <!-- Chapter 9 -->
+                <div id="chapter-9" class="chapter">
+                    <h2>Chương 9: Error Handling và API Contract</h2>
+                    <div class="callout concept">
+                        <div class="callout-title">Mục tiêu</div>
+                        <p>Xử lý ngoại lệ (exceptions) một cách có hệ thống, không để lộ lỗi crash hệ thống (internal stack trace) cho client, trả về cấu trúc lỗi JSON nhất quán.</p>
+                    </div>
+
+                    <h3>1. Sử dụng HTTPException</h3>
+                    <p>FastAPI cung cấp lớp <code>HTTPException</code> kế thừa từ các lớp lỗi cơ bản để bạn kích hoạt lỗi kèm HTTP status code và nội dung tùy chọn tại bất kỳ vị trí nào trong ứng dụng.</p>
+
+                    <h3>2. Code: Custom Exception Handler [C08, C09]</h3>
+                    <div class="code-window">
+                        <div class="code-header">
+                            <span class="code-filename">error_handling.py</span>
+                        </div>
+                        <pre><code>from fastapi import FastAPI, HTTPException, Request, status
+from fastapi.responses import JSONResponse
+
+app = FastAPI()
+
+# Định nghĩa một Class Exception tự chế
+class DatabaseConnectionException(Exception):
+    def __init__(self, name: str):
+        self.name = name
+
+# Đăng ký handler xử lý toàn cục cho DatabaseConnectionException
+@app.exception_handler(DatabaseConnectionException)
+async def db_exception_handler(request: Request, exc: DatabaseConnectionException):
+    return JSONResponse(
+        status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+        content={
+            "error_code": "DATABASE_ERROR",
+            "message": f"Hệ thống cơ sở dữ liệu tạm thời gián đoạn: {exc.name}"
+        }
+    )
+
+@app.get("/items/{item_id}")
+async def read_item(item_id: int):
+    if item_id == 0:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Item ID không thể bằng 0."
+        )
+    if item_id == 999:
+        # Giả lập lỗi kết nối database
+        raise DatabaseConnectionException(name="PostgreSQL-Primary")
+    return {"item_id": item_id}
+</code></pre>
+                    </div>
+
+                    <div class="code-explanation">
+                        <div class="explanation-title">Giải thích luồng xử lý lỗi</div>
+                        <ul>
+                            <li><strong>Mục tiêu:</strong> Bắt lỗi client (400 Bad Request) và lỗi hệ thống (503 Service Unavailable) một cách an toàn.</li>
+                            <li><strong>Exception Handler:</strong> Khi <code>DatabaseConnectionException</code> bị kích hoạt ở bất cứ đâu, hàm <code>db_exception_handler</code> sẽ hứng lại lỗi đó và trả về định dạng JSON thống nhất, ngăn ngừa rò rỉ mã lỗi Python thô ra màn hình của client.</li>
+                        </ul>
+                    </div>
+
+                    <div class="recap-block">
+                        <p>Recap: Sử dụng `HTTPException` cho các lỗi logic nghiệp vụ thông thường, và `@app.exception_handler()` để xử lý tập trung các lỗi đặc thù của hệ thống.</p>
+                    </div>
+                </div>
+
+                <!-- Chapter 10 -->
+                <div id="chapter-10" class="chapter">
+                    <h2>Chương 10: Headers, Cookies, Forms, Files</h2>
+                    <div class="callout concept">
+                        <div class="callout-title">Mục tiêu</div>
+                        <p>Tiếp nhận dữ liệu truyền vào từ HTTP Headers, Cookies, dữ liệu Form truyền thống của trình duyệt và xử lý tải lên các tệp tin (File Upload).</p>
+                    </div>
+
+                    <h3>1. Upload file và Form data trong FastAPI</h3>
+                    <p>Việc tải file yêu cầu sử dụng định dạng truyền dữ liệu đa phần <code>multipart/form-data</code>. FastAPI cung cấp hai cách xử lý file:</p>
+                    <ul>
+                        <li><code>bytes</code>: Đọc toàn bộ nội dung file vào bộ nhớ RAM. Chỉ phù hợp với file kích thước nhỏ.</li>
+                        <li><code>UploadFile</code>: Sử dụng cấu trúc file lưu tạm thời trên đĩa cứng (spooled file) giúp tối ưu hóa bộ nhớ, phù hợp với các file cực lớn.</li>
+                    </ul>
+
+                    <h3>2. Code: Nhận Headers, Cookies, Form & File [C10, C11]</h3>
+                    <div class="code-window">
+                        <div class="code-header">
+                            <span class="code-filename">headers_files.py</span>
+                        </div>
+                        <pre><code>from fastapi import FastAPI, Header, Cookie, Form, File, UploadFile
+from typing import Optional
+
+app = FastAPI()
+
+@app.post("/upload")
+async def handle_assets(
+    user_agent: Optional[str] = Header(None),         # Đọc User-Agent từ Header
+    session_token: Optional[str] = Cookie(None),     # Đọc session_token từ Cookie
+    description: str = Form(...),                      # Nhận thông tin Form
+    uploaded_file: UploadFile = File(...)              # Nhận file tải lên
+):
+    # Đọc thông tin file mà không tải hết vào RAM
+    contents = await uploaded_file.read()
+    return {
+        "user_agent": user_agent,
+        "cookie_token": session_token,
+        "form_description": description,
+        "file_name": uploaded_file.filename,
+        "file_size_bytes": len(contents)
+    }
+</code></pre>
+                    </div>
+
+                    <div class="code-explanation">
+                        <div class="explanation-title">Giải thích luồng chạy của headers_files.py</div>
+                        <ul>
+                            <li><strong>Mục tiêu:</strong> Nhận các siêu dữ liệu HTTP và tệp đính kèm.</li>
+                            <li><strong>UploadFile:</strong> Cung cấp các thuộc tính hữu ích như <code>filename</code>, <code>content_type</code> và các hàm bất đồng bộ <code>read()</code>, <code>write()</code>, <code>seek()</code>.</li>
+                        </ul>
+                    </div>
+
+                    <div class="callout pitfall">
+                        <div class="callout-title">Lỗi thiếu thư viện multipart</div>
+                        <p>Để nhận dữ liệu Form và File upload trong FastAPI, bạn bắt buộc phải cài đặt thư viện <code>python-multipart</code> bằng lệnh: <code>uv add python-multipart</code>. Nếu thiếu thư viện này, hệ thống sẽ báo lỗi ngay khi khởi chạy.</p>
+                    </div>
+
+                    <div class="recap-block">
+                        <p>Recap: Dùng `Header()` và `Cookie()` để đọc metadata. Sử dụng `UploadFile` làm mặc định để tiếp nhận các file tải lên một cách tối ưu hiệu năng.</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- PART C: STRUCTURING A REAL FASTAPI APPLICATION -->
+            <section id="part-c">
+                <h1 style="font-size: 2.8rem; color: var(--primary); margin-top: 4rem;">Part C: Structuring a Real FastAPI Application</h1>
+
+                <!-- Chapter 11 -->
+                <div id="chapter-11" class="chapter">
+                    <h2>Chương 11: Dependency Injection</h2>
+                    <div class="callout concept">
+                        <div class="callout-title">Mục tiêu</div>
+                        <p>Hiểu sâu sắc về cơ chế Tiêm phụ thuộc (Dependency Injection) trong FastAPI, cách tái sử dụng logic xử lý, giải phóng tài nguyên một cách an toàn.</p>
+                    </div>
+
+                    <h3>1. Dependency Injection là gì?</h3>
+                    <p>Dependency Injection (DI) là một mô hình thiết kế phần mềm cho phép một hàm hoặc class nhận các phụ thuộc (các dịch vụ, kết nối cơ sở dữ liệu) từ bên ngoài thay vì tự khởi tạo chúng bên trong thân hàm. Trong FastAPI, DI hoạt động như một **đồ thị phụ thuộc có hướng, không có chu trình (Directed Acyclic Graph - DAG)**. FastAPI sẽ tự phân tích và giải quyết các dependency lồng nhau theo đúng thứ tự trước khi đưa tham số cuối cùng vào hàm route chính.</p>
+
+                    <h3>2. Code: Basic DI & Yield Dependency [C12, C13]</h3>
+                    <div class="code-window">
+                        <div class="code-header">
+                            <span class="code-filename">di_demo.py</span>
+                        </div>
+                        <pre><code>from fastapi import FastAPI, Depends, Header, HTTPException
+from typing import Generator
+
+app = FastAPI()
+
+# 1. Dependency kiểm tra API Key từ Header
+async def verify_api_key(x_api_key: str = Header(...)):
+    if x_api_key != "secret-handbook-key":
+        raise HTTPException(status_code=403, detail="API Key không hợp lệ!")
+    return x_api_key
+
+# 2. Dependency quản lý tài nguyên sạch (sử dụng yield)
+async def get_db_session() -> Generator[str, None, None]:
+    try:
+        # Bắt đầu vòng đời kết nối
+        db_connection = "SQLAlchemy-Session-Connected"
+        print("Mở DB Connection Session")
+        yield db_connection  # Cung cấp session cho endpoint sử dụng
+    finally:
+        # Điểm dọn dẹp (luôn chạy sau khi endpoint hoàn thành gửi response)
+        print("Đóng DB Connection Session an toàn")
+
+# Route sử dụng cả 2 dependencies
+@app.get("/secure-data")
+async def get_data(
+    api_key: str = Depends(verify_api_key),
+    db: str = Depends(get_db_session)
+):
+    return {
+        "status": "authorized",
+        "api_key_used": api_key,
+        "db_session_status": db
+    }
+</code></pre>
+                    </div>
+
+                    <div class="code-explanation">
+                        <div class="explanation-title">Giải thích cơ chế vận hành DI</div>
+                        <ul>
+                            <li><strong>Mục tiêu:</strong> Bảo vệ route bằng API key và cấp phát session DB tự động dọn dẹp.</li>
+                            <li><strong>yield cơ chế:</strong> Hàm <code>get_db_session</code> thực hiện phần code phía trước lệnh <code>yield</code> trước khi route chạy, sau đó tạm dừng tại `yield`. Sau khi route <code>get_data</code> trả về kết quả cho client, phần code trong khối <code>finally</code> mới tiếp tục chạy để đóng kết nối, đảm bảo không bao giờ rò rỉ (leak) tài nguyên DB.</li>
+                        </ul>
+                    </div>
+
+                    <div class="callout production-note">
+                        <div class="callout-title">Production Note: Dependency Injection và Unit Testing</div>
+                        <p>DI là nhân tố quan trọng nhất giúp viết test dễ dàng trong FastAPI. Bạn có thể dễ dàng hoán đổi cơ sở dữ liệu thật sang cơ sở dữ liệu thử nghiệm trong các bài kiểm thử tự động bằng tính năng override dependencies của FastAPI mà không cần sửa một dòng code nào trong route.</p>
+                    </div>
+
+                    <div class="recap-block">
+                        <p>Recap: Dùng `Depends` để tiêm logic. Sử dụng `yield` bên trong các dependency để tự động đóng kết nối DB hoặc giải phóng tài nguyên mạng.</p>
+                    </div>
+                </div>
+
+                <!-- Chapter 12 -->
+                <div id="chapter-12" class="chapter">
+                    <h2>Chương 12: Bigger Apps và APIRouter</h2>
+                    <div class="callout concept">
+                        <div class="callout-title">Mục tiêu</div>
+                        <p>Cấu trúc một dự án lớn, chia nhỏ các tệp tin chức năng thành các Module độc lập sử dụng APIRouter thay vì nhồi nhét mọi thứ vào main.py.</p>
+                    </div>
+
+                    <h3>1. Cấu trúc thư mục chuẩn cho dự án Enterprise</h3>
+                    <p>Một cấu trúc thư mục sạch sẽ giúp dự án dễ dàng bảo trì và mở rộng khi có hàng trăm route:</p>
+                    <pre style="background: var(--surface-dark); color: var(--on-dark); padding: 1.5rem; border-radius: 8px; font-family: 'JetBrains Mono', monospace; font-size: 0.85rem;">
+my_project/
+├── app/
+│   ├── __init__.py
+│   ├── main.py                # Điểm khởi chạy ứng dụng chính
+│   ├── core/                  # Cấu hình dự án, bảo mật, biến môi trường
+│   │   ├── config.py
+│   │   └── security.py
+│   ├── db/                    # Thiết lập database kết nối
+│   │   ├── session.py
+│   │   └── base_model.py
+│   ├── models/                # Các thực thể ORM Database
+│   │   └── user.py
+│   ├── schemas/               # Các Pydantic Schemas đầu vào/ra
+│   │   └── user.py
+│   ├── routers/               # Các phân vùng API routes
+│   │   ├── auth.py
+│   │   └── users.py
+│   └── services/              # Logic nghiệp vụ xử lý chính (Business Logic)
+│       └── user_service.py
+└── requirements.txt
+</pre>
+
+                    <h3>2. Code: Sử dụng APIRouter [C14]</h3>
+                    <p>Chúng ta chia nhỏ các đường dẫn bằng <code>APIRouter</code> sau đó khai báo gộp chúng lại trong file <code>main.py</code>:</p>
+                    <div class="code-window">
+                        <div class="code-header">
+                            <span class="code-filename">app/routers/users.py</span>
+                        </div>
+                        <pre><code>from fastapi import APIRouter
+
+# Khởi tạo Router riêng biệt cho phân hệ Users
+router = APIRouter(
+    prefix="/users",
+    tags=["Phân hệ quản lý User"]
+)
+
+@router.get("/")
+async def get_all_users():
+    return [{"user_id": 1, "username": "taylor"}]
+</code></pre>
+                    </div>
+
+                    <div class="code-window">
+                        <div class="code-header">
+                            <span class="code-filename">app/main.py</span>
+                        </div>
+                        <pre><code>from fastapi import FastAPI
+from app.routers import users # Import module router
+
+app = FastAPI(title="Ứng dụng kiến trúc lớn")
+
+# Đăng ký các router phân hệ vào hệ thống chính
+app.include_router(users.router, prefix="/api/v1")
+</code></pre>
+                    </div>
+
+                    <div class="code-explanation">
+                        <div class="explanation-title">Giải thích cấu trúc APIRouter</div>
+                        <ul>
+                            <li><strong>Mục tiêu:</strong> Gom nhóm và tách biệt các endpoint theo miền nghiệp vụ (domain).</li>
+                            <li><strong>include_router:</strong> Router con <code>/users</code> được đính vào main app dưới tiền tố <code>/api/v1</code>, tạo ra đường dẫn hoàn chỉnh là <code>/api/v1/users/</code> trong tài liệu API tự động.</li>
+                        </ul>
+                    </div>
+
+                    <div class="recap-block">
+                        <p>Recap: Không bao giờ nhét tất cả vào `main.py`. Sử dụng `APIRouter` để cấu trúc hóa các thư mục dự án theo chuẩn thiết kế sạch.</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- PART D: DATABASES AND CRUD ARCHITECTURE -->
+            <section id="part-d">
+                <h1 style="font-size: 2.8rem; color: var(--primary); margin-top: 4rem;">Part D: Databases and CRUD Architecture</h1>
+
+                <!-- Chapter 13 -->
+                <div id="chapter-13" class="chapter">
+                    <h2>Chương 13: Database Foundations</h2>
+                    <div class="callout concept">
+                        <div class="callout-title">Mục tiêu</div>
+                        <p>Làm quen với thư viện SQLAlchemy ORM, hiểu cấu trúc kết nối cơ sở dữ liệu và quản lý vùng nhớ Connection Pool trong ứng dụng Web.</p>
+                    </div>
+
+                    <h3>1. Vai trò của ORM</h3>
+                    <p><strong>Object-Relational Mapping (ORM)</strong> giúp lập trình viên tương tác với cơ sở dữ liệu quan hệ (SQLite, PostgreSQL, MySQL) bằng cách sử dụng các đối tượng Python thuần túy thay vì phải viết các câu lệnh SQL thô dễ gây lỗi cú pháp.</p>
+
+                    <h3>2. Cấu trúc kết nối Database [C15]</h3>
+                    <p>Để quản lý kết nối cơ sở dữ liệu đúng cách, chúng ta khởi tạo engine dùng chung và một nhà máy sản xuất các session phục vụ các giao dịch đơn lẻ:</p>
+                    
+                    <div class="code-window">
+                        <div class="code-header">
+                            <span class="code-filename">database_config.py</span>
+                        </div>
+                        <pre><code>from sqlalchemy import create_engine
+from sqlalchemy.orm import sessionmaker, declarative_base
+
+# Kết nối database thử nghiệm SQLite
+DATABASE_URL = "sqlite:///./app_database.db"
+
+# Khởi tạo engine dùng chung. Đối với PostgreSQL, pool_size sẽ cấu hình tại đây
+engine = create_engine(
+    DATABASE_URL, 
+    connect_args={"check_same_thread": False}  # Chỉ cần thiết đối với SQLite
+)
+
+# Tạo một sessionmaker để khởi tạo các phiên transaction độc lập
+SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+
+# Base class để các DB Models kế thừa
+Base = declarative_base()
+</code></pre>
+                    </div>
+
+                    <div class="code-explanation">
+                        <div class="explanation-title">Giải thích database_config.py</div>
+                        <ul>
+                            <li><strong>Mục tiêu:</strong> Thiết lập cấu hình kết nối DB ban đầu.</li>
+                            <li><strong>check_same_thread=False:</strong> Cho phép nhiều luồng bất đồng bộ trong FastAPI cùng truy cập database SQLite an toàn.</li>
+                        </ul>
+                    </div>
+
+                    <div class="recap-block">
+                        <p>Recap: Sử dụng ORM như SQLAlchemy giúp trừu tượng hóa các câu lệnh SQL. Cần kiểm soát chặt chẽ vòng đời của Session để tránh lỗi rò rỉ bộ nhớ cơ sở dữ liệu.</p>
+                    </div>
+                </div>
+
+                <!-- Chapter 14 -->
+                <div id="chapter-14" class="chapter">
+                    <h2>Chương 14: CRUD Application</h2>
+                    <div class="callout concept">
+                        <div class="callout-title">Mục tiêu</div>
+                        <p>Xây dựng một hệ thống CRUD (Create, Read, Update, Delete) hoàn chỉnh, tương tác trực tiếp với cơ sở dữ liệu thông qua Repository pattern.</p>
+                    </div>
+
+                    <h3>1. Tạo cấu trúc Database Model & Schema</h3>
+                    <p>Chúng ta tách biệt Database Model (SQLAlchemy) và Data Schema (Pydantic) để đảm bảo tính an toàn dữ liệu.</p>
+
+                    <h3>2. Code: CRUD & DB Integration [C16]</h3>
+                    <div class="code-window">
+                        <div class="code-header">
+                            <span class="code-filename">db_crud.py</span>
+                        </div>
+                        <pre><code>from fastapi import FastAPI, Depends, HTTPException, status
+from sqlalchemy import create_engine, Column, Integer, String
+from sqlalchemy.orm import declarative_base, sessionmaker, Session
+from pydantic import BaseModel
+from typing import Generator
+
+# Cấu hình Database SQLite
+SQLALCHEMY_DATABASE_URL = "sqlite:///./test_handbook.db"
+engine = create_engine(SQLALCHEMY_DATABASE_URL, connect_args={"check_same_thread": False})
+SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+Base = declarative_base()
+
+# 1. SQLAlchemy DB Model (Cấu trúc bảng lưu trong DB)
+class BookDB(Base):
+    __tablename__ = "books"
+    id = Column(Integer, primary_key=True, index=True)
+    title = Column(String, index=True)
+    author = Column(String)
+
+# Tạo bảng tự động (chỉ dùng cho SQLite thử nghiệm)
+Base.metadata.create_all(bind=engine)
+
+# 2. Pydantic Schemas
+class BookCreate(BaseModel):
+    title: str
+    author: str
+
+class BookOut(BaseModel):
+    id: int
+    title: str
+    author: str
+    class Config:
+        from_attributes = True # Cho phép chuyển đổi từ thực thể ORM SQLAlchemy
+
+# 3. Dependency lấy DB Session
+def get_db() -> Generator[Session, None, None]:
+    db = SessionLocal()
+    try:
+        yield db  # Đưa session vào route
+    finally:
+        db.close() # Đóng kết nối an toàn sau khi hoàn thành request
+
+app = FastAPI()
+
+# POST: Tạo sách mới
+@app.post("/books", response_model=BookOut, status_code=status.HTTP_201_CREATED)
+def create_book(book: BookCreate, db: Session = Depends(get_db)):
+    new_book = BookDB(title=book.title, author=book.author)
+    db.add(new_book)
+    db.commit()
+    db.refresh(new_book) # Lấy dữ liệu mới nhất kèm ID tự sinh từ DB
+    return new_book
+
+# GET: Đọc thông tin sách
+@app.get("/books/{book_id}", response_model=BookOut)
+def read_book(book_id: int, db: Session = Depends(get_db)):
+    db_book = db.query(BookDB).filter(BookDB.id == book_id).first()
+    if not db_book:
+        raise HTTPException(status_code=404, detail="Không tìm thấy cuốn sách này!")
+    return db_book
+</code></pre>
+                    </div>
+
+                    <div class="code-explanation">
+                        <div class="explanation-title">Giải thích luồng chạy CRUD</div>
+                        <ul>
+                            <li><strong>Mục tiêu:</strong> Triển khai việc lưu trữ và truy xuất thực thể `Book` vào DB SQLite.</li>
+                            <li><strong>from_attributes = True:</strong> (Trong Pydantic v2) Cho phép Pydantic đọc trực tiếp các trường từ DB Model trả về (như <code>book.title</code>) thay vì bắt buộc dữ liệu phải là định dạng dict.</li>
+                            <li><strong>Vòng đời DB Session:</strong> Được bao bọc hoàn hảo trong dependency `get_db`. Lệnh <code>db.close()</code> luôn chạy cuối cùng để giải phóng kết nối về Pool.</li>
+                        </ul>
+                    </div>
+
+                    <div class="recap-block">
+                        <p>Recap: Tiến trình CRUD chuẩn mực: Nhận dữ liệu đầu vào qua Pydantic -> Lưu trữ qua SQLAlchemy ORM -> Trả về dữ liệu được chuẩn hóa qua `response_model`.</p>
+                    </div>
+                </div>
+
+                <!-- Chapter 15 -->
+                <div id="chapter-15" class="chapter">
+                    <h2>Chương 15: Alembic Migrations</h2>
+                    <div class="callout concept">
+                        <div class="callout-title">Mục tiêu</div>
+                        <p>Sử dụng công cụ Alembic để quản trị sự thay đổi cấu trúc bảng cơ sở dữ liệu (schema migrations) theo lịch sử thay đổi phiên bản code, tránh việc tạo lại bảng thủ công làm mất mát dữ liệu.</p>
+                    </div>
+
+                    <h3>1. Tại sao cần Alembic?</h3>
+                    <p>Lệnh <code>Base.metadata.create_all()</code> chỉ hữu ích khi tạo bảng lần đầu. Nếu bạn cập nhật thêm một cột (ví dụ: thêm cột <code>publish_year</code> vào bảng sách), câu lệnh đó sẽ bỏ qua vì bảng đã tồn tại trong DB. Alembic sẽ theo dõi các thay đổi này và cập nhật cấu trúc database mà không làm mất dữ liệu cũ.</p>
+
+                    <h3>2. Code & Workflow: Cấu hình Alembic [C17]</h3>
+                    <p>Cấu hình tệp <code>env.py</code> của Alembic để tự động dò quét các DB Model của ứng dụng:</p>
+                    <div class="code-window">
+                        <div class="code-header">
+                            <span class="code-filename">alembic/env.py</span>
+                        </div>
+                        <pre><code>from logging.config import fileConfig
+from sqlalchemy import engine_from_config
+from sqlalchemy import pool
+from alembic import context
+
+# 1. Nhập cấu trúc Base model của ứng dụng của bạn để Alembic theo dõi
+from app.db.base_model import Base 
+
+config = context.config
+
+if config.config_file_name is not None:
+    fileConfig(config.config_file_name)
+
+# Trỏ metadata của Alembic tới metadata của SQLAlchemy Base
+target_metadata = Base.metadata
+</code></pre>
+                    </div>
+
+                    <p>Các bước thực thi migrations thực tế trong Terminal:</p>
+                    <pre style="background: var(--surface-dark); color: var(--on-dark); padding: 1.5rem; border-radius: 8px; font-family: 'JetBrains Mono', monospace; font-size: 0.85rem;">
+# 1. Khởi tạo môi trường Alembic trong dự án
+alembic init alembic
+
+# 2. Cấu hình file alembic.ini để kết nối DB của bạn
+# Sửa dòng: sqlalchemy.url = postgresql://user:pass@localhost/dbname
+
+# 3. Tạo một file Revision ghi nhận sự thay đổi bảng
+alembic revision --autogenerate -m "create_books_table"
+
+# 4. Thực thi áp dụng thay đổi cấu trúc vào cơ sở dữ liệu thật
+alembic upgrade head
+
+# 5. Rút lui về phiên bản cấu trúc trước đó nếu phát hiện lỗi
+alembic downgrade -1
+</pre>
+
+                    <div class="callout best-practice">
+                        <div class="callout-title">Best Practice: Kiểm tra file script tự sinh</div>
+                        <p>Lệnh <code>--autogenerate</code> của Alembic là một cơ chế so sánh tự động giữa Python code và DB thực tế. Cơ chế này đôi khi có thể nhận diện thiếu các thay đổi phức tạp (như kiểu enum, đổi tên cột). Hãy luôn mở tệp migration script được sinh ra trong thư mục <code>alembic/versions</code> để review mã lệnh trước khi chạy lệnh <code>upgrade head</code> lên hệ thống production.</p>
+                    </div>
+
+                    <div class="recap-block">
+                        <p>Recap: Quản trị DB Production bắt buộc phải thông qua cơ chế Migrations của Alembic. Không bao giờ can thiệp cấu trúc bảng trực tiếp bằng các công cụ GUI.</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- PART E: SECURITY AND AUTHENTICATION -->
+            <section id="part-e">
+                <h1 style="font-size: 2.8rem; color: var(--primary); margin-top: 4rem;">Part E: Security and Authentication</h1>
+
+                <!-- Chapter 16 -->
+                <div id="chapter-16" class="chapter">
+                    <h2>Chương 16: Security Fundamentals</h2>
+                    <div class="callout concept">
+                        <div class="callout-title">Mục tiêu</div>
+                        <p>Phân biệt rõ ràng giữa hai khái niệm: Xác thực (Authentication) và Phân quyền (Authorization), tìm hiểu cơ chế băm mật khẩu mật mã một chiều (Password Hashing).</p>
+                    </div>
+
+                    <h3>1. Authentication vs Authorization</h3>
+                    <ul>
+                        <li><strong>Authentication (Xác thực):</strong> Là bước xác định danh tính của người dùng ("Bạn là ai?"). Thường thực hiện qua đăng nhập với Email/Password hoặc API Keys.</li>
+                        <li><strong>Authorization (Phân quyền):</strong> Là bước xác định xem người dùng đã được xác thực đó có được quyền truy cập tài nguyên cụ thể hay không ("Bạn được làm gì?").</li>
+                    </ul>
+
+                    <h3>2. Cơ chế băm mật khẩu an toàn</h3>
+                    <p>Tuyệt đối không lưu trữ mật khẩu thô của người dùng trong DB. Sử dụng các thuật toán băm chậm, có bổ sung muối muối ngẫu nhiên (salt) như <code>bcrypt</code> để chống lại các đòn tấn công vét cạn (brute-force) hoặc tra cứu bảng cầu vồng (rainbow tables).</p>
+
+                    <h3>3. Code: Password Hashing [C18]</h3>
+                    <p>Yêu cầu cài đặt thư viện mã hóa: <code>uv add "passlib[bcrypt]"</code></p>
+                    <div class="code-window">
+                        <div class="code-header">
+                            <span class="code-filename">hashing_util.py</span>
+                        </div>
+                        <pre><code>from passlib.context import CryptContext
+
+# Thiết lập ngữ cảnh mã hóa sử dụng thuật toán bcrypt
+pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+
+def hash_password(password: str) -> str:
+    # Sinh muối ngẫu nhiên và băm mật khẩu thô
+    return pwd_context.hash(password)
+
+def verify_password(plain_password: str, hashed_password: str) -> bool:
+    # Đối sánh mật khẩu thô nhập vào với mật khẩu đã băm trong Database
+    return pwd_context.verify(plain_password, hashed_password)
+
+# Chạy thử nghiệm kiểm tra tính đúng đắn
+if __name__ == "__main__":
+    my_pass = "admin1234"
+    hashed = hash_password(my_pass)
+    print(f"Mật khẩu thô: {my_pass}")
+    print(f"Bản băm lưu Database: {hashed}")
+    print(f"Kết quả khớp: {verify_password(my_pass, hashed)}")
+</code></pre>
+                    </div>
+
+                    <div class="recap-block">
+                        <p>Recap: Không bao giờ lưu mật khẩu dạng plaintext. Sử dụng `CryptContext` của thư viện `passlib` để băm và đối sánh mật khẩu an toàn.</p>
+                    </div>
+                </div>
+
+                <!-- Chapter 17 -->
+                <div id="chapter-17" class="chapter">
+                    <h2>Chương 17: OAuth2 và JWT Thực Chiến</h2>
+                    <div class="callout concept">
+                        <div class="callout-title">Mục tiêu</div>
+                        <p>Triển khai quy trình đăng nhập cấp mã thông báo bảo mật dạng JWT (JSON Web Token), xây dựng các middleware và dependencies để bảo vệ các tuyến đường dẫn (protected routes).</p>
+                    </div>
+
+                    <h3>1. JSON Web Token (JWT) hoạt động như thế nào?</h3>
+                    <p>JWT là mã thông báo tự chứa thông tin (stateless token). Nó bao gồm 3 phần phân tách bởi dấu chấm: <code>Header.Payload.Signature</code>. Phần chữ ký được tạo ra bằng khóa bí mật (Secret Key) phía server để đảm bảo dữ liệu không bị sửa đổi.</p>
+
+                    <h3>2. Code: Đăng nhập & Xác thực JWT [C19, C20]</h3>
+                    <p>Yêu cầu cài đặt: <code>uv add pyjwt python-multipart</code></p>
+                    <div class="code-window">
+                        <div class="code-header">
+                            <span class="code-filename">auth_server.py</span>
+                        </div>
+                        <pre><code>from fastapi import FastAPI, Depends, HTTPException, status
+from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
+import jwt
+import os
+from datetime import datetime, timedelta, timezone
+from typing import Optional
+
+# Cấu hình bảo mật JWT
+# WARNING: Tuyệt đối không hardcode khóa bảo mật trong mã nguồn!
+# Đọc trực tiếp từ biến môi trường của hệ điều hành. Ứng dụng sẽ báo lỗi ngay nếu thiếu khóa.
+SECRET_KEY = os.environ.get("SECRET_KEY")
+if not SECRET_KEY:
+    raise RuntimeError("Biến môi trường SECRET_KEY chưa được cấu hình. Ứng dụng không thể khởi chạy an toàn!")
+ALGORITHM = "HS256"
+ACCESS_TOKEN_EXPIRE_MINUTES = 30
+
+# Công cụ phân tích mã token từ Header Authorization Bearer
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="login")
+
+app = FastAPI()
+
+# 1. Hàm tạo JWT Token
+def create_access_token(data: dict, expires_delta: Optional[timedelta] = None):
+    to_encode = data.copy()
+    if expires_delta:
+        expire = datetime.now(timezone.utc) + expires_delta
+    else:
+        expire = datetime.now(timezone.utc) + timedelta(minutes=15)
+    to_encode.update({"exp": expire})
+    encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
+    return encoded_jwt
+
+# 2. Endpoint Đăng nhập: Cấp token
+@app.post("/login")
+async def login(form_data: OAuth2PasswordRequestForm = Depends()):
+    # Xác thực người dùng (ở đây giả định xác thực cứng)
+    if form_data.username != "hieu" or form_data.password != "password":
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Tên đăng nhập hoặc mật khẩu không chính xác"
+        )
+    access_token = create_access_token(data={"sub": form_data.username})
+    return {"access_token": access_token, "token_type": "bearer"}
+
+# 3. Dependency lấy thông tin User hiện tại từ JWT Token
+async def get_current_user(token: str = Depends(oauth2_scheme)):
+    credentials_exception = HTTPException(
+        status_code=status.HTTP_401_UNAUTHORIZED,
+        detail="Không thể xác thực thông tin đăng nhập",
+        headers={"WWW-Authenticate": "Bearer"},
+    )
+    try:
+        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+        username: str = payload.get("sub")
+        if username is None:
+            raise credentials_exception
+    except jwt.PyJWTError:
+        raise credentials_exception
+    return {"username": username}
+
+# 4. Route được bảo vệ (Protected Route)
+@app.get("/users/me")
+async def read_current_user(current_user: dict = Depends(get_current_user)):
+    return {"message": "Truy cập thông tin thành công!", "user": current_user}
+</code></pre>
+                    </div>
+
+                    <div class="code-explanation">
+                        <div class="explanation-title">Giải thích luồng xác thực JWT</div>
+                        <ul>
+                            <li><strong>Mục tiêu:</strong> Tạo route đăng nhập và bảo vệ dữ liệu nhạy cảm của người dùng hiện tại mà không để lộ khóa bí mật.</li>
+                            <li><strong>os.environ.get:</strong> Đảm bảo khóa mật mã của hệ thống luôn được nạp từ biến cấu hình ngoài, ngăn chặn hoàn toàn việc rò rỉ mã bảo mật khi đẩy code lên Github.</li>
+                        </ul>
+                    </div>
+
+                    <div class="callout pitfall">
+                        <div class="callout-title">Cảnh báo: BOLA / IDOR Vulnerability</div>
+                        <p>Lỗi thiết kế bảo mật phổ biến nhất (Broken Object Level Authorization): Endpoint dạng <code>/users/{user_id}/invoice</code> đọc dữ liệu trực tiếp dựa trên biến <code>user_id</code> mà quên không kiểm tra xem <code>user_id</code> này có trùng khớp với danh tính giải mã ra từ JWT Token hay không. Người dùng A có thể đổi ID thành của người dùng B để đọc lén dữ liệu.</p>
+                    </div>
+
+                    <div class="recap-block">
+                        <p>Recap: Đăng nhập -> Cấp Token JWT ký bằng Secret Key -> Client đính kèm Header `Authorization: Bearer <Token>` -> Sử dụng `Depends(get_current_user)` bảo vệ API.</p>
+                    </div>
+                </div>
+
+                <!-- Chapter 18 -->
+                <div id="chapter-18" class="chapter">
+                    <h2>Chương 18: Middleware và CORS</h2>
+                    <div class="callout concept">
+                        <div class="callout-title">Mục tiêu</div>
+                        <p>Hiểu cơ chế hoạt động của Middleware, đăng ký CORS (Cross-Origin Resource Sharing) để cho phép ứng dụng frontend kết nối API an toàn.</p>
+                    </div>
+
+                    <h3>1. Middleware là gì?</h3>
+                    <p>Middleware là một hàm trung gian chặn (intercept) tất cả các request đi vào ứng dụng và các response đi ra trước khi gửi về client, thích hợp cho việc ghi log, đo lường thời gian đáp ứng hệ thống (performance tracing).</p>
+
+                    <h3>2. Code: Middleware ghi log & CORS config [C21, C22]</h3>
+                    <div class="code-window">
+                        <div class="code-header">
+                            <span class="code-filename">middleware_demo.py</span>
+                        </div>
+                        <pre><code>from fastapi import FastAPI, Request
+from fastapi.middleware.cors import CORSMiddleware
+import time
+
+app = FastAPI()
+
+# 1. Cấu hình CORS Middleware
+origins = [
+    "http://localhost:3000", # Cho phép frontend React chạy trên port 3000 kết nối
+    "https://myproductionapp.com"
+]
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"], # Cho phép toàn bộ các methods GET, POST, PUT, DELETE...
+    allow_headers=["*"], # Cho phép toàn bộ các Custom Headers gửi lên
+)
+
+# 2. Tự viết Middleware đo lường thời gian chạy (Timing Middleware)
+@app.middleware("http")
+async def add_process_time_header(request: Request, call_next):
+    start_time = time.time()
+    # Chuyển giao request cho các router xử lý chính
+    response = await call_next(request)
+    # Đo đạc thời gian sau khi router xử lý xong
+    process_time = time.time() - start_time
+    response.headers["X-Process-Time"] = f"{process_time:.4f} seconds"
+    return response
+
+@app.get("/ping")
+async def ping():
+    return {"message": "pong"}
+</code></pre>
+                    </div>
+
+                    <div class="code-explanation">
+                        <div class="explanation-title">Giải thích middleware_demo.py</div>
+                        <ul>
+                            <li><strong>Mục tiêu:</strong> Hỗ trợ gọi API chéo tên miền (CORS) và gán thêm header đo tốc độ xử lý vào response.</li>
+                            <li><strong>call_next:</strong> Là hàm nhận vào request và trả về đối tượng response sau khi đã đi qua toàn bộ các lớp xử lý của API.</li>
+                        </ul>
+                    </div>
+
+                    <div class="recap-block">
+                        <p>Recap: CORS chặn các trang web ngoài tên miền gọi API của bạn. Đăng ký CORSMiddleware đúng cách để tháo gỡ rào cản chặn tên miền của trình duyệt.</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- PART F: MIDDLEWARE, LIFECYCLE, BACKGROUND WORK, AND REALTIME FEATURES -->
+            <section id="part-f">
+                <h1 style="font-size: 2.8rem; color: var(--primary); margin-top: 4rem;">Part F: Middleware, Lifecycle, Background Work, and Realtime Features</h1>
+
+                <!-- Chapter 19 -->
+                <div id="chapter-19" class="chapter">
+                    <h2>Chương 19: Lifespan và Events</h2>
+                    <div class="callout concept">
+                        <div class="callout-title">Mục tiêu</div>
+                        <p>Sử dụng cơ chế lifespan mới để thực hiện các thao tác khởi động (startup) và dọn dẹp (shutdown) tài nguyên hệ thống dùng chung.</p>
+                    </div>
+
+                    <div class="callout version-note">
+                        <div class="callout-title">Version Note: Lifespan thay thế on_event</div>
+                        <p>Các hàm decorator cũ như <code>@app.on_event("startup")</code> đã bị loại bỏ trong các phiên bản mới của FastAPI. Hãy sử dụng context manager <code>lifespan</code> truyền trực tiếp vào thực thể ứng dụng.</p>
+                    </div>
+
+                    <h3>1. Ý nghĩa của Lifespan</h3>
+                    <p>Khi ứng dụng chạy, chúng ta cần nạp các tài nguyên nặng và giữ lại bộ nhớ của nó (như kết nối Pool cơ sở dữ liệu, nạp các mô hình mạng neural học máy lớn, kết nối HTTP client dùng chung). Khi tắt server, ta phải giải phóng các bộ nhớ này một cách an toàn để tránh thất thoát hoặc hỏng hóc dữ liệu.</p>
+
+                    <h3>2. Code: Lifespan Manager [C23]</h3>
+                    <div class="code-window">
+                        <div class="code-header">
+                            <span class="code-filename">lifespan_demo.py</span>
+                        </div>
+                        <pre><code>from fastapi import FastAPI
+from contextlib import asynccontextmanager
+import httpx
+
+# Mock class đại diện cho Model AI lớn cần nạp sẵn
+class MachineLearningModel:
+    def load(self):
+        print("Đang nạp mô hình AI nặng vào GPU...")
+    def predict(self, text: str) -> str:
+        return f"Mô hình AI dự đoán cho từ: {text}"
+    def unload(self):
+        print("Giải phóng mô hình khỏi GPU bộ nhớ")
+
+# Định nghĩa Lifespan Manager
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    # [STARTUP STATE] - Thực hiện khi ứng dụng bắt đầu khởi chạy
+    ai_model = MachineLearningModel()
+    ai_model.load()
+    shared_client = httpx.AsyncClient()
+    
+    # Gán trực tiếp vào app.state trước khi yield để các route truy cập an toàn
+    app.state.ai_model = ai_model
+    app.state.shared_client = shared_client
+    
+    yield  # Nhường quyền điều khiển chạy ứng dụng chính
+    
+    # [SHUTDOWN STATE] - Thực hiện khi tắt ứng dụng
+    await shared_client.aclose()
+    ai_model.unload()
+    print("Dọn dẹp hệ thống hoàn tất.")
+
+app = FastAPI(lifespan=lifespan)
+
+@app.get("/predict")
+async def get_prediction(text: str):
+    # Truy xuất tài nguyên dùng chung từ state của app
+    ai_model = app.state.ai_model
+    result = ai_model.predict(text)
+    return {"prediction": result}
+</code></pre>
+                    </div>
+
+                    <div class="code-explanation">
+                        <div class="explanation-title">Giải thích hoạt động của Lifespan</div>
+                        <ul>
+                            <li><strong>Mục tiêu:</strong> Quản lý tài nguyên nặng (ML Model, HTTP Client) xuyên suốt chu kỳ sống của Server.</li>
+                            <li><strong>app.state:</strong> Các tài nguyên nạp vào <code>app.state</code> trong giai đoạn startup sẽ tồn tại ổn định, giúp các route truy cập dễ dàng mà không bị khởi tạo lại ở mỗi request.</li>
+                        </ul>
+                    </div>
+
+                    <div class="recap-block">
+                        <p>Recap: Dọn dẹp hệ thống khi tắt, khởi tạo dùng chung khi bật thông qua lifespan context manager để tránh rò rỉ bộ nhớ GPU/RAM.</p>
+                    </div>
+                </div>
+
+                <!-- Chapter 20 -->
+                <div id="chapter-20" class="chapter">
+                    <h2>Chương 20: Background, SSE & WebSockets</h2>
+                    <div class="callout concept">
+                        <div class="callout-title">Mục tiêu</div>
+                        <p>Khám phá thế giới kết nối realtime thông qua các công nghệ truyền phát dữ liệu (Streaming Response), Server-Sent Events (SSE), WebSockets và xử lý tác vụ chạy nền (Background Tasks).</p>
+                    </div>
+
+                    <h3>1. Khi nào chọn công nghệ nào?</h3>
+                    <ul>
+                        <li><strong>Background Tasks:</strong> Chạy các tác vụ tốn thời gian phụ (ví dụ: Gửi email xác nhận sau khi đăng ký) ngay trong luồng xử lý web mà không chặn response trả về.</li>
+                        <li><strong>Streaming Response:</strong> Gửi từng mảnh dữ liệu thô (chunk) về client liên tục thay vì nén dữ liệu gửi một lần (ví dụ: Token streaming từ OpenAI).</li>
+                        <li><strong>SSE (Server-Sent Events):</strong> Kết nối một chiều từ Server truyền sự kiện thời gian thực tới Client, cực kỳ nhẹ nhàng (qua giao thức HTTP thông thường).</li>
+                        <li><strong>WebSockets:</strong> Kết nối hai chiều liên tục (full-duplex) giữa Client và Server (ví dụ: Ứng dụng chat trực tuyến).</li>
+                    </ul>
+
+                    <h3>2. Code: Tổng hợp realtime & Background [C24, C25, C26, C27]</h3>
+                    <div class="code-window">
+                        <div class="code-header">
+                            <span class="code-filename">realtime_demo.py</span>
+                        </div>
+                        <pre><code>from fastapi import FastAPI, BackgroundTasks, WebSocket, WebSocketDisconnect
+from fastapi.responses import StreamingResponse
+import asyncio
+import json
+import time
+
+app = FastAPI()
+
+# 1. Background Tasks: Giả lập tác vụ nặng
+def write_log_file(message: str):
+    time.sleep(2) # Giả lập ghi file chậm
+    print(f"[BACKGROUND LOG]: {message}")
+
+@app.post("/trigger-task")
+def trigger(message: str, background_tasks: BackgroundTasks):
+    # Đăng ký tác vụ chạy nền, response trả về ngay lập tức
+    background_tasks.add_task(write_log_file, message)
+    return {"message": "Tác vụ chạy nền đã được đăng ký!"}
+
+# 2. StreamingResponse & SSE: Gửi từng mảnh dữ liệu
+async def generator_stream():
+    for i in range(5):
+        await asyncio.sleep(1)
+        # Định dạng chuẩn SSE bắt đầu bằng "data: "
+        yield f"data: {json.dumps({'message': f'Dữ liệu mảnh {i}'})}\n\n"
+
+@app.get("/sse")
+def get_stream():
+    return StreamingResponse(generator_stream(), media_type="text/event-stream")
+
+# 3. WebSockets: Giao tiếp hai chiều
+@app.websocket("/ws")
+async def websocket_endpoint(websocket: WebSocket):
+    await websocket.accept() # Chấp nhận kết nối
+    try:
+        while True:
+            # Nhận tin nhắn gửi lên từ client
+            data = await websocket.receive_text()
+            # Gửi phản hồi ngược lại client thời gian thực
+            await websocket.send_text(f"Server đã nhận tin nhắn: {data}")
+    except WebSocketDisconnect:
+        print("Client ngắt kết nối WebSocket")
+</code></pre>
+                    </div>
+
+                    <div class="code-explanation">
+                        <div class="explanation-title">Giải thích luồng chạy realtime_demo.py</div>
+                        <ul>
+                            <li><strong>Mục tiêu:</strong> Triển khai đồng thời cơ chế chạy nền, streaming dữ liệu (SSE) và kết nối socket.</li>
+                            <li><strong>generator_stream:</strong> Sử dụng cơ chế async generator (<code>async def</code> với <code>yield</code>) để liên tục phát dữ liệu mà không làm tốn tài nguyên server.</li>
+                        </ul>
+                    </div>
+
+                    <div class="recap-block">
+                        <p>Recap: Dùng BackgroundTasks cho các logic phụ. Dùng StreamingResponse (SSE) cho Token LLM. Dùng WebSocket cho các ứng dụng tương tác hai chiều.</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- PART G: TESTING AND DEBUGGING -->
+            <section id="part-g">
+                <h1 style="font-size: 2.8rem; color: var(--primary); margin-top: 4rem;">Part G: Testing and Debugging</h1>
+
+                <!-- Chapter 21 -->
+                <div id="chapter-21" class="chapter">
+                    <h2>Chương 21: Testing FastAPI Applications</h2>
+                    <div class="callout concept">
+                        <div class="callout-title">Mục tiêu</div>
+                        <p>Viết các bài kiểm thử tự động (Unit / Integration Tests) sử dụng thư viện `pytest`, giả lập client bằng `TestClient` và override dependencies.</p>
+                    </div>
+
+                    <h3>1. Tại sao cần Test tự động?</h3>
+                    <p>Việc kiểm tra thủ công qua Swagger UI hoặc Postman tốn nhiều thời gian và dễ bỏ sót lỗi khi hệ thống lớn lên. Thư viện <code>TestClient</code> của FastAPI (xây dựng trên <code>httpx</code>) giúp giả lập các cuộc gọi HTTP cục bộ cực kỳ nhanh chóng.</p>
+
+                    <h3>2. Code: Trình kiểm thử tự động với PyTest [C28, C29, C30]</h3>
+                    <div class="code-window">
+                        <div class="code-header">
+                            <span class="code-filename">test_main.py</span>
+                        </div>
+                        <pre><code>from fastapi import FastAPI, Depends
+from fastapi.testclient import TestClient
+import httpx
+from httpx import ASGITransport
+import pytest
+
+app = FastAPI()
+
+# Giả lập một dependency kiểm tra quyền quản trị
+def get_user_role():
+    return "guest"
+
+@app.get("/admin-zone")
+def admin_area(role: str = Depends(get_user_role)):
+    if role != "admin":
+        return {"status": "denied"}
+    return {"status": "welcome"}
+
+client = TestClient(app)
+
+# 1. Test thông thường với Guest [C28]
+def test_guest_access():
+    response = client.get("/admin-zone")
+    assert response.status_code == 200
+    assert response.json() == {"status": "denied"}
+
+# 2. Test sử dụng Dependency Override [C29]
+def test_admin_access_with_override():
+    # Thay thế hàm get_user_role bằng một hàm giả lập trả về "admin"
+    app.dependency_overrides[get_user_role] = lambda: "admin"
+    
+    response = client.get("/admin-zone")
+    assert response.status_code == 200
+    assert response.json() == {"status": "welcome"}
+    
+    # Dọn dẹp override sau khi hoàn thành test để không ảnh hưởng test khác
+    app.dependency_overrides.clear()
+
+# 3. Viết Async Test thực tế bằng AsyncClient và ASGITransport [C30]
+@pytest.mark.asyncio
+async def test_async_endpoint():
+    # Sử dụng ASGITransport để HTTPX gọi trực tiếp ứng dụng ASGI không cần chạy server mạng thật
+    transport = ASGITransport(app=app)
+    async with httpx.AsyncClient(transport=transport, base_url="http://test") as ac:
+        response = await ac.get("/admin-zone")
+        assert response.status_code == 200
+        assert response.json() == {"status": "denied"}
+</code></pre>
+                    </div>
+
+                    <div class="code-explanation">
+                        <div class="explanation-title">Giải thích luồng chạy test_main.py</div>
+                        <ul>
+                            <li><strong>Mục tiêu:</strong> Viết Unit test và giả lập giá trị trả về của dependency đồng bộ và bất đồng bộ.</li>
+                            <li><strong>ASGITransport:</strong> Giúp <code>httpx.AsyncClient</code> giao tiếp bất đồng bộ trực tiếp với Event Loop của ứng dụng ASGI FastAPI mà không cần mở kết nối TCP thật, tối ưu tốc độ chạy test lên gấp nhiều lần.</li>
+                        </ul>
+                    </div>
+
+                    <div class="recap-block">
+                        <p>Recap: Viết test nhanh gọn với `TestClient`. Sử dụng cơ chế `dependency_overrides` để cô lập mã nguồn kiểm thử khỏi dữ liệu thực tế.</p>
+                    </div>
+                </div>
+
+                <!-- Chapter 22 -->
+                <div id="chapter-22" class="chapter">
+                    <h2>Chương 22: Debugging và Quality Mindset</h2>
+                    <div class="callout concept">
+                        <div class="callout-title">Mục tiêu</div>
+                        <p>Xây dựng tư duy phát triển phần mềm chất lượng cao, định vị và giải quyết các lỗi nhập tuần hoàn (Circular Imports), lỗi bất đồng bộ bị khóa hay lỗi cấu trúc dữ liệu không khớp (Schema Mismatch).</p>
+                    </div>
+
+                    <h3>1. Lỗi Import tuần hoàn (Circular Imports)</h3>
+                    <p><strong>Triệu chứng:</strong> Server crash khi khởi chạy kèm thông báo lỗi: <code>cannot import name 'X' from partially initialized module</code>.</p>
+                    <p><strong>Nguyên nhân:</strong> Module A import module B và Module B lại import ngược lại module A để lấy đối tượng. Thường xảy ra khi khai báo cấu trúc DB models lồng nhau hoặc dependencies.</p>
+                    
+                    <h3>2. Code: Giải quyết Circular Import</h3>
+                    <p>Để giải quyết lỗi import tuần hoàn, ta thực hiện import cục bộ bên trong hàm xử lý:</p>
+                    <div class="code-window">
+                        <div class="code-header">
+                            <span class="code-filename">circular_solution.py</span>
+                        </div>
+                        <pre><code># File: auth_service.py
+# Thay vì import UserManager ở đầu file, ta import cục bộ trong hàm cần dùng
+
+async def authenticate_user(username: str, password: str):
+    # Import cục bộ ngăn chặn việc nạp module chéo nhau khi khởi chạy
+    from app.services.user_manager import UserManager
+    
+    user = await UserManager.get_by_username(username)
+    # logic xác thực...
+    return user
+</code></pre>
+                    </div>
+
+                    <div class="code-explanation">
+                        <div class="explanation-title">Giải thích circular_solution.py</div>
+                        <ul>
+                            <li><strong>Mục tiêu:</strong> Tránh lỗi nạp chéo module.</li>
+                            <li><strong>Cơ chế:</strong> Khi Python khởi chạy file, nó sẽ không nạp ngay class <code>UserManager</code>, giải quyết hoàn toàn vấn đề vòng lặp nạp thư viện.</li>
+                        </ul>
+                    </div>
+
+                    <div class="recap-block">
+                        <p>Recap: Đọc log lỗi từ dưới lên. Tách biệt cấu trúc dữ liệu và logic module để tránh lỗi import vòng và lỗi kiểu dữ liệu.</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- PART H: PRODUCTION OPERATIONS, DEPLOYMENT, DOCKER, AND SCALING -->
+            <section id="part-h">
+                <h1 style="font-size: 2.8rem; color: var(--primary); margin-top: 4rem;">Part H: Production Operations, Deployment, Docker, and Scaling</h1>
+
+                <!-- Chapter 23 -->
+                <div id="chapter-23" class="chapter">
+                    <h2>Chương 23: Settings và Environment Variables</h2>
+                    <div class="callout concept">
+                        <div class="callout-title">Mục tiêu</div>
+                        <p>Quản lý cấu hình ứng dụng (DATABASE_URL, API_KEYS) tập trung thông qua file biến môi trường `.env` sử dụng thư viện `pydantic-settings`.</p>
+                    </div>
+
+                    <h3>1. Tại sao không hardcode cấu hình?</h3>
+                    <p>Việc ghi thẳng chuỗi kết nối Database vào code là lỗ hổng bảo mật nghiêm trọng. Thông tin nhạy cảm này có thể bị lộ khi bạn đẩy mã nguồn lên GitHub. Chúng ta cần tách biệt hoàn toàn cấu hình khỏi logic code.</p>
+
+                    <h3>2. Code: Quản lý cấu hình thông qua class Settings [C31]</h3>
+                    <div class="code-window">
+                        <div class="code-header">
+                            <span class="code-filename">config.py</span>
+                        </div>
+                        <pre><code>from pydantic_settings import BaseSettings, SettingsConfigDict
+from pydantic import Field
+
+class Settings(BaseSettings):
+    database_url: str = Field("sqlite:///./default.db", alias="DATABASE_URL")
+    
+    # Bắt buộc phải có trong môi trường/file .env, không cung cấp giá trị mặc định để tránh hardcode secret
+    # WARNING: Nếu không cấu hình SECRET_KEY ở file .env, ứng dụng sẽ báo lỗi ngay lập tức khi khởi chạy.
+    secret_key: str = Field(..., alias="SECRET_KEY")
+    
+    debug_mode: bool = False
+    
+    # Thiết lập đọc từ file .env
+    model_config = SettingsConfigDict(env_file=".env", extra="ignore")
+
+# Khởi tạo thực thể cấu hình duy nhất dùng chung cho toàn bộ app
+# Trong thực tế, khởi tạo này sẽ tự động đọc file .env có sẵn.
+# Nếu thiếu SECRET_KEY, Pydantic sẽ ném lỗi ValidationError để ngăn chặn việc chạy ứng dụng thiếu an toàn.
+settings = Settings()
+</code></pre>
+                    </div>
+
+                    <div class="code-explanation">
+                        <div class="explanation-title">Giải thích config.py</div>
+                        <ul>
+                            <li><strong>Mục tiêu:</strong> Đọc và validate toàn bộ biến môi trường từ hệ thống và file cấu hình mà không rò rỉ mã bảo mật.</li>
+                            <li><strong>Field(..., alias="SECRET_KEY"):</strong> Dấu ba chấm <code>...</code> buộc Pydantic Settings phải quét tìm và bắt buộc biến môi trường này phải tồn tại ở file <code>.env</code> hoặc biến hệ thống (OS Environment).</li>
+                        </ul>
+                    </div>
+
+                    <div class="recap-block">
+                        <p>Recap: Khai báo cấu hình tập trung qua lớp `BaseSettings`. Tuyệt đối không đẩy file `.env` lên hệ thống Git (đăng ký nó trong tệp `.gitignore`).</p>
+                    </div>
+                </div>
+
+                <!-- Chapter 24 -->
+                <div id="chapter-24" class="chapter">
+                    <h2>Chương 24: Observability và Production Operations</h2>
+                    <div class="callout concept">
+                        <div class="callout-title">Mục tiêu</div>
+                        <p>Giám sát sức khỏe ứng dụng khi vận hành (observability) thông qua việc phân định ghi nhật ký (logs) có cấu trúc và thiết lập API đo lường trạng thái sống/chết (Health Checks).</p>
+                    </div>
+
+                    <h3>1. Liveness vs Readiness Probes</h3>
+                    <p>Trong hệ thống vận hành thực tế (như chạy Kubernetes), hệ thống giám sát cần phân biệt:</p>
+                    <ul>
+                        <li><strong>Liveness Probe:</strong> Cho biết ứng dụng còn sống hay không. Nếu kiểm tra thất bại, Kubernetes sẽ lập tức khởi động lại container.</li>
+                        <li><strong>Readiness Probe:</strong> Cho biết ứng dụng đã sẵn sàng tiếp nhận lượng truy cập mạng hay chưa (đã kết nối DB xong chưa, nạp AI model xong chưa). Nếu thất bại, hệ thống sẽ tạm thời ngắt kết nối mạng đến container này chứ không khởi động lại nó.</li>
+                    </ul>
+
+                    <h3>2. Code: Liveness & Readiness Endpoints [C32]</h3>
+                    <div class="code-window">
+                        <div class="code-header">
+                            <span class="code-filename">health_check.py</span>
+                        </div>
+                        <pre><code>from fastapi import FastAPI, status, Response
+import logging
+
+app = FastAPI()
+logger = logging.getLogger("uvicorn.error")
+
+@app.get("/health/live", status_code=status.HTTP_200_OK)
+def liveness():
+    # Kiểm tra ứng dụng có phản hồi bình thường không
+    return {"status": "alive"}
+
+@app.get("/health/ready")
+def readiness(response: Response):
+    try:
+        # Giả lập kiểm tra kết nối Database thực tế
+        db_ok = True 
+        if not db_ok:
+            raise Exception("Mất kết nối database")
+        return {"status": "ready"}
+    except Exception as e:
+        logger.error(f"[READINESS ERROR]: {str(e)}")
+        response.status_code = status.HTTP_503_SERVICE_UNAVAILABLE
+        return {"status": "unready", "detail": str(e)}
+</code></pre>
+                    </div>
+
+                    <div class="recap-block">
+                        <p>Recap: Thiết lập `/health/live` và `/health/ready` tách biệt giúp các hệ thống tự động hóa khôi phục ứng dụng một cách an toàn mà không gây crash hệ thống.</p>
+                    </div>
+                </div>
+
+                <!-- Chapter 25 -->
+                <div id="chapter-25" class="chapter">
+                    <h2>Chương 25: Deployment và Docker</h2>
+                    <div class="callout concept">
+                        <div class="callout-title">Mục tiêu</div>
+                        <p>Đóng gói ứng dụng FastAPI thành một Container Docker chuẩn hóa, hiểu được thiết lập mạng khi đặt sau máy chủ chuyển tiếp (Reverse Proxy) và cách chạy uvicorn workers hiệu quả.</p>
+                    </div>
+
+                    <h3>1. Kiến trúc Production thực tế</h3>
+                    <p>Trong thực tế, người ta không bao giờ phơi trực tiếp server Uvicorn ra ngoài Internet. Uvicorn sẽ được đặt sau một máy chủ Reverse Proxy (Nginx, Traefik, Cloudflare) để quản lý chứng chỉ HTTPS, giới hạn lưu lượng (rate limiting) và chống tấn công từ chối dịch vụ (DDoS).</p>
+
+                    <div class="callout production-note">
+                        <div class="callout-title">Production Note: Chuyển tiếp Headers (Proxy Headers)</div>
+                        <p>Khi ứng dụng đặt sau Nginx, địa chỉ IP của client truy cập vào ứng dụng sẽ luôn hiển thị là địa chỉ IP của Nginx (`127.0.0.1`). Để ghi nhận đúng IP thật và giao thức kết nối HTTPS của người dùng cuối, Nginx cần truyền các header: <code>X-Forwarded-For</code> và <code>X-Forwarded-Proto</code>. Ứng dụng FastAPI cần cấu hình Uvicorn nhận các header này bằng tùy chọn: <code>--proxy-headers</code> và <code>--forwarded-allow-ips="*"</code>.</p>
+                    </div>
+
+                    <h3>2. Code: Dockerfile tối ưu cho Python [C33]</h3>
+                    <div class="code-window">
+                        <div class="code-header">
+                            <span class="code-filename">Dockerfile</span>
+                        </div>
+                        <pre><code># Sử dụng image Python slim siêu nhẹ làm nền tảng
+FROM python:3.12-slim
+
+# Thiết lập thư mục làm việc chính
+WORKDIR /app
+
+# Ngăn Python ghi file bytecode (.pyc) xuống đĩa cứng
+ENV PYTHONDONTWRITEBYTECODE=1
+# Ngăn Python buffer dữ liệu log để ghi log tức thì ra terminal
+ENV PYTHONUNBUFFERED=1
+
+# Sao chép file cấu hình thư viện trước để tận dụng cache Docker
+COPY requirements.txt .
+
+# Cài đặt thư viện không lưu cache để tối ưu kích thước container
+RUN pip install --no-cache-dir -r requirements.txt
+
+# Sao chép toàn bộ mã nguồn vào container
+COPY . .
+
+# Mở port mặc định
+EXPOSE 8000
+
+# Chạy ứng dụng bằng lệnh fastapi run hỗ trợ tối ưu môi trường production
+CMD ["fastapi", "run", "app/main.py", "--port", "8000"]
+</code></pre>
+                    </div>
+
+                    <h3>3. Chạy với Uvicorn Workers ngoài Container [C34]</h3>
+                    <p>Nếu không sử dụng Docker và cần triển khai thủ công trên server Linux ảo (VPS), chúng ta sử dụng Gunicorn làm trình quản lý các tiến trình (Process Manager) điều khiển các worker Uvicorn:</p>
+                    <pre style="background: var(--surface-dark); color: var(--on-dark); padding: 1rem; border-radius: 6px; font-family: monospace;">
+# Khởi chạy ứng dụng với 4 luồng xử lý worker song song
+gunicorn app.main:app -w 4 -k uvicorn.workers.UvicornWorker --bind 0.0.0.0:8000
+</pre>
+
+                    <div class="recap-block">
+                        <p>Recap: Viết Dockerfile tối ưu dùng ảnh slim. Triển khai đứng sau proxy Nginx và điều hành song song bằng nhiều workers để tận dụng tối đa số lượng CPU lõi.</p>
+                    </div>
+                </div>
+
+                <!-- Chapter 26 -->
+                <div id="chapter-26" class="chapter">
+                    <h2>Chương 26: Scaling Basics</h2>
+                    <div class="callout concept">
+                        <div class="callout-title">Mục tiêu</div>
+                        <p>Nắm vững tư duy thiết kế ứng dụng không lưu trạng thái (Stateless API Design) để mở rộng hệ thống theo chiều ngang (Horizontal Scaling) không giới hạn.</p>
+                    </div>
+
+                    <h3>1. Stateless API là gì?</h3>
+                    <p>Một API được gọi là Stateless nếu mỗi request gửi lên chứa đầy đủ thông tin để tự thực thi mà không phụ thuộc vào bộ nhớ tạm thời (RAM session) của riêng server đó. Nếu server A bị sập, server B có thể tiếp quản xử lý request thay thế mà không gây mất dữ liệu của người dùng.</p>
+
+                    <h3>2. Ứng phó áp lực kết nối DB (Connection Pressure)</h3>
+                    <p>Khi mở rộng quy mô chạy hàng chục Container ứng dụng song song, số lượng kết nối đồng thời đến Database sẽ bùng nổ vượt quá giới hạn của máy chủ DB. Giải pháp là thiết lập một máy chủ quản lý pool kết nối tập trung (như <strong>PgBouncer</strong> cho PostgreSQL) hoặc điều chỉnh cấu hình Connection Pool của SQLAlchemy ở mức vừa phải.</p>
+                    
+                    <h3>3. Code: Cấu hình Connection Pool cho SQLAlchemy</h3>
+                    <div class="code-window">
+                        <div class="code-header">
+                            <span class="code-filename">db_pool_config.py</span>
+                        </div>
+                        <pre><code>from sqlalchemy import create_engine
+
+# Kết nối PostgreSQL có giới hạn kích thước pool kết nối
+DATABASE_URL = "postgresql://user:pass@localhost/db"
+
+engine = create_engine(
+    DATABASE_URL,
+    pool_size=10,          # Số kết nối mặc định được mở sẵn và giữ lại
+    max_overflow=5,        # Số kết nối mở thêm vượt ngưỡng khi tải cao
+    pool_timeout=30,       # Thời gian chờ (giây) trước khi báo lỗi hết kết nối
+    pool_recycle=1800      # Tự động tạo mới kết nối sau 30 phút để tránh lỗi timeout từ DB
+)
+</code></pre>
+                    </div>
+
+                    <div class="code-explanation">
+                        <div class="explanation-title">Giải thích db_pool_config.py</div>
+                        <ul>
+                            <li><strong>Mục tiêu:</strong> Kiểm soát lượng kết nối mạng gửi đến máy chủ DB.</li>
+                            <li><strong>pool_size:</strong> Giúp các Container ứng dụng kiểm soát chặt chẽ tài nguyên, tránh gây nghẽn và sập máy chủ cơ sở dữ liệu.</li>
+                        </ul>
+                    </div>
+
+                    <div class="recap-block">
+                        <p>Recap: Thiết kế API Stateless tuyệt đối. Sử dụng PgBouncer quản lý áp lực kết nối khi nhân rộng số lượng container ứng dụng.</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- PART I: FASTAPI FOR AI/LLM/RAG -->
+            <section id="part-i">
+                <h1 style="font-size: 2.8rem; color: var(--primary); margin-top: 4rem;">Part I: FastAPI for AI/LLM/RAG</h1>
+
+                <!-- Chapter 27 -->
+                <div id="chapter-27" class="chapter">
+                    <h2>Chương 27: AI/LLM/RAG Integration</h2>
+                    <div class="callout concept">
+                        <div class="callout-title">Mục tiêu</div>
+                        <p>Tận dụng khả năng xử lý bất đồng bộ của FastAPI để thiết lập các cổng API tích hợp AI: Gateway gọi LLM, Token Streaming thời gian thực, sinh Vector Embeddings và kiến trúc luồng truy xuất thông tin tăng cường (RAG).</p>
+                    </div>
+
+                    <div class="callout ai-note">
+                        <div class="callout-title">Tại sao FastAPI là vua của ứng dụng AI?</div>
+                        <p>Các lời gọi hàm của mô hình AI hoặc API của nhà cung cấp LLM ngoài (như OpenAI, Anthropic) thường tốn từ 2-20 giây. Tính chất bất đồng bộ (async/await) của FastAPI giúp server rảnh tay xử lý hàng ngàn kết nối đồng thời khác trong lúc đợi LLM phản hồi, tăng đáng kể hiệu năng hệ thống.</p>
+                    </div>
+
+                    <h3>1. Thiết kế Endpoint AI Proxy, Embeddings & RAG [C35, C36, C37, C38]</h3>
+                    <p>Chúng ta sẽ xây dựng một Server AI hoàn chỉnh bao gồm các tính năng: Proxy gọi LLM, Stream token về client, tính toán Embeddings của một đoạn text, và truy vấn hệ thống RAG kết hợp Vector DB.</p>
+                    <p>Yêu cầu cài đặt: <code>uv add httpx</code></p>
+                    
+                    <div class="code-window">
+                        <div class="code-header">
+                            <span class="code-filename">ai_endpoints.py</span>
+                        </div>
+                        <pre><code>from fastapi import FastAPI, Depends, HTTPException, status
+from fastapi.responses import StreamingResponse
+from pydantic import BaseModel
+import httpx
+import asyncio
+import json
+
+app = FastAPI(title="AI / LLM Gateway Service")
+
+# Định nghĩa các model đầu vào
+class QueryRequest(BaseModel):
+    prompt: str
+
+class EmbeddingsRequest(BaseModel):
+    text: str
+
+# 1. Endpoint AI Proxy thông thường [C35]
+@app.post("/ai/ask")
+async def ask_llm(payload: QueryRequest):
+    # Mock hành vi gọi upstream LLM API qua client HTTP async
+    async with httpx.AsyncClient() as client:
+        try:
+            # Giả lập gửi yêu cầu đến OpenAI API (ở đây mock để chạy độc lập)
+            await asyncio.sleep(1.5)  # Đợi LLM xử lý
+            mock_llm_response = f"Câu trả lời từ AI cho prompt: '{payload.prompt}'"
+            return {"response": mock_llm_response}
+        except Exception as e:
+            raise HTTPException(status_code=502, detail=f"Lỗi kết nối LLM: {str(e)}")
+
+# 2. Endpoint Token Streaming AI [C36]
+async def llm_token_generator(prompt: str):
+    # Phát từng từ (token) giống như ChatGPT
+    mock_tokens = [f"Phản ", "hồi ", "từng ", "từ ", "cho ", f"'{prompt}'"]
+    for token in mock_tokens:
+        await asyncio.sleep(0.4) # Độ trễ sinh token của LLM
+        # Trả về chuỗi JSON thô
+        yield json.dumps({"token": token}) + "\n"
+
+@app.post("/ai/stream")
+async def stream_llm(payload: QueryRequest):
+    return StreamingResponse(
+        llm_token_generator(payload.prompt), 
+        media_type="application/x-ndjson"
+    )
+
+# 3. Endpoint Embeddings [C37]
+@app.post("/ai/embeddings")
+async def get_embeddings(payload: EmbeddingsRequest):
+    # Sinh vector đại diện (ở đây mock sinh mảng 3 chiều đại diện)
+    # Trong thực tế, bạn sẽ gọi SentenceTransformers hoặc OpenAI Embeddings
+    mock_vector = [0.125, -0.456, 0.789]
+    return {"text": payload.text, "embedding": mock_vector}
+
+# 4. Endpoint RAG Query [C38]
+@app.post("/ai/rag")
+async def query_rag(payload: QueryRequest):
+    # Quy trình RAG chuẩn:
+    # Bước A: Sinh vector embeddings cho prompt đầu vào
+    prompt_embedding = [0.125, -0.456, 0.789]
+    
+    # Bước B: Truy vấn Vector Database (như Pinecone, Qdrant) lấy ngữ cảnh liên quan
+    # Giả lập dữ liệu ngữ cảnh tìm được từ tài liệu
+    retrieved_context = "FastAPI là framework ASGI có hiệu năng cao nhất hiện nay."
+    
+    # Bước C: Trộn Prompt nguyên bản + Ngữ cảnh thành prompt nâng cao gửi lên LLM
+    combined_prompt = f"Dựa vào tài liệu sau: {retrieved_context}. Trả lời câu hỏi: {payload.prompt}"
+    
+    # Bước D: Gọi LLM lấy kết quả trả về người dùng
+    final_answer = f"Kết quả RAG: {combined_prompt} -> Trả lời: FastAPI cực kỳ nhanh!"
+    return {
+        "retrieved_context": retrieved_context,
+        "final_answer": final_answer
+    }
+</code></pre>
+                    </div>
+
+                    <div class="code-explanation">
+                        <div class="explanation-title">Giải thích mã nguồn AI Endpoints</div>
+                        <ul>
+                            <li><strong>Mục tiêu:</strong> Thiết kế toàn bộ kiến trúc lõi của một Backend phục vụ AI/RAG.</li>
+                            <li><strong>StreamingResponse:</strong> Sử dụng kiểu dữ liệu <code>application/x-ndjson</code> (Newline Delimited JSON) để client React/Vue dễ dàng phân tích và hiển thị từng từ chạy trên màn hình.</li>
+                            <li><strong>RAG Flow:</strong> Mô phỏng quá trình thu thập thông tin từ tài liệu dựa trên Vector Search và đưa vào văn cảnh của LLM để trả lời, giảm thiểu tối đa hiện tượng "ảo giác" (hallucination) của AI.</li>
+                        </ul>
+                    </div>
+
+                    <div class="callout production-note">
+                        <div class="callout-title">Production Note: Timeout & Guardrails</div>
+                        <p>Các API LLM ngoài rất dễ bị trễ hoặc quá tải. Hãy luôn cài đặt giá trị <strong>Timeout</strong> hợp lý khi sử dụng <code>httpx</code> client (ví dụ: tối đa 10 giây). Đồng thời, hãy xây dựng các hàm kiểm duyệt (Guardrails) để lọc nội dung độc hại đầu vào trước khi chuyển tiếp lên mô hình AI.</p>
+                    </div>
+
+                    <div class="recap-block">
+                        <p>Recap: FastAPI là công cụ số một để viết AI backend. Sử dụng cơ chế async streaming để tăng trải nghiệm người dùng, thiết lập RAG bằng cách xâu chuỗi: Embeddings -> Vector Search -> LLM.</p>
+                    </div>
+                </div>
+
+                <!-- Chapter 28 -->
+                <div id="chapter-28" class="chapter">
+                    <h2>Chương 28: Bốn Dự án mẫu thực tế</h2>
+                    <p>Phần này triển khai 4 dự án mini chi tiết theo lộ trình nâng cấp độ phức tạp.</p>
+
+                    <!-- PROJECT A -->
+                    <div class="project-card">
+                        <span class="project-tag">Project A</span>
+                        <h3>Hello FastAPI Starter</h3>
+                        <p><strong>Mục tiêu:</strong> Làm quen cấu trúc API đầu tiên, hiểu cách thức nhận tham số và kiểm tra tài liệu API tự động.</p>
+                        <p><strong>Cấu trúc thư mục:</strong></p>
+                        <pre style="background: var(--surface-dark); color: var(--on-dark); padding: 0.8rem; border-radius: 6px; font-family: monospace; font-size: 0.85rem;">
+project_a/
+└── main.py
+</pre>
+                        <p><strong>Mã nguồn:</strong></p>
+                        <div class="code-window">
+                            <div class="code-header"><span class="code-filename">project_a/main.py</span></div>
+                            <pre><code>from fastapi import FastAPI
+
+app = FastAPI(title="Project A: Hello FastAPI")
+
+@app.get("/hello")
+def say_hello(name: str = "Learner"):
+    return {"message": f"Chào mừng {name} đến với khóa học FastAPI!"}
+</code></pre>
+                        </div>
+                        <p><strong>Giải thích:</strong> Truy cập <code>/hello?name=Hieu</code> để nhận về dòng JSON lời chào. Truy cập <code>/docs</code> để kiểm chứng tài liệu Swagger UI tự sinh.</p>
+                    </div>
+
+                    <!-- PROJECT B -->
+                    <div class="project-card">
+                        <span class="project-tag">Project B</span>
+                        <h3>CRUD API với Database SQLite + APIRouter</h3>
+                        <p><strong>Mục tiêu:</strong> Xây dựng hệ thống quản lý danh sách sản phẩm (Products), có kết nối DB và cấu trúc thư mục phân module chuyên nghiệp.</p>
+                        <p><strong>Cấu trúc thư mục:</strong></p>
+                        <pre style="background: var(--surface-dark); color: var(--on-dark); padding: 0.8rem; border-radius: 6px; font-family: monospace; font-size: 0.85rem;">
+project_b/
+├── app/
+│   ├── __init__.py
+│   ├── main.py
+│   ├── database.py
+│   ├── schemas.py
+│   └── routers/
+│       └── products.py
+</pre>
+                        <p><strong>Mã nguồn:</strong></p>
+                        <div class="code-window">
+                            <div class="code-header"><span class="code-filename">project_b/app/database.py</span></div>
+                            <pre><code>from sqlalchemy import create_engine, Column, Integer, String, Float
+from sqlalchemy.orm import declarative_base, sessionmaker
+
+engine = create_engine("sqlite:///./project_b.db", connect_args={"check_same_thread": False})
+SessionLocal = sessionmaker(bind=engine)
+Base = declarative_base()
+
+class ProductDB(Base):
+    __tablename__ = "products"
+    id = Column(Integer, primary_key=True, index=True)
+    name = Column(String)
+    price = Column(Float)
+
+Base.metadata.create_all(bind=engine)
+</code></pre>
+                        </div>
+
+                        <div class="code-window">
+                            <div class="code-header"><span class="code-filename">project_b/app/schemas.py</span></div>
+                            <pre><code>from pydantic import BaseModel
+
+class ProductCreate(BaseModel):
+    name: str
+    price: float
+
+class ProductOut(BaseModel):
+    id: int
+    name: str
+    price: float
+    class Config:
+        from_attributes = True
+</code></pre>
+                        </div>
+
+                        <div class="code-window">
+                            <div class="code-header"><span class="code-filename">project_b/app/routers/products.py</span></div>
+                            <pre><code>from fastapi import APIRouter, Depends, HTTPException
+from sqlalchemy.orm import Session
+from project_b.app.database import SessionLocal, ProductDB
+from project_b.app.schemas import ProductCreate, ProductOut
+from typing import List
+
+router = APIRouter(prefix="/products", tags=["Sản phẩm"])
+
+def get_db():
+    db = SessionLocal()
+    try:
+        yield db
+    finally:
+        db.close()
+
+@router.post("/", response_model=ProductOut)
+def create(product: ProductCreate, db: Session = Depends(get_db)):
+    db_prod = ProductDB(name=product.name, price=product.price)
+    db.add(db_prod)
+    db.commit()
+    db.refresh(db_prod)
+    return db_prod
+
+@router.get("/", response_model=List[ProductOut])
+def read_all(db: Session = Depends(get_db)):
+    return db.query(ProductDB).all()
+</code></pre>
+                        </div>
+
+                        <div class="code-window">
+                            <div class="code-header"><span class="code-filename">project_b/app/main.py</span></div>
+                            <pre><code>from fastapi import FastAPI
+from project_b.app.routers import products
+
+app = FastAPI(title="Project B: Product API")
+app.include_router(products.router)
+</code></pre>
+                        </div>
+                    </div>
+
+                    <!-- PROJECT C -->
+                    <div class="project-card">
+                        <span class="project-tag">Project C</span>
+                        <h3>Authenticated Production-minded Backend</h3>
+                        <p><strong>Mục tiêu:</strong> Xây dựng backend đăng ký, đăng nhập tài khoản có xác thực bảo mật chuẩn mã hóa mật khẩu và kiểm duyệt token JWT trước khi cho phép đọc dữ liệu bảo mật.</p>
+                        <p><strong>Cấu trúc thư mục:</strong></p>
+                        <pre style="background: var(--surface-dark); color: var(--on-dark); padding: 0.8rem; border-radius: 6px; font-family: monospace; font-size: 0.85rem;">
+project_c/
+├── app/
+│   ├── __init__.py
+│   ├── main.py
+│   ├── auth.py
+│   └── secure_routes.py
+</pre>
+                        <p><strong>Mã nguồn:</strong></p>
+                        <div class="code-window">
+                            <div class="code-header"><span class="code-filename">project_c/app/auth.py</span></div>
+                            <pre><code>from passlib.context import CryptContext
+import jwt
+import os
+from datetime import datetime, timedelta, timezone
+
+pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+
+# WARNING: Tuyệt đối không hardcode khóa bảo mật ở production! 
+# Luôn nạp thông tin này từ môi trường hệ thống. Ứng dụng sẽ báo lỗi ngay nếu thiếu khóa.
+SECRET_KEY = os.environ.get("SECRET_KEY")
+if not SECRET_KEY:
+    raise RuntimeError("Biến môi trường SECRET_KEY chưa được cấu hình!")
+
+def hash_pw(pw: str) -> str:
+    return pwd_context.hash(pw)
+
+def verify_pw(plain: str, hashed: str) -> bool:
+    return pwd_context.verify(plain, hashed)
+
+def create_token(user: str):
+    expire = datetime.now(timezone.utc) + timedelta(hours=1)
+    return jwt.encode({"sub": user, "exp": expire}, SECRET_KEY, algorithm="HS256")
+</code></pre>
+                        </div>
+
+                        <div class="code-window">
+                            <div class="code-header"><span class="code-filename">project_c/app/secure_routes.py</span></div>
+                            <pre><code>from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi.security import OAuth2PasswordBearer
+import jwt
+import os
+
+# Đọc chung cấu hình bảo mật từ biến môi trường. Ứng dụng sẽ báo lỗi ngay nếu thiếu cấu hình.
+SECRET_KEY = os.environ.get("SECRET_KEY")
+if not SECRET_KEY:
+    raise RuntimeError("Biến môi trường SECRET_KEY chưa được cấu hình!")
+
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
+router = APIRouter(tags=["Authenticated Area"])
+
+async def get_user(token: str = Depends(oauth2_scheme)):
+    try:
+        payload = jwt.decode(token, SECRET_KEY, algorithms=["HS256"])
+        return payload.get("sub")
+    except jwt.PyJWTError:
+        raise HTTPException(status_code=401, detail="Token không hợp lệ hoặc hết hạn")
+
+@router.get("/dashboard")
+async def get_dashboard(user: str = Depends(get_user)):
+    return {"message": f"Xin chào {user}, chào mừng bạn đến với khu vực quản trị bí mật!"}
+</code></pre>
+                        </div>
+
+                        <div class="code-window">
+                            <div class="code-header"><span class="code-filename">project_c/app/main.py</span></div>
+                            <pre><code>from fastapi import FastAPI, Depends, HTTPException
+from fastapi.security import OAuth2PasswordRequestForm
+from project_c.app.auth import hash_pw, verify_pw, create_token
+from project_c.app.secure_routes import router
+
+app = FastAPI(title="Project C: Secure Backend")
+app.include_router(router)
+
+# Cơ sở dữ liệu người dùng mô phỏng (User Database)
+USER_DB = {
+    "admin": hash_pw("admin123")
+}
+
+@app.post("/token")
+async def get_access_token(form_data: OAuth2PasswordRequestForm = Depends()):
+    hashed_pass = USER_DB.get(form_data.username)
+    if not hashed_pass or not verify_pw(form_data.password, hashed_pass):
+        raise HTTPException(status_code=400, detail="Sai tài khoản hoặc mật khẩu")
+    token = create_token(form_data.username)
+    return {"access_token": token, "token_type": "bearer"}
+</code></pre>
+                        </div>
+                    </div>
+
+                    <!-- PROJECT D -->
+                    <div class="project-card">
+                        <span class="project-tag">Project D</span>
+                        <h3>AI/LLM/RAG Service Skeleton</h3>
+                        <p><strong>Mục tiêu:</strong> Xây dựng khung dịch vụ xử lý AI kết nối cơ sở dữ liệu tri thức dạng Vector Database (giả lập) để thực hiện hỏi đáp văn bản (RAG) và streaming token kết quả.</p>
+                        <p><strong>Cấu trúc thư mục:</strong></p>
+                        <pre style="background: var(--surface-dark); color: var(--on-dark); padding: 0.8rem; border-radius: 6px; font-family: monospace; font-size: 0.85rem;">
+project_d/
+├── app/
+│   ├── __init__.py
+│   ├── main.py
+│   ├── vector_db.py
+│   └── ai_service.py
+</pre>
+                        <p><strong>Mã nguồn:</strong></p>
+                        <div class="code-window">
+                            <div class="code-header"><span class="code-filename">project_d/app/vector_db.py</span></div>
+                            <pre><code># Cơ sở dữ liệu tri thức giả lập (Mock Vector DB)
+KNOWLEDGE_BASE = [
+    {"text": "Python là ngôn ngữ phổ biến nhất cho AI và Machine Learning.", "vector": [0.1, 0.2, 0.3]},
+    {"text": "FastAPI xử lý bất đồng bộ dựa trên thư viện Starlette và Uvicorn.", "vector": [0.4, 0.5, 0.6]},
+    {"text": "RAG giúp hạn chế hiện tượng ảo giác của mô hình LLM lớn.", "vector": [0.7, 0.8, 0.9]}
+]
+
+def search_similar_documents(query_embedding: list) -> str:
+    # Giả lập tìm kiếm theo độ tương đồng Vector (Cosine Similarity)
+    # Trả về tài liệu khớp nhất (ở đây mock trả về phần tử đầu tiên)
+    return KNOWLEDGE_BASE[1]["text"]
+</code></pre>
+                        </div>
+
+                        <div class="code-window">
+                            <div class="code-header"><span class="code-filename">project_d/app/ai_service.py</span></div>
+                            <pre><code>import asyncio
+import json
+
+async def mock_llm_stream_generation(prompt: str, context: str):
+    yield "data: [Bắt đầu phản hồi RAG]\n\n"
+    await asyncio.sleep(0.5)
+    
+    # Mô tả luồng xử lý
+    yield f"data: Ngữ cảnh tìm được: {context}\n\n"
+    await asyncio.sleep(0.5)
+    
+    responses = ["Dựa ", "trên ", "ngữ ", "cảnh, ", "FastAPI ", "sử ", "dụng ", "Uvicorn ", "làm ", "ASGI ", "server."]
+    for word in responses:
+        await asyncio.sleep(0.3)
+        yield f"data: {word}\n\n"
+    
+    yield "data: [Hoàn thành]\n\n"
+</code></pre>
+                        </div>
+
+                        <div class="code-window">
+                            <div class="code-header"><span class="code-filename">project_d/app/main.py</span></div>
+                            <pre><code>from fastapi import FastAPI
+from fastapi.responses import StreamingResponse
+from pydantic import BaseModel
+from project_d.app.vector_db import search_similar_documents
+from project_d.app.ai_service import mock_llm_stream_generation
+
+app = FastAPI(title="Project D: RAG Service")
+
+class RAGQuery(BaseModel):
+    question: str
+
+@app.post("/rag/ask")
+async def ask_rag(query: RAGQuery):
+    # Bước 1: Giả lập tạo embedding từ câu hỏi
+    question_vector = [0.4, 0.5, 0.6]
+    
+    # Bước 2: Tìm kiếm ngữ cảnh tương quan từ Vector Database
+    context = search_similar_documents(question_vector)
+    
+    # Bước 3: Đưa câu hỏi và ngữ cảnh vào LLM và trả về luồng streaming dữ liệu
+    return StreamingResponse(
+        mock_llm_stream_generation(query.question, context),
+        media_type="text/event-stream"
+    )
+</code></pre>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- PART J: COMMON MISTAKES, BEST PRACTICES, AND LEARNING ROADMAP -->
+            <section id="part-j">
+                <h1 style="font-size: 2.8rem; color: var(--primary); margin-top: 4rem;">Part J: Common Mistakes, Best Practices, and Learning Roadmap</h1>
+
+                <!-- Chapter 29 -->
+                <div id="chapter-29" class="chapter">
+                    <h2>Chương 29: Sai lầm thường gặp</h2>
+                    <div class="callout pitfall">
+                        <div class="callout-title">1. Không đóng DB Session</div>
+                        <p><strong>Mô tả:</strong> Khởi tạo DB Session bên trong route nhưng quên không gọi <code>db.close()</code> ở khối lệnh finally. Dẫn đến rò rỉ kết nối, làm treo server DB sau vài giờ chạy.</p>
+                        <p><strong>Giải pháp:</strong> Luôn dùng dependency Injection dạng <code>yield</code> để quản lý mở/đóng tự động.</p>
+                    </div>
+
+                    <div class="callout pitfall">
+                        <div class="callout-title">2. Lạm dụng async cho các hàm blocking</div>
+                        <p><strong>Mô tả:</strong> Định nghĩa <code>async def</code> nhưng bên trong gọi các hàm đồng bộ nặng như <code>requests.get()</code> hoặc <code>time.sleep()</code>.</p>
+                        <p><strong>Giải pháp:</strong> Đổi sang dùng <code>def</code> thông thường để FastAPI tự động điều hành chạy trên luồng phụ Thread Pool, hoặc chuyển đổi các thư viện này sang thư viện async tương ứng (ví dụ: dùng <code>httpx.AsyncClient</code> và <code>asyncio.sleep()</code>).</p>
+                    </div>
+
+                    <div class="callout pitfall">
+                        <div class="callout-title">3. Trả về trực tiếp thực thể ORM</div>
+                        <p><strong>Mô tả:</strong> Trả về trực tiếp object Database Model trong route mà không định cấu hình lọc qua Pydantic `response_model`, dễ làm rò rỉ các trường thông tin nhạy cảm của người dùng.</p>
+                    </div>
+
+                    <div class="callout pitfall">
+                        <div class="callout-title">4. Quên đặt Timeout cho các API AI ngoài</div>
+                        <p><strong>Mô tả:</strong> Gọi API của OpenAI hay Anthropic bằng httpx client mà không cấu hình Timeout. Nếu máy chủ của nhà cung cấp AI bị nghẽn, server của bạn sẽ bị treo chờ vô thời hạn.</p>
+                        <p><strong>Giải pháp:</strong> Luôn đặt <code>timeout=10.0</code> khi thực hiện các cuộc gọi API.</p>
+                    </div>
+                </div>
+
+                <!-- Chapter 30 -->
+                <div id="chapter-30" class="chapter">
+                    <h2>Chương 30: Best Practices và Lộ trình học tiếp</h2>
+                    
+                    <h3>1. Production Checklist</h3>
+                    <ul>
+                        <li>[ ] Không bao giờ hardcode mã mật (SECRET_KEY).</li>
+                        <li>[ ] Sử dụng Docker multi-stage build để thu nhỏ kích thước container ảnh chạy.</li>
+                        <li>[ ] Thiết lập đầy đủ /health endpoints cho Kubernetes.</li>
+                        <li>[ ] Giới hạn Connection Pool trong khoảng 10-20 kết nối để tránh quá tải DB.</li>
+                        <li>[ ] Viết test tự động bao phủ ít nhất 80% mã nguồn dự án.</li>
+                    </ul>
+
+                    <h3>2. Lộ trình học tập tiếp theo</h3>
+                    <p>Để trở thành một Python Backend & AI Engineer chuyên sâu, bạn được khuyến nghị tiếp tục nghiên cứu:</p>
+                    <ul>
+                        <li><strong>FastAPI Advanced Docs:</strong> Học thêm về các cơ chế Webhooks, Callbacks, sub-applications nâng cao.</li>
+                        <li><strong>SQLAlchemy Async:</strong> Chuyển đổi tương tác database sang dạng bất đồng bộ hoàn toàn với AsyncEngine.</li>
+                        <li><strong>Celery & Redis:</strong> Quản lý hàng đợi tác vụ (Task Queues) khi cần thực hiện các công việc nặng kéo dài hơn 1 phút (ví dụ: xử lý video, đào tạo mô hình).</li>
+                        <li><strong>Vector Databases:</strong> Tương tác trực tiếp và tối ưu hóa tìm kiếm với Pinecone, Milvus, Qdrant để nâng cấp ứng dụng RAG.</li>
+                    </ul>
+                </div>
+            </section>
+
+            <!-- APPENDIX -->
+            <section id="appendix">
+                <h1 style="font-size: 2.8rem; color: var(--primary); margin-top: 4rem;">Phụ lục & Glossary</h1>
+                
+                <h3>1. Bảng giải nghĩa thuật ngữ (Glossary)</h3>
+                <table class="comparison-table">
+                    <thead>
+                        <tr>
+                            <th>Thuật ngữ</th>
+                            <th>Định nghĩa</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>ASGI</strong></td>
+                            <td>Asynchronous Server Gateway Interface - Chuẩn giao diện máy chủ web bất đồng bộ.</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Pydantic</strong></td>
+                            <td>Thư viện Python dùng để xác thực và chuyển đổi kiểu dữ liệu dựa trên type hints.</td>
+                        </tr>
+                        <tr>
+                            <td><strong>JWT</strong></td>
+                            <td>JSON Web Token - Tiêu chuẩn dùng để mã hóa thông tin danh tính dưới dạng chuỗi bảo mật an toàn.</td>
+                        </tr>
+                        <tr>
+                            <td><strong>RAG</strong></td>
+                            <td>Retrieval-Augmented Generation - Quy trình truy xuất kiến thức bên ngoài bổ sung cho mô hình LLM.</td>
+                        </tr>
+                        <tr>
+                            <td><strong>BOLA/IDOR</strong></td>
+                            <td>Broken Object Level Authorization - Lỗi bảo mật cho phép truy cập tài nguyên của người khác bằng cách sửa ID.</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <h3>2. Tra cứu mã trạng thái HTTP phổ biến (HTTP Status Codes)</h3>
+                <table class="comparison-table">
+                    <thead>
+                        <tr>
+                            <th>Mã lỗi</th>
+                            <th>Tên chuẩn (English)</th>
+                            <th>Mô tả chi tiết bằng Tiếng Việt</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>200</strong></td>
+                            <td>OK</td>
+                            <td>Yêu cầu thành công, dữ liệu được trả về trong response body.</td>
+                        </tr>
+                        <tr>
+                            <td><strong>201</strong></td>
+                            <td>Created</td>
+                            <td>Tạo mới tài nguyên thành công (thường dùng sau POST request).</td>
+                        </tr>
+                        <tr>
+                            <td><strong>400</strong></td>
+                            <td>Bad Request</td>
+                            <td>Yêu cầu của client không hợp lệ về mặt logic hoặc cú pháp.</td>
+                        </tr>
+                        <tr>
+                            <td><strong>401</strong></td>
+                            <td>Unauthorized</td>
+                            <td>Thiếu thông tin xác thực hoặc thông tin xác thực sai (như JWT token lỗi).</td>
+                        </tr>
+                        <tr>
+                            <td><strong>403</strong></td>
+                            <td>Forbidden</td>
+                            <td>Đã xác thực nhưng không có quyền hạn truy cập tài nguyên.</td>
+                        </tr>
+                        <tr>
+                            <td><strong>404</strong></td>
+                            <td>Not Found</td>
+                            <td>Không tìm thấy tài nguyên yêu cầu trên server.</td>
+                        </tr>
+                        <tr>
+                            <td><strong>422</strong></td>
+                            <td>Unprocessable Entity</td>
+                            <td>Lỗi xác thực dữ liệu (FastAPI tự kích hoạt khi Pydantic validation thất bại).</td>
+                        </tr>
+                        <tr>
+                            <td><strong>500</strong></td>
+                            <td>Internal Server Error</td>
+                            <td>Lỗi crash phát sinh từ phía server code.</td>
+                        </tr>
+                        <tr>
+                            <td><strong>503</strong></td>
+                            <td>Service Unavailable</td>
+                            <td>Server bị quá tải hoặc dịch vụ bên trong (như DB) bị gián đoạn.</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <h3>3. Cấu trúc thư mục dự án mẫu khuyến nghị (Suggested Project Structure)</h3>
+                <pre style="background: var(--surface-dark); color: var(--on-dark); padding: 1.5rem; border-radius: 8px; font-family: 'JetBrains Mono', monospace; font-size: 0.85rem;">
+production_app/
+├── alembic/                  # Thư mục lịch sử di trú database
+├── app/
+│   ├── __init__.py
+│   ├── main.py                # Điểm khởi động chính ứng dụng
+│   ├── core/                  # Cấu hình cài đặt, bảo mật
+│   │   ├── config.py          # Pydantic Settings
+│   │   └── security.py        # Hashing, JWT utils
+│   ├── db/                    # Thiết lập database session
+│   │   ├── session.py
+│   │   └── base_class.py
+│   ├── models/                # Bảng cơ sở dữ liệu SQLAlchemy ORM
+│   │   ├── user.py
+│   │   └── document.py
+│   ├── schemas/               # Mô hình dữ liệu Pydantic validation
+│   │   ├── user.py
+│   │   └── document.py
+│   ├── routers/               # Phân hệ API routes
+│   │   ├── auth.py
+│   │   └── rag.py
+│   └── services/              # Xử lý logic nghiệp vụ, LLM orchestration
+│       ├── ai_service.py
+│       └── user_service.py
+├── .env                       # File cấu hình biến môi trường cục bộ
+├── .gitignore
+├── Dockerfile                 # File đóng gói container production
+└── requirements.txt
+</pre>
+
+                <h3>4. Các chủ đề nâng cao cần tìm hiểu thêm (Advanced Topics)</h3>
+                <ul>
+                    <li><strong>Webhooks & Callbacks:</strong> Cho phép API của bạn gửi thông báo chủ động đến hệ thống khác (ví dụ: gửi thông báo sau khi xử lý thành công audio dài từ mô hình speech-to-text).</li>
+                    <li><strong>Sub-applications:</strong> FastAPI cho phép bạn đính các ứng dụng phụ độc lập vào trong ứng dụng chính (Ví dụ: đính một trang admin riêng biệt viết bằng WSGI/Django).</li>
+                    <li><strong>SDK Generation:</strong> Tự động sinh Client SDK (TypeScript, Dart...) từ OpenAPI specification của FastAPI để frontend gọi hàm trực tiếp không cần viết tay HTTP fetch.</li>
+                </ul>
+
+                <h3>5. Tài liệu tham khảo lệnh nhanh (CLI Cheat Sheet)</h3>
+                <ul>
+                    <li><code>fastapi dev main.py</code>: Khởi chạy dự án ở môi trường phát triển (tự động reload khi sửa file).</li>
+                    <li><code>fastapi run main.py</code>: Khởi chạy dự án ở môi trường production (bảo mật, hiệu năng cao).</li>
+                    <li><code>alembic revision --autogenerate -m "title"</code>: So sánh code và sinh file migration tự động.</li>
+                    <li><code>alembic upgrade head</code>: Cập nhật cấu trúc database lên phiên bản mới nhất.</li>
+                </ul>
+            </section>
+        </main>
+    </div>
+
+    <!-- Sticky Table of Contents highlight script -->
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const links = document.querySelectorAll('aside.sidebar nav.toc a');
+            const sections = document.querySelectorAll('main.content section, main.content .chapter');
+            
+            function changeLinkState() {
+                let index = sections.length;
+                while(--index && window.scrollY + 100 < sections[index].offsetTop) {}
+                
+                links.forEach((link) => link.classList.remove('active'));
+                
+                const activeId = sections[index] ? sections[index].getAttribute('id') : null;
+                if (activeId) {
+                    const activeLink = document.querySelector(`aside.sidebar nav.toc a[href="#${activeId}"]`);
+                    if (activeLink) activeLink.classList.add('active');
+                }
+            }
+            
+            changeLinkState();
+            window.addEventListener('scroll', changeLinkState);
+        });
+    </script>
+</body>
+</html>
