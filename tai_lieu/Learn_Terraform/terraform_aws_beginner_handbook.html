@@ -1,0 +1,2623 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Cẩm nang nhập môn Terraform cho AWS từ cơ bản đến nâng cao cho người mới bắt đầu và kỹ sư AI" />
+  <title>Terraform for AWS: Beginner Handbook</title>
+  
+  <style>
+    :root {
+      /* Bảng màu chuẩn từ DESIGN-claude.md */
+      --canvas: #faf9f5;
+      --ink: #141413;
+      --body: #3d3d3a;
+      --body-strong: #252523;
+      --muted: #6c6a64;
+      --muted-soft: #8e8b82;
+      --hairline: #e6dfd8;
+      --hairline-soft: #ebe6df;
+      --surface-card: #efe9de;
+      --surface-cream-strong: #e8e0d2;
+      
+      /* Dark navy product surfaces */
+      --surface-dark: #181715;
+      --surface-dark-elevated: #252320;
+      --surface-dark-soft: #1f1e1b;
+      
+      /* Accent colors */
+      --primary: #cc785c;
+      --primary-active: #a9583e;
+      --primary-disabled: #e6dfd8;
+      --on-primary: #ffffff;
+      --on-dark: #faf9f5;
+      --on-dark-soft: #a09d96;
+      
+      /* Semantic colors */
+      --success: #5db872;
+      --warning: #d4a017;
+      --error: #c64545;
+      
+      /* Layout & Spacing */
+      --max-width: 1200px;
+      --radius-sm: 6px;
+      --radius-md: 8px;
+      --radius-lg: 12px;
+      --radius-xl: 16px;
+      --radius-pill: 9999px;
+      
+      --spacing-xxs: 4px;
+      --spacing-xs: 8px;
+      --spacing-sm: 12px;
+      --spacing-md: 16px;
+      --spacing-lg: 24px;
+      --spacing-xl: 32px;
+      --spacing-xxl: 48px;
+      --spacing-section: 96px;
+      
+      --shadow-soft: 0 1px 3px rgba(20, 20, 19, 0.08);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      background-color: var(--canvas);
+      color: var(--body);
+      /* Bỏ Google Fonts bên ngoài, dùng font-stack fallback local-first theo chuẩn DESIGN-claude.md */
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      font-size: 16px;
+      line-height: 1.7;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* Typography */
+    h1, h2, h3, h4, .serif-font {
+      font-family: 'Cormorant Garamond', 'Garamond', 'Georgia', 'Times New Roman', serif;
+      color: var(--ink);
+      font-weight: 500;
+      margin-top: 0;
+      letter-spacing: -0.5px;
+    }
+
+    h1 {
+      font-size: 3rem;
+      line-height: 1.1;
+      letter-spacing: -1.5px;
+    }
+
+    h2 {
+      font-size: 2.2rem;
+      line-height: 1.2;
+      letter-spacing: -1.0px;
+      border-bottom: 1px solid var(--hairline);
+      padding-bottom: var(--spacing-sm);
+      margin-top: var(--spacing-xl);
+    }
+
+    h3 {
+      font-size: 1.6rem;
+      line-height: 1.3;
+      letter-spacing: -0.3px;
+      margin-top: var(--spacing-lg);
+    }
+
+    h4 {
+      font-size: 1.2rem;
+      line-height: 1.4;
+      margin-top: var(--spacing-md);
+      font-weight: 600;
+    }
+
+    p {
+      margin-bottom: 1.5rem;
+    }
+
+    a {
+      color: var(--primary);
+      text-decoration: none;
+      transition: color 0.2s ease;
+    }
+
+    a:hover {
+      color: var(--primary-active);
+      text-decoration: underline;
+    }
+
+    /* Progress Indicator */
+    .progress-bar-container {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 4px;
+      background: var(--hairline);
+      z-index: 1000;
+    }
+
+    .progress-bar {
+      height: 100%;
+      width: 0%;
+      background: var(--primary);
+      transition: width 0.1s ease-out;
+    }
+
+    /* Hero Overview */
+    .hero {
+      background-color: var(--canvas);
+      padding: var(--spacing-section) 0;
+      border-bottom: 1px solid var(--hairline);
+    }
+
+    .hero-container {
+      max-width: var(--max-width);
+      margin: 0 auto;
+      padding: 0 var(--spacing-lg);
+      display: grid;
+      grid-template-columns: 1.2fr 0.8fr;
+      gap: var(--spacing-xl);
+      align-items: center;
+    }
+
+    .hero-content {
+      padding-right: var(--spacing-lg);
+    }
+
+    .hero-eyebrow {
+      font-family: 'Inter', sans-serif;
+      font-size: 0.85rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      color: var(--primary);
+      margin-bottom: var(--spacing-sm);
+    }
+
+    .hero h1 {
+      margin-bottom: var(--spacing-md);
+    }
+
+    .hero-lead {
+      font-size: 1.2rem;
+      color: var(--body-strong);
+      margin-bottom: var(--spacing-lg);
+    }
+
+    /* Radial Spike Mark (Anthropic Mark Prefix) */
+    .spike-mark {
+      display: inline-block;
+      width: 16px;
+      height: 16px;
+      margin-right: 8px;
+      vertical-align: middle;
+      fill: currentColor;
+    }
+
+    .hero-visual {
+      background-color: var(--surface-dark);
+      border-radius: var(--radius-xl);
+      padding: var(--spacing-lg);
+      color: var(--on-dark);
+      box-shadow: var(--shadow-soft);
+    }
+
+    .hero-visual pre {
+      margin: 0;
+      font-family: 'JetBrains Mono', ui-monospace, 'Courier New', monospace;
+      font-size: 0.85rem;
+      line-height: 1.4;
+      color: var(--on-dark);
+      overflow-x: auto;
+    }
+
+    /* Layout Shell */
+    .layout-shell {
+      max-width: var(--max-width);
+      margin: 0 auto;
+      padding: var(--spacing-xl) var(--spacing-lg);
+      display: grid;
+      grid-template-columns: 280px minmax(0, 1fr);
+      gap: var(--spacing-xl);
+    }
+
+    /* Sidebar and TOC */
+    .sidebar {
+      position: sticky;
+      top: var(--spacing-lg);
+      height: calc(100vh - 80px);
+      overflow-y: auto;
+      padding-right: var(--spacing-sm);
+    }
+
+    .toc-card {
+      background-color: var(--surface-card);
+      border: 1px solid var(--hairline);
+      border-radius: var(--radius-lg);
+      padding: var(--spacing-md);
+    }
+
+    .toc-card h3 {
+      font-family: 'Inter', sans-serif;
+      font-size: 0.9rem;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: var(--muted);
+      margin-bottom: var(--spacing-md);
+      border-bottom: 1px solid var(--hairline);
+      padding-bottom: var(--spacing-xs);
+    }
+
+    .toc-list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+
+    .toc-item {
+      margin-bottom: var(--spacing-xs);
+      font-size: 0.85rem;
+    }
+
+    .toc-link {
+      color: var(--muted);
+      display: block;
+      padding: 4px 8px;
+      border-radius: var(--radius-sm);
+      transition: all 0.2s ease;
+    }
+
+    .toc-link:hover {
+      background-color: var(--hairline-soft);
+      color: var(--ink);
+      text-decoration: none;
+    }
+
+    .toc-link.active {
+      background-color: var(--surface-cream-strong);
+      color: var(--primary);
+      font-weight: 500;
+    }
+
+    /* Content Area */
+    .content-area {
+      padding-left: var(--spacing-md);
+    }
+
+    .chapter {
+      margin-bottom: var(--spacing-section);
+      scroll-margin-top: 40px;
+    }
+
+    /* Components */
+    /* Callout Box Patterns */
+    .callout {
+      border-left: 4px solid var(--muted);
+      background-color: var(--surface-card);
+      padding: var(--spacing-md);
+      margin: var(--spacing-md) 0;
+      border-radius: 0 var(--radius-md) var(--radius-md) 0;
+    }
+
+    .callout-title {
+      font-weight: 600;
+      margin-bottom: 4px;
+      font-size: 0.95rem;
+      color: var(--ink);
+      display: flex;
+      align-items: center;
+    }
+
+    .callout-title::before {
+      content: "•";
+      color: currentColor;
+      font-size: 1.5rem;
+      margin-right: 8px;
+      line-height: 1;
+    }
+
+    .callout.beginner {
+      border-left-color: var(--primary);
+      background-color: var(--surface-soft);
+    }
+
+    .callout.beginner .callout-title {
+      color: var(--primary);
+    }
+
+    .callout.production {
+      border-left-color: var(--success);
+      background-color: var(--surface-cream-strong);
+    }
+
+    .callout.production .callout-title {
+      color: var(--success);
+    }
+
+    .callout.warning {
+      border-left-color: var(--warning);
+      background-color: #fdfaf0;
+    }
+
+    .callout.warning .callout-title {
+      color: var(--warning);
+    }
+
+    .callout.mistake {
+      border-left-color: var(--error);
+      background-color: #fdf5f5;
+    }
+
+    .callout.mistake .callout-title {
+      color: var(--error);
+    }
+
+    /* Code Window Card */
+    .code-window-card {
+      background-color: var(--surface-dark);
+      border-radius: var(--radius-lg);
+      margin: var(--spacing-md) 0;
+      overflow: hidden;
+      box-shadow: var(--shadow-soft);
+      position: relative;
+    }
+
+    .code-header {
+      background-color: var(--surface-dark-elevated);
+      padding: var(--spacing-xs) var(--spacing-md);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid var(--surface-dark-soft);
+    }
+
+    .code-title {
+      font-family: 'JetBrains Mono', ui-monospace, 'Courier New', monospace;
+      font-size: 0.8rem;
+      color: var(--on-dark-soft);
+    }
+
+    .copy-btn {
+      background: transparent;
+      border: 1px solid var(--on-dark-soft);
+      color: var(--on-dark-soft);
+      font-size: 0.75rem;
+      padding: 2px 8px;
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      font-family: 'Inter', sans-serif;
+      transition: all 0.2s ease;
+    }
+
+    .copy-btn:hover {
+      background: var(--surface-dark-soft);
+      color: var(--on-dark);
+      border-color: var(--on-dark);
+    }
+
+    .code-body {
+      padding: var(--spacing-md);
+      background-color: var(--surface-dark-soft);
+      overflow-x: auto;
+      margin: 0;
+    }
+
+    .code-body pre {
+      margin: 0;
+    }
+
+    code {
+      font-family: 'JetBrains Mono', ui-monospace, 'Courier New', monospace;
+      font-size: 0.85rem;
+      line-height: 1.6;
+    }
+
+    .code-body code {
+      color: var(--on-dark);
+    }
+
+    p code, li code {
+      background-color: var(--surface-card);
+      padding: 2px 6px;
+      border-radius: var(--radius-sm);
+      color: var(--ink);
+      font-size: 0.9rem;
+    }
+
+    /* Diagram Card */
+    .diagram-card {
+      background-color: var(--surface-card);
+      border: 1px solid var(--hairline);
+      border-radius: var(--radius-lg);
+      padding: var(--spacing-md);
+      margin: var(--spacing-md) 0;
+      text-align: center;
+    }
+
+    .diagram-box {
+      border: 1px solid var(--hairline);
+      background-color: var(--canvas);
+      padding: var(--spacing-sm);
+      border-radius: var(--radius-md);
+      margin: var(--spacing-xs) auto;
+      max-width: 400px;
+      font-weight: 500;
+      font-family: 'JetBrains Mono', ui-monospace, monospace;
+      font-size: 0.85rem;
+    }
+
+    .diagram-arrow {
+      font-size: 1.2rem;
+      color: var(--primary);
+      margin: var(--spacing-xs) 0;
+    }
+
+    /* Details/Summary Pattern */
+    details.deep-dive {
+      border: 1px solid var(--hairline);
+      border-radius: var(--radius-lg);
+      background-color: var(--canvas);
+      margin: var(--spacing-md) 0;
+      overflow: hidden;
+    }
+
+    details.deep-dive summary {
+      padding: var(--spacing-md);
+      font-weight: 600;
+      cursor: pointer;
+      background-color: var(--surface-card);
+      user-select: none;
+      color: var(--ink);
+      outline: none;
+    }
+
+    details.deep-dive summary:hover {
+      background-color: var(--surface-cream-strong);
+    }
+
+    details.deep-dive .details-content {
+      padding: var(--spacing-md);
+      border-top: 1px solid var(--hairline);
+    }
+
+    /* Capstone Card */
+    .capstone-card {
+      background-color: var(--canvas);
+      border: 2px solid var(--primary-disabled);
+      border-radius: var(--radius-xl);
+      padding: var(--spacing-xl);
+      margin: var(--spacing-lg) 0;
+    }
+
+    .capstone-card.active-border {
+      border-color: var(--primary);
+    }
+
+    .capstone-badge {
+      display: inline-block;
+      background-color: var(--primary);
+      color: var(--on-primary);
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      font-weight: 600;
+      letter-spacing: 1px;
+      padding: 4px 12px;
+      border-radius: var(--radius-pill);
+      margin-bottom: var(--spacing-sm);
+    }
+
+    /* Tables */
+    .comparison-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: var(--spacing-md) 0;
+      font-size: 0.9rem;
+    }
+
+    .comparison-table th, .comparison-table td {
+      border: 1px solid var(--hairline);
+      padding: var(--spacing-sm) var(--spacing-md);
+      text-align: left;
+    }
+
+    .comparison-table th {
+      background-color: var(--surface-card);
+      color: var(--ink);
+      font-weight: 600;
+    }
+
+    .comparison-table tr:nth-child(even) {
+      background-color: var(--surface-soft);
+    }
+
+    /* Checklist Box */
+    .checklist-box {
+      background-color: var(--surface-card);
+      border-radius: var(--radius-lg);
+      padding: var(--spacing-md);
+      margin: var(--spacing-md) 0;
+      border: 1px solid var(--hairline);
+    }
+
+    .checklist-title {
+      font-weight: 600;
+      color: var(--ink);
+      margin-bottom: var(--spacing-sm);
+      display: flex;
+      align-items: center;
+    }
+
+    .checklist-list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+
+    .checklist-item {
+      display: flex;
+      align-items: flex-start;
+      margin-bottom: var(--spacing-xs);
+    }
+
+    .checklist-checkbox {
+      margin-right: var(--spacing-sm);
+      margin-top: 5px;
+    }
+
+    /* Footer */
+    footer {
+      background-color: var(--surface-dark);
+      color: var(--on-dark-soft);
+      padding: var(--spacing-xxl) 0;
+      margin-top: var(--spacing-section);
+      border-top: 1px solid var(--surface-dark-soft);
+    }
+
+    .footer-container {
+      max-width: var(--max-width);
+      margin: 0 auto;
+      padding: 0 var(--spacing-lg);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .footer-brand {
+      display: flex;
+      align-items: center;
+      color: var(--on-dark);
+      font-weight: 500;
+    }
+
+    .footer-brand svg {
+      margin-right: 8px;
+    }
+
+    .footer-copyright {
+      font-size: 0.8rem;
+    }
+
+    /* Section Anchor Link */
+    .anchor-link {
+      margin-left: 8px;
+      color: var(--hairline);
+      font-weight: normal;
+      font-size: 0.8em;
+      opacity: 0;
+      transition: opacity 0.2s ease;
+    }
+
+    h2:hover .anchor-link, h3:hover .anchor-link {
+      opacity: 1;
+    }
+
+    /* Responsive Design */
+    @media (max-width: 960px) {
+      .hero-container {
+        grid-template-columns: 1fr;
+        padding: var(--spacing-xl) var(--spacing-lg);
+        text-align: center;
+      }
+
+      .hero-content {
+        padding-right: 0;
+      }
+
+      .hero-visual {
+        max-width: 100%;
+        margin-top: var(--spacing-lg);
+      }
+
+      .layout-shell {
+        grid-template-columns: 1fr;
+      }
+
+      .sidebar {
+        position: relative;
+        top: 0;
+        height: auto;
+        margin-bottom: var(--spacing-lg);
+        padding-right: 0;
+      }
+
+      .content-area {
+        padding-left: 0;
+      }
+
+      h1 {
+        font-size: 2.2rem;
+      }
+
+      h2 {
+        font-size: 1.8rem;
+      }
+
+      h3 {
+        font-size: 1.4rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="progress-bar-container">
+    <div class="progress-bar" id="progressBar"></div>
+  </div>
+
+  <!-- Header / Hero Overview -->
+  <header class="hero" id="hero-overview">
+    <div class="hero-container">
+      <div class="hero-content">
+        <div class="hero-eyebrow">AWS & Terraform Guided Course</div>
+        <h1>
+          <svg class="spike-mark" viewBox="0 0 24 24">
+            <path d="M12 2v20M2 12h20M5 5l14 14M5 19L19 5" stroke="currentColor" stroke-width="3" stroke-linecap="round"/>
+          </svg>Tài liệu nhập môn Terraform cho AWS
+        </h1>
+        <p class="hero-lead">
+          Lộ trình hướng dẫn thực tế từ số 0, giúp hiểu tường tận tư duy viết mã Infrastructure as Code (IaC), tổ chức Module, quản lý State, xử lý Drift và triển khai 3 dự án Capstone về AWS & Trí tuệ nhân tạo (AI).
+        </p>
+        <p class="hero-summary" style="font-size: 0.95rem; color: var(--muted);">
+          Handbook này kế thừa và tái cấu trúc hệ thống kiến thức từ chuỗi bài viết Terraform của tác giả Quân Huỳnh trên Viblo (Bài 1 đến Bài 19), kết hợp chặt chẽ với tài liệu chuẩn hóa từ HashiCorp và AWS Prescriptive Guidance.
+        </p>
+      </div>
+      <div class="hero-visual">
+        <pre><code># Mental Picture của Terraform
+$ terraform init
+  ↳ Tải Providers & Modules
+$ terraform plan
+  ↳ So sánh Desired State vs Real Infra
+$ terraform apply
+  ↳ Cập nhật hạ tầng AWS thực tế
+  ↳ Ghi nhận vào terraform.tfstate</code></pre>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Shell -->
+  <div class="layout-shell">
+    <aside class="sidebar">
+      <nav class="toc-card" id="tocContainer">
+        <h3>Mục lục tài liệu</h3>
+        <ul class="toc-list" id="tocList">
+          <!-- Điền bằng JS động -->
+        </ul>
+      </nav>
+    </aside>
+
+    <main class="content-area" id="content">
+      
+      <!-- Section 2: How to use this guide -->
+      <section id="how-to-use-this-guide" class="chapter">
+        <h2>Cách dùng handbook này để học nhanh nhưng không hổng nền<a href="#how-to-use-this-guide" class="anchor-link">§</a></h2>
+        <p>Tài liệu này được biên soạn như một cuốn sách hướng dẫn tự học (guided handbook) có chiều sâu và nhịp điệu biên tập rõ ràng. Nó không phải là một cheat sheet hay bài đăng blog hời hợt.</p>
+        
+        <div class="callout beginner">
+          <div class="callout-title">Beginner note: Đọc tuần tự hay tra cứu?</div>
+          <p>Nếu bạn hoàn toàn mới bắt đầu với Terraform, hãy đọc tuần tự từ <strong>Section 3</strong> đến <strong>Section 16</strong> để hình thành mô hình tư duy (mental model) vững chắc trước khi thử sức với các dự án lớn ở phần cuối.</p>
+        </div>
+
+        <div class="callout production">
+          <div class="callout-title">Production note: Dành cho kỹ sư DevOps và AI</div>
+          <p>Nếu bạn đã có kinh nghiệm và muốn tra cứu, các phần về <strong>Backend & State (Section 15)</strong>, <strong>Import & Drift (Section 16)</strong>, <strong>Security (Section 21)</strong> và <strong>3 Capstones</strong> thực tế sẽ cung cấp các blueprint chất lượng cao để áp dụng trực tiếp.</p>
+        </div>
+
+        <div class="checklist-box">
+          <div class="checklist-title">Checklist: Chuẩn bị trước khi học</div>
+          <ul class="checklist-list">
+            <li class="checklist-item">
+              <input type="checkbox" class="checklist-checkbox" checked disabled />
+              <span>Một tài khoản AWS (Free Tier là đủ, lưu ý chi phí của một số tài nguyên sẽ được cảnh báo cụ thể).</span>
+            </li>
+            <li class="checklist-item">
+              <input type="checkbox" class="checklist-checkbox" checked disabled />
+              <span>Trình soạn thảo mã nguồn VS Code hoặc bất kỳ IDE nào có cài plugin hỗ trợ cú pháp HashiCorp Terraform (HCL).</span>
+            </li>
+            <li class="checklist-item">
+              <input type="checkbox" class="checklist-checkbox" checked disabled />
+              <span>Máy tính chạy hệ điều hành Windows (handbook này hướng dẫn CLI tối ưu trên Windows PowerShell).</span>
+            </li>
+          </ul>
+        </div>
+      </section>
+
+      <!-- Section 3: What is IaC -->
+      <section id="what-is-iac" class="chapter">
+        <h2>Bản chất của Infrastructure as Code (IaC)<a href="#what-is-iac" class="anchor-link">§</a></h2>
+        <p><strong>Infrastructure as Code (IaC)</strong> là phương pháp quản lý và thiết lập hạ tầng máy tính thông qua các tệp mã nguồn được định nghĩa rõ ràng, thay vì thực hiện các thao tác thủ công trên giao diện đồ họa Web hoặc sử dụng các kịch bản cài đặt ad-hoc không đồng nhất.</p>
+
+        <div class="callout warning">
+          <div class="callout-title">Why this matters: Nỗi đau của Click-Ops</div>
+          <p>Khi bạn tạo một máy ảo EC2 trên AWS Console bằng cách click tay: Bạn chọn AMI, Instance Type, tạo Security Group, đính kèm IAM Role. Lần đầu thì dễ. Nhưng nếu bạn cần tạo lại chính xác hạ tầng đó ở vùng (region) khác, hoặc khi xảy ra sự cố thảm họa (Disaster Recovery)? Bạn sẽ rất dễ quên hoặc click sai một tùy chọn nhỏ, dẫn đến cấu hình không nhất quán và mất nhiều giờ để gỡ lỗi.</p>
+        </div>
+
+        <div class="callout beginner">
+          <div class="callout-title">What this means: Hạ tầng của bạn là mã nguồn</div>
+          <p>Với IaC, toàn bộ VPC, Subnet, máy chủ, cơ sở dữ liệu của bạn được mô tả chi tiết trong các file text. Bạn có thể lưu chúng vào Git, xem lịch sử thay đổi (version control), review code (Pull Request) trước khi triển khai và tạo lại y hệt 100% môi trường chỉ bằng một dòng lệnh.</p>
+        </div>
+
+        <table class="comparison-table">
+          <thead>
+            <tr>
+              <th>Khía cạnh</th>
+              <th>Quản lý thủ công (Click-Ops)</th>
+              <th>Hạ tầng dưới dạng mã (IaC)</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>Tính nhất quán</strong></td>
+              <td>Thấp (Dễ sai lệch cấu hình giữa các môi trường dev/prod).</td>
+              <td>Tuyệt đối (Mã nguồn chạy nhiều lần đều ra kết quả giống nhau).</td>
+            </tr>
+            <tr>
+              <td><strong>Tốc độ triển khai</strong></td>
+              <td>Chậm (Phụ thuộc vào tốc độ nhấp chuột của con người).</td>
+              <td>Nhanh (Thực thi tự động chỉ trong vài phút).</td>
+            </tr>
+            <tr>
+              <td><strong>Khôi phục thảm họa</strong></td>
+              <td>Phức tạp (Phải cấu hình lại từ đầu dựa trên tài liệu giấy).</td>
+              <td>Tức thì (Chạy lệnh apply lại từ mã nguồn lưu trên Git).</td>
+            </tr>
+          </tbody>
+        </table>
+      </section>
+
+      <!-- Section 4: What is Terraform -->
+      <section id="what-is-terraform" class="chapter">
+        <h2>Terraform là gì và mô hình Declarative<a href="#what-is-terraform" class="anchor-link">§</a></h2>
+        <p><strong>HashiCorp Terraform</strong> là một công cụ IaC mã nguồn mở cực kỳ phổ biến giúp bạn định nghĩa, xây dựng và thay đổi hạ tầng một cách an toàn và hiệu quả trên nhiều nhà cung cấp đám mây khác nhau (như AWS, Azure, GCP).</p>
+
+        <div class="callout beginner">
+          <div class="callout-title">What this means: Mô hình Khai báo (Declarative Model)</div>
+          <p>Trong lập trình thông thường (Imperative), bạn viết mã mô tả từng bước thực hiện: "Bước 1 tạo đĩa S3, Bước 2 gán quyền cho Lambda...". Nhưng với Terraform, bạn viết theo kiểu <strong>Declarative (Khai báo trạng thái mong muốn)</strong>: "Tôi muốn có một S3 Bucket tên là A, một Lambda tên là B có quyền đọc Bucket A". Terraform sẽ tự tính toán xem thứ tự tạo thế nào cho đúng và chạy các API tương ứng.</p>
+        </div>
+
+        <div class="callout production">
+          <div class="callout-title">Why this matters: Resource Dependency Graph</div>
+          <p>Khi bạn định nghĩa hàng chục tài nguyên liên kết với nhau, Terraform tự động xây dựng một biểu đồ phụ thuộc (Dependency Graph) dưới dạng đồ thị có hướng không chu trình (DAG). Nó tự biết tài nguyên nào không phụ thuộc nhau để tạo song song nhằm tối ưu thời gian, và tài nguyên nào phụ thuộc nhau để tạo theo trình tự bắt buộc.</p>
+        </div>
+
+        <div class="diagram-card">
+          <h4>Sơ đồ quy trình hoạt động cốt lõi của Terraform</h4>
+          <div class="diagram-box">1. Viết cấu hình (.tf files)</div>
+          <div class="diagram-arrow">↓</div>
+          <div class="diagram-box">2. Khởi tạo môi trường (terraform init)</div>
+          <div class="diagram-arrow">↓</div>
+          <div class="diagram-box">3. Lên kế hoạch (terraform plan)</div>
+          <div class="diagram-arrow">↓</div>
+          <div class="diagram-box">4. Áp dụng thực tế (terraform apply)</div>
+        </div>
+      </section>
+
+      <!-- Section 5: Terraform vs Other Tools -->
+      <section id="terraform-vs-other-tools" class="chapter">
+        <h2>So sánh Terraform với các công cụ khác<a href="#terraform-vs-other-tools" class="anchor-link">§</a></h2>
+        <p>Người mới thường bị nhầm lẫn giữa Terraform với các công cụ tự động hóa hoặc IaC khác như AWS CloudFormation, Ansible, hoặc Shell Script.</p>
+
+        <div class="callout beginner">
+          <div class="callout-title">Beginner note: Phân biệt Provisioning vs Configuration Management</div>
+          <p><strong>Provisioning (Khởi dựng hạ tầng)</strong>: Tạo ra phần cứng, ảo hóa như mạng VPC, máy chủ EC2, ổ cứng S3. Terraform cực kỳ mạnh ở mảng này. <br>
+          <strong>Configuration Management (Cấu hình hệ điều hành)</strong>: Cài đặt phần mềm, cấu hình nginx, thiết lập database bên trong máy chủ ảo. Ansible, Chef, Puppet mạnh ở mảng này.</p>
+        </div>
+
+        <table class="comparison-table">
+          <thead>
+            <tr>
+              <th>Tiêu chí</th>
+              <th>Terraform</th>
+              <th>CloudFormation</th>
+              <th>Ansible</th>
+              <th>Shell Script</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>Phạm vi</strong></td>
+              <td>Multi-cloud (AWS, GCP, Azure, Kubernetes)</td>
+              <td>Chỉ dành riêng cho AWS</td>
+              <td>Cấu hình phần mềm bên trong OS</td>
+              <td>Kịch bản lệnh chạy cục bộ ad-hoc</td>
+            </tr>
+            <tr>
+              <td><strong>Cơ chế</strong></td>
+              <td>Declarative (Khai báo)</td>
+              <td>Declarative (Khai báo)</td>
+              <td>Hỗn hợp (Hybrid)</td>
+              <td>Imperative (Tuần tự từng bước)</td>
+            </tr>
+            <tr>
+              <td><strong>Quản lý State</strong></td>
+              <td>Có (Lưu trong tệp tin State)</td>
+              <td>Có (AWS quản lý ngầm)</td>
+              <td>Không có tệp tin State lưu trữ</td>
+              <td>Không có quản lý State</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <div class="callout warning">
+          <div class="callout-title">Why this matters: Multi-Cloud Awareness</div>
+          <p>Mặc dù mỗi nhà cung cấp đám mây có một bộ Provider riêng và bạn không thể lấy trực tiếp code AWS chạy sang Azure được, nhưng việc dùng chung một cú pháp HCL và cùng một quy trình (init, plan, apply) giúp đội ngũ kỹ sư tiết kiệm rất nhiều thời gian học tập khi làm việc trên môi trường đa đám mây.</p>
+        </div>
+      </section>
+
+      <!-- Section 6: Setup Windows and AWS -->
+      <section id="setup-windows-and-aws" class="chapter">
+        <h2>Thiết lập môi trường trên Windows và cấu hình AWS CLI<a href="#setup-windows-and-aws" class="anchor-link">§</a></h2>
+        <p>Để bắt đầu thực hành, chúng ta cần cài đặt Terraform CLI, AWS CLI và cấu hình khóa truy cập (Credentials) một cách an toàn trên Windows.</p>
+
+        <div class="callout warning">
+          <div class="callout-title">Cảnh báo bảo mật cực kỳ quan trọng về Secret Key</div>
+          <p>Tuyệt đối không bao giờ được hard-code hoặc lưu trực tiếp <strong>AWS Access Key ID</strong> và <strong>AWS Secret Access Key</strong> vào trong các tệp cấu hình Terraform. Nếu bạn vô tình đẩy chúng lên GitHub, kẻ xấu có thể quét và chiếm quyền kiểm soát tài khoản AWS của bạn chỉ trong vài phút, gây ra các hóa đơn hàng ngàn USD.</p>
+        </div>
+
+        <div class="code-window-card">
+          <div class="code-header">
+            <span class="code-title">PowerShell - Cài đặt và cấu hình</span>
+            <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+          </div>
+          <div class="code-body">
+            <pre><code># 1. Tải và cài đặt Terraform bằng Chocolatey trên Windows (Nếu có)
+choco install terraform
+
+# 2. Hoặc kiểm tra xem Terraform đã được nhận diện trong Path chưa
+terraform -version
+
+# 3. Cấu hình AWS Credentials thông qua AWS CLI
+# Lệnh này sẽ nhắc bạn nhập Access Key, Secret Key, Region mặc định và Output Format.
+aws configure --profile terraform-learning
+
+# 4. Xác minh thông tin đăng nhập và quyền truy cập hiện tại
+aws sts get-caller-identity --profile terraform-learning</code></pre>
+          </div>
+        </div>
+
+        <div class="callout beginner">
+          <div class="callout-title">What this means: Cách đọc phản hồi từ lệnh STS</div>
+          <p>Khi chạy lệnh <code>aws sts get-caller-identity</code>, nếu nhận được một phản hồi dạng JSON chứa các trường <code>UserId</code>, <code>Account</code>, và <code>Arn</code> của User IAM mà bạn vừa cấu hình, nghĩa là máy tính của bạn đã kết nối thành công tới AWS API.</p>
+        </div>
+      </section>
+
+      <!-- Section 7: Terraform Mental Model -->
+      <section id="terraform-mental-model" class="chapter">
+        <h2>Mô hình tư duy và chu trình hoạt động của Terraform<a href="#terraform-mental-model" class="anchor-link">§</a></h2>
+        <p>Để không bị bối rối khi làm việc với Terraform, bạn cần ghi nhớ sâu sắc chu trình 4 bước hoạt động chính của nó.</p>
+
+        <div class="callout beginner">
+          <div class="callout-title">Chu trình 4 bước cốt lõi</div>
+          <p>
+            <strong>1. Viết cấu hình:</strong> Bạn định nghĩa các tài nguyên mong muốn trong các file <code>.tf</code>.<br>
+            <strong>2. Khởi tạo (Init):</strong> Chạy <code>terraform init</code> để tải về các Provider (ví dụ: Provider AWS để giao tiếp với AWS API).<br>
+            <strong>3. Lập kế hoạch (Plan):</strong> Chạy <code>terraform plan</code> để so sánh mã nguồn của bạn với hạ tầng thực tế đang chạy trên AWS. Nó sẽ liệt kê ra những gì sẽ được tạo mới (+), cập nhật (~), hoặc xóa bỏ (-).<br>
+            <strong>4. Thực thi (Apply):</strong> Chạy <code>terraform apply</code> để thực hiện các thay đổi đó lên đám mây AWS.
+          </p>
+        </div>
+
+        <div class="callout production">
+          <div class="callout-title">Why this matters: Tầm quan trọng của tệp State</div>
+          <p>Làm thế nào Terraform biết hạ tầng thực tế đang có gì để so sánh? Đó là nhờ tệp tin <code>terraform.tfstate</code>. Đây là cơ sở dữ liệu nội bộ lưu giữ ánh xạ giữa mã nguồn của bạn và ID của các tài nguyên thực tế trên AWS. Tệp này phải được bảo vệ cực kỳ nghiêm ngặt.</p>
+        </div>
+      </section>
+
+      <!-- Section 8: Terraform File Structure -->
+      <section id="terraform-file-structure" class="chapter">
+        <h2>Cấu trúc thư mục chuẩn của một dự án Terraform<a href="#terraform-file-structure" class="anchor-link">§</a></h2>
+        <p>Mặc dù bạn có thể viết tất cả mã nguồn vào duy nhất một file <code>main.tf</code>, nhưng trong môi trường thực tế, việc phân tách các tệp tin theo chức năng là bắt buộc để dễ quản lý và review.</p>
+
+        <div class="callout beginner">
+          <div class="callout-title">Cấu trúc thư mục khuyên dùng cho dự án</div>
+          <pre><code>project-root/
+├── versions.tf          # Định nghĩa phiên bản Terraform và Providers
+├── provider.tf          # Khai báo cấu hình kết nối của Provider (AWS)
+├── main.tf              # Nơi khai báo các tài nguyên chính
+├── variables.tf         # Khai báo các tham số đầu vào (Input Variables)
+├── terraform.tfvars     # Giá trị thực tế gán cho các Variables
+├── outputs.tf           # Các thông tin đầu ra cần hiển thị sau khi apply
+├── locals.tf            # Các biến tính toán nội bộ để tái sử dụng
+├── backend.tf           # Khai báo nơi lưu trữ tệp State (S3 Remote State)
+└── modules/             # Thư mục chứa các module con tự định nghĩa
+    └── vpc/
+        ├── main.tf
+        ├── variables.tf
+        └── outputs.tf</code></pre>
+        </div>
+
+        <div class="callout production">
+          <div class="callout-title">Why this matters: Tách cấu hình khỏi dữ liệu thực tế</div>
+          <p>Bằng việc tách <code>variables.tf</code> (khai báo khuôn mẫu) và <code>terraform.tfvars</code> (chứa giá trị cụ thể của từng môi trường), bạn có thể tái sử dụng toàn bộ mã nguồn của dự án để tạo ra môi trường Dev, Staging, và Prod mà không cần phải viết lại logic hạ tầng.</p>
+        </div>
+      </section>
+
+      <!-- Section 9: HCL Basics -->
+      <section id="hcl-basics" class="chapter">
+        <h2>Cú pháp ngôn ngữ cấu hình HashiCorp (HCL)<a href="#hcl-basics" class="anchor-link">§</a></h2>
+        <p>HCL (HashiCorp Configuration Language) được thiết kế để con người dễ đọc và máy tính dễ phân tích. Dưới đây là các kiểu dữ liệu và cú pháp lập trình chức năng cơ bản.</p>
+
+        <div class="code-window-card">
+          <div class="code-header">
+            <span class="code-title">hcl_examples.tf - Các cú pháp cơ bản</span>
+            <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+          </div>
+          <div class="code-body">
+            <pre><code># 1. Các kiểu dữ liệu cơ bản
+variable "project_name" {
+  type    = string
+  default = "ai-system"
+}
+
+variable "instance_count" {
+  type    = number
+  default = 3
+}
+
+variable "enable_public_ip" {
+  type    = bool
+  default = true
+}
+
+# 2. Kiểu dữ liệu phức hợp (List, Map, Object)
+variable "availability_zones" {
+  type    = list(string)
+  default = ["ap-southeast-1a", "ap-southeast-1b"]
+}
+
+variable "tags" {
+  type = map(string)
+  default = {
+    Environment = "dev"
+    ManagedBy   = "terraform"
+  }
+}
+
+# 3. Sử dụng biểu thức điều kiện (Ternary Operator)
+locals {
+  instance_type = var.enable_public_ip ? "t3.micro" : "t3.nano"
+}
+
+# 4. Vòng lặp for_each và count
+resource "aws_s3_bucket" "buckets" {
+  for_each = toset(["logs", "data", "artifacts"])
+  bucket   = "${var.project_name}-${each.key}"
+}</code></pre>
+          </div>
+        </div>
+
+        <div class="callout beginner">
+          <div class="callout-title">What this means: Khác biệt giữa Count và For_Each</div>
+          <p>
+            <code>count</code>: Thích hợp khi bạn muốn tạo ra N tài nguyên hoàn toàn giống hệt nhau (chỉ khác số thứ tự 0, 1, 2). Tuy nhiên, nếu bạn xóa một phần tử ở giữa danh sách, Terraform sẽ phải hủy và tạo lại các phần tử phía sau.<br>
+            <code>for_each</code>: Thích hợp khi các tài nguyên được phân biệt bằng các key duy nhất (như map hoặc set). Xóa một phần tử không ảnh hưởng đến các tài nguyên còn lại.
+          </p>
+        </div>
+      </section>
+
+      <!-- Section 10: First Terraform Project -->
+      <section id="first-terraform-project" class="chapter">
+        <h2>Dự án đầu tiên trên AWS: Tạo máy chủ EC2 đơn giản<a href="#first-terraform-project" class="anchor-link">§</a></h2>
+        <p>Hãy thực hành viết và chạy dự án Terraform đầu tiên của bạn để khởi tạo một máy chủ EC2 trên AWS.</p>
+
+        <div class="code-window-card">
+          <div class="code-header">
+            <span class="code-title">versions.tf - Cấu hình phiên bản</span>
+            <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+          </div>
+          <div class="code-body">
+            <pre><code>terraform {
+  required_version = ">= 1.5.0"
+
+  required_providers {
+    aws = {
+      source  = "hashicorp/aws"
+      version = "~> 5.0"
+    }
+  }
+}</code></pre>
+          </div>
+        </div>
+
+        <div class="code-window-card">
+          <div class="code-header">
+            <span class="code-title">provider.tf - Cấu hình Provider AWS</span>
+            <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+          </div>
+          <div class="code-body">
+            <pre><code>provider "aws" {
+  region  = "ap-southeast-1"
+  profile = "terraform-learning"
+}</code></pre>
+          </div>
+        </div>
+
+        <div class="callout beginner">
+          <div class="callout-title">Beginner note: Sử dụng Data Source để tự động hóa việc lấy AMI ID</div>
+          <p>Thay vì hard-code một ID máy ảo (AMI) cố định (rất dễ bị lỗi hoặc lỗi thời khi chuyển đổi Region), chúng ta nên dùng khối <code>data "aws_ami"</code> để tự động truy vấn ID của phiên bản Ubuntu mới nhất từ nhà phát triển Canonical.</p>
+        </div>
+
+        <div class="code-window-card">
+          <div class="code-header">
+            <span class="code-title">main.tf - Tài nguyên EC2 với Dynamic AMI</span>
+            <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+          </div>
+          <div class="code-body">
+            <pre><code># Truy vấn dynamic AMI ID của Ubuntu 22.04 LTS mới nhất từ AWS API
+data "aws_ami" "ubuntu" {
+  most_recent = true
+
+  filter {
+    name   = "name"
+    values = ["ubuntu/images/hvm-ssd/ubuntu-jammy-22.04-amd64-server-*"]
+  }
+
+  filter {
+    name   = "virtualization-type"
+    values = ["hvm"]
+  }
+
+  owners = ["099720109477"] # ID của hãng Canonical phát triển Ubuntu
+}
+
+resource "aws_instance" "my_first_server" {
+  ami           = data.aws_ami.ubuntu.id
+  instance_type = "t2.micro"
+
+  tags = {
+    Name = "my-first-terraform-ec2"
+  }
+}</code></pre>
+          </div>
+        </div>
+
+        <div class="code-window-card">
+          <div class="code-header">
+            <span class="code-title">outputs.tf - Hiển thị Public IP</span>
+            <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+          </div>
+          <div class="code-body">
+            <pre><code>output "server_public_ip" {
+  description = "Địa chỉ IP công cộng của EC2 instance"
+  value       = aws_instance.my_first_server.public_ip
+}</code></pre>
+          </div>
+        </div>
+
+        <div class="callout warning">
+          <div class="callout-title">Lưu ý cho người mới: Quy trình thực thi lệnh</div>
+          <p>Hãy mở PowerShell tại thư mục chứa các file trên và chạy tuần tự các lệnh sau:</p>
+          <pre><code># 1. Định dạng code cho đẹp và chuẩn
+terraform fmt
+
+# 2. Khởi tạo thư mục và tải Provider AWS
+terraform init
+
+# 3. Xác thực cú pháp xem có lỗi chính tả nào không
+terraform validate
+
+# 4. Xem trước kế hoạch thay đổi hạ tầng
+terraform plan
+
+# 5. Áp dụng triển khai (Nhập 'yes' khi được hỏi)
+terraform apply
+
+# 6. Dọn dẹp tài nguyên để tránh bị tính phí AWS sau khi thực hành xong
+terraform destroy</code></pre>
+        </div>
+      </section>
+
+      <!-- Section 11: Resource Lifecycle -->
+      <section id="resource-lifecycle" class="chapter">
+        <h2>Vòng đời tài nguyên và tư duy thay đổi hạ tầng<a href="#resource-lifecycle" class="anchor-link">§</a></h2>
+        <p>Làm thế nào Terraform xử lý khi bạn cập nhật mã nguồn của một tài nguyên đang chạy?</p>
+
+        <div class="callout beginner">
+          <div class="callout-title">What this means: 3 kịch bản cập nhật tài nguyên</div>
+          <p>
+            <strong>1. Update In-Place (Cập nhật tại chỗ):</strong> AWS cho phép thay đổi tham số đó mà không cần tắt máy ảo (ví dụ: đổi tag tên).<br>
+            <strong>2. Destroy and Recreate (Hủy và tạo mới):</strong> Một số tham số đặc thù của AWS bắt buộc phải tạo mới tài nguyên (ví dụ: thay đổi Subnet ID của EC2). Terraform sẽ hủy máy cũ trước, sau đó tạo máy mới.<br>
+            <strong>3. Immutable Infrastructure (Hạ tầng bất biến):</strong> Thay vì sửa chữa máy chủ đang chạy, ta luôn tạo máy mới hoàn toàn để thay thế để đảm bảo độ tin cậy.
+          </p>
+        </div>
+
+        <div class="callout production">
+          <div class="callout-title">Why this matters: Khối Lifecycle Meta-Argument</div>
+          <p>Nếu bạn cập nhật tài nguyên bắt buộc phải Recreate, việc hủy máy cũ trước sẽ làm gián đoạn hệ thống (Downtime). Bạn có thể dùng tùy chọn <code>create_before_destroy = true</code> để Terraform tạo máy mới chạy ổn định trước, rồi mới hủy máy cũ.</p>
+        </div>
+
+        <div class="code-window-card">
+          <div class="code-header">
+            <span class="code-title">lifecycle_example.tf - Cấu hình vòng đời</span>
+            <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+          </div>
+          <div class="code-body">
+            <pre><code>resource "aws_instance" "lifecycle_server" {
+  ami           = "ami-0c55b159cbfafe1f0"
+  instance_type = "t2.micro"
+
+  lifecycle {
+    # Tạo tài nguyên mới chạy ổn định rồi mới hủy tài nguyên cũ
+    create_before_destroy = true
+    
+    # Ngăn chặn việc vô tình hủy tài nguyên quan trọng (như database)
+    prevent_destroy = false
+    
+    # Bỏ qua các thay đổi đối với tag nếu hệ thống bên ngoài tự động thay đổi chúng
+    ignore_changes = [
+      tags,
+    ]
+  }
+}</code></pre>
+          </div>
+        </div>
+      </section>
+
+      <!-- Section 12: Variables, Locals, Outputs, Naming, Tagging -->
+      <section id="variables-locals-outputs" class="chapter">
+        <h2>Biến, Dữ liệu nội bộ, Đầu ra và Chiến lược gắn nhãn AWS<a href="#variables-locals-outputs" class="anchor-link">§</a></h2>
+        <p>Quản lý mã nguồn sạch sẽ bằng cách sử dụng hiệu quả Variables, Locals, Outputs và thiết lập chiến lược phân loại hạ tầng.</p>
+
+        <div class="callout beginner">
+          <div class="callout-title">What this means: Cách dùng từng loại biến</div>
+          <p>
+            <strong>Variables (Tham số đầu vào):</strong> Dùng để truyền cấu hình từ ngoài vào (ví dụ: chọn Region, Instance Type). Có thể cấu hình giá trị mặc định, kiểm tra định dạng dữ liệu (validation).<br>
+            <strong>Locals (Biến tính toán nội bộ):</strong> Dùng như hằng số trong code, gán các chuỗi tính toán lặp đi lặp lại để tránh lặp code (DRY - Don't Repeat Yourself).<br>
+            <strong>Outputs (Dữ liệu đầu ra):</strong> Xuất thông tin ra màn hình sau khi chạy xong (ví dụ: DNS name của Load Balancer) hoặc truyền sang dự án Terraform khác.
+          </p>
+        </div>
+
+        <div class="code-window-card">
+          <div class="code-header">
+            <span class="code-title">variables_and_tags.tf - Ví dụ thực tế</span>
+            <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+          </div>
+          <div class="code-body">
+            <pre><code>variable "environment" {
+  type        = string
+  description = "Môi trường triển khai hạ tầng"
+  
+  validation {
+    condition     = contains(["dev", "staging", "prod"], var.environment)
+    error_message = "Môi trường triển khai bắt buộc phải thuộc một trong các giá trị: dev, staging, prod."
+  }
+}
+
+locals {
+  name_prefix = "my-company-${var.environment}"
+  common_tags = {
+    Environment = var.environment
+    ManagedBy   = "terraform"
+    Project     = "data-analytics"
+  }
+}
+
+# Sử dụng locals để tạo tên tài nguyên đồng nhất
+resource "aws_s3_bucket" "analytics_data" {
+  bucket = "${local.name_prefix}-analytics-bucket"
+  tags   = local.common_tags
+}</code></pre>
+          </div>
+        </div>
+      </section>
+
+      <!-- Section 13: AWS Building Blocks with Terraform -->
+      <section id="aws-building-blocks" class="chapter">
+        <h2>Các viên gạch nền tảng của AWS trong Terraform<a href="#aws-building-blocks" class="anchor-link">§</a></h2>
+        <p>Để xây dựng một kiến trúc chuẩn trên AWS, bạn cần nắm vững cách viết mã nguồn Terraform để khởi dựng các tài nguyên cốt lõi dưới đây.</p>
+
+        <div class="callout warning">
+          <div class="callout-title">Why this matters: Mạng VPC là nền móng</div>
+          <p>Bất kỳ ứng dụng nào trên AWS đều cần một không gian mạng riêng biệt và bảo mật (VPC). Bạn phải thiết kế Subnet công cộng (Public Subnet) cho Load Balancer/Web Server hướng ra Internet, và Subnet riêng tư (Private Subnet) cho Database/AI model để tránh bị tấn công trực tiếp.</p>
+        </div>
+
+        <details class="deep-dive">
+          <summary>Nhấn vào đây để xem toàn bộ mã nguồn mô tả VPC, Subnets, SG, ALB và IAM</summary>
+          <div class="details-content">
+            <div class="code-window-card">
+              <div class="code-header">
+                <span class="code-title">aws_infra_blocks.tf</span>
+                <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+              </div>
+              <div class="code-body">
+                <pre><code># 1. Tạo mạng VPC riêng biệt
+resource "aws_vpc" "custom_vpc" {
+  cidr_block           = "10.0.0.0/16"
+  enable_dns_support   = true
+  enable_dns_hostnames = true
+  tags                 = { Name = "custom-vpc" }
+}
+
+# 2. Tạo Subnet Public (Có Route hướng ra Internet Gateway)
+resource "aws_subnet" "public_subnet" {
+  vpc_id                  = aws_vpc.custom_vpc.id
+  cidr_block              = "10.0.1.0/24"
+  availability_zone       = "ap-southeast-1a"
+  map_public_ip_on_launch = true
+  tags                 = { Name = "public-subnet-1a" }
+}
+
+# 3. Tạo Subnet Private (Không cho phép truy cập trực tiếp từ Internet)
+resource "aws_subnet" "private_subnet" {
+  vpc_id            = aws_vpc.custom_vpc.id
+  cidr_block        = "10.0.2.0/24"
+  availability_zone = "ap-southeast-1b"
+  tags              = { Name = "private-subnet-1b" }
+}
+
+# 4. Thiết lập Internet Gateway kết nối VPC ra bên ngoài
+resource "aws_internet_gateway" "igw" {
+  vpc_id = aws_vpc.custom_vpc.id
+  tags   = { Name = "custom-igw" }
+}
+
+# 5. Tạo nhóm bảo mật (Security Group)
+resource "aws_security_group" "web_sg" {
+  name        = "allow-http-web"
+  description = "Cho phep truy cap HTTP cong cong"
+  vpc_id      = aws_vpc.custom_vpc.id
+
+  ingress {
+    from_port   = 80
+    to_port     = 80
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+}</code></pre>
+          </div>
+        </div>
+      </div>
+    </details>
+  </section>
+
+      <!-- Section 14: Modules -->
+      <section id="terraform-modules" class="chapter">
+        <h2>Xây dựng Modules để tái sử dụng cấu trúc hạ tầng<a href="#terraform-modules" class="anchor-link">§</a></h2>
+        <p>Module trong Terraform tương tự như hàm (function) trong lập trình. Nó cho phép bạn gom các tài nguyên liên quan lại với nhau để tái sử dụng nhiều lần.</p>
+
+        <div class="callout beginner">
+          <div class="callout-title">What this means: Root Module vs Child Module</div>
+          <p>
+            <strong>Root Module:</strong> Là thư mục chính nơi bạn chạy các lệnh <code>terraform apply</code>.<br>
+            <strong>Child Module:</strong> Là các module được gọi từ bên ngoài (hoặc từ thư mục con <code>modules/</code>) để khởi tạo các thành phần nhỏ hơn.
+          </p>
+        </div>
+
+        <div class="code-window-card">
+          <div class="code-header">
+            <span class="code-title">Sử dụng module trong main.tf ở thư mục gốc</span>
+            <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+          </div>
+          <div class="code-body">
+            <pre><code>module "production_vpc" {
+  source      = "./modules/vpc"
+  vpc_cidr    = "172.16.0.0/16"
+  vpc_name    = "prod-network"
+  environment = "production"
+}
+
+# Lấy output từ module VPC để truyền vào EC2
+resource "aws_instance" "app_server" {
+  ami           = "ami-0c55b159cbfafe1f0"
+  instance_type = "t3.medium"
+  subnet_id     = module.production_vpc.private_subnet_ids[0]
+}</code></pre>
+          </div>
+        </div>
+
+        <div class="callout production">
+          <div class="callout-title">Why this matters: Độc lập hóa và Đóng gói</div>
+          <p>Bằng cách đóng gói VPC thành một module chuẩn, đội phát triển ứng dụng chỉ cần khai báo CIDR block mà không cần quan tâm đến cách cấu hình chi tiết Internet Gateway, Route Table hay Subnet. Điều này tăng tốc độ phát triển và giảm thiểu sai sót đáng kể.</p>
+        </div>
+      </section>
+
+      <!-- Section 15: Backend, State, Remote State -->
+      <section id="backend-state-remote-state" class="chapter">
+        <h2>Quản lý State và cấu hình lưu trữ Remote State trên AWS S3<a href="#backend-state-remote-state" class="anchor-link">§</a></h2>
+        <p>Mặc định, Terraform lưu tệp state ngay tại máy tính của bạn (local state). Nhưng khi làm việc nhóm, bạn bắt buộc phải cấu hình Remote State.</p>
+
+        <div class="callout warning">
+          <div class="callout-title">Why this matters: Rủi ro của việc dùng chung local state</div>
+          <p>Nếu hai lập trình viên cùng chỉnh sửa mã nguồn và chạy <code>terraform apply</code> trên máy cá nhân của họ mà không đồng bộ file state, họ sẽ ghi đè và phá hủy hạ tầng của nhau. Hơn nữa, tệp state chứa các thông tin nhạy cảm ở dạng clear-text (như mật khẩu cơ sở dữ liệu), không bao giờ được commit lên Git.</p>
+        </div>
+
+        <div class="callout production">
+          <div class="callout-title">Cấu hình S3 Backend hiện đại với native locking (Terraform 1.10+)</div>
+          <p>Trước đây, ta cần DynamoDB để khóa file state (State Locking). Từ các phiên bản mới của Terraform, S3 đã hỗ trợ cơ chế khóa bản ghi thông qua tham số <code>use_lockfile = true</code> cực kỳ tiện lợi.</p>
+        </div>
+
+        <div class="code-window-card">
+          <div class="code-header">
+            <span class="code-title">backend.tf - Cấu hình Remote State</span>
+            <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+          </div>
+          <div class="code-body">
+            <pre><code>terraform {
+  backend "s3" {
+    bucket       = "my-company-terraform-states"
+    key          = "global/s3/terraform.tfstate"
+    region       = "ap-southeast-1"
+    
+    # Kích hoạt State Locking trực tiếp bằng cơ chế mới của S3
+    use_lockfile = true
+  }
+}</code></pre>
+          </div>
+        </div>
+      </section>
+
+      <!-- Section 16: Import, Refactor, Moved Blocks, Drift -->
+      <section id="import-moved-drift" class="chapter">
+        <h2>Xử lý sai lệch hạ tầng (Drift) và Tái cấu trúc mã nguồn<a href="#import-moved-drift" class="anchor-link">§</a></h2>
+        <p>Trong thực tế, bạn sẽ gặp tình huống hạ tầng trên AWS bị thay đổi thủ công trên Console (Drift), hoặc bạn muốn đổi tên tài nguyên trong code mà không muốn Terraform xóa đi tạo lại.</p>
+
+        <div class="callout beginner">
+          <div class="callout-title">What this means: Drift là gì?</div>
+          <p>Drift là hiện tượng xảy ra khi hạ tầng thực tế bị thay đổi nằm ngoài tầm kiểm soát của Terraform (ví dụ: một ai đó đăng nhập AWS Console và xóa một Security Group). Chạy lệnh <code>terraform plan</code> sẽ ngay lập tức phát hiện sự sai lệch này và đề xuất phương án cập nhật lại.</p>
+        </div>
+
+        <div class="code-window-card">
+          <div class="code-header">
+            <span class="code-title">refactoring_examples.tf - Khối import và moved mới</span>
+            <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+          </div>
+          <div class="code-body">
+            <pre><code># 1. Đưa tài nguyên có sẵn ngoài Console vào quản lý của Terraform (Không cần chạy lệnh CLI cũ)
+import {
+  to = aws_s3_bucket.legacy_bucket
+  id = "my-legacy-bucket-name-on-aws"
+}
+
+resource "aws_s3_bucket" "legacy_bucket" {
+  bucket = "my-legacy-bucket-name-on-aws"
+}
+
+# 2. Đổi tên tài nguyên trong code mà không làm mất dữ liệu / recreating resource
+moved {
+  from = aws_instance.old_server_name
+  to   = aws_instance.new_server_name
+}</code></pre>
+          </div>
+        </div>
+      </section>
+
+      <!-- Section 17: Testing, Validation, Quality Gates -->
+      <section id="testing-validation-quality-gates" class="chapter">
+        <h2>Kiểm thử cấu trúc hạ tầng và các Quality Gates<a href="#testing-validation-quality-gates" class="anchor-link">§</a></h2>
+        <p>Để đảm bảo code Terraform hoạt động an toàn trước khi apply lên hệ thống sản xuất (Production), chúng ta cần thiết lập các vòng kiểm thử tự động.</p>
+
+        <div class="code-window-card">
+          <div class="code-header">
+            <span class="code-title">tests/s3_test.tftest.hcl - Kiểm thử bằng framework tích hợp</span>
+            <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+          </div>
+          <div class="code-body">
+            <pre><code>run "verify_bucket_naming" {
+  command = plan
+
+  assert {
+    condition     = can(regex("^[a-z0-9-]+$", aws_s3_bucket.analytics_data.bucket))
+    error_message = "Tên S3 Bucket bắt buộc phải chỉ chứa chữ thường, số và dấu gạch ngang."
+  }
+}</code></pre>
+          </div>
+        </div>
+      </section>
+
+      <!-- Section 18: CI/CD and Automation -->
+      <section id="cicd-and-automation" class="chapter">
+        <h2>Tích hợp CI/CD tự động hóa hạ tầng đám mây<a href="#cicd-and-automation" class="anchor-link">§</a></h2>
+        <p>Mục tiêu tối thượng của IaC là đưa hạ tầng vào quy trình tích hợp và triển khai liên tục (CI/CD) thông qua Gitlab CI hoặc Jenkins.</p>
+
+        <div class="code-window-card">
+          <div class="code-header">
+            <span class="code-title">.gitlab-ci.yml - Quy trình triển khai tự động</span>
+            <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+          </div>
+          <div class="code-body">
+            <pre><code>stages:
+  - validate
+  - plan
+  - apply
+
+# 1. Kiểm tra cú pháp mã nguồn
+validate_code:
+  stage: validate
+  script:
+    - terraform init -backend=false
+    - terraform validate
+
+# 2. Tạo bản nháp kế hoạch thay đổi (Lưu artifact)
+create_plan:
+  stage: plan
+  script:
+    - terraform init
+    - terraform plan -out=tfplan
+  artifacts:
+    paths:
+      - tfplan
+
+# 3. Apply hạ tầng (Chỉ chạy khi merge vào main và cần phê duyệt thủ công)
+apply_infrastructure:
+  stage: apply
+  script:
+    - terraform apply -auto-approve tfplan
+  when: manual
+  only:
+    - main</code></pre>
+          </div>
+        </div>
+      </section>
+
+      <!-- Section 19: Deployment Strategies -->
+      <section id="deployment-strategies" class="chapter">
+        <h2>Chiến lược triển khai không gián đoạn (Zero-Downtime)<a href="#deployment-strategies" class="anchor-link">§</a></h2>
+        <p>Làm thế nào để cập nhật máy chủ web của bạn mà người dùng không gặp lỗi gián đoạn dịch vụ?</p>
+
+        <div class="callout production">
+          <div class="callout-title">Why this matters: Blue/Green Deployment với Terraform</div>
+          <p>
+            <strong>Blue Environment:</strong> Môi trường hiện tại đang chạy ứng dụng phiên bản cũ.<br>
+            <strong>Green Environment:</strong> Môi trường mới chạy ứng dụng phiên bản mới.<br>
+            Terraform sẽ tạo mới hoàn toàn cụm Green, chạy kiểm tra chất lượng (Health Check). Khi cụm Green chạy tốt, Load Balancer sẽ chuyển hướng traffic từ Blue sang Green một cách mượt mà.
+          </p>
+        </div>
+      </section>
+
+      <!-- Section 20: Terraform + Ansible + Multi-tool Thinking -->
+      <section id="terraform-and-ansible" class="chapter">
+        <h2>Phối hợp Terraform và Ansible trong quản lý cấu hình hệ thống<a href="#terraform-and-ansible" class="anchor-link">§</a></h2>
+        <p>Đừng cố gắng biến Terraform thành công cụ cài đặt phần mềm. Hãy sử dụng đúng công cụ cho đúng mục đích.</p>
+
+        <div class="callout beginner">
+          <div class="callout-title">Ví dụ về sự kết hợp lý tưởng</div>
+          <p>
+            <strong>Bước 1 (Terraform):</strong> Provisioning ra mạng VPC, IAM Roles, Security Groups và các máy chủ ảo EC2 mới.<br>
+            <strong>Bước 2 (Ansible):</strong> Nhận danh sách IP máy chủ vừa tạo, thực hiện SSH vào để cài đặt Docker, cấu hình Python, tải mã nguồn ứng dụng về chạy.
+          </p>
+        </div>
+      </section>
+
+      <!-- Section 21: Security -->
+      <section id="security" class="chapter">
+        <h2>Bảo mật hạ tầng đám mây và quản lý khóa truy cập<a href="#security" class="anchor-link">§</a></h2>
+        <p>Các nguyên tắc bảo mật tối thượng khi vận hành Terraform trên AWS.</p>
+
+        <div class="callout warning">
+          <div class="callout-title">Nguyên tắc đặc quyền tối thiểu (Least Privilege)</div>
+          <p>Không bao giờ chạy Terraform bằng tài khoản AWS Root Account. Hãy tạo một IAM User riêng biệt chỉ có các quyền hạn cụ thể cần thiết để quản trị tài nguyên hạ tầng của dự án.</p>
+        </div>
+
+        <div class="callout production">
+          <div class="callout-title">Tích hợp HashiCorp Vault</div>
+          <p>Đối với môi trường sản xuất lớn, hãy sử dụng HashiCorp Vault để cấp phát các khóa truy cập AWS tạm thời có thời hạn ngắn (Dynamic Credentials), thay vì sử dụng Access Key cố định dài hạn.</p>
+        </div>
+      </section>
+
+      <!-- Section 22: Terraform for AI on AWS -->
+      <section id="terraform-for-ai-on-aws" class="chapter">
+        <h2>Kiến trúc hạ tầng dành riêng cho ứng dụng Trí tuệ nhân tạo (AI)<a href="#terraform-for-ai-on-aws" class="anchor-link">§</a></h2>
+        <p>Tại sao các kỹ sư AI cần biết cách viết code Terraform?</p>
+
+        <div class="callout beginner">
+          <div class="callout-title">Phân định vai trò: Terraform làm gì trong dự án AI?</div>
+          <p>
+            <strong>Terraform quản lý:</strong> Các tài nguyên chứa mô hình và chạy xử lý (như S3 Buckets chứa weights của mô hình, API Gateway định tuyến request, AWS Lambda chạy inference không máy chủ, ECR Registry chứa Docker images, IAM gán quyền).<br>
+            <strong>Terraform KHÔNG quản lý:</strong> Code thuật toán Python của mô hình LLM, quá trình huấn luyện (Training) hoặc điều chỉnh tham số (Hyperparameter tuning).
+          </p>
+        </div>
+
+        <table class="comparison-table">
+          <thead>
+            <tr>
+              <th>Dịch vụ AWS cho AI</th>
+              <th>Khi nào nên dùng</th>
+              <th>Chi phí và Dọn dẹp</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>AWS Lambda</strong></td>
+              <td>Phù hợp cho API suy luận (Inference API) nhẹ, chạy không liên tục, tiết kiệm chi phí.</td>
+              <td>Rẻ (Chỉ trả tiền khi chạy). Hầu như không tốn phí duy trì.</td>
+            </tr>
+            <tr>
+              <td><strong>AWS ECS/Fargate</strong></td>
+              <td>Dành cho các mô hình LLM lớn, cần chạy liên tục trên Container Docker và cần GPU.</td>
+              <td>Đắt hơn (Tính phí theo giờ chạy container). Cần giám sát và tắt khi không dùng.</td>
+            </tr>
+          </tbody>
+        </table>
+      </section>
+
+      <!-- Section 23: Capstone Foundation App -->
+      <section id="capstone-foundation-app" class="chapter">
+        <div class="capstone-card active-border">
+          <div class="capstone-badge">Capstone 1</div>
+          <h2>AWS Foundation Multi-Tier Application<a href="#capstone-foundation-app" class="anchor-link">§</a></h2>
+          <p>Xây dựng hạ tầng đa tầng hoàn chỉnh trên AWS bao gồm VPC riêng biệt, nhóm máy chủ EC2 tự động co giãn đặt trong Private Subnet và định tuyến thông qua Application Load Balancer (ALB) công cộng.</p>
+
+          <details class="deep-dive">
+            <summary>Nhấn vào đây để xem toàn bộ cấu trúc dự án và mã nguồn chi tiết</summary>
+            <div class="details-content">
+              
+              <h4>Cấu trúc thư mục của Capstone 1</h4>
+              <div class="code-window-card">
+                <div class="code-body">
+                  <pre><code>capstone-1-foundation-app/
+├── versions.tf
+├── provider.tf
+├── variables.tf
+├── terraform.tfvars
+├── locals.tf
+├── main.tf
+├── outputs.tf
+├── modules/
+│   ├── vpc/
+│   │   ├── main.tf
+│   │   ├── variables.tf
+│   │   └── outputs.tf
+│   ├── alb/
+│   │   ├── main.tf
+│   │   ├── variables.tf
+│   │   └── outputs.tf
+│   └── ec2/
+│       ├── main.tf
+│       ├── variables.tf
+│       └── outputs.tf
+└── scripts/
+    ├── init.ps1
+    ├── plan.ps1
+    ├── apply.ps1
+    └── destroy.ps1</code></pre>
+                </div>
+              </div>
+              <div class="callout beginner">
+                <div class="callout-title">Beginner note: Nguyên tắc thiết kế mạng cho ALB và Dynamic AZs</div>
+                <p>Một AWS Application Load Balancer (ALB) bắt buộc phải liên kết với ít nhất 2 Public Subnet nằm ở 2 Availability Zone (AZ) khác nhau để đảm bảo tính sẵn sàng cao (High Availability). <br>
+                Thay vì hard-code các hậu tố như <code>"a"</code>, <code>"b"</code>, hoặc <code>"c"</code> (vốn dễ lỗi vì không phải vùng AWS nào cũng hỗ trợ các ký tự này giống nhau), chúng ta sử dụng data source <code>aws_availability_zones</code> để truy vấn danh sách AZ khả dụng thực tế của Region và trỏ chỉ mục động (ví dụ: <code>names[0]</code> và <code>names[1]</code>).</p>
+              </div>
+
+              <h4>1. Module VPC - Khai báo biến (`modules/vpc/variables.tf`)</h4>
+              <div class="code-window-card">
+                <div class="code-header">
+                  <span class="code-title">modules/vpc/variables.tf</span>
+                  <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                </div>
+                <div class="code-body">
+                  <pre><code>variable "project_name" {
+  type        = string
+  description = "Ten du an dung de lam tien to"
+}
+
+variable "vpc_cidr" {
+  type        = string
+  description = "CIDR block cho VPC"
+}
+
+variable "public_subnet_1_cidr" {
+  type        = string
+  description = "CIDR block cho Public Subnet 1"
+}
+
+variable "public_subnet_2_cidr" {
+  type        = string
+  description = "CIDR block cho Public Subnet 2"
+}
+
+variable "private_subnet_1_cidr" {
+  type        = string
+  description = "CIDR block cho Private Subnet 1"
+}
+
+variable "tags" {
+  type        = map(string)
+  description = "Cac the nhan chung cho tài nguyen"
+}</code></pre>
+                </div>
+              </div>
+
+              <h4>2. Module VPC - Cấu hình chính (`modules/vpc/main.tf`)</h4>
+              <div class="code-window-card">
+                <div class="code-header">
+                  <span class="code-title">modules/vpc/main.tf</span>
+                  <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                </div>
+                <div class="code-body">
+                  <pre><code>resource "aws_vpc" "main" {
+  cidr_block           = var.vpc_cidr
+  enable_dns_support   = true
+  enable_dns_hostnames = true
+  tags = merge(var.tags, {
+    Name = "${var.project_name}-vpc"
+  })
+}
+
+data "aws_availability_zones" "available" {
+  state = "available"
+}
+
+resource "aws_subnet" "public_1" {
+  vpc_id            = aws_vpc.main.id
+  cidr_block        = var.public_subnet_1_cidr
+  # Lay dong Availability Zone dau tien tu data source de tránh hard-code
+  availability_zone = data.aws_availability_zones.available.names[0]
+  map_public_ip_on_launch = true
+  tags = { Name = "${var.project_name}-public-1" }
+}
+
+# AWS Application Load Balancer (ALB) bat buoc phai di kem it nhat 2 Public Subnet o 2 Availability Zone (AZ) khac nhau
+resource "aws_subnet" "public_2" {
+  vpc_id            = aws_vpc.main.id
+  cidr_block        = var.public_subnet_2_cidr
+  # Lay Availability Zone thu hai
+  availability_zone = data.aws_availability_zones.available.names[1]
+  map_public_ip_on_launch = true
+  tags = { Name = "${var.project_name}-public-2" }
+}
+
+resource "aws_subnet" "private_1" {
+  vpc_id            = aws_vpc.main.id
+  cidr_block        = var.private_subnet_1_cidr
+  # Dat private subnet tai AZ dau tien ma khong can gia dinh co AZ thu ba
+  availability_zone = data.aws_availability_zones.available.names[0]
+  tags = { Name = "${var.project_name}-private-1" }
+}
+
+resource "aws_internet_gateway" "gw" {
+  vpc_id = aws_vpc.main.id
+  tags   = { Name = "${var.project_name}-igw" }
+}
+
+resource "aws_route_table" "public" {
+  vpc_id = aws_vpc.main.id
+  route {
+    cidr_block = "0.0.0.0/0"
+    gateway_id = aws_internet_gateway.gw.id
+  }
+  tags = { Name = "${var.project_name}-public-rt" }
+}
+
+resource "aws_route_table_association" "public_1" {
+  subnet_id      = aws_subnet.public_1.id
+  route_table_id = aws_route_table.public.id
+}
+
+resource "aws_route_table_association" "public_2" {
+  subnet_id      = aws_subnet.public_2.id
+  route_table_id = aws_route_table.public.id
+}</code></pre>
+                </div>
+              </div>
+
+              <h4>3. Module VPC - Đầu ra (`modules/vpc/outputs.tf`)</h4>
+              <div class="code-window-card">
+                <div class="code-header">
+                  <span class="code-title">modules/vpc/outputs.tf</span>
+                  <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                </div>
+                <div class="code-body">
+                  <pre><code>output "vpc_id" {
+  value       = aws_vpc.main.id
+  description = "ID cua VPC vua tao"
+}
+
+output "public_subnet_1_id" {
+  value       = aws_subnet.public_1.id
+  description = "ID cua Public Subnet 1"
+}
+
+output "public_subnet_2_id" {
+  value       = aws_subnet.public_2.id
+  description = "ID cua Public Subnet 2"
+}
+
+output "private_subnet_1_id" {
+  value       = aws_subnet.private_1.id
+  description = "ID cua Private Subnet 1"
+}</code></pre>
+                </div>
+              </div>
+
+              <h4>4. Module EC2 - Khai báo biến (`modules/ec2/variables.tf`)</h4>
+              <div class="code-window-card">
+                <div class="code-header">
+                  <span class="code-title">modules/ec2/variables.tf</span>
+                  <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                </div>
+                <div class="code-body">
+                  <pre><code>variable "project_name" {
+  type = string
+}
+
+variable "instance_type" {
+  type    = string
+  default = "t3.micro"
+}
+
+variable "subnet_id" {
+  type = string
+}
+
+variable "vpc_id" {
+  type = string
+}
+
+variable "alb_security_group_id" {
+  type        = string
+  description = "ID Security Group cua ALB de gan cho EC2 SG"
+}
+
+variable "tags" {
+  type = map(string)
+}</code></pre>
+                </div>
+              </div>
+
+              <h4>5. Module EC2 - Cấu hình chính (`modules/ec2/main.tf`)</h4>
+              <div class="code-window-card">
+                <div class="code-header">
+                  <span class="code-title">modules/ec2/main.tf</span>
+                  <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                </div>
+                <div class="code-body">
+                  <pre><code>data "aws_ami" "ubuntu" {
+  most_recent = true
+  filter {
+    name   = "name"
+    values = ["ubuntu/images/hvm-ssd/ubuntu-jammy-22.04-amd64-server-*"]
+  }
+  filter {
+    name   = "virtualization-type"
+    values = ["hvm"]
+  }
+  owners = ["099720109477"]
+}
+
+resource "aws_security_group" "ec2_sg" {
+  name        = "${var.project_name}-ec2-sg"
+  description = "SG cho phep traffic di vao tu ALB"
+  vpc_id      = var.vpc_id
+
+  ingress {
+    from_port       = 80
+    to_port         = 80
+    protocol        = "tcp"
+    # Chi cho phep traffic tu Security Group cua Load Balancer
+    security_groups = [var.alb_security_group_id]
+  }
+
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+  tags = var.tags
+}
+
+resource "aws_instance" "app" {
+  ami                    = data.aws_ami.ubuntu.id
+  instance_type          = var.instance_type
+  subnet_id              = var.subnet_id
+  vpc_security_group_ids = [aws_security_group.ec2_sg.id]
+
+  # Bootstrap web server toi thieu de pass ALB Health Check (dung Python3 san co tren Ubuntu)
+  # Day la bootstrap toi thieu de bien vi du thanh runnable demo. Trong production that, nen thay bang app thuc.
+  user_data = <<-EOF
+              #!/bin/bash
+              echo "Hello World from EC2 App Node deployed via Terraform!" > index.html
+              nohup python3 -m http.server 80 &
+              EOF
+
+  tags = merge(var.tags, {
+    Name = "${var.project_name}-app-node"
+  })
+}</code></pre>
+                </div>
+              </div>
+
+              <h4>6. Module EC2 - Đầu ra (`modules/ec2/outputs.tf`)</h4>
+              <div class="code-window-card">
+                <div class="code-header">
+                  <span class="code-title">modules/ec2/outputs.tf</span>
+                  <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                </div>
+                <div class="code-body">
+                  <pre><code>output "instance_id" {
+  value = aws_instance.app.id
+}
+
+output "private_ip" {
+  value = aws_instance.app.private_ip
+}</code></pre>
+                </div>
+              </div>
+
+              <h4>7. Module ALB - Khai báo biến (`modules/alb/variables.tf`)</h4>
+              <div class="code-window-card">
+                <div class="code-header">
+                  <span class="code-title">modules/alb/variables.tf</span>
+                  <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                </div>
+                <div class="code-body">
+                  <pre><code>variable "project_name" {
+  type = string
+}
+
+variable "vpc_id" {
+  type = string
+}
+
+variable "public_subnet_ids" {
+  type        = list(string)
+  description = "Danh sach các ID cua Public Subnets de Load Balancer phan phoi traffic"
+}
+
+variable "tags" {
+  type = map(string)
+}</code></pre>
+                </div>
+              </div>
+
+              <h4>8. Module ALB - Cấu hình chính (`modules/alb/main.tf`)</h4>
+              <div class="code-window-card">
+                <div class="code-header">
+                  <span class="code-title">modules/alb/main.tf</span>
+                  <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                </div>
+                <div class="code-body">
+                  <pre><code>resource "aws_security_group" "alb_sg" {
+  name        = "${var.project_name}-alb-sg"
+  description = "SG cho phep traffic di vao Load Balancer tu cong cong"
+  vpc_id      = var.vpc_id
+
+  ingress {
+    from_port   = 80
+    to_port     = 80
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+  tags = var.tags
+}
+
+resource "aws_lb" "main" {
+  name               = "${var.project_name}-alb"
+  internal           = false
+  load_balancer_type = "application"
+  security_groups    = [aws_security_group.alb_sg.id]
+  subnets            = var.public_subnet_ids
+
+  tags = var.tags
+}
+
+resource "aws_lb_target_group" "tg" {
+  name     = "${var.project_name}-tg"
+  port     = 80
+  protocol = "HTTP"
+  vpc_id   = var.vpc_id
+
+  health_check {
+    path                = "/"
+    interval            = 30
+    timeout             = 5
+    healthy_threshold   = 2
+    unhealthy_threshold = 2
+  }
+  tags = var.tags
+}
+
+resource "aws_lb_listener" "http" {
+  load_balancer_arn = aws_lb.main.arn
+  port              = "80"
+  protocol          = "HTTP"
+
+  default_action {
+    type             = "forward"
+    target_group_arn = aws_lb_target_group.tg.arn
+  }
+}</code></pre>
+                </div>
+              </div>
+
+              <h4>9. Module ALB - Đầu ra (`modules/alb/outputs.tf`)</h4>
+              <div class="code-window-card">
+                <div class="code-header">
+                  <span class="code-title">modules/alb/outputs.tf</span>
+                  <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                </div>
+                <div class="code-body">
+                  <pre><code>output "alb_dns_name" {
+  value = aws_lb.main.dns_name
+}
+
+output "target_group_arn" {
+  value = aws_lb_target_group.tg.arn
+}
+
+output "alb_security_group_id" {
+  value       = aws_security_group.alb_sg.id
+  description = "ID Security Group cua ALB"
+}</code></pre>
+                </div>
+              </div>
+
+              <h4>10. Khởi tạo dự án chính (`main.tf` ở thư mục gốc)</h4>
+              <p>Mục đích: Liên kết và khởi tạo các thành phần hạ tầng.</p>
+              <div class="code-window-card">
+                <div class="code-header">
+                  <span class="code-title">main.tf</span>
+                  <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                </div>
+                <div class="code-body">
+                  <pre><code>module "network" {
+  source                = "./modules/vpc"
+  project_name          = var.project_name
+  vpc_cidr              = "10.0.0.0/16"
+  public_subnet_1_cidr  = "10.0.1.0/24"
+  public_subnet_2_cidr  = "10.0.3.0/24" # Public Subnet thu 2 o AZ khac de ALB hop le
+  private_subnet_1_cidr = "10.0.2.0/24"
+  tags                  = local.common_tags
+}
+
+module "load_balancer" {
+  source            = "./modules/alb"
+  project_name      = var.project_name
+  vpc_id            = module.network.vpc_id
+  public_subnet_ids = [module.network.public_subnet_1_id, module.network.public_subnet_2_id]
+  tags              = local.common_tags
+}
+
+module "app_server" {
+  source                = "./modules/ec2"
+  project_name          = var.project_name
+  subnet_id             = module.network.private_subnet_1_id
+  vpc_id                = module.network.vpc_id
+  alb_security_group_id = module.load_balancer.alb_security_group_id
+  tags                  = local.common_tags
+}
+
+# Ket noi EC2 instance vao Target Group cua ALB
+resource "aws_lb_target_group_attachment" "app_attachment" {
+  target_group_arn = module.load_balancer.target_group_arn
+  target_id        = module.app_server.instance_id
+  port             = 80
+}</code></pre>
+                </div>
+              </div>
+
+              <h4>11. Kịch bản PowerShell - Tự động hóa khởi tạo (`scripts/init.ps1`)</h4>
+              <div class="code-window-card">
+                <div class="code-header">
+                  <span class="code-title">scripts/init.ps1</span>
+                  <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                </div>
+                <div class="code-body">
+                  <pre><code>Write-Host "Configuring AWS profile environment variable..."
+$env:AWS_PROFILE="terraform-learning"
+
+Write-Host "Running terraform init to download providers and initialize modules..."
+terraform init</code></pre>
+                </div>
+              </div>
+
+              <h4>12. Kịch bản PowerShell - Áp dụng cấu hình (`scripts/apply.ps1`)</h4>
+              <div class="code-window-card">
+                <div class="code-header">
+                  <span class="code-title">scripts/apply.ps1</span>
+                  <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                </div>
+                <div class="code-body">
+                  <pre><code>Write-Host "Executing terraform apply with auto-approval..."
+$env:AWS_PROFILE="terraform-learning"
+terraform apply -auto-approve</code></pre>
+                </div>
+              </div>
+
+              <h4>13. Kịch bản PowerShell - Dọn dẹp tài nguyên (`scripts/destroy.ps1`)</h4>
+              <div class="code-window-card">
+                <div class="code-header">
+                  <span class="code-title">scripts/destroy.ps1</span>
+                  <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                </div>
+                <div class="code-body">
+                  <pre><code>Write-Host "WARNING: Destroying all infrastructure built by this project..."
+$env:AWS_PROFILE="terraform-learning"
+terraform destroy -auto-approve</code></pre>
+                </div>
+              </div>
+
+            </div>
+          </details>
+        </div>
+      </section>
+
+      <!-- Section 24: Capstone Serverless AI API -->
+      <section id="capstone-serverless-ai-api" class="chapter">
+        <div class="capstone-card active-border">
+          <div class="capstone-badge">Capstone 2</div>
+          <h2>Serverless AI API on AWS<a href="#capstone-serverless-ai-api" class="anchor-link">§</a></h2>
+          <p>Triển khai một API suy luận (Inference API) không máy chủ sử dụng AWS Lambda chạy mã nguồn suy luận Python kết hợp với AWS API Gateway phục vụ định tuyến và phân phối request.</p>
+
+          <details class="deep-dive">
+            <summary>Nhấn vào đây để xem toàn bộ cấu trúc dự án và mã nguồn chi tiết</summary>
+            <div class="details-content">
+              
+              <h4>Cấu trúc thư mục của Capstone 2</h4>
+              <div class="code-window-card">
+                <div class="code-body">
+                  <pre><code>capstone-2-serverless-ai-api/
+├── versions.tf
+├── provider.tf
+├── variables.tf
+├── locals.tf
+├── main.tf
+├── outputs.tf
+├── lambda/
+│   └── handler.py
+└── scripts/
+    ├── package_lambda.ps1
+    ├── plan.ps1
+    ├── apply.ps1
+    └── cleanup.ps1</code></pre>
+                </div>
+              </div>
+
+              <h4>1. Mã xử lý Python của Lambda (`lambda/handler.py`)</h4>
+              <div class="code-window-card">
+                <div class="code-header">
+                  <span class="code-title">lambda/handler.py</span>
+                  <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                </div>
+                <div class="code-body">
+                  <pre><code>import json
+
+def lambda_handler(event, context):
+    print("Received event: " + json.dumps(event, indent=2))
+    
+    body = {
+        "message": "AI Inference result generated successfully!",
+        "model_used": "simple-llm-v1",
+        "prediction": "Hello! I am a simulated response from your Serverless AI API on AWS."
+    }
+    
+    response = {
+        "statusCode": 200,
+        "headers": {
+            "Content-Type": "application/json"
+        },
+        "body": json.dumps(body)
+    }
+    
+    return response</code></pre>
+                </div>
+              </div>
+
+              <h4>2. Cấu trúc Terraform chính (`main.tf`)</h4>
+              <div class="code-window-card">
+                <div class="code-header">
+                  <span class="code-title">main.tf</span>
+                  <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                </div>
+                <div class="code-body">
+                  <pre><code># Khai bao IAM Role cho Lambda
+resource "aws_iam_role" "lambda_exec_role" {
+  name = "serverless-ai-lambda-role"
+
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [{
+      Action    = "sts:AssumeRole"
+      Effect    = "Allow"
+      Principal = { Service = "lambda.amazonaws.com" }
+    }]
+  })
+}
+
+resource "aws_iam_role_policy_attachment" "lambda_logs" {
+  role       = aws_iam_role.lambda_exec_role.name
+  policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+}
+
+# Tao nhom CloudWatch Logs rieng biet de luu tru log cua Lambda
+resource "aws_cloudwatch_log_group" "lambda_log_group" {
+  name              = "/aws/lambda/ai-inference-function"
+  retention_in_days = 7
+}
+
+# Deploy Lambda tu file zip duoc script dong goi san
+resource "aws_lambda_function" "ai_inference" {
+  filename      = "dist/lambda.zip"
+  function_name = "ai-inference-function"
+  role          = aws_iam_role.lambda_exec_role.arn
+  handler       = "handler.lambda_handler"
+  runtime       = "python3.9"
+
+  source_code_hash = filebase64sha256("dist/lambda.zip")
+  depends_on       = [aws_cloudwatch_log_group.lambda_log_group]
+}
+
+# API Gateway xac dinh route HTTP
+resource "aws_apigatewayv2_api" "http_api" {
+  name          = "serverless-ai-gateway-api"
+  protocol_type = "HTTP"
+}
+
+# Tich hop API Gateway voi Lambda
+resource "aws_apigatewayv2_integration" "lambda_integration" {
+  api_id             = aws_apigatewayv2_api.http_api.id
+  integration_type   = "AWS_PROXY"
+  integration_uri    = aws_lambda_function.ai_inference.invoke_arn
+  integration_method = "POST"
+}
+
+# Xac dinh route POST /predict de gui input len AI Model
+resource "aws_apigatewayv2_route" "default_route" {
+  api_id    = aws_apigatewayv2_api.http_api.id
+  route_key = "POST /predict"
+  target    = "integrations/${aws_apigatewayv2_integration.lambda_integration.id}"
+}
+
+# Khai bao Stage thuc su de API Gateway co the publish ra public
+resource "aws_apigatewayv2_stage" "api_stage" {
+  api_id      = aws_apigatewayv2_api.http_api.id
+  name        = "$default"
+  auto_deploy = true
+
+  # Cấu hình logging cho access request toi API
+  access_log_settings {
+    destination_arn = aws_cloudwatch_log_group.api_gateway_logs.arn
+    format          = "$context.identity.sourceIp - $context.authorizer.principalId - [$context.requestTime] \"$context.routeKey $context.protocol\" $context.status $context.responseLength $context.requestId"
+  }
+}
+
+resource "aws_cloudwatch_log_group" "api_gateway_logs" {
+  name              = "/aws/apigateway/serverless-ai-api-access"
+  retention_in_days = 7
+}
+
+# Cap quyen cho API Gateway goi Lambda
+resource "aws_lambda_permission" "api_gateway" {
+  statement_id  = "AllowExecutionFromAPIGateway"
+  action        = "lambda:InvokeFunction"
+  function_name = aws_lambda_function.ai_inference.function_name
+  principal     = "apigateway.amazonaws.com"
+  source_arn    = "${aws_apigatewayv2_api.http_api.execution_arn}/*/*"
+}</code></pre>
+                </div>
+              </div>
+
+              <h4>3. Script PowerShell đóng gói và nén mã nguồn Lambda (`scripts/package_lambda.ps1`)</h4>
+              <div class="code-window-card">
+                <div class="code-header">
+                  <span class="code-title">scripts/package_lambda.ps1</span>
+                  <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                </div>
+                <div class="code-body">
+                  <pre><code># Script kiem tra va dong goi folder lambda thanh zip file deterministic
+$distFolder = ".\dist"
+$zipPath = ".\dist\lambda.zip"
+
+if (-not (Test-Path $distFolder)) {
+    New-Item -ItemType Directory -Path $distFolder | Out-Null
+}
+
+if (Test-Path $zipPath) {
+    Remove-Item $zipPath -Force
+}
+
+Compress-Archive -Path .\lambda\* -DestinationPath $zipPath -Force
+Write-Host "Dong goi Lambda thanh cong tai: $zipPath"</code></pre>
+                </div>
+              </div>
+
+              <div class="callout beginner">
+                <div class="callout-title">Beginner note: Hướng dẫn gọi API sau khi Deploy</div>
+                <p>Sau khi chạy <code>terraform apply</code>, hệ thống sẽ xuất ra endpoint URL của API Gateway. Bạn có thể sử dụng công cụ Postman hoặc lệnh Curl bên dưới để gọi API:</p>
+                <pre><code>curl -X POST -H "Content-Type: application/json" -d '{"prompt": "Hello AI"}' https://&lt;API_GATEWAY_URL&gt;/predict</code></pre>
+              </div>
+
+            </div>
+          </details>
+        </div>
+      </section>
+
+      <!-- Section 25: Capstone Secure AI Ingestion Pipeline -->
+      <section id="capstone-secure-ai-ingestion" class="chapter">
+        <div class="capstone-card active-border">
+          <div class="capstone-badge">Capstone 3</div>
+          <h2>Secure AI Ingestion Pipeline on AWS<a href="#capstone-secure-ai-ingestion" class="anchor-link">§</a></h2>
+          <p>Xây dựng hệ thống đường ống thu nạp dữ liệu AI an toàn: Khi dữ liệu thô (như văn bản/hình ảnh) được tải lên S3 Bucket, một sự kiện (Event Trigger) sẽ kích hoạt Lambda để xử lý và phân tách dữ liệu an toàn.</p>
+
+          <details class="deep-dive">
+            <summary>Nhấn vào đây để xem toàn bộ cấu trúc dự án và mã nguồn chi tiết</summary>
+            <div class="details-content">
+              
+              <h4>Cấu trúc thư mục của Capstone 3</h4>
+              <div class="code-window-card">
+                <div class="code-body">
+                  <pre><code>capstone-3-secure-ai-ingestion/
+├── versions.tf
+├── provider.tf
+├── variables.tf
+├── main.tf
+├── outputs.tf
+├── lambda/
+│   └── ingest_handler.py
+└── scripts/
+    ├── package_ingestion_lambda.ps1
+    ├── plan.ps1
+    └── apply.ps1</code></pre>
+                </div>
+              </div>
+
+              <h4>1. Mã nguồn Terraform chính (`main.tf`)</h4>
+              <div class="code-window-card">
+                <div class="code-header">
+                  <span class="code-title">main.tf</span>
+                  <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                </div>
+                <div class="code-body">
+                  <pre><code># S3 Bucket nhan file doc AI input - Bat buoc ma hoa va an toan
+resource "aws_s3_bucket" "input_bucket" {
+  bucket        = "secure-ai-ingestion-input-data"
+  force_destroy = true
+}
+
+# Bat tinh nang ma hoa phia server de bao ve file du lieu AI
+resource "aws_s3_bucket_server_side_encryption_configuration" "sec" {
+  bucket = aws_s3_bucket.input_bucket.id
+  rule {
+    apply_server_side_encryption_by_default {
+      sse_algorithm = "AES256"
+    }
+  }
+}
+
+# CloudWatch Log Group danh rieng cho Ingestion Lambda (Observability & Audit Foundation)
+resource "aws_cloudwatch_log_group" "ingest_logs" {
+  name              = "/aws/lambda/secure-ingest-processor"
+  retention_in_days = 7
+}
+
+# Lambda function nhan event trigger tu S3
+resource "aws_lambda_function" "ingest_processor" {
+  filename      = "dist/ingest_lambda.zip"
+  function_name = "secure-ingest-processor"
+  role          = aws_iam_role.ingest_lambda_role.arn
+  handler       = "ingest_handler.handler"
+  runtime       = "python3.9"
+
+  source_code_hash = filebase64sha256("dist/ingest_lambda.zip")
+  depends_on       = [aws_cloudwatch_log_group.ingest_logs]
+}
+
+# Cap quyen cho S3 trigger Lambda
+resource "aws_lambda_permission" "allow_s3" {
+  statement_id  = "AllowExecutionFromS3Bucket"
+  action        = "lambda:InvokeFunction"
+  function_name = aws_lambda_function.ingest_processor.function_name
+  principal     = "s3.amazonaws.com"
+  source_arn    = aws_s3_bucket.input_bucket.arn
+}
+
+# Dang ky su kien khi co Object tao moi trong bucket
+resource "aws_s3_bucket_notification" "bucket_notification" {
+  bucket = aws_s3_bucket.input_bucket.id
+
+  lambda_function {
+    lambda_function_arn = aws_lambda_function.ingest_processor.arn
+    events              = ["s3:ObjectCreated:*"]
+  }
+  
+  depends_on = [aws_lambda_permission.allow_s3]
+}
+
+# IAM Role cho phép ghi log và đọc S3
+resource "aws_iam_role" "ingest_lambda_role" {
+  name = "secure-ai-ingest-lambda-role"
+
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [{
+      Action    = "sts:AssumeRole"
+      Effect    = "Allow"
+      Principal = { Service = "lambda.amazonaws.com" }
+    }]
+  })
+}
+
+# Đính kèm AWSLambdaBasicExecutionRole để đảm bảo Lambda có thể tạo Log Stream và đẩy logs lên CloudWatch
+resource "aws_iam_role_policy_attachment" "lambda_basic_execution" {
+  role       = aws_iam_role.ingest_lambda_role.name
+  policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+}
+
+resource "aws_iam_policy" "s3_read_policy" {
+  name        = "secure-ai-ingestion-s3-read"
+  description = "Cho phep Lambda chi duoc doc bucket dung quy dinh"
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Action   = ["s3:GetObject", "s3:ListBucket"]
+        Effect   = "Allow"
+        Resource = [
+          aws_s3_bucket.input_bucket.arn,
+          "${aws_s3_bucket.input_bucket.arn}/*"
+        ]
+      }
+    ]
+  })
+}
+
+resource "aws_iam_role_policy_attachment" "attach_s3_read" {
+  role       = aws_iam_role.ingest_lambda_role.name
+  policy_arn = aws_iam_policy.s3_read_policy.arn
+}</code></pre>
+                </div>
+              </div>
+
+              <div class="callout warning">
+                <div class="callout-title">Why this matters: Ingestion Pipeline cần Log để làm gì?</div>
+                <p>Trong các hệ thống xử lý dữ liệu nhạy cảm cho AI, việc ghi log đóng vai trò sống còn để:</p>
+                <ul>
+                  <li><strong>Gỡ lỗi (Debug):</strong> Phát hiện xem các định dạng tệp tin đầu vào có bị lỗi cấu trúc hoặc kích thước vượt ngưỡng không.</li>
+                  <li><strong>Bảo mật (Security & Audit):</strong> Ghi vết lại lịch sử hoạt động để chứng minh chỉ có các tệp tin hợp lệ được xử lý, phát hiện hành vi cố tình đẩy mã độc hoặc tệp tin không hợp lệ.</li>
+                </ul>
+              </div>
+
+            </div>
+          </details>
+        </div>
+      </section>
+
+      <!-- Section 26: Troubleshooting and Anti-Patterns -->
+      <section id="troubleshooting-and-anti-patterns" class="chapter">
+        <h2>Các lỗi phổ biến (Anti-Patterns) và Gỡ lỗi<a href="#troubleshooting-and-anti-patterns" class="anchor-link">§</a></h2>
+        <p>Tổng hợp các sai sót kinh điển và phương án khắc phục nhanh khi triển khai Terraform trên AWS.</p>
+
+        <div class="callout mistake">
+          <div class="callout-title">Lỗi 1: AccessDenied khi chạy Terraform apply</div>
+          <p>
+            <strong>Nguyên nhân:</strong> AWS credentials cấu hình trong profile thiếu quyền truy cập để tạo tài nguyên tương ứng.<br>
+            <strong>Phương án sửa:</strong> Kiểm tra lại IAM Policy đính kèm với User IAM, đảm bảo đã cấp đủ quyền tạo tài nguyên tương đương.
+          </p>
+        </div>
+
+        <div class="callout mistake">
+          <div class="callout-title">Lỗi 2: State Lock Error (Không thể lấy bản khóa ghi state)</div>
+          <p>
+            <strong>Nguyên nhân:</strong> Có người dùng khác đang đồng thời apply hạ tầng hoặc tiến trình apply trước đó của bạn bị ngắt đột ngột giữa chừng.<br>
+            <strong>Phương án sửa:</strong> Nếu chắc chắn không có ai khác đang chạy, bạn có thể giải phóng bản khóa bằng lệnh <code>terraform force-unlock &lt;LOCK_ID&gt;</code>.
+          </p>
+        </div>
+
+        <div class="callout mistake">
+          <div class="callout-title">Lỗi 3: Xóa nhầm tài nguyên trên AWS Console gây lỗi lệch State</div>
+          <p>
+            <strong>Nguyên nhân:</strong> Tự ý thao tác tay (sửa, xóa) trên Web Console thay vì dùng code.<br>
+            <strong>Phương án sửa:</strong> Hãy chạy <code>terraform plan</code>, Terraform sẽ tự động so sánh và đưa ra phương án tạo lại hoặc cập nhật lại đúng như khai báo trong code của bạn.
+          </p>
+        </div>
+      </section>
+
+      <!-- Section 27: Cheat Sheets -->
+      <section id="cheat-sheets" class="chapter">
+        <h2>Bảng tra cứu nhanh lệnh Terraform (Cheat Sheets)<a href="#cheat-sheets" class="anchor-link">§</a></h2>
+        <p>Bảng tổng hợp nhanh các lệnh thường dùng nhất để bạn tiện tra cứu.</p>
+
+        <table class="comparison-table">
+          <thead>
+            <tr>
+              <th>Lệnh CLI</th>
+              <th>Chức năng chính</th>
+              <th>Bối cảnh áp dụng</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><code>terraform init</code></td>
+              <td>Khởi tạo dự án, tải Provider và Modules con.</td>
+              <td>Lần đầu tiên clone dự án hoặc khi thêm Provider mới.</td>
+            </tr>
+            <tr>
+              <td><code>terraform fmt</code></td>
+              <td>Tự động định dạng mã nguồn HCL theo quy chuẩn của HashiCorp.</td>
+              <td>Chạy trước khi commit code lên Git.</td>
+            </tr>
+            <tr>
+              <td><code>terraform validate</code></td>
+              <td>Kiểm tra cú pháp và logic cơ bản của các tệp tin cấu hình.</td>
+              <td>Sau khi chỉnh sửa code để rà soát lỗi chính tả.</td>
+            </tr>
+            <tr>
+              <td><code>terraform plan</code></td>
+              <td>Hiển thị kế hoạch thay đổi (Tạo mới, sửa đổi, xóa bỏ).</td>
+              <td>Kiểm tra an toàn trước khi chạy apply.</td>
+            </tr>
+            <tr>
+              <td><code>terraform apply</code></td>
+              <td>Thực thi thay đổi hạ tầng thực tế lên AWS Cloud.</td>
+              <td>Khi muốn áp dụng cấu hình mới.</td>
+            </tr>
+            <tr>
+              <td><code>terraform destroy</code></td>
+              <td>Hủy bỏ toàn bộ hạ tầng do dự án Terraform này quản lý.</td>
+              <td>Dọn dẹp môi trường thử nghiệm để tránh bị tính phí AWS.</td>
+            </tr>
+          </tbody>
+        </table>
+      </section>
+
+      <!-- Section 28: Final Recap -->
+      <section id="final-recap" class="chapter">
+        <h2>Tổng kết và Định hướng học tập tiếp theo<a href="#final-recap" class="anchor-link">§</a></h2>
+        <p>Chúc mừng bạn đã hoàn thành chặng đường học tập toàn bộ các kiến thức cốt lõi của Terraform trên AWS cùng 3 dự án Capstones thực tế!</p>
+
+        <div class="callout beginner">
+          <div class="callout-title">Hành trình tiếp theo của bạn</div>
+          <p>
+            1. Tìm hiểu sâu hơn về thiết kế các Module nâng cao có cấu trúc động (Dynamic Blocks).<br>
+            2. Vận hành chính thức hệ thống an toàn thông qua các công cụ phân tích tĩnh (Static Analysis) như tfsec, Checkov để phát hiện lỗi bảo mật trước khi deploy.<br>
+            3. Thiết lập các hạ tầng quy mô lớn đa vùng (Multi-Region) và đa tài khoản (Multi-Account) an toàn bằng Terraform Workspaces hoặc Terragrunt.
+          </p>
+        </div>
+
+        <p style="text-align: center; margin-top: var(--spacing-xl); font-weight: 500;">
+          Hạ tầng của bạn giờ đây đã sẵn sàng dưới dạng mã nguồn. Hãy viết, thử nghiệm và triển khai một cách tự tin!
+        </p>
+      </section>
+
+      <!-- Section 29 (References): references-and-further-reading -->
+      <section id="references-and-further-reading" class="chapter">
+        <h2>Nguồn tham khảo khuyến nghị để học sâu hơn<a href="#references-and-further-reading" class="anchor-link">§</a></h2>
+        <p>Để tiếp tục mở rộng và nâng cao kỹ năng về Terraform và AWS, bạn có thể học tập từ các nguồn tài liệu chất lượng cao sau:</p>
+        <ul>
+          <li><strong>Viblo Terraform Series (Quân Huỳnh):</strong> Chuỗi bài viết xương sống của handbook này, cung cấp hướng dẫn đầy đủ từ cơ bản đến nâng cao. Truy cập tại: <a href="https://viblo.asia/s/terraform-series-3m5WB8JvlO7" target="_blank" rel="noopener">Viblo Series</a>.</li>
+          <li><strong>HashiCorp Terraform Documentation:</strong> Tài liệu ngôn ngữ chính thức từ nhà phát triển HashiCorp để tra cứu cú pháp và các Provider. Truy cập tại: <a href="https://developer.hashicorp.com/terraform/docs" target="_blank" rel="noopener">Terraform Docs</a>.</li>
+          <li><strong>AWS Prescriptive Guidance:</strong> Cẩm nang hướng dẫn best practices và các patterns chuẩn hóa khi triển khai Terraform trên AWS. Truy cập tại: <a href="https://docs.aws.amazon.com/prescriptive-guidance/latest/terraform-aws-provider-best-practices/introduction.html" target="_blank" rel="noopener">AWS Guidance</a>.</li>
+          <li><strong>DevOps VN Terraform Series:</strong> Các bài viết chia sẻ kinh nghiệm vận hành thực tế và kiến trúc hạ tầng bằng tiếng Việt. Truy cập tại: <a href="https://devopsvn.tech/terraform-series" target="_blank" rel="noopener">DevOps VN Series</a>.</li>
+        </ul>
+      </section>
+
+    </main>
+  </div>
+
+  <!-- Footer Section -->
+  <footer>
+    <div class="footer-container">
+      <div class="footer-brand">
+        <svg class="spike-mark" viewBox="0 0 24 24" style="fill: var(--on-dark);">
+          <path d="M12 2v20M2 12h20M5 5l14 14M5 19L19 5" stroke="currentColor" stroke-width="3" stroke-linecap="round"/>
+        </svg>
+        <span>Terraform AWS Beginner Handbook</span>
+      </div>
+      <div class="footer-copyright">
+        © 2026 Sunny-sunnyy / AIProduction2026. Thiết kế theo chuẩn Claude Warm Editorial.
+      </div>
+    </div>
+  </footer>
+
+  <!-- Script for Dynamic TOC, Progress Indicator and Copy Code -->
+  <script>
+    document.addEventListener("DOMContentLoaded", function() {
+      // 1. Dynamic Table of Contents (TOC) Generation
+      const tocList = document.getElementById("tocList");
+      const sections = document.querySelectorAll("main section[id]");
+      
+      sections.forEach(section => {
+        const id = section.id;
+        const headingElement = section.querySelector("h2");
+        if (headingElement) {
+          let titleText = headingElement.textContent.replace("§", "").trim();
+          
+          const li = document.createElement("li");
+          li.className = "toc-item";
+          
+          const a = document.createElement("a");
+          a.href = "#" + id;
+          a.className = "toc-link";
+          a.textContent = titleText;
+          
+          li.appendChild(a);
+          tocList.appendChild(li);
+        }
+      });
+
+      // 2. Active Section Highlighting inside TOC using IntersectionObserver
+      const tocLinks = document.querySelectorAll(".toc-link");
+      const observerOptions = {
+        root: null,
+        rootMargin: "-20% 0px -60% 0px", // Focus area in viewport
+        threshold: 0
+      };
+
+      const observer = new IntersectionObserver(entries => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            const id = entry.target.getAttribute("id");
+            tocLinks.forEach(link => {
+              if (link.getAttribute("href") === "#" + id) {
+                link.classList.add("active");
+                link.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+              } else {
+                link.classList.remove("active");
+              }
+            });
+          }
+        });
+      }, observerOptions);
+
+      sections.forEach(section => {
+        observer.observe(section);
+      });
+
+      // 3. Scroll Progress Indicator Logic
+      const progressBar = document.getElementById("progressBar");
+      window.addEventListener("scroll", function() {
+        const scrollTop = window.scrollY || document.documentElement.scrollTop;
+        const scrollHeight = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+        const scrollPercentage = (scrollTop / scrollHeight) * 100;
+        progressBar.style.width = scrollPercentage + "%";
+      });
+    });
+
+    // 4. Copy Code to Clipboard Functionality
+    function copyCode(button) {
+      const codeBlock = button.parentElement.nextElementSibling.querySelector("code");
+      const codeText = codeBlock.textContent;
+      
+      navigator.clipboard.writeText(codeText).then(() => {
+        const originalText = button.textContent;
+        button.textContent = "Copied!";
+        button.style.backgroundColor = "var(--success)";
+        button.style.color = "#fff";
+        button.style.borderColor = "var(--success)";
+        
+        setTimeout(() => {
+          button.textContent = originalText;
+          button.style.backgroundColor = "transparent";
+          button.style.color = "var(--on-dark-soft)";
+          button.style.borderColor = "var(--on-dark-soft)";
+        }, 2000);
+      }).catch(err => {
+        console.error("Could not copy text: ", err);
+      });
+    }
+  </script>
+</body>
+</html>
