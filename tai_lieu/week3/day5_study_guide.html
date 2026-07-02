@@ -1,0 +1,1325 @@
+<!doctype html>
+<html lang="vi">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Nền Tảng ALEX: AI Research Agent Với MCP Servers & Data Pipeline - Study Guide</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+  <style>
+    :root {
+      --canvas: #faf9f5;
+      --surface-soft: #f5f0e8;
+      --surface-card: #efe9de;
+      --surface-strong: #e8e0d2;
+      --surface-dark: #181715;
+      --surface-dark-elevated: #252320;
+      --surface-dark-soft: #1f1e1b;
+      --hairline: #e6dfd8;
+      --hairline-soft: #ebe6df;
+      --ink: #141413;
+      --body: #3d3d3a;
+      --body-strong: #252523;
+      --muted: #6c6a64;
+      --muted-soft: #8e8b82;
+      --primary: #cc785c;
+      --primary-active: #a9583e;
+      --accent-teal: #5db8a6;
+      --accent-amber: #e8a55a;
+      --on-dark: #faf9f5;
+      --on-dark-soft: #a09d96;
+      --radius-md: 8px;
+      --radius-lg: 12px;
+      --radius-xl: 16px;
+      --content: 1200px;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      margin: 0;
+      background: var(--canvas);
+      color: var(--body);
+      font-family: 'Inter', "Segoe UI", Arial, sans-serif;
+      line-height: 1.62;
+    }
+
+    h1,
+    h2 {
+      color: var(--ink);
+      font-family: 'Cormorant Garamond', Cambria, "Noto Serif", serif;
+      font-weight: 600;
+      letter-spacing: -0.02em;
+      line-height: 1.1;
+      margin: 0;
+    }
+
+    h1 {
+      font-size: clamp(2.2rem, 4.5vw, 3.8rem);
+      max-width: 25ch;
+    }
+
+    h2 {
+      font-size: clamp(1.6rem, 2.8vw, 2.2rem);
+      border-bottom: 1px solid var(--hairline-soft);
+      padding-bottom: 8px;
+    }
+
+    h3 {
+      color: var(--ink);
+      font-family: 'Inter', sans-serif;
+      font-size: 1.1rem;
+      font-weight: 600;
+      line-height: 1.35;
+      margin: 0;
+    }
+
+    p,
+    li {
+      margin: 0;
+    }
+
+    code {
+      border-radius: 6px;
+      background: var(--surface-strong);
+      color: var(--body-strong);
+      font-family: "JetBrains Mono", Consolas, monospace;
+      font-size: 0.9em;
+      padding: 2px 6px;
+    }
+
+    pre {
+      margin: 0;
+      overflow-x: auto;
+      border-radius: var(--radius-lg);
+      background: var(--surface-dark-soft);
+      color: var(--on-dark);
+      padding: 18px;
+      font-family: "JetBrains Mono", Consolas, monospace;
+      font-size: 13px;
+      line-height: 1.58;
+      white-space: pre;
+    }
+
+    pre code {
+      background: transparent;
+      color: inherit;
+      padding: 0;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.95rem;
+      margin-top: 14px;
+      background: var(--canvas);
+    }
+
+    th,
+    td {
+      border-bottom: 1px solid var(--hairline);
+      padding: 12px 16px;
+      text-align: left;
+      vertical-align: top;
+    }
+
+    th {
+      color: var(--ink);
+      background: var(--surface-soft);
+      font-weight: 700;
+    }
+
+    .page {
+      max-width: var(--content);
+      margin: 0 auto;
+      padding: 30px 20px 64px;
+    }
+
+    .hero {
+      display: grid;
+      grid-template-columns: minmax(0, 1.2fr) minmax(320px, 0.8fr);
+      gap: 28px;
+      align-items: stretch;
+      padding: 40px;
+      border: 1px solid var(--hairline);
+      border-radius: var(--radius-xl);
+      background: var(--surface-soft);
+    }
+
+    .hero-copy {
+      display: grid;
+      gap: 18px;
+      align-content: start;
+    }
+
+    .eyebrow {
+      width: fit-content;
+      border-radius: 999px;
+      background: var(--primary);
+      color: white;
+      font-size: 0.75rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      padding: 6px 12px;
+      text-transform: uppercase;
+    }
+
+    .lead {
+      max-width: 72ch;
+      color: var(--body-strong);
+      font-size: 1.1rem;
+    }
+
+    .tag-row,
+    .source-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .tag,
+    .source {
+      display: inline-flex;
+      align-items: center;
+      border-radius: 999px;
+      font-size: 0.82rem;
+      font-weight: 600;
+      padding: 5px 12px;
+    }
+
+    .tag {
+      background: var(--surface-card);
+      color: var(--ink);
+      border: 1px solid var(--hairline-soft);
+    }
+
+    .source {
+      border: 1px solid var(--hairline);
+      background: var(--canvas);
+      color: var(--muted);
+    }
+
+    .source.extended {
+      border-color: rgba(204, 120, 92, 0.38);
+      background: rgba(204, 120, 92, 0.12);
+      color: var(--primary-active);
+    }
+
+    .hero-panel,
+    .code-panel {
+      border-radius: var(--radius-lg);
+      background: var(--surface-dark);
+      color: var(--on-dark);
+      padding: 24px;
+    }
+
+    .hero-panel {
+      display: grid;
+      gap: 16px;
+      align-content: start;
+    }
+
+    .hero-panel h2,
+    .hero-panel h3,
+    .code-panel h3 {
+      color: var(--on-dark);
+      border: none;
+      padding: 0;
+    }
+
+    .hero-panel p,
+    .hero-panel li,
+    .code-panel p,
+    .code-panel li {
+      color: var(--on-dark-soft);
+    }
+
+    .progress-track {
+      height: 8px;
+      overflow: hidden;
+      border-radius: 999px;
+      background: var(--surface-dark-elevated);
+    }
+
+    .progress-bar {
+      width: 0;
+      height: 100%;
+      background: var(--primary);
+      transition: width 0.1s ease;
+    }
+
+    .layout {
+      display: grid;
+      grid-template-columns: 260px minmax(0, 1fr);
+      gap: 24px;
+      align-items: start;
+      margin-top: 26px;
+    }
+
+    .toc {
+      position: sticky;
+      top: 20px;
+      border: 1px solid var(--hairline);
+      border-radius: var(--radius-lg);
+      background: var(--canvas);
+      padding: 18px;
+    }
+
+    .toc h2 {
+      font-family: 'Inter', sans-serif;
+      font-size: 1rem;
+      font-weight: 700;
+      border: none;
+      padding: 0;
+      margin-bottom: 12px;
+    }
+
+    .toc nav {
+      display: grid;
+      gap: 4px;
+    }
+
+    .toc a {
+      border-radius: var(--radius-md);
+      color: var(--muted);
+      padding: 6px 10px;
+      text-decoration: none;
+      font-size: 0.9rem;
+      font-weight: 500;
+      transition: all 0.2s ease;
+    }
+
+    .toc a:hover,
+    .toc a.active {
+      background: var(--surface-card);
+      color: var(--ink);
+      font-weight: 600;
+    }
+
+    .toc-tools {
+      display: grid;
+      gap: 8px;
+      margin-top: 16px;
+      padding-top: 16px;
+      border-top: 1px solid var(--hairline);
+    }
+
+    .button {
+      min-height: 40px;
+      border: 1px solid var(--hairline);
+      border-radius: var(--radius-md);
+      background: var(--canvas);
+      color: var(--ink);
+      cursor: pointer;
+      font: inherit;
+      font-size: 0.9rem;
+      font-weight: 600;
+      padding: 10px 14px;
+      transition: all 0.2s ease;
+    }
+
+    .button:hover {
+      background: var(--surface-card);
+    }
+
+    .button.primary {
+      border-color: var(--primary);
+      background: var(--primary);
+      color: white;
+    }
+
+    .button.primary:hover {
+      background: var(--primary-active);
+    }
+
+    .content {
+      display: grid;
+      gap: 24px;
+    }
+
+    .section {
+      border: 1px solid var(--hairline);
+      border-radius: var(--radius-lg);
+      background: var(--canvas);
+      padding: 32px;
+    }
+
+    .section-title {
+      display: flex;
+      justify-content: space-between;
+      gap: 16px;
+      align-items: start;
+      margin-bottom: 20px;
+    }
+
+    .kicker {
+      color: var(--primary-active);
+      font-size: 0.76rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      margin-bottom: 6px;
+      text-transform: uppercase;
+    }
+
+    .grid-2,
+    .grid-3 {
+      display: grid;
+      gap: 16px;
+    }
+
+    .grid-2 {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .grid-3 {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+
+    .card,
+    details {
+      border: 1px solid var(--hairline);
+      border-radius: var(--radius-lg);
+      background: var(--surface-card);
+      padding: 20px;
+    }
+
+    .card h3 {
+      margin-bottom: 10px;
+    }
+
+    .card p,
+    .card ul,
+    .card ol,
+    details p,
+    details ul,
+    details ol {
+      margin-top: 8px;
+    }
+
+    .list {
+      padding-left: 20px;
+    }
+
+    .list li + li {
+      margin-top: 6px;
+    }
+
+    details {
+      margin-top: 14px;
+      background: var(--canvas);
+    }
+
+    summary {
+      color: var(--ink);
+      cursor: pointer;
+      font-weight: 700;
+      outline: none;
+    }
+
+    .callout {
+      border-left: 4px solid var(--primary);
+      border-radius: var(--radius-md);
+      background: var(--surface-soft);
+      padding: 14px 18px;
+      margin-top: 14px;
+    }
+
+    .code-panel {
+      display: grid;
+      gap: 14px;
+      margin-top: 16px;
+    }
+
+    .code-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      color: var(--on-dark-soft);
+      font-size: 0.86rem;
+    }
+
+    .code-meta span {
+      background: var(--surface-dark-elevated);
+      padding: 2px 8px;
+      border-radius: 4px;
+    }
+
+    .flashcard {
+      display: grid;
+      gap: 12px;
+      align-content: space-between;
+    }
+
+    .flash-answer {
+      display: none;
+      border-top: 1px solid var(--hairline);
+      padding-top: 12px;
+      margin-top: 12px;
+      color: var(--body-strong);
+    }
+
+    .flashcard.revealed .flash-answer {
+      display: block;
+    }
+
+    .quiz-options {
+      display: grid;
+      gap: 8px;
+      margin-top: 12px;
+    }
+
+    .quiz-option {
+      display: block;
+      width: 100%;
+      text-align: left;
+      font-weight: 500;
+    }
+
+    .quiz-result {
+      min-height: 24px;
+      margin-top: 12px;
+      color: var(--primary-active);
+      font-weight: 700;
+      font-size: 0.95rem;
+    }
+
+    .mermaid-container {
+      background: var(--canvas);
+      border: 1px solid var(--hairline);
+      border-radius: var(--radius-lg);
+      padding: 20px;
+      margin-top: 16px;
+      display: flex;
+      justify-content: center;
+    }
+
+    .mermaid-container.diagram-xl {
+      overflow-x: auto;
+      justify-content: flex-start;
+    }
+
+    .mermaid-container.diagram-xl .mermaid {
+      width: 100%;
+      min-width: 960px;
+    }
+
+    .mermaid-container.diagram-xl .mermaid svg {
+      display: block;
+      width: 100% !important;
+      height: auto !important;
+    }
+
+    .footer {
+      border-radius: var(--radius-lg);
+      background: var(--surface-dark);
+      color: var(--on-dark-soft);
+      padding: 32px;
+      margin-top: 32px;
+      font-size: 0.9rem;
+    }
+
+    .footer strong {
+      color: var(--on-dark);
+    }
+
+    @media (max-width: 900px) {
+      .hero,
+      .layout,
+      .grid-2,
+      .grid-3 {
+        grid-template-columns: 1fr;
+      }
+
+      .toc {
+        position: static;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="page">
+    <header class="hero">
+      <div class="hero-copy">
+        <span class="eyebrow">Study guide</span>
+        <h1>Nền Tảng ALEX: AI Research Agent Với MCP Servers & Data Pipeline</h1>
+        <p class="lead">
+          Tìm hiểu quy trình hoàn thiện đường ống dữ liệu (ETL) bằng cách triển khai tác tử nghiên cứu độc lập (Researcher Agent) sử dụng Playwright MCP Server, LiteLLM bọc Amazon Bedrock Nova Pro, kỹ thuật giải quyết phụ thuộc vòng ECR và cơ chế Lambda Proxy Scheduler khắc phục timeout EventBridge.
+        </p>
+        <div class="tag-row">
+          <span class="tag">AI Engineer Production Track</span>
+          <span class="tag">Day 5 - Agent Integration</span>
+          <span class="tag">Week 3: Data Engineering</span>
+        </div>
+        <div class="source-row">
+          <span class="source">Docx LLM (day5_summary.md)</span>
+          <span class="source">Slide (Production W3D5.pdf)</span>
+          <span class="source">Code (researcher lambda & tools)</span>
+          <span class="source extended">Tenacity Retry & EventBridge</span>
+        </div>
+      </div>
+      <aside class="hero-panel">
+        <h2>Quick focus - Điểm tập trung</h2>
+        <ul class="list">
+          <li><strong>ETL & Medallion:</strong> Phân tầng dữ liệu thô (Bronze), sạch (Silver) và tinh lọc (Gold) trong ứng dụng RAG.</li>
+          <li><strong>ECR Target Deploy:</strong> Phá vỡ bài toán phụ thuộc chéo ECR-Lambda bằng targeted apply trong Terraform.</li>
+          <li><strong>Lambda Proxy Pattern:</strong> Vượt qua giới hạn timeout 5 giây của EventBridge bằng cách chèn Lambda Scheduler 3 phút.</li>
+        </ul>
+        <div>
+          <p style="margin-bottom: 8px; font-weight: 600;">Reading progress - Tiến độ đọc bài</p>
+          <div class="progress-track" aria-label="Reading progress">
+            <div class="progress-bar" id="progressBar"></div>
+          </div>
+        </div>
+      </aside>
+    </header>
+
+    <div class="layout">
+      <aside class="toc">
+        <h2>Navigation - Mục lục</h2>
+        <nav>
+          <a href="#source-map">1. Source Map</a>
+          <a href="#cheat-sheet">2. Cheat Sheet</a>
+          <a href="#previous-context">3. Previous Context</a>
+          <a href="#core-theory">4. Core Theory</a>
+          <a href="#workflow">5. Workflow / Pipeline</a>
+          <a href="#techniques">6. Techniques</a>
+          <a href="#code-walkthrough">7. Code Walkthrough</a>
+          <a href="#options">8. Options / Trade-offs</a>
+          <a href="#pitfalls">9. Pitfalls</a>
+          <a href="#flashcards">10. Flashcards / Quiz</a>
+          <a href="#memory">11. Quick Memory</a>
+        </nav>
+        <div class="toc-tools">
+          <button class="button" type="button" id="expandAll">Expand notes</button>
+          <button class="button" type="button" id="collapseAll">Collapse notes</button>
+        </div>
+      </aside>
+
+      <main class="content">
+        <section id="source-map" class="section">
+          <div class="section-title">
+            <div>
+              <div class="kicker">Section 1</div>
+              <h2>Source Map - Bản đồ nguồn</h2>
+            </div>
+          </div>
+          <div class="grid-2">
+            <article class="card">
+              <h3>Sources used - Nguồn đã dùng</h3>
+              <ul class="list">
+                <li><strong>Docx LLM:</strong> Dựa trên tóm tắt đầy đủ từ [day5_summary.md](file:///G:/AIProduction_t6_2026/production/tai_lieu/week3/day5_summary.md).</li>
+                <li><strong>Slide:</strong> Tham chiếu slide học trình `Production W3D5.pdf` mô tả cấu trúc phân tầng Medallion và mô hình Lambda Scheduler.</li>
+                <li><strong>Code:</strong> Phân tích [4_researcher.md](file:///G:/AIProduction_t6_2026/production/week3/alex/guides/4_researcher.md), các tệp nguồn trong thư mục [researcher](file:///G:/AIProduction_t6_2026/production/week3/alex/backend/researcher) và cấu hình Terraform [4_researcher](file:///G:/AIProduction_t6_2026/production/week3/alex/terraform/4_researcher).</li>
+              </ul>
+            </article>
+            <article class="card">
+              <h3>Grounding notes - Ghi chú căn cứ</h3>
+              <p>
+                Bài học này tích hợp các kiến thức liên ngành về Kỹ thuật dữ liệu (Data Engineering) với thiết kế Tác tử tự động (Autonomous Agent). Các đoạn mã cấu hình thực tế về cơ chế retry lũy thừa (tenacity) và kỹ thuật targeted apply trong Terraform được nhấn mạnh chi tiết để đảm bảo tính thực hành cao.
+              </p>
+            </article>
+          </div>
+          <div class="callout">
+            <strong>Terminology rule - Quy tắc thuật ngữ:</strong> Cụm thuật ngữ kỹ thuật được biểu diễn dạng
+            <code>English - nghĩa tiếng Việt</code>. Các từ đơn phổ biến được viết dạng <code>word (nghĩa)</code>.
+            Ví dụ: <code>Data pipeline - đường ống dữ liệu</code>, <code>Agent tracing - theo dõi vết tác tử</code>.
+          </div>
+        </section>
+
+        <section id="cheat-sheet" class="section">
+          <div class="section-title">
+            <div>
+              <div class="kicker">Section 2</div>
+              <h2>Cheat Sheet - Tóm tắt một trang</h2>
+            </div>
+          </div>
+          <div class="grid-3">
+            <article class="card">
+              <h3>Core idea - Ý chính</h3>
+              <p>
+                Hoàn thiện hệ thống RAG tự động cho Alex bằng cách dựng một container hóa tác tử (Researcher Agent) cào tin tức tài chính qua Playwright MCP, tinh lọc qua Bedrock Nova Pro, và gọi nạp vào database. Hệ thống được lập lịch định kỳ thông qua sự kết hợp giữa EventBridge và một Lambda Scheduler trung gian làm Proxy chống timeout.
+              </p>
+            </article>
+            <article class="card">
+              <h3>Must know - Cần nhớ</h3>
+              <ul class="list">
+                <li>Medallion Stage trong Alex: Cào web thô (Bronze) -> Trích lọc qua LLM (Silver) -> Vector hóa lập chỉ mục trong S3 Vectors (Gold).</li>
+                <li>Chicken-and-egg problem: ECR repo cần tạo trước, sau đó build/push image từ local, rồi mới deploy Lambda từ image đó.</li>
+                <li>Timeout: EventBridge chỉ chờ 5s. Phải dùng Lambda Scheduler (timeout 180s) để trigger và chờ Agent phản hồi.</li>
+              </ul>
+            </article>
+            <article class="card">
+              <h3>Use in practice - Dùng khi nào</h3>
+              <p>
+                Áp dụng khi cần thiết lập các luồng nạp tri thức chạy ngầm định kỳ (cron job) cho chatbot doanh nghiệp từ các nguồn dữ liệu thay đổi liên tục trên internet (báo chí, tài liệu mạng) một cách bền bỉ và bảo mật.
+              </p>
+            </article>
+          </div>
+        </section>
+
+        <section id="previous-context" class="section">
+          <div class="section-title">
+            <div>
+              <div class="kicker">Section 3</div>
+              <h2>Previous Context - Liên hệ với bài trước</h2>
+            </div>
+          </div>
+          <div class="callout">
+            Day 5 là mảnh ghép cuối cùng liên kết với **Day 3** (SageMaker embedding endpoint) và **Day 4** (Ingest API Gateway & S3 Vectors). Researcher Agent đóng vai trò là "client" gọi trực tiếp đến API Gateway đã được bảo mật bằng API Key cấu hình từ Day 4 nhằm hoàn tất một chu trình ETL tự động khép kín.
+          </div>
+        </section>
+
+        <section id="core-theory" class="section">
+          <div class="section-title">
+            <div>
+              <div class="kicker">Section 4</div>
+              <h2>Core Theory - Lý thuyết cốt lõi</h2>
+            </div>
+            <div class="source-row">
+              <span class="source">Docx LLM</span>
+              <span class="source">Slide</span>
+            </div>
+          </div>
+          <div class="grid-2">
+            <article class="card">
+              <h3>Key concepts - Khái niệm chính</h3>
+              <ul class="list">
+                <li><strong>Data Engineering - Khoa học dữ liệu:</strong> Lĩnh vực tập trung vào thiết kế, xây dựng và quản trị các đường ống (data pipelines) thu thập, biến đổi dữ liệu quy mô lớn một cách tin cậy và chịu lỗi tốt.</li>
+                <li><strong>ETL (Extract, Transform, Load) - Trích xuất, Chuyển đổi, Nạp:</strong> Quy trình chuẩn gồm thu thập dữ liệu thô (Extract), chuẩn hóa cấu trúc ngữ nghĩa (Transform), và ghi vào kho đích (Load).</li>
+                <li><strong>LiteLLM - Lớp trừu tượng hóa mô hình:</strong> Thư viện trung gian cho phép lập trình viên gọi đa dạng mô hình ngôn ngữ (như Bedrock Nova, OpenAI, Anthropic) bằng cách sử dụng một chuẩn API duy nhất.</li>
+                <li><strong>Function URL - Đường dẫn hàm:</strong> Endpoint HTTP(S) duy nhất được gán cho một Lambda function để kích hoạt trực tiếp không cần API Gateway.</li>
+                <li><strong>Agent Tracing - Theo dõi vết tác tử:</strong> Cơ chế ghi lại chi tiết các bước suy luận, suy nghĩ (thought) và gọi công cụ (tool call) của Agent để phục vụ giám sát và debug.</li>
+              </ul>
+            </article>
+            <article class="card">
+              <h3>Medallion Architecture trong Alex RAG Pipeline</h3>
+              <p>
+                Kiến trúc Huy chương (Medallion) thiết kế kho dữ liệu phân tầng nhằm tăng chất lượng thông tin qua từng giai đoạn:
+              </p>
+              <ul class="list" style="margin-top: 8px;">
+                <li><strong>Tầng Bronze (Raw Data):</strong> Dữ liệu HTML thô được Playwright MCP cào về từ các trang tài chính Yahoo Finance, Bloomberg. Chứa nhiều mã định dạng và quảng cáo rác.</li>
+                <li><strong>Tầng Silver (Cleaned Data):</strong> Bedrock LLM (Nova Pro) nhận dữ liệu thô, loại bỏ nhiễu và tiến hành phân tích, tóm tắt cô đọng các ý quan trọng của doanh nghiệp.</li>
+                <li><strong>Tầng Gold (Curated Data):</strong> SageMaker Endpoint thực hiện chuyển đổi văn bản đã làm sạch thành vector nhúng 384 chiều, và Ingest Lambda thực thi lưu vào S3 Vectors sẵn sàng cho Agent trả lời câu hỏi truy vấn.</li>
+              </ul>
+            </article>
+          </div>
+          <details>
+            <summary>Deep explanation - Các framework xử lý dữ liệu lớn (Spark và Beam)</summary>
+            <div class="callout" style="margin-top: 8px;">
+              <span class="source.extended" style="float: right; font-size: 0.75rem; padding: 2px 8px;">Kiến thức mở rộng</span>
+              <p>Đối với hệ thống dữ liệu lớn của doanh nghiệp, các pipeline ETL thường sử dụng các framework tính toán phân tán:</p>
+              <ul class="list" style="margin-top: 8px;">
+                <li><strong>Apache Spark:</strong> Engine tính toán phân tán trong bộ nhớ (in-memory computing) cực nhanh, phù hợp cho việc xử lý dữ liệu lớn dạng mẻ (batch processing) và phân tích luồng thời gian thực.</li>
+                <li><strong>Apache Beam:</strong> Mô hình lập trình thống nhất cho phép định nghĩa các pipeline xử lý dữ liệu cả dạng mẻ (batch) và dạng luồng (stream), có khả năng chạy trên nhiều execution engines khác nhau như Spark, Flink, hoặc Google Cloud Dataflow.</li>
+                <li>*Ghi chú:* Đối với quy mô của Alex, EventBridge phối hợp Lambda Scheduler và Python script là đủ gọn nhẹ và tối ưu chi phí.</li>
+              </ul>
+            </div>
+          </details>
+        </section>
+
+        <section id="workflow" class="section">
+          <div class="section-title">
+            <div>
+              <div class="kicker">Section 5</div>
+              <h2>Workflow / Pipeline - Quy trình / luồng hoạt động</h2>
+            </div>
+            <div class="source-row">
+              <span class="source">Docx LLM</span>
+              <span class="source">Slide</span>
+              <span class="source">Code</span>
+            </div>
+          </div>
+
+          <h3>Sơ đồ Luồng Tự Động Hóa Kích Hoạt Nghiên Cứu và Nạp Dữ Liệu (Day 5 Automation Detail)</h3>
+          <div class="mermaid-container diagram-xl">
+            <div class="mermaid">
+              sequenceDiagram
+                autonumber
+                participant EB as EventBridge Scheduler
+                participant LS as alex-researcher-scheduler<br/>(Lambda Proxy - Timeout 180s)
+                participant AL as alex-researcher<br/>(Container Lambda)
+                participant MCP as Playwright MCP Server<br/>(Chromium Headless)
+                participant Web as Internet (Financial Sites)
+                participant BR as AWS Bedrock<br/>(Nova Pro)
+                participant IG as alex-ingest API<br/>(Day 4 Gateway & Lambda)
+
+                EB->>LS: Kích hoạt định kỳ (mỗi 2 giờ hoặc 10 phút)
+                Note over EB,LS: Lệnh invoke nhanh < 1 giây
+                LS->>AL: POST /research/auto (Giữ kết nối HTTP)
+                Note over LS,AL: Chờ đợi phản hồi đồng bộ tối đa 3 phút
+                AL->>MCP: Spawn process & cấu hình chrome binary
+                AL->>MCP: Gọi tool browser_navigate
+                MCP->>Web: Truy cập trang tài chính
+                Web-->>MCP: Trả về nội dung HTML thô
+                MCP-->>AL: Trả về văn bản cào được
+                AL->>BR: Gửi văn bản thô yêu cầu tóm tắt (Silver)
+                BR-->>AL: Trả về bản phân tích tóm tắt sạch
+                AL->>IG: Gọi tool ingest_financial_document (POST /ingest)
+                Note over AL,IG: Tự động retry qua tenacity nếu cold-start
+                IG-->>AL: Trả về document_id thành công (Gold)
+                AL-->>LS: Trả về 200 OK (Báo hoàn thành)
+                LS-->>EB: Ghi nhận kết thúc lượt chạy thành công
+            </div>
+          </div>
+
+          <h3 style="margin-top: 24px;">End-to-End Targeted Deployment & Execution Walkthrough</h3>
+          <p>
+            Dưới đây là chi tiết quy trình từng bước triển khai và vận hành hệ thống để tránh các lỗi phụ thuộc và timeout:
+          </p>
+
+          <details>
+            <summary>Bước 1: Giải quyết bài toán phụ thuộc chéo ECR bằng Targeted Apply</summary>
+            <ol class="list" style="margin-top: 8px;">
+              <li>Trong thư mục [4_researcher](file:///G:/AIProduction_t6_2026/production/week3/alex/terraform/4_researcher), người dùng chạy lệnh:
+                <code>terraform apply -target=aws_ecr_repository.researcher -target=aws_ecr_repository_policy.researcher_lambda_access</code>
+              </li>
+              <li>Terraform bỏ qua tài nguyên Lambda function và scheduler (do chưa có image) và chỉ khởi tạo ECR Repository rỗng mang tên <code>alex-researcher</code> cùng phân quyền kéo ảnh (image pull) cho Lambda.</li>
+            </ol>
+          </details>
+
+          <details>
+            <summary>Bước 2: Đóng gói và Đẩy Docker Image lên ECR qua deploy.py</summary>
+            <ol class="list" style="margin-top: 8px;">
+              <li>Người dùng thực hiện chạy <code>uv run deploy.py</code> tại thư mục [researcher](file:///G:/AIProduction_t6_2026/production/week3/alex/backend/researcher).</li>
+              <li>Kịch bản thực thi:
+                <ul class="list" style="margin-top: 4px;">
+                  <li>Đọc file state của Terraform để lấy địa chỉ ECR Repo URL vừa được tạo.</li>
+                  <li>Đăng nhập Docker vào ECR registry bằng password sinh ra từ AWS CLI.</li>
+                  <li>Build Docker image bằng lệnh: <code>docker build --platform linux/amd64 -t alex-researcher:deploy-... .</code></li>
+                  <li>Nhãn <code>--platform linux/amd64</code> bắt buộc được truyền để biên dịch đúng tập lệnh tương thích với môi trường AWS compute, tránh lỗi không tương thích tập lệnh chip (như máy Mac ARM64).</li>
+                  <li>Đẩy image lên registry bằng lệnh <code>docker push</code>.</li>
+                  <li>Ghi đè tệp biến tạm <code>researcher.auto.tfvars.json</code> lưu lại URI ảnh thực tế.</li>
+                </ul>
+              </li>
+            </ol>
+          </details>
+
+          <details>
+            <summary>Bước 3: Hoàn tất triển khai toàn bộ hạ tầng</summary>
+            <ol class="list" style="margin-top: 8px;">
+              <li>Người dùng chạy lệnh <code>terraform apply</code> toàn phần không target.</li>
+              <li>Terraform tìm thấy file cấu hình <code>researcher.auto.tfvars.json</code> chứa image URI, thực hiện:
+                <ul class="list" style="margin-top: 4px;">
+                  <li>Khởi tạo Lambda function <code>alex-researcher</code> trỏ vào ảnh container trên ECR, cấu hình RAM 2GB, bộ nhớ tạm 2GB, timeout 5 phút, và gán đường dẫn Public Function URL.</li>
+                  <li>Triển khai Lambda Scheduler trung gian <code>alex-researcher-scheduler</code> với timeout 180s và truyền Function URL của Agent qua biến môi trường.</li>
+                  <li>Triển khai EventBridge Scheduler <code>alex-research-schedule</code> với chu kỳ chạy 2 giờ và gán quyền trigger Lambda Scheduler.</li>
+                </ul>
+              </li>
+            </ol>
+          </details>
+        </section>
+
+        <section id="techniques" class="section">
+          <div class="section-title">
+            <div>
+              <div class="kicker">Section 6</div>
+              <h2>Techniques - Kỹ thuật sử dụng</h2>
+            </div>
+          </div>
+          <div class="grid-2">
+            <article class="card">
+              <h3>Targeted Apply for Dependency Resolution</h3>
+              <p><strong>Purpose:</strong> Phá vỡ vòng lặp phụ thuộc chéo (chicken-and-egg problem) trong IaC khi tài nguyên hạ tầng (Lambda) cần container image, nhưng registry lưu trữ image (ECR) lại được quản lý bởi chính code hạ tầng đó.</p>
+              <p><strong>When to use:</strong> Áp dụng cho mọi luồng triển khai lần đầu tiên của các ứng dụng serverless/container chạy trên AWS, GCP, Azure.</p>
+              <p><strong>Trade-off:</strong> Đòi hỏi quy trình deploy gồm nhiều bước chạy lệnh thủ công hoặc viết script tự động hóa bao quanh.</p>
+            </article>
+            <article class="card">
+              <h3>Proxy Lambda Pattern for Timeout Mitigation</h3>
+              <p><strong>Purpose:</strong> Vượt qua giới hạn thời gian chờ phản hồi tối đa 5 giây nghiêm ngặt của EventBridge Scheduler đối với các cuộc gọi API ngoài (API Destinations).</p>
+              <p><strong>When to use:</strong> Khi lập lịch định kỳ kích hoạt các tác vụ nặng như AI Agents suy luận, cào dữ liệu web hoặc chạy báo cáo ETL mất từ 30s đến vài phút.</p>
+              <p><strong>Trade-off:</strong> Tốn thêm một chút chi phí duy trì tài nguyên Lambda Proxy trung gian (tuy nhiên không đáng kể vì RAM Lambda proxy được đặt tối thiểu 256MB).</p>
+            </article>
+            <article class="card">
+              <h3>Tenacity retry logic với Exponential Backoff</h3>
+              <p><strong>Purpose:</strong> Tự động gửi lại yêu cầu gọi API khi gặp sự cố mạng hoặc lỗi timeout do container SageMaker Serverless Endpoint bị khởi động lạnh (cold start) sau thời gian dài không hoạt động.</p>
+              <p><strong>When to use:</strong> Áp dụng tại hàm gửi dữ liệu <code>ingest_financial_document</code> của Agent hướng tới Ingest API.</p>
+              <p><strong>Logic hoạt động:</strong> Thử lại tối đa 3 lần. Thời gian chờ giữa các lần thử tăng theo lũy thừa cơ số 2 (1s, 2s, 4s,...) giúp backend có đủ thời gian khởi động container và hồi phục tải.</p>
+            </article>
+            <article class="card">
+              <h3>Docker Layer Caching & Multi-Platform</h3>
+              <p><strong>Purpose:</strong> Đảm bảo thời gian build container nhanh nhất bằng cách đặt các câu lệnh cài đặt hệ thống ít thay đổi (Node.js, Playwright Chromium) ở phía trên của Dockerfile. Đồng thời, cờ <code>--platform linux/amd64</code> đảm bảo ảnh chạy ổn định trên CPU đám mây AWS.</p>
+              <p><strong>When to use:</strong> Khi đóng gói container trên các máy trạm local đa kiến trúc (như Apple Silicon M-series chip ARM64) để đẩy lên môi trường AWS.</p>
+            </article>
+          </div>
+        </section>
+
+        <section id="code-walkthrough" class="section">
+          <div class="section-title">
+            <div>
+              <div class="kicker">Section 7</div>
+              <h2>Code Walkthrough - Phân tích code</h2>
+            </div>
+            <div class="source-row">
+              <span class="source">Code</span>
+              <span class="source">Docx LLM</span>
+            </div>
+          </div>
+
+          <article class="code-panel">
+            <div>
+              <h3>[server.py](file:///G:/AIProduction_t6_2026/production/week3/alex/backend/researcher/server.py) - Khởi chạy Agent qua LiteLLM Bedrock</h3>
+              <p>Trích đoạn mã nguồn cấu hình và chạy Agent bằng OpenAI Agents SDK, bọc mô hình Bedrock Nova Pro qua thư viện LiteLLM.</p>
+            </div>
+            <div class="code-meta">
+              <span>Model: bedrock/us.amazon.nova-pro-v1:0</span>
+              <span>Turns: max_turns=15</span>
+            </div>
+            <pre><code># Hàm khởi chạy quy trình suy luận của Agent nghiên cứu đầu tư
+async def run_research_agent(topic: str = None) -> str:
+    # 1. Định nghĩa prompt truy vấn dựa trên chủ đề hoặc mặc định
+    query = f"Research this investment topic: {topic}" if topic else DEFAULT_RESEARCH_PROMPT
+
+    # 2. Cấu hình các biến môi trường bắt buộc để LiteLLM nhận diện Bedrock Region
+    region = os.environ.get("BEDROCK_REGION", "us-west-2")
+    os.environ["AWS_REGION_NAME"] = region   # LiteLLM bắt buộc sử dụng tham số này
+    os.environ["AWS_REGION"] = region
+    os.environ["AWS_DEFAULT_REGION"] = region
+    
+    # 3. Khởi tạo mô hình Bedrock Nova Pro (hoặc GPT OSS 120B) qua lớp LitellmModel
+    model_name = os.environ.get("RESEARCHER_MODEL", "bedrock/global.openai.gpt-oss-120b-1:0")
+    model = LitellmModel(model=model_name)
+
+    # 4. Kích hoạt context tracing để ghi log
+    with trace("Researcher"):
+        # Khởi tạo Playwright MCP Server trong container với timeout 2 phút
+        async with create_playwright_mcp_server(timeout_seconds=120) as playwright_mcp:
+            agent = Agent(
+                name="Alex Investment Researcher",
+                instructions=get_agent_instructions(), # Tải system prompt
+                model=model,
+                tools=[ingest_financial_document],     # Công cụ nạp dữ liệu lên S3 Vectors
+                mcp_servers=[playwright_mcp],          # Công cụ duyệt web tự động
+            )
+
+            # Thực thi vòng lặp Thought-Action Loop của tác tử với giới hạn tối đa 15 lượt
+            result = await Runner.run(
+                agent,
+                input=query,
+                max_turns=15,
+                hooks=ResearchLoggingHooks() if MCP_LOGGING_ENABLED else None,
+            )
+
+    return result.final_output</code></pre>
+          </article>
+
+          <article class="code-panel">
+            <div>
+              <h3>[tools.py](file:///G:/AIProduction_t6_2026/production/week3/alex/backend/researcher/tools.py) - Tool nạp dữ liệu với cơ chế Retry</h3>
+              <p>Mã nguồn định nghĩa công cụ nạp dữ liệu tri thức của Agent kèm theo bộ lọc retry tự động ngăn lỗi cold start của SageMaker.</p>
+            </div>
+            <pre><code># Hàm thô thực hiện gửi yêu cầu POST HTTP tới Ingest API Gateway
+def _ingest(document: Dict[str, Any]) -> Dict[str, Any]:
+    with httpx.Client() as client:
+        response = client.post(
+            ALEX_API_ENDPOINT,                # Endpoint API Gateway từ Day 4
+            json=document,
+            headers={"x-api-key": ALEX_API_KEY}, # Truyền API Key để bypass Usage Plan
+            timeout=30.0
+        )
+        response.raise_for_status()
+        return response.json()
+
+# Đính kèm bộ decorator retry từ thư viện tenacity
+@retry(
+    stop=stop_after_attempt(3),                              # Thử lại tối đa 3 lần trước khi báo lỗi thực sự
+    wait=wait_exponential(multiplier=1, min=1, max=10)       # Chờ lũy thừa: 1s, 2s, 4s...
+)
+def ingest_with_retries(document: Dict[str, Any]) -> Dict[str, Any]:
+    """Ingest với retry logic đề phòng lỗi SageMaker Endpoint đang khởi động lạnh (cold start)"""
+    return _ingest(document)
+
+# Khai báo decorator function_tool để Agent nhận diện được đây là một công cụ khả dụng
+@function_tool
+def ingest_financial_document(topic: str, analysis: str) -> Dict[str, Any]:
+    """Ingest a financial document into the Alex knowledge base."""
+    if not ALEX_API_ENDPOINT or not ALEX_API_KEY:
+        return {"success": False, "error": "Alex API not configured. Running in local mode."}
+    
+    document = {
+        "text": analysis,
+        "metadata": {
+            "topic": topic,
+            "timestamp": datetime.now(UTC).isoformat()
+        }
+    }
+    
+    try:
+        result = ingest_with_retries(document)
+        return {
+            "success": True,
+            "document_id": result.get("document_id"),
+            "message": f"Successfully ingested analysis for {topic}"
+        }
+    except Exception as e:
+        return {"success": False, "error": str(e)}</code></pre>
+          </article>
+
+          <article class="code-panel">
+            <div>
+              <h3>[mcp_servers.py](file:///G:/AIProduction_t6_2026/production/week3/alex/backend/researcher/mcp_servers.py) - Spawn Playwright MCP Stdio</h3>
+              <p>Hàm spawn tiến trình Playwright MCP Server chạy dưới dạng stdio trong container, tự động quét nhị phân trình duyệt Chromium.</p>
+            </div>
+            <pre><code>def create_playwright_mcp_server(timeout_seconds=120):
+    # Cấu hình các tham số chạy Chromium headless bảo mật trong Lambda container
+    args = [
+        "--headless",
+        "--isolated",
+        "--no-sandbox",
+        "--ignore-https-errors",
+        "--user-agent",
+        PLAYWRIGHT_USER_AGENT,
+    ]
+
+    # Quét thư mục tìm đường dẫn cài đặt thực tế của Chromium binary
+    chrome_paths = glob.glob(PLAYWRIGHT_BROWSER_GLOB)
+    if chrome_paths:
+        chrome_path = chrome_paths[0]
+        args.extend(["--executable-path", chrome_path])
+    else:
+        chrome_path = PLAYWRIGHT_BROWSER_FALLBACK
+        args.extend(["--executable-path", chrome_path])
+
+    # Thiết lập file config tạm thời cấu hình các launchOptions cho trình duyệt
+    config_path = "/tmp/playwright-mcp.config.json"
+    config = {
+        "browser": {
+            "launchOptions": {
+                "args": [
+                    "--single-process",   # Lambda chỉ hỗ trợ chạy đơn tiến trình tốt
+                    "--no-zygote",
+                    "--disable-gpu",       # Lambda container không có GPU vật lý
+                ]
+            }
+        }
+    }
+    with open(config_path, "w", encoding="utf-8") as config_file:
+        json.dump(config, config_file)
+
+    args.extend(["--config", config_path])
+
+    params = {
+        "command": "playwright-mcp",       # Lệnh CLI kích hoạt playwright-mcp toàn cục
+        "args": args,
+        "env": {"DEBUG": "pw:api,pw:browser*"},
+    }
+
+    # Trả về đối tượng MCPServerStdio để SDK quản lý giao tiếp qua stdin/stdout
+    return MCPServerStdio(params=params, client_session_timeout_seconds=timeout_seconds)</code></pre>
+          </article>
+
+          <article class="code-panel">
+            <div>
+              <h3>[main.tf](file:///G:/AIProduction_t6_2026/production/week3/alex/terraform/4_researcher/main.tf) - Khởi tạo Lambda và Scheduler</h3>
+              <p>Khai báo hạ tầng Lambda chạy ảnh Docker cùng cấu hình Lambda Scheduler Proxy gán EventBridge.</p>
+            </div>
+            <pre><code># 1. Lambda chạy bằng ảnh Docker kéo từ ECR repo
+resource "aws_lambda_function" "researcher" {
+  count         = local.researcher_deployed ? 1 : 0
+  function_name = "alex-researcher"
+  package_type  = "Image"              # Cấu hình loại package dạng ảnh container
+  image_uri     = var.researcher_image_uri
+  role          = aws_iam_role.researcher_lambda_role.arn
+  timeout       = 300                  # Tối đa 5 phút cho Agent duyệt web
+  memory_size   = 2048                 # 2GB RAM để chạy mượt mà Chromium headless
+  architectures = ["x86_64"]
+
+  ephemeral_storage {
+    size = 2048                        # Cấp phát 2GB dung lượng ổ đĩa /tmp
+  }
+
+  environment {
+    variables = {
+      OPENAI_API_KEY    = var.openai_api_key    # Tracing
+      ALEX_API_ENDPOINT = var.alex_api_endpoint # API Gateway Day 4
+      ALEX_API_KEY      = var.alex_api_key
+      BEDROCK_REGION    = var.bedrock_region
+      RESEARCHER_MODEL  = var.researcher_model
+    }
+  }
+}
+
+# 2. Lambda Scheduler làm nhiệm vụ Proxy trung gian tránh timeout 5 giây của EventBridge
+resource "aws_lambda_function" "scheduler_lambda" {
+  count         = local.scheduler_active ? 1 : 0
+  function_name = "alex-researcher-scheduler"
+  role          = aws_iam_role.lambda_scheduler_role[0].arn
+  filename      = "${path.module}/../../backend/scheduler/lambda_function.zip"
+  handler       = "lambda_function.handler"
+  runtime       = "python3.12"
+  timeout       = 180                  # Timeout 3 phút chờ Agent phản hồi xong
+  memory_size   = 256
+
+  environment {
+    variables = {
+      APP_RUNNER_URL = trimsuffix(aws_lambda_function_url.researcher[0].function_url, "/")
+    }
+  }
+}
+
+# 3. Lên lịch EventBridge Scheduler kích hoạt Lambda Proxy định kỳ
+resource "aws_scheduler_schedule" "research_schedule" {
+  count = local.scheduler_active ? 1 : 0
+  name  = "alex-research-schedule"
+
+  flexible_time_window {
+    mode = "OFF"                       # Tắt cửa sổ linh hoạt để chạy chuẩn mốc giờ
+  }
+
+  schedule_expression = "rate(2 hours)" # Kích hoạt mỗi 2 giờ một lần
+
+  target {
+    arn      = aws_lambda_function.scheduler_lambda[0].arn
+    role_arn = aws_iam_role.eventbridge_role[0].arn
+  }
+}</code></pre>
+          </article>
+        </section>
+
+        <section id="options" class="section">
+          <div class="section-title">
+            <div>
+              <div class="kicker">Section 8</div>
+              <h2>Options / Trade-offs - Bản đồ lựa chọn & Assignment</h2>
+            </div>
+          </div>
+          
+          <h3>Lựa chọn thiết kế hệ thống</h3>
+          <table>
+            <thead>
+              <tr>
+                <th>Lựa chọn kiến trúc</th>
+                <th>Phù hợp khi (Best for)</th>
+                <th>Đánh đổi (Trade-off)</th>
+                <th>Rủi ro (Risk)</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>Lựa chọn 1: EventBridge gọi trực tiếp Agent Function URL</strong><br/>Thiết lập EventBridge target trỏ trực tiếp đến URL của Lambda Agent.</td>
+                <td>Tác vụ ngắn hạn, API phản hồi ngay lập tức hoặc xử lý bất đồng bộ hoàn toàn (fire-and-forget).</td>
+                <td>Hệ thống liên tục báo lỗi Timeout do EventBridge chỉ chờ tối đa 5 giây cho API Destinations.</td>
+                <td>EventBridge kích hoạt retry liên tục gây spam tốn phí token Bedrock vô ích.</td>
+              </tr>
+              <tr>
+                <td><strong>Lựa chọn 2: Proxy Lambda Pattern (Lựa chọn của dự án)</strong><br/>Dùng Lambda Scheduler trung gian kích hoạt và chờ đợi Agent phản hồi.</td>
+                <td>(Recommended) Các tác vụ AI Agent hoặc crawl dữ liệu chạy đồng bộ cần theo dõi trạng thái hoàn thành.</td>
+                <td>Phải duy trì thêm một tệp zip code Lambda và cấu hình tài nguyên Terraform phụ trợ.</td>
+                <td>Làm tăng nhẹ thời gian triển khai hệ thống lúc ban đầu.</td>
+              </tr>
+              <tr>
+                <td><strong>Lựa chọn 3: Sử dụng Amazon Nova Lite</strong><br/>Cấu hình RESEARCHER_MODEL trỏ về dòng Nova Lite tiết kiệm.</td>
+                <td>Các tác vụ chatbot hỏi đáp hoặc tóm tắt văn bản thông thường không phức tạp.</td>
+                <td>Không đủ năng lực lập luận để xử lý tool calling phức tạp và tương tác với MCP server.</td>
+                <td>Agent rơi vào crash loop hoặc báo lỗi không chọn được công cụ phù hợp.</td>
+              </tr>
+            </tbody>
+          </table>
+
+          <h3 style="margin-top: 24px;">Week 3 Assignment Options - Hướng phát triển bài tập tuần 3</h3>
+          <p>
+            Kết thúc tuần 3 (hoàn thành 75% chặng đường), học viên được lựa chọn một trong ba hướng phát triển mở rộng hệ thống RAG:
+          </p>
+          <div class="grid-3" style="margin-top: 14px;">
+            <article class="card">
+              <h3>Hướng 1: Advanced AI Agent</h3>
+              <p>Tích hợp thêm các công cụ API chuyên nghiệp (như Polygon API để lấy dữ liệu chứng khoán thực tế), cải tiến kỹ thuật context engineering và cung cấp các công cụ quản lý danh sách việc cần làm (to-do list tools) cho tác tử.</p>
+              <p><strong>Dành cho:</strong> Ai muốn làm chuyên sâu về AI Agent Logic.</p>
+            </article>
+            <article class="card">
+              <h3>Hướng 2: Platform & DevOps</h3>
+              <p>Xây dựng hệ thống hàng đợi tác vụ chịu tải lớn sử dụng AWS SQS (Simple Queue Service), thiết lập cơ chế tự động thử lại (auto retry) và xử lý thư rác DLQ (Dead Letter Queue) khi cào web lỗi.</p>
+              <p><strong>Dành cho:</strong> Ai định hướng làm Cloud/DevOps AI Engineer.</p>
+            </article>
+            <article class="card">
+              <h3>Hướng 3: Data Engineering</h3>
+              <p>Chuẩn hóa cơ sở dữ liệu vector, thiết lập các schema nghiêm ngặt, tích hợp cơ sở dữ liệu Postgres bên ngoài thông qua Supabase và tối ưu hóa các bộ lọc tìm kiếm kết hợp (hybrid filters).</p>
+              <p><strong>Dành cho:</strong> Ai định hướng làm AI Data Engineer.</p>
+            </article>
+          </div>
+        </section>
+
+        <section id="pitfalls" class="section">
+          <div class="section-title">
+            <div>
+              <div class="kicker">Section 9</div>
+              <h2>Pitfalls - Lỗi / bẫy thường gặp</h2>
+            </div>
+          </div>
+          <div class="grid-2">
+            <article class="card">
+              <h3>Failure modes - Trường hợp dễ lỗi</h3>
+              <ul class="list">
+                <li><strong>Lỗi crash loop container trên AWS (Exit code 255):</strong> Image build thành công trên local và đẩy lên ECR, nhưng Lambda báo lỗi crash ngay khi start. Do build trên máy Mac M1/M2/M3 (chip ARM64) mà quên không cấu hình platform Linux AMD64.</li>
+                <li><strong>Lỗi Timeout 3 phút của Lambda Scheduler:</strong> Lịch trình chạy báo thất bại do Lambda Scheduler bị chết trước khi Agent kịp trả về phản hồi.</li>
+                <li><strong>Lỗi ModelNotSupported từ LiteLLM:</strong> Agent báo lỗi không tìm thấy mô hình hoặc tham số không hợp lệ khi gọi Bedrock.</li>
+                <li><strong>Phát sinh chi phí AWS khổng lồ ngoài ý muốn:</strong> Học viên để scheduler chạy liên tục qua đêm/cuối tuần khi không học.</li>
+              </ul>
+            </article>
+            <article class="card">
+              <h3>Fix / prevention - Cách khắc phục</h3>
+              <ul class="list">
+                <li><strong>Khắc phục platform:</strong> Bắt buộc dùng cờ <code>--platform linux/amd64</code> khi thực thi lệnh build Docker trong <code>deploy.py</code> và dòng <code>FROM</code> trong Dockerfile.</li>
+                <li><strong>Khắc phục timeout:</strong> Cấu hình thuộc tính <code>timeout</code> của Lambda Scheduler trong Terraform lên tối thiểu 180 giây (3 phút) hoặc 300 giây.</li>
+                <li><strong>Khắc phục region LiteLLM:</strong> Khai báo và gán giá trị đồng thời cho cả 3 biến môi trường <code>AWS_REGION_NAME</code>, <code>AWS_REGION</code> và <code>AWS_DEFAULT_REGION</code> trong mã nguồn Python.</li>
+                <li><strong>Khắc phục chi phí rác:</strong> Đặt cấu hình <code>scheduler_enabled = false</code> trong <code>terraform.tfvars</code> và chạy <code>terraform apply</code> để hủy scheduler. Hoặc chạy <code>terraform destroy</code> toàn bộ khi nghỉ cuối tuần.</li>
+              </ul>
+            </article>
+          </div>
+        </section>
+
+        <section id="flashcards" class="section">
+          <div class="section-title">
+            <div>
+              <div class="kicker">Section 10</div>
+              <h2>Flashcards / Q&A - Thẻ ôn tập</h2>
+            </div>
+          </div>
+          <div class="grid-2">
+            <article class="card flashcard">
+              <h3>Q: Tại sao AWS EventBridge không thể gọi trực tiếp public Function URL của Researcher Agent trong thực tế?</h3>
+              <button class="button primary" type="button" data-reveal>Reveal answer</button>
+              <p class="flash-answer"><strong>A:</strong> Do giới hạn timeout nghiêm ngặt của EventBridge Scheduler đối với các endpoint gọi HTTP tối đa chỉ là 5 giây, trong khi Researcher Agent cần từ 30s đến 90s để hoàn thành tác vụ duyệt web và phân tích.</p>
+            </article>
+            <article class="card flashcard">
+              <h3>Q: Sự khác nhau trong cấu hình của LiteLLM so với Boto3 khi chỉ định Region cho Bedrock là gì?</h3>
+              <button class="button primary" type="button" data-reveal>Reveal answer</button>
+              <p class="flash-answer"><strong>A:</strong> Boto3 sử dụng biến môi trường tiêu chuẩn `AWS_REGION` hoặc `AWS_DEFAULT_REGION`. Trong khi đó, thư viện LiteLLM bắt buộc lập trình viên phải khai báo biến `AWS_REGION_NAME` để nhận dạng đúng endpoint Bedrock.</p>
+            </article>
+            <article class="card flashcard">
+              <h3>Q: Cơ chế retry lũy thừa (tenacity) giải quyết vấn đề gì của SageMaker Serverless Endpoint?</h3>
+              <button class="button primary" type="button" data-reveal>Reveal answer</button>
+              <p class="flash-answer"><strong>A:</strong> Giải quyết vấn đề container bị tắt khi không có tải. Lần gọi đầu tiên của Agent sẽ đánh thức container (mất khoảng 10-15s khởi động lạnh gây lỗi timeout), cơ chế retry sẽ thử lại tự động ở giây thứ 1, 2, 4,... để hoàn tất cuộc gọi khi container đã active.</p>
+            </article>
+            <article class="card flashcard">
+              <h3>Q: Giải thích bài toán "chicken-and-egg" khi deploy Lambda container và cách giải quyết?</h3>
+              <button class="button primary" type="button" data-reveal>Reveal answer</button>
+              <p class="flash-answer"><strong>A:</strong> Vòng lặp: Lambda cần image trên ECR để khởi tạo, nhưng ECR repository lại được quản lý bởi chính Terraform. Cách giải quyết: dùng lệnh `terraform apply -target=...` chỉ tạo riêng ECR repository trước, build/push image lên, sau đó mới apply toàn phần.</p>
+            </article>
+            <article class="card">
+              <h3>Quick quiz - Câu hỏi trắc nghiệm</h3>
+              <p>Mô hình dữ liệu phân tầng nào được giới thiệu để tổ chức kho tri thức của hệ thống RAG trong Alex?</p>
+              <div class="quiz-options">
+                <button class="button quiz-option" type="button" data-correct="false">A. Snowflake Architecture</button>
+                <button class="button quiz-option" type="button" data-correct="true">B. Medallion Architecture (Bronze, Silver, Gold)</button>
+                <button class="button quiz-option" type="button" data-correct="false">C. Star Schema Model</button>
+                <button class="button quiz-option" type="button" data-correct="false">D. Lambda Architecture</button>
+              </div>
+              <div class="quiz-result" aria-live="polite"></div>
+            </article>
+          </div>
+        </section>
+
+        <section id="memory" class="section">
+          <div class="section-title">
+            <div>
+              <div class="kicker">Section 11</div>
+              <h2>Quick Memory - Ôn nhanh cuối bài</h2>
+            </div>
+          </div>
+          <div class="grid-2">
+            <article class="card">
+              <h3>Must remember - Phải nhớ</h3>
+              <ol class="list">
+                <li>ETL là viết tắt của **Extract (trích xuất), Transform (chuyển đổi), Load (nạp)**.</li>
+                <li>Hạn mức số lượt chạy tối đa (max turns) mặc định của Agent là 15 để tránh lặp vô hạn.</li>
+                <li>Dòng mô hình được khuyến nghị sử dụng cho Agent là **Amazon Nova Pro** do hỗ trợ tốt tool calling và MCP.</li>
+                <li>Để gỡ bỏ lịch trình ngầm tránh tốn credit AWS: sửa `scheduler_enabled = false` và chạy `terraform apply`.</li>
+              </ol>
+            </article>
+            <article class="card">
+              <h3>Self-check - Tự kiểm tra</h3>
+              <ul class="list">
+                <li>Bạn có giải thích được vai trò của từng layer trong file Dockerfile của Researcher không?</li>
+                <li>Làm thế nào để theo dõi vết (tracing) hoạt động của tác tử trong môi trường production?</li>
+                <li>Mô tả cách thức hoạt động của công cụ cào web Playwright MCP trong container.</li>
+              </ul>
+            </article>
+          </div>
+        </section>
+
+        <footer class="footer">
+          <strong>Study note:</strong> Hướng dẫn học tập này được tự động tạo lập dựa trên tài nguyên khóa học AI in Production. Mọi kiến thức mở rộng ngoài chương trình đều được chú thích rõ ràng.
+        </footer>
+      </main>
+    </div>
+  </div>
+
+  <script>
+    const links = Array.from(document.querySelectorAll(".toc a"));
+    const sections = links.map((link) => document.querySelector(link.getAttribute("href"))).filter(Boolean);
+    const progressBar = document.getElementById("progressBar");
+    const detailsNodes = Array.from(document.querySelectorAll("details"));
+
+    function setActiveLink() {
+      let current = sections[0]?.id;
+      const offset = window.scrollY + 170;
+      for (const section of sections) {
+        if (section.offsetTop <= offset) {
+          current = section.id;
+        }
+      }
+      links.forEach((link) => {
+        link.classList.toggle("active", link.getAttribute("href") === `#${current}`);
+      });
+    }
+
+    function updateProgress() {
+      const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+      const progress = docHeight > 0 ? Math.min((window.scrollY / docHeight) * 100, 100) : 0;
+      progressBar.style.width = `${progress}%`;
+    }
+
+    document.getElementById("expandAll").addEventListener("click", () => {
+      detailsNodes.forEach((node) => {
+        node.open = true;
+      });
+    });
+
+    document.getElementById("collapseAll").addEventListener("click", () => {
+      detailsNodes.forEach((node) => {
+        node.open = false;
+      });
+    });
+
+    document.querySelectorAll("[data-reveal]").forEach((button) => {
+      button.addEventListener("click", () => {
+        const card = button.closest(".flashcard");
+        card.classList.toggle("revealed");
+        button.innerText = card.classList.contains("revealed") ? "Hide answer" : "Reveal answer";
+      });
+    });
+
+    document.querySelectorAll(".quiz-option").forEach((button) => {
+      button.addEventListener("click", () => {
+        const result = button.closest(".card").querySelector(".quiz-result");
+        if (button.dataset.correct === "true") {
+          result.style.color = "var(--accent-teal)";
+          result.innerText = "Chính xác! Medallion chia cấu trúc dữ liệu thành Bronze (Raw HTML thô cào được), Silver (LLM tóm tắt làm sạch), và Gold (Vector nhúng lập chỉ mục sẵn sàng truy vấn RAG).";
+        } else {
+          result.style.color = "var(--primary-active)";
+          result.innerText = "Chưa chính xác. Đọc lại phần Medallion Architecture trong mục Core Theory.";
+        }
+      });
+    });
+
+    window.addEventListener("scroll", () => {
+      setActiveLink();
+      updateProgress();
+    }, { passive: true });
+
+    setActiveLink();
+    updateProgress();
+  </script>
+</body>
+
+</html>

@@ -1,0 +1,1332 @@
+<!doctype html>
+<html lang="vi">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Nền Tảng ALEX: Vector Ingestion Pipeline & S3 Vectors - Study Guide</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+  <style>
+    :root {
+      --canvas: #faf9f5;
+      --surface-soft: #f5f0e8;
+      --surface-card: #efe9de;
+      --surface-strong: #e8e0d2;
+      --surface-dark: #181715;
+      --surface-dark-elevated: #252320;
+      --surface-dark-soft: #1f1e1b;
+      --hairline: #e6dfd8;
+      --hairline-soft: #ebe6df;
+      --ink: #141413;
+      --body: #3d3d3a;
+      --body-strong: #252523;
+      --muted: #6c6a64;
+      --muted-soft: #8e8b82;
+      --primary: #cc785c;
+      --primary-active: #a9583e;
+      --accent-teal: #5db8a6;
+      --accent-amber: #e8a55a;
+      --on-dark: #faf9f5;
+      --on-dark-soft: #a09d96;
+      --radius-md: 8px;
+      --radius-lg: 12px;
+      --radius-xl: 16px;
+      --content: 1200px;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      margin: 0;
+      background: var(--canvas);
+      color: var(--body);
+      font-family: 'Inter', "Segoe UI", Arial, sans-serif;
+      line-height: 1.62;
+    }
+
+    h1,
+    h2 {
+      color: var(--ink);
+      font-family: 'Cormorant Garamond', Cambria, "Noto Serif", serif;
+      font-weight: 600;
+      letter-spacing: -0.02em;
+      line-height: 1.1;
+      margin: 0;
+    }
+
+    h1 {
+      font-size: clamp(2.2rem, 4.5vw, 3.8rem);
+      max-width: 25ch;
+    }
+
+    h2 {
+      font-size: clamp(1.6rem, 2.8vw, 2.2rem);
+      border-bottom: 1px solid var(--hairline-soft);
+      padding-bottom: 8px;
+    }
+
+    h3 {
+      color: var(--ink);
+      font-family: 'Inter', sans-serif;
+      font-size: 1.1rem;
+      font-weight: 600;
+      line-height: 1.35;
+      margin: 0;
+    }
+
+    p,
+    li {
+      margin: 0;
+    }
+
+    code {
+      border-radius: 6px;
+      background: var(--surface-strong);
+      color: var(--body-strong);
+      font-family: "JetBrains Mono", Consolas, monospace;
+      font-size: 0.9em;
+      padding: 2px 6px;
+    }
+
+    pre {
+      margin: 0;
+      overflow-x: auto;
+      border-radius: var(--radius-lg);
+      background: var(--surface-dark-soft);
+      color: var(--on-dark);
+      padding: 18px;
+      font-family: "JetBrains Mono", Consolas, monospace;
+      font-size: 13px;
+      line-height: 1.58;
+      white-space: pre;
+    }
+
+    pre code {
+      background: transparent;
+      color: inherit;
+      padding: 0;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.95rem;
+      margin-top: 14px;
+      background: var(--canvas);
+    }
+
+    th,
+    td {
+      border-bottom: 1px solid var(--hairline);
+      padding: 12px 16px;
+      text-align: left;
+      vertical-align: top;
+    }
+
+    th {
+      color: var(--ink);
+      background: var(--surface-soft);
+      font-weight: 700;
+    }
+
+    .page {
+      max-width: var(--content);
+      margin: 0 auto;
+      padding: 30px 20px 64px;
+    }
+
+    .hero {
+      display: grid;
+      grid-template-columns: minmax(0, 1.2fr) minmax(320px, 0.8fr);
+      gap: 28px;
+      align-items: stretch;
+      padding: 40px;
+      border: 1px solid var(--hairline);
+      border-radius: var(--radius-xl);
+      background: var(--surface-soft);
+    }
+
+    .hero-copy {
+      display: grid;
+      gap: 18px;
+      align-content: start;
+    }
+
+    .eyebrow {
+      width: fit-content;
+      border-radius: 999px;
+      background: var(--primary);
+      color: white;
+      font-size: 0.75rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      padding: 6px 12px;
+      text-transform: uppercase;
+    }
+
+    .lead {
+      max-width: 72ch;
+      color: var(--body-strong);
+      font-size: 1.1rem;
+    }
+
+    .tag-row,
+    .source-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .tag,
+    .source {
+      display: inline-flex;
+      align-items: center;
+      border-radius: 999px;
+      font-size: 0.82rem;
+      font-weight: 600;
+      padding: 5px 12px;
+    }
+
+    .tag {
+      background: var(--surface-card);
+      color: var(--ink);
+      border: 1px solid var(--hairline-soft);
+    }
+
+    .source {
+      border: 1px solid var(--hairline);
+      background: var(--canvas);
+      color: var(--muted);
+    }
+
+    .source.extended {
+      border-color: rgba(204, 120, 92, 0.38);
+      background: rgba(204, 120, 92, 0.12);
+      color: var(--primary-active);
+    }
+
+    .hero-panel,
+    .code-panel {
+      border-radius: var(--radius-lg);
+      background: var(--surface-dark);
+      color: var(--on-dark);
+      padding: 24px;
+    }
+
+    .hero-panel {
+      display: grid;
+      gap: 16px;
+      align-content: start;
+    }
+
+    .hero-panel h2,
+    .hero-panel h3,
+    .code-panel h3 {
+      color: var(--on-dark);
+      border: none;
+      padding: 0;
+    }
+
+    .hero-panel p,
+    .hero-panel li,
+    .code-panel p,
+    .code-panel li {
+      color: var(--on-dark-soft);
+    }
+
+    .progress-track {
+      height: 8px;
+      overflow: hidden;
+      border-radius: 999px;
+      background: var(--surface-dark-elevated);
+    }
+
+    .progress-bar {
+      width: 0;
+      height: 100%;
+      background: var(--primary);
+      transition: width 0.1s ease;
+    }
+
+    .layout {
+      display: grid;
+      grid-template-columns: 260px minmax(0, 1fr);
+      gap: 24px;
+      align-items: start;
+      margin-top: 26px;
+    }
+
+    .toc {
+      position: sticky;
+      top: 20px;
+      border: 1px solid var(--hairline);
+      border-radius: var(--radius-lg);
+      background: var(--canvas);
+      padding: 18px;
+    }
+
+    .toc h2 {
+      font-family: 'Inter', sans-serif;
+      font-size: 1rem;
+      font-weight: 700;
+      border: none;
+      padding: 0;
+      margin-bottom: 12px;
+    }
+
+    .toc nav {
+      display: grid;
+      gap: 4px;
+    }
+
+    .toc a {
+      border-radius: var(--radius-md);
+      color: var(--muted);
+      padding: 6px 10px;
+      text-decoration: none;
+      font-size: 0.9rem;
+      font-weight: 500;
+      transition: all 0.2s ease;
+    }
+
+    .toc a:hover,
+    .toc a.active {
+      background: var(--surface-card);
+      color: var(--ink);
+      font-weight: 600;
+    }
+
+    .toc-tools {
+      display: grid;
+      gap: 8px;
+      margin-top: 16px;
+      padding-top: 16px;
+      border-top: 1px solid var(--hairline);
+    }
+
+    .button {
+      min-height: 40px;
+      border: 1px solid var(--hairline);
+      border-radius: var(--radius-md);
+      background: var(--canvas);
+      color: var(--ink);
+      cursor: pointer;
+      font: inherit;
+      font-size: 0.9rem;
+      font-weight: 600;
+      padding: 10px 14px;
+      transition: all 0.2s ease;
+    }
+
+    .button:hover {
+      background: var(--surface-card);
+    }
+
+    .button.primary {
+      border-color: var(--primary);
+      background: var(--primary);
+      color: white;
+    }
+
+    .button.primary:hover {
+      background: var(--primary-active);
+    }
+
+    .content {
+      display: grid;
+      gap: 24px;
+    }
+
+    .section {
+      border: 1px solid var(--hairline);
+      border-radius: var(--radius-lg);
+      background: var(--canvas);
+      padding: 32px;
+    }
+
+    .section-title {
+      display: flex;
+      justify-content: space-between;
+      gap: 16px;
+      align-items: start;
+      margin-bottom: 20px;
+    }
+
+    .kicker {
+      color: var(--primary-active);
+      font-size: 0.76rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      margin-bottom: 6px;
+      text-transform: uppercase;
+    }
+
+    .grid-2,
+    .grid-3 {
+      display: grid;
+      gap: 16px;
+    }
+
+    .grid-2 {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .grid-3 {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+
+    .card,
+    details {
+      border: 1px solid var(--hairline);
+      border-radius: var(--radius-lg);
+      background: var(--surface-card);
+      padding: 20px;
+    }
+
+    .card h3 {
+      margin-bottom: 10px;
+    }
+
+    .card p,
+    .card ul,
+    .card ol,
+    details p,
+    details ul,
+    details ol {
+      margin-top: 8px;
+    }
+
+    .list {
+      padding-left: 20px;
+    }
+
+    .list li + li {
+      margin-top: 6px;
+    }
+
+    details {
+      margin-top: 14px;
+      background: var(--canvas);
+    }
+
+    summary {
+      color: var(--ink);
+      cursor: pointer;
+      font-weight: 700;
+      outline: none;
+    }
+
+    .callout {
+      border-left: 4px solid var(--primary);
+      border-radius: var(--radius-md);
+      background: var(--surface-soft);
+      padding: 14px 18px;
+      margin-top: 14px;
+    }
+
+    .code-panel {
+      display: grid;
+      gap: 14px;
+      margin-top: 16px;
+    }
+
+    .code-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      color: var(--on-dark-soft);
+      font-size: 0.86rem;
+    }
+
+    .code-meta span {
+      background: var(--surface-dark-elevated);
+      padding: 2px 8px;
+      border-radius: 4px;
+    }
+
+    .flashcard {
+      display: grid;
+      gap: 12px;
+      align-content: space-between;
+    }
+
+    .flash-answer {
+      display: none;
+      border-top: 1px solid var(--hairline);
+      padding-top: 12px;
+      margin-top: 12px;
+      color: var(--body-strong);
+    }
+
+    .flashcard.revealed .flash-answer {
+      display: block;
+    }
+
+    .quiz-options {
+      display: grid;
+      gap: 8px;
+      margin-top: 12px;
+    }
+
+    .quiz-option {
+      display: block;
+      width: 100%;
+      text-align: left;
+      font-weight: 500;
+    }
+
+    .quiz-result {
+      min-height: 24px;
+      margin-top: 12px;
+      color: var(--primary-active);
+      font-weight: 700;
+      font-size: 0.95rem;
+    }
+
+    .mermaid-container {
+      background: var(--canvas);
+      border: 1px solid var(--hairline);
+      border-radius: var(--radius-lg);
+      padding: 20px;
+      margin-top: 16px;
+      overflow-x: auto;
+      display: flex;
+      justify-content: flex-start;
+    }
+
+    .mermaid-container .mermaid {
+      min-width: 1200px;
+      width: 100%;
+      display: flex;
+      justify-content: center;
+    }
+
+    .mermaid-container .mermaid svg {
+      max-width: 100% !important;
+      width: 100% !important;
+      height: auto !important;
+    }
+
+    .footer {
+      border-radius: var(--radius-lg);
+      background: var(--surface-dark);
+      color: var(--on-dark-soft);
+      padding: 32px;
+      margin-top: 32px;
+      font-size: 0.9rem;
+    }
+
+    .footer strong {
+      color: var(--on-dark);
+    }
+
+    @media (max-width: 900px) {
+      .hero,
+      .layout,
+      .grid-2,
+      .grid-3 {
+        grid-template-columns: 1fr;
+      }
+
+      .toc {
+        position: static;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="page">
+    <header class="hero">
+      <div class="hero-copy">
+        <span class="eyebrow">Study guide</span>
+        <h1>Nền Tảng ALEX: Vector Ingestion Pipeline & S3 Vectors</h1>
+        <p class="lead">
+          Khám phá quy trình xây dựng đường ống nạp dữ liệu vector tự động cho Alex, tích hợp API Gateway bảo mật bằng API Key và tối ưu hóa chi phí đến 90% bằng cách lưu trữ trực tiếp trong S3 Vectors bản địa.
+        </p>
+        <div class="tag-row">
+          <span class="tag">AI Engineer Production Track</span>
+          <span class="tag">Day 4 - Vector Storage</span>
+          <span class="tag">Week 3: Research Infrastructure</span>
+        </div>
+        <div class="source-row">
+          <span class="source">Docx LLM (day4_summary.md)</span>
+          <span class="source">Slide (Production W3D4.pdf)</span>
+          <span class="source">Code (ingest lambda & terraform)</span>
+          <span class="source extended">Knowledge extension</span>
+        </div>
+      </div>
+      <aside class="hero-panel">
+        <h2>Quick focus - Điểm tập trung</h2>
+        <ul class="list">
+          <li><strong>S3 Vectors:</strong> Native vector storage giúp tiết kiệm chi phí cực lớn (~$20-30/tháng) so với OpenSearch.</li>
+          <li><strong>Lambda Packaging:</strong> Đóng gói dependencies và handler tự động bằng <code>package.py</code> qua uv.</li>
+          <li><strong>API Security:</strong> Cấu hình API Key và Usage Plan (Throttling 100, Burst 200) chống spam API.</li>
+        </ul>
+        <div>
+          <p style="margin-bottom: 8px; font-weight: 600;">Reading progress - Tiến độ đọc bài</p>
+          <div class="progress-track" aria-label="Reading progress">
+            <div class="progress-bar" id="progressBar"></div>
+          </div>
+        </div>
+      </aside>
+    </header>
+
+    <div class="layout">
+      <aside class="toc">
+        <h2>Navigation - Mục lục</h2>
+        <nav>
+          <a href="#source-map">1. Source Map</a>
+          <a href="#cheat-sheet">2. Cheat Sheet</a>
+          <a href="#previous-context">3. Previous Context</a>
+          <a href="#core-theory">4. Core Theory</a>
+          <a href="#workflow">5. Workflow / Pipeline</a>
+          <a href="#techniques">6. Techniques</a>
+          <a href="#code-walkthrough">7. Code Walkthrough</a>
+          <a href="#options">8. Options / Trade-offs</a>
+          <a href="#pitfalls">9. Pitfalls</a>
+          <a href="#flashcards">10. Flashcards / Quiz</a>
+          <a href="#memory">11. Quick Memory</a>
+        </nav>
+        <div class="toc-tools">
+          <button class="button" type="button" id="expandAll">Expand notes</button>
+          <button class="button" type="button" id="collapseAll">Collapse notes</button>
+        </div>
+      </aside>
+
+      <main class="content">
+        <section id="source-map" class="section">
+          <div class="section-title">
+            <div>
+              <div class="kicker">Section 1</div>
+              <h2>Source Map - Bản đồ nguồn</h2>
+            </div>
+          </div>
+          <div class="grid-2">
+            <article class="card">
+              <h3>Sources used - Nguồn đã dùng</h3>
+              <ul class="list">
+                <li><strong>Docx LLM:</strong> Sử dụng tóm tắt từ file [day4_summary.md](file:///G:/AIProduction_t6_2026/production/tai_lieu/week3/day4_summary.md).</li>
+                <li><strong>Slide:</strong> Dựa trên slide học trình `Production W3D4.pdf` mô tả luồng Ingestion Pipeline.</li>
+                <li><strong>Code:</strong> Phân tích [3_ingest.md](file:///G:/AIProduction_t6_2026/production/week3/alex/guides/3_ingest.md) và các file code trong thư mục [ingest](file:///G:/AIProduction_t6_2026/production/week3/alex/backend/ingest) và [3_ingestion](file:///G:/AIProduction_t6_2026/production/week3/alex/terraform/3_ingestion).</li>
+              </ul>
+            </article>
+            <article class="card">
+              <h3>Grounding notes - Ghi chú căn cứ</h3>
+              <p>
+                Bài học này kết hợp chặt chẽ giữa tài liệu lý thuyết, tài liệu hướng dẫn triển khai, và các tệp mã nguồn Python / Terraform thực tế. Các giải thuật tìm kiếm ẩn dưới S3 Vectors (HNSW) được chú thích là kiến thức mở rộng giúp học viên tăng cường chuyên môn.
+              </p>
+            </article>
+          </div>
+          <div class="callout">
+            <strong>Terminology rule - Quy tắc thuật ngữ:</strong> Cụm thuật ngữ kỹ thuật được biểu diễn dạng
+            <code>English - nghĩa tiếng Việt</code>. Các từ đơn phổ biến được viết dạng <code>word (nghĩa)</code>.
+            Ví dụ: <code>Semantic search - tìm kiếm ngữ nghĩa</code>, <code>exact keyword match - khớp chính xác từ khóa</code>.
+          </div>
+        </section>
+
+        <section id="cheat-sheet" class="section">
+          <div class="section-title">
+            <div>
+              <div class="kicker">Section 2</div>
+              <h2>Cheat Sheet - Tóm tắt một trang</h2>
+            </div>
+          </div>
+          <div class="grid-3">
+            <article class="card">
+              <h3>Core idea - Ý chính</h3>
+              <p>
+                Xây dựng đường ống nạp dữ liệu vector (embeddings) cho Alex bằng cách kết hợp API Gateway, Lambda function, SageMaker Serverless Endpoint và kho lưu trữ S3 Vectors. Việc sử dụng S3 Vectors giúp thay thế cụm OpenSearch Serverless đắt đỏ, giảm 90% chi phí vận hành cho môi trường phát triển và thử nghiệm.
+              </p>
+            </article>
+            <article class="card">
+              <h3>Must know - Cần nhớ</h3>
+              <ul class="list">
+                <li>S3 Vector Bucket được tạo thủ công (stateful resource) để bảo toàn dữ liệu khi hủy/tạo các tài nguyên stateless qua Terraform.</li>
+                <li>Hành vi nạp vector lên S3 yêu cầu bóc tách mảng lồng 3 lớp từ SageMaker <code>[[[embedding]]]</code> về mảng 1 chiều chứa 384 số thực.</li>
+                <li>Kiểm thử End-to-End theo quy trình: Kiểm tra rỗng -> Nạp dữ liệu -> Truy vấn ngữ nghĩa (1 - Cosine Distance).</li>
+              </ul>
+            </article>
+            <article class="card">
+              <h3>Use in practice - Dùng khi nào</h3>
+              <p>
+                Dùng để tự động hóa việc đưa các bài viết phân tích, báo cáo thị trường vào kho tri thức phục vụ cho RAG (Retrieval-Augmented Generation), giúp Planner Agent tra cứu thông tin nhanh chóng với chi phí tối thiểu.
+              </p>
+            </article>
+          </div>
+        </section>
+
+        <section id="previous-context" class="section">
+          <div class="section-title">
+            <div>
+              <div class="kicker">Section 3</div>
+              <h2>Previous Context - Liên hệ với bài trước</h2>
+            </div>
+          </div>
+          <div class="callout">
+            Day 4 sử dụng trực tiếp kết quả của **Day 3** (SageMaker Serverless Endpoint chạy mô hình `all-MiniLM-L6-v2`). Cấu hình tên endpoint `alex-embedding-endpoint` được lưu vào biến môi trường của Lambda để thực hiện cuộc gọi invoke sinh vector biểu diễn ngữ nghĩa cho văn bản thô.
+          </div>
+        </section>
+
+        <section id="core-theory" class="section">
+          <div class="section-title">
+            <div>
+              <div class="kicker">Section 4</div>
+              <h2>Core Theory - Lý thuyết cốt lõi</h2>
+            </div>
+            <div class="source-row">
+              <span class="source">Docx LLM</span>
+              <span class="source">Slide</span>
+            </div>
+          </div>
+          <div class="grid-2">
+            <article class="card">
+              <h3>Key concepts - Khái niệm chính</h3>
+              <ul class="list">
+                <li><strong>Stateful vs Stateless Resources - Tài nguyên có trạng thái và không trạng thái:</strong> Tài nguyên stateful (S3 Vector bucket, DB) lưu trữ dữ liệu bền vững cần được bảo vệ. Tài nguyên stateless (Lambda, API Gateway) có thể phá hủy và tái tạo tự động bằng mã nguồn hạ tầng.</li>
+                <li><strong>Cosine similarity - Độ tương đồng Cosine:</strong> Phép đo hướng của hai vector trong không gian đa chiều, đánh giá độ gần gũi ngữ nghĩa từ -1 đến 1 (càng gần 1 càng đồng nghĩa).</li>
+                <li><strong>Lambda Deployment Package - Gói triển khai Lambda:</strong> File nén `.zip` chứa mã nguồn và toàn bộ dependencies giúp Lambda thực thi độc lập trên môi trường đám mây AWS.</li>
+                <li><strong>Usage Plan - Kế hoạch sử dụng:</strong> Cơ chế kiểm soát API Gateway, liên kết API Key với các giới hạn về lưu lượng gọi (quota) và tốc độ gọi (throttling/burst).</li>
+                <li><strong>Throttling and Burst - Điều tiết và Bùng nổ:</strong> Cơ chế chống quá tải. Rate limit (số yêu cầu trung bình mỗi giây) và Burst limit (số yêu cầu xử lý ngay lập tức tại một thời điểm rất ngắn).</li>
+              </ul>
+            </article>
+            <article class="card">
+              <h3>S3 Vectors vs OpenSearch Serverless</h3>
+              <table style="margin-top: 0;">
+                <thead>
+                  <tr>
+                    <th>Đặc trưng</th>
+                    <th>S3 Vectors</th>
+                    <th>OpenSearch Serverless</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><strong>Chi phí (Cost)</strong></td>
+                    <td>Rất rẻ (~$20-30/tháng) nhờ co giãn về 0.</td>
+                    <td>Rất đắt (~$200-300/tháng) do phí duy trì cụm tối thiểu.</td>
+                  </tr>
+                  <tr>
+                    <td><strong>Độ phức tạp</strong></td>
+                    <td>Rất đơn giản, tích hợp trực tiếp trên S3 Console.</td>
+                    <td>Cao, yêu cầu cấu hình mạng VPC, bảo mật và quyền truy cập phức tạp.</td>
+                  </tr>
+                  <tr>
+                    <td><strong>Độ trễ</strong></td>
+                    <td>Trung bình/Thấp (phụ thuộc S3 I/O).</td>
+                    <td>Cực kỳ thấp (tối ưu hóa bộ nhớ đệm).</td>
+                  </tr>
+                  <tr>
+                    <td><strong>Tính năng</strong></td>
+                    <td>Hỗ trợ thuật toán tìm kiếm khoảng cách cơ bản.</td>
+                    <td>Hỗ trợ tìm kiếm kết hợp (hybrid search), bộ lọc văn bản chuyên sâu.</td>
+                  </tr>
+                </tbody>
+              </table>
+            </article>
+          </div>
+          <details>
+            <summary>Deep explanation - Giải thuật tìm kiếm lân cận HNSW trên S3 Vectors</summary>
+            <div class="callout" style="margin-top: 8px;">
+              <span class="source.extended" style="float: right; font-size: 0.75rem; padding: 2px 8px;">Kiến thức mở rộng</span>
+              <p><strong>Hierarchical Navigable Small World (HNSW):</strong> Là giải thuật tìm kiếm lân cận gần đúng (Approximate Nearest Neighbor - ANN) được tích hợp trực tiếp dưới tầng lưu trữ vật lý của S3 Vectors.</p>
+              <p style="margin-top: 8px;">Cách thức hoạt động:</p>
+              <ul class="list">
+                <li>HNSW xây dựng một cấu trúc đồ thị phân cấp nhiều lớp (tương tự skip-list). Lớp trên cùng chứa các nút thưa thớt giúp định tuyến nhanh đến khu vực gần đúng của vector truy vấn.</li>
+                <li>Càng xuống lớp dưới, mật độ nút càng dày đặc để tìm kiếm chi tiết. Điều này cho phép S3 Vectors thực hiện tìm kiếm ngữ nghĩa trong thời gian mili-giây trên hàng triệu vector mà không cần quét tuyến tính qua tất cả các đối tượng S3, khắc phục nhược điểm về tốc độ đọc/ghi của S3 thô.</li>
+              </ul>
+            </div>
+          </details>
+        </section>
+
+        <section id="workflow" class="section">
+          <div class="section-title">
+            <div>
+              <div class="kicker">Section 5</div>
+              <h2>Workflow / Pipeline - Quy trình / luồng hoạt động</h2>
+            </div>
+            <div class="source-row">
+              <span class="source">Docx LLM</span>
+              <span class="source">Slide</span>
+              <span class="source">Code</span>
+            </div>
+          </div>
+
+          <h3>Sơ đồ Luồng Nạp và Tra Cứu Dữ Liệu RAG (End-to-End Day 4 Ingestion Pipeline)</h3>
+          <div class="mermaid-container">
+            <div class="mermaid">
+              graph TB
+                subgraph Scheduled_Crawl["1. Thu thập dữ liệu chủ động (Scheduler)"]
+                  EB["EventBridge Scheduler"] -->|"Kích hoạt mỗi 2h"| Sched["alex-scheduler Lambda"]
+                  Sched -->|"Gọi POST /research/auto"| AR["App Runner: alex-researcher"]
+                  AR -->|"Duyệt web crawl"| Playwright["Playwright MCP Server"]
+                  AR -->|"Tóm tắt phân tích"| Bedrock["AWS Bedrock: Nova Pro"]
+                end
+
+                subgraph Ingest_Pipeline["2. Đẩy dữ liệu qua Ingest Pipeline (Day 4 Focus)"]
+                  AR -->|"Văn bản + Metadata"| APIGW["API Gateway REST API"]
+                  APIGW -->|"Kiểm tra x-api-key & Usage Plan"| APIGW_Verify{"Auth & Rate Limit"}
+                  APIGW_Verify -->|"Hợp lệ (AWS PROXY)"| IngestLambda["alex-ingest Lambda"]
+                  IngestLambda -->|"Gửi văn bản"| SM["SageMaker Serverless Endpoint <br/> all-MiniLM-L6-v2"]
+                  SM -->|"Trả về embedding vector"| IngestLambda
+                  IngestLambda -->|"Unpack & lưu trữ"| S3Vectors[("S3 Vectors Bucket")]
+                end
+
+                subgraph Semantic_Search_Test["3. Kiểm thử truy vấn ngữ nghĩa"]
+                  TestScript["test_search_s3vectors.py"] -->|"1. Gọi embed"| SM
+                  TestScript -->|"2. Query queryVector"| S3Vectors
+                  S3Vectors -->|"Trả về distance"| TestScript
+                  TestScript -->|"Tính toán 1 - distance"| Show["Hiển thị Similarity Score"]
+                end
+
+                classDef highlight fill:#efe9de,stroke:#cc785c,stroke-width:2px
+                classDef focus fill:#ffece6,stroke:#cc785c,stroke-width:2px
+                class SM,S3Vectors focus
+                style Ingest_Pipeline fill:#ffece6,stroke:#cc785c,stroke-width:2px
+            </div>
+          </div>
+
+          <h3 style="margin-top: 24px;">End-to-End Detailed Workflow Walkthrough (Mô tả chi tiết luồng hoạt động)</h3>
+          <p>
+            Dưới đây là chi tiết từng bước hoạt động của hệ thống từ khâu đóng gói mã nguồn đến khâu kiểm thử tìm kiếm ngữ nghĩa:
+          </p>
+
+          <details>
+            <summary>Bước 1: Đóng gói mã nguồn Lambda bằng package.py</summary>
+            <ol class="list" style="margin-top: 8px;">
+              <li>Học viên thực hiện chạy lệnh <code>uv run package.py</code> trong thư mục [ingest](file:///G:/AIProduction_t6_2026/production/week3/alex/backend/ingest).</li>
+              <li>Hàm <code>create_deployment_package()</code> khởi chạy:
+                <ul class="list" style="margin-top: 4px;">
+                  <li>Xóa các thư mục build cũ và tệp tin <code>lambda_function.zip</code> nếu có.</li>
+                  <li>Tạo thư mục tạm <code>build/package/</code>.</li>
+                  <li>Sử dụng thư viện <code>pathlib</code> để tìm kiếm thư mục dependencies <code>site-packages</code> trong môi trường ảo <code>.venv</code> cục bộ của <code>uv</code>.</li>
+                  <li>Sao chép toàn bộ thư viện phụ thuộc (phục vụ cho việc gọi API của S3 Vectors) vào thư mục tạm.</li>
+                  <li>Sao chép file handler chính [ingest_s3vectors.py](file:///G:/AIProduction_t6_2026/production/week3/alex/backend/ingest/ingest_s3vectors.py) vào thư mục tạm.</li>
+                  <li>Sử dụng thư viện <code>zipfile</code> để nén toàn bộ thành tệp <code>lambda_function.zip</code> (dung lượng ~15MB) và tự động xóa bỏ thư mục build tạm thời.</li>
+                </ul>
+              </li>
+            </ol>
+          </details>
+
+          <details>
+            <summary>Bước 2: Triển khai hạ tầng bằng Terraform</summary>
+            <ol class="list" style="margin-top: 8px;">
+              <li>Người dùng di chuyển vào thư mục [3_ingestion](file:///G:/AIProduction_t6_2026/production/week3/alex/terraform/3_ingestion), cấu hình tệp <code>terraform.tfvars</code> với vùng AWS và tên endpoint SageMaker từ Day 3.</li>
+              <li>Chạy <code>terraform apply</code> để khởi tạo:
+                <ul class="list" style="margin-top: 4px;">
+                  <li>Tạo IAM Role <code>alex-ingest-lambda-role</code> và đính kèm chính sách gán quyền tối giản (logs, đọc/ghi S3 vectors, invoke SageMaker).</li>
+                  <li>Triển khai Lambda function <code>alex-ingest</code> nạp trực tiếp file zip <code>lambda_function.zip</code> vừa được đóng gói.</li>
+                  <li>Tạo API Gateway REST API <code>alex-api</code> và phương thức POST trên route <code>/ingest</code>, kích hoạt yêu cầu xác thực API Key (<code>api_key_required = true</code>).</li>
+                  <li>Tạo Usage Plan giới hạn quota 10,000 requests/tháng, throttling rate 100 và burst 200, sau đó gán API Key vào Usage Plan.</li>
+                </ul>
+              </li>
+            </ol>
+          </details>
+
+          <details>
+            <summary>Bước 3: Gọi nạp dữ liệu (Ingestion Pipeline Execution)</summary>
+            <ol class="list" style="margin-top: 8px;">
+              <li>Ứng dụng client gửi yêu cầu POST đến <code>/ingest</code> kèm theo header <code>x-api-key</code>.</li>
+              <li>API Gateway kiểm tra tính hợp lệ và hạn ngạch (Usage Plan). Nếu vượt quá throttling hoặc key sai, lập tức trả về lỗi đầu cuối (403 hoặc 429).</li>
+              <li>Nếu hợp lệ, API Gateway chuyển tiếp (proxy) payload chứa trường <code>text</code> và <code>metadata</code> đến Lambda handler <code>lambda_handler(event, context)</code>.</li>
+              <li>Lambda gọi hàm <code>get_embedding(text)</code> để gọi SageMaker Endpoint sinh vector 384 chiều, nhận phản hồi mảng lồng 3 lớp <code>[[[embedding]]]</code> và bóc tách thành mảng phẳng 1 chiều.</li>
+              <li>Lambda tạo UUID v4 làm khóa định danh, gọi hàm <code>s3_vectors.put_vectors</code> để lưu trữ vector kèm metadata gốc (văn bản gốc, timestamp) vào S3 Vectors bucket.</li>
+              <li>Lambda trả về mã trạng thái <code>200 OK</code> kèm ID của tài liệu đã lập chỉ mục.</li>
+            </ol>
+          </details>
+
+          <details>
+            <summary>Bước 4: Tra cứu ngữ nghĩa và tính toán điểm tương đồng (Semantic Search)</summary>
+            <ol class="list" style="margin-top: 8px;">
+              <li>Học viên chạy kịch bản [test_search_s3vectors.py](file:///G:/AIProduction_t6_2026/production/week3/alex/backend/ingest/test_search_s3vectors.py) gửi câu hỏi kiểm tra (ví dụ: <code>"electric vehicles"</code>).</li>
+              <li>Script gọi SageMaker chuyển câu hỏi thành vector truy vấn (query vector).</li>
+              <li>Script gọi API <code>s3_vectors.query_vectors</code> truyền query vector và tham số <code>topK=3</code>, <code>returnDistance=True</code>.</li>
+              <li>S3 Vectors thực hiện thuật toán tìm kiếm lân cận HNSW trên S3 bucket, trả về danh sách các vector có khoảng cách ngắn nhất kèm theo giá trị <code>distance</code> (khoảng cách Cosine).</li>
+              <li>Script nhận kết quả, tính toán điểm tương đồng ngữ nghĩa: <code>similarity_score = 1 - distance</code> và in kết quả ra màn hình console.</li>
+            </ol>
+          </details>
+        </section>
+
+        <section id="techniques" class="section">
+          <div class="section-title">
+            <div>
+              <div class="kicker">Section 6</div>
+              <h2>Techniques - Kỹ thuật sử dụng</h2>
+            </div>
+          </div>
+          <div class="grid-3">
+            <article class="card">
+              <h3>API Rate Limiting - Giới hạn tần suất API</h3>
+              <p><strong>Purpose:</strong> Ngăn chặn tấn công DDoS và tránh các lỗi vòng lặp vô hạn ở client làm tăng chi phí AWS khổng lồ từ Lambda và SageMaker.</p>
+              <p><strong>When to use:</strong> Bắt buộc áp dụng cho mọi API Gateway REST API public hướng ra ngoài internet trong các hệ thống sản xuất.</p>
+              <p><strong>Trade-off:</strong> Làm tăng độ phức tạp trong cấu hình hạ tầng và yêu cầu quản lý phân phối API Key cho các client.</p>
+            </article>
+            <article class="card">
+              <h3>Stateful Resource Isolation - Cô lập tài nguyên có trạng thái</h3>
+              <p><strong>Purpose:</strong> Đảm bảo an toàn dữ liệu, tránh việc vô tình xóa mất cơ sở dữ liệu vector hoặc tệp dữ liệu gốc khi cập nhật hạ tầng stateless.</p>
+              <p><strong>When to use:</strong> Áp dụng cho các cơ sở dữ liệu, S3 Vector buckets trong môi trường học tập/thử nghiệm có tần suất hủy hạ tầng cao bằng Terraform.</p>
+              <p><strong>Trade-off:</strong> Đòi hỏi nhà phát triển phải thực hiện tạo thủ công bằng tay hoặc duy trì một kịch bản Terraform quản lý trạng thái riêng biệt.</p>
+            </article>
+            <article class="card">
+              <h3>API Gateway Auto-Redeployment Trigger</h3>
+              <p><strong>Purpose:</strong> Tự động kích hoạt redeployment stage <code>prod</code> của API Gateway khi có bất kỳ thay đổi cấu hình nào trong file code Terraform.</p>
+              <p><strong>When to use:</strong> Khi làm việc với tài nguyên <code>aws_api_gateway_deployment</code> của Terraform để tránh tình trạng hạ tầng cập nhật nhưng API thực tế vẫn chạy phiên bản cũ.</p>
+              <p><strong>Trade-off:</strong> Sử dụng hàm băm <code>sha1(jsonencode(...))</code> làm tăng một chút thời gian kiểm tra thay đổi của Terraform engine.</p>
+            </article>
+          </div>
+        </section>
+
+        <section id="code-walkthrough" class="section">
+          <div class="section-title">
+            <div>
+              <div class="kicker">Section 7</div>
+              <h2>Code Walkthrough - Phân tích code</h2>
+            </div>
+            <div class="source-row">
+              <span class="source">Code</span>
+              <span class="source">Docx LLM</span>
+            </div>
+          </div>
+
+          <article class="code-panel">
+            <div>
+              <h3>[ingest_s3vectors.py](file:///G:/AIProduction_t6_2026/production/week3/alex/backend/ingest/ingest_s3vectors.py) - Logic nạp vector nhúng</h3>
+              <p>Mã nguồn chính của Lambda function xử lý nhận dữ liệu văn bản thô, gọi SageMaker Endpoint để sinh vector nhúng và thực hiện ghi vào S3 Vectors bucket.</p>
+            </div>
+            <div class="code-meta">
+              <span>Purpose: Ingest Data & Vectorize</span>
+              <span>Key Functions: get_embedding, lambda_handler</span>
+            </div>
+            <pre><code># Hàm gọi SageMaker Endpoint tạo vector embedding 384 chiều
+def get_embedding(text):
+    response = sagemaker_runtime.invoke_endpoint(
+        EndpointName=SAGEMAKER_ENDPOINT,     # Tên endpoint cấu hình từ biến môi trường
+        ContentType='application/json',
+        Body=json.dumps({'inputs': text})    # Truyền chuỗi văn bản cần nhúng
+    )
+    
+    result = json.loads(response['Body'].read().decode())
+    
+    # Do container Hugging Face trả về mảng lồng 3 lớp [[[embedding]]] cho tác vụ feature-extraction,
+    # chúng ta thực hiện bóc tách mảng về mảng 1 chiều chứa 384 phần tử số thực.
+    if isinstance(result, list) and len(result) > 0:
+        if isinstance(result[0], list) and len(result[0]) > 0:
+            if isinstance(result[0][0], list):
+                return result[0][0]  # Trích xuất từ [[[embedding]]]
+            return result[0]  # Trích xuất từ [[embedding]]
+    return result  # Trả về nguyên bản nếu cấu trúc không bị lồng
+
+# Lambda Handler chính tiếp nhận yêu cầu từ API Gateway
+def lambda_handler(event, context):
+    try:
+        # Hỗ trợ phân tích cả chuỗi JSON string thô gửi qua AWS PROXY Integration
+        if isinstance(event.get('body'), str):
+            body = json.loads(event['body'])
+        else:
+            body = event.get('body', {})
+        
+        text = body.get('text')
+        metadata = body.get('metadata', {})
+        
+        if not text:
+            return {
+                'statusCode': 400,
+                'body': json.dumps({'error': 'Missing required field: text'})
+            }
+        
+        # 1. Gọi SageMaker sinh vector nhúng
+        embedding = get_embedding(text)
+        
+        # 2. Sinh mã UUID v4 làm khóa duy nhất cho vector
+        vector_id = str(uuid.uuid4())
+        
+        # 3. Ghi vector nhúng và metadata gốc vào S3 Vectors bucket
+        s3_vectors.put_vectors(
+            vectorBucketName=VECTOR_BUCKET,
+            indexName=INDEX_NAME,            # financial-research
+            vectors=[{
+                "key": vector_id,
+                "data": {"float32": embedding}, # Định dạng float32 bắt buộc của S3 Vectors
+                "metadata": {
+                    "text": text,
+                    "timestamp": datetime.datetime.utcnow().isoformat(),
+                    **metadata                # Đính kèm metadata tùy chọn (ticker, company_name,...)
+                }
+            }]
+        )
+        
+        return {
+            'statusCode': 200,
+            'body': json.dumps({
+                'message': 'Document indexed successfully',
+                'document_id': vector_id
+            })
+        }
+    except Exception as e:
+        print(f"Error: {str(e)}")
+        return {
+            'statusCode': 500,
+            'body': json.dumps({'error': str(e)})
+        }</code></pre>
+          </article>
+
+          <article class="code-panel">
+            <div>
+              <h3>[package.py](file:///G:/AIProduction_t6_2026/production/week3/alex/backend/ingest/package.py) - Script đóng gói Lambda tự động</h3>
+              <p>Script Python thực hiện cài đặt các thư viện phụ thuộc từ môi trường ảo .venv của uv và nén mã nguồn thành tệp zip.</p>
+            </div>
+            <pre><code>def create_deployment_package():
+    current_dir = Path(__file__).parent
+    build_dir = current_dir / 'build'
+    package_dir = build_dir / 'package'
+    zip_path = current_dir / 'lambda_function.zip'
+    venv_site_packages = current_dir / '.venv' / 'lib'
+    
+    # 1. Dọn dẹp các thư mục build cũ để tránh nén trùng lặp dữ liệu thừa
+    if build_dir.exists():
+        shutil.rmtree(build_dir)
+    if zip_path.exists():
+        os.remove(zip_path)
+    
+    package_dir.mkdir(parents=True, exist_ok=True)
+    
+    # 2. Định vị thư mục site-packages của môi trường ảo (Cross-platform)
+    site_packages = None
+    for path in venv_site_packages.rglob('site-packages'):
+        site_packages = path
+        break
+        
+    # 3. Sao chép toàn bộ dependencies vào thư mục tạm thời
+    for item in site_packages.iterdir():
+        if item.name.endswith('.dist-info') or item.name == '__pycache__':
+            continue
+        if item.is_dir():
+            shutil.copytree(item, package_dir / item.name, dirs_exist_ok=True)
+        else:
+            shutil.copy2(item, package_dir)
+            
+    # 4. Sao chép file mã nguồn Lambda vào thư mục tạm thời
+    shutil.copy(current_dir / 'ingest_s3vectors.py', package_dir)
+    
+    # 5. Tạo tệp tin nén lambda_function.zip để sẵn sàng deploy qua Terraform
+    with zipfile.ZipFile(zip_path, 'w', zipfile.ZIP_DEFLATED) as zipf:
+        for root, dirs, files in os.walk(package_dir):
+            dirs[:] = [d for d in dirs if d != '__pycache__']
+            for file in files:
+                file_path = Path(root) / file
+                arcname = file_path.relative_to(package_dir)
+                zipf.write(file_path, arcname)
+                
+    shutil.rmtree(build_dir) # Dọn dẹp thư mục build tạm thời</code></pre>
+          </article>
+
+          <article class="code-panel">
+            <div>
+              <h3>[main.tf](file:///G:/AIProduction_t6_2026/production/week3/alex/terraform/3_ingestion/main.tf) - Phân quyền IAM Policy cho Lambda</h3>
+              <p>Khối tài nguyên Terraform định nghĩa các quyền hạn cụ thể cho Lambda tương tác với SageMaker Endpoint và dịch vụ S3 Vectors.</p>
+            </div>
+            <pre><code># Định nghĩa chính sách IAM Role Policy cho Lambda tương tác các dịch vụ AI
+resource "aws_iam_role_policy" "lambda_policy" {
+  name = "alex-ingest-lambda-policy"
+  role = aws_iam_role.lambda_role.id
+  
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      # Quyền ghi Logs ra CloudWatch
+      {
+        Effect = "Allow"
+        Action = [
+          "logs:CreateLogGroup",
+          "logs:CreateLogStream",
+          "logs:PutLogEvents"
+        ]
+        Resource = "arn:aws:logs:${var.aws_region}:${data.aws_caller_identity.current.account_id}:*"
+      },
+      # Quyền tương tác với SageMaker Endpoint để tạo Vector Embedding
+      {
+        Effect = "Allow"
+        Action = [
+          "sagemaker:InvokeEndpoint"
+        ]
+        Resource = "arn:aws:sagemaker:${var.aws_region}:${data.aws_caller_identity.current.account_id}:endpoint/${var.sagemaker_endpoint_name}"
+      },
+      # Quyền ghi và đọc dữ liệu đối với dịch vụ S3 Vectors
+      {
+        Effect = "Allow"
+        Action = [
+          "s3vectors:PutVectors",
+          "s3vectors:QueryVectors",
+          "s3vectors:GetVectors",
+          "s3vectors:DeleteVectors"
+        ]
+        Resource = "arn:aws:s3vectors:${var.aws_region}:${data.aws_caller_identity.current.account_id}:bucket/${aws_s3_bucket.vectors.id}/index/*"
+      }
+    ]
+  })
+}</code></pre>
+          </article>
+
+          <article class="code-panel">
+            <div>
+              <h3>[test_search_s3vectors.py](file:///G:/AIProduction_t6_2026/production/week3/alex/backend/ingest/test_search_s3vectors.py) - Thực hiện tìm kiếm ngữ nghĩa</h3>
+              <p>Đoạn mã nguồn trong kịch bản kiểm thử tính toán điểm số tương đồng ngữ nghĩa từ khoảng cách Cosine trả về từ S3 Vectors.</p>
+            </div>
+            <pre><code>def search_vectors(query_text, k=5):
+    # 1. Gọi SageMaker chuyển câu hỏi thành vector đặc trưng
+    query_embedding = get_embedding(query_text)
+    
+    # 2. Truy vấn trực tiếp cơ sở dữ liệu S3 Vectors
+    response = s3_vectors.query_vectors(
+        vectorBucketName=VECTOR_BUCKET,
+        indexName=INDEX_NAME,
+        queryVector={"float32": query_embedding}, # Truyền vector truy vấn
+        topK=k,
+        returnDistance=True,                     # Yêu cầu trả về khoảng cách Cosine
+        returnMetadata=True                      # Yêu cầu trả về metadata văn bản gốc
+    )
+    
+    vectors = response.get('vectors', [])
+    print(f"Found {len(vectors)} results:\n")
+    
+    # 3. Duyệt kết quả và tính toán Similarity Score
+    for vector in vectors:
+        metadata = vector.get('metadata', {})
+        distance = vector.get('distance', 0)
+        
+        # Công thức đổi từ khoảng cách Cosine sang điểm số tương đồng trực quan [0, 1]
+        similarity_score = 1 - distance
+        print(f"Score: {similarity_score:.3f}")
+        if metadata.get('company_name'):
+            print(f"Company: {metadata['company_name']} ({metadata.get('ticker', 'N/A')})")
+        print(f"Text: {metadata.get('text', '')[:200]}...")
+        print()</code></pre>
+          </article>
+        </section>
+
+        <section id="options" class="section">
+          <div class="section-title">
+            <div>
+              <div class="kicker">Section 8</div>
+              <h2>Options / Trade-offs - Bản đồ lựa chọn</h2>
+            </div>
+          </div>
+          <table>
+            <thead>
+              <tr>
+                <th>Lựa chọn kiến trúc</th>
+                <th>Phù hợp khi (Best for)</th>
+                <th>Đánh đổi (Trade-off)</th>
+                <th>Rủi ro (Risk)</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>Lựa chọn 1: Lưu trữ vector bucket trực tiếp qua Terraform</strong><br/>Khai báo tài nguyên S3 Vector Bucket trong tệp code main.tf của Terraform.</td>
+                <td>Khi hệ thống chạy trên pipeline CI/CD ổn định, không có nhu cầu gỡ bỏ hoặc tái tạo hạ tầng thường xuyên.</td>
+                <td>Toàn bộ dữ liệu vector đã được nạp sẽ bị xóa sạch hoàn toàn mỗi khi nhà phát triển chạy lệnh <code>terraform destroy</code>.</td>
+                <td>Mất mát dữ liệu tri thức của hệ thống RAG khi dọn dẹp hạ tầng stateless.</td>
+              </tr>
+              <tr>
+                <td><strong>Lựa chọn 2: Cô lập tài nguyên trạng thái (Lựa chọn của dự án)</strong><br/>Khởi tạo Vector Bucket thủ công trên AWS Console độc lập.</td>
+                <td>(Recommended) Môi trường phát triển, học tập thực hành có nhu cầu hủy/tạo liên tục phần hạ tầng API Gateway và Lambda tính toán.</td>
+                <td>Đòi hỏi nhà phát triển phải thực hiện tạo thủ công bằng tay và khai báo chính xác tên bucket vào tệp cấu hình <code>.env</code>.</td>
+                <td>Gây sai sót cấu hình biến môi trường cục bộ nếu gõ sai tên bucket ảo.</td>
+              </tr>
+              <tr>
+                <td><strong>Lựa chọn 3: Public Endpoint không yêu cầu API Key</strong><br/>Tắt thuộc tính xác thực API Key trên method POST của API Gateway.</td>
+                <td>Chỉ dùng cho các buổi demo ngắn hạn hoặc môi trường mạng nội bộ hoàn toàn cô lập, không có kết nối internet.</td>
+                <td>Bất kỳ ai dò được API URL đều có thể spam tài nguyên backend.</td>
+                <td>Cạn kiệt tài nguyên hệ thống và phát sinh chi phí khổng lồ từ SageMaker endpoint.</td>
+              </tr>
+            </tbody>
+          </table>
+        </section>
+
+        <section id="pitfalls" class="section">
+          <div class="section-title">
+            <div>
+              <div class="kicker">Section 9</div>
+              <h2>Pitfalls - Lỗi / bẫy thường gặp</h2>
+            </div>
+          </div>
+          <div class="grid-2">
+            <article class="card">
+              <h3>Failure modes - Trường hợp dễ lỗi</h3>
+              <ul class="list">
+                <li><strong>Lỗi ghi dữ liệu vào S3 Vectors do sai cấu trúc mảng:</strong> SageMaker trả về mảng lồng 3 lớp <code>[[[embedding]]]</code>. Nếu truyền thẳng mảng này vào API <code>put_vectors</code>, S3 Vectors sẽ từ chối và báo lỗi API 500.</li>
+                <li><strong>Lỗi gọi API Gateway trả về statusCode 403 hoặc 500:</strong> Sau khi deploy thành công, gọi endpoint từ curl nhận lỗi <code>Forbidden</code> hoặc <code>Internal Server Error</code>.</li>
+                <li><strong>Phát sinh chi phí lớn ngoài ý muốn trên tài khoản AWS:</strong> Học viên để các cụm OpenSearch cũ hoặc các RDS Instance chạy liên tục không tắt.</li>
+              </ul>
+            </article>
+            <article class="card">
+              <h3>Fix / prevention - Cách khắc phục</h3>
+              <ul class="list">
+                <li><strong>Khắc phục sai định dạng:</strong> Sử dụng khối lệnh kiểm tra kiểu dữ liệu <code>isinstance(..., list)</code> trong hàm <code>get_embedding</code> để bóc tách mảng lồng về mảng 1 chiều chứa 384 số thực trước khi ghi.</li>
+                <li><strong>Khắc phục API lỗi:</strong> Xác minh tài nguyên <code>aws_lambda_permission.api_gateway</code> được khai báo đúng để cấp quyền cho API Gateway invoke Lambda, và kiểm tra API Key đã được gán vào Usage Plan stage <code>prod</code>.</li>
+                <li><strong>Khắc phục chi phí ngầm:</strong> Sử dụng S3 Vectors co giãn về 0. Thiết lập <em>AWS Budgets</em> và hủy (destroy) các tài nguyên dọn dẹp RDS khi kết thúc buổi thực hành.</li>
+              </ul>
+            </article>
+          </div>
+        </section>
+
+        <section id="flashcards" class="section">
+          <div class="section-title">
+            <div>
+              <div class="kicker">Section 10</div>
+              <h2>Flashcards / Q&A - Thẻ ôn tập</h2>
+            </div>
+          </div>
+          <div class="grid-2">
+            <article class="card flashcard">
+              <h3>Q: Tại sao phải tách S3 Vector Bucket ra khỏi quản lý của Terraform trong bài học này?</h3>
+              <button class="button primary" type="button" data-reveal>Reveal answer</button>
+              <p class="flash-answer"><strong>A:</strong> Để cô lập tài nguyên có trạng thái (stateful). Khi chạy lệnh `terraform destroy` để hủy hạ tầng tính toán stateless (Lambda, API Gateway), dữ liệu vector tri thức được nạp thủ công sẽ không bị xóa mất.</p>
+            </article>
+            <article class="card flashcard">
+              <h3>Q: Công thức tính Similarity Score trong bài tìm kiếm ngữ nghĩa là gì và tại sao cần công thức này?</h3>
+              <button class="button primary" type="button" data-reveal>Reveal answer</button>
+              <p class="flash-answer"><strong>A:</strong> Công thức là `Similarity = 1 - Cosine Distance`. Cần công thức này vì khoảng cách Cosine từ S3 Vectors trả về dải trị từ [0, 2], chuyển đổi giúp đưa điểm số tương đồng về dải trị trực quan từ [0, 1] (điểm càng cao nghĩa càng sát).</p>
+            </article>
+            <article class="card flashcard">
+              <h3>Q: Tác dụng của Usage Plan trong API Gateway là gì?</h3>
+              <button class="button primary" type="button" data-reveal>Reveal answer</button>
+              <p class="flash-answer"><strong>A:</strong> Usage Plan giúp giới hạn số lượng cuộc gọi tối đa của client theo tháng (quota) và tốc độ gọi tối đa mỗi giây (throttling/burst), ngăn chặn client spam hoặc vô tình lặp cuộc gọi gây tốn chi phí.</p>
+            </article>
+            <article class="card flashcard">
+              <h3>Q: Kỹ thuật sha1 băm cấu hình trong aws_api_gateway_deployment dùng để làm gì?</h3>
+              <button class="button primary" type="button" data-reveal>Reveal answer</button>
+              <p class="flash-answer"><strong>A:</strong> Giúp Terraform tự động phát hiện mọi thay đổi cấu hình nhỏ nhất trong API Gateway (route, method, integration) để thực hiện redeployment lại stage ngay lập tức, tránh hiện tượng cấu hình lệch pha với thực tế trên AWS.</p>
+            </article>
+            <article class="card flashcard">
+              <h3>Q: Tại sao tìm kiếm ngữ nghĩa (semantic search) lại vượt trội hơn tìm kiếm từ khóa (keyword search)?</h3>
+              <button class="button primary" type="button" data-reveal>Reveal answer</button>
+              <p class="flash-answer"><strong>A:</strong> Vì tìm kiếm ngữ nghĩa so khớp dựa trên ý nghĩa ngữ cảnh và khái niệm, cho phép tìm thấy tài liệu liên quan ngay cả khi từ ngữ hỏi và văn bản gốc hoàn toàn khác nhau (ví dụ: "electric vehicles" tìm thấy tài liệu chứa "TSLA").</p>
+            </article>
+            <article class="card">
+              <h3>Quick quiz - Câu hỏi trắc nghiệm</h3>
+              <p>Khi gọi API S3 Vectors để ghi vector nhúng, kiểu dữ liệu đại diện cho vector số thực (embedding) truyền vào trường "data" là gì?</p>
+              <div class="quiz-options">
+                <button class="button quiz-option" type="button" data-correct="false">A. float64</button>
+                <button class="button quiz-option" type="button" data-correct="true">B. float32</button>
+                <button class="button quiz-option" type="button" data-correct="false">C. int32</button>
+                <button class="button quiz-option" type="button" data-correct="false">D. array</button>
+              </div>
+              <div class="quiz-result" aria-live="polite"></div>
+            </article>
+          </div>
+        </section>
+
+        <section id="memory" class="section">
+          <div class="section-title">
+            <div>
+              <div class="kicker">Section 11</div>
+              <h2>Quick Memory - Ôn nhanh cuối bài</h2>
+            </div>
+          </div>
+          <div class="grid-2">
+            <article class="card">
+              <h3>Must remember - Phải nhớ</h3>
+              <ol class="list">
+                <li>S3 Vectors là native vector storage giúp tiết kiệm 90% chi phí so với OpenSearch Serverless.</li>
+                <li>Index tìm kiếm <code>financial-research</code> bắt buộc phải cấu hình đúng <strong>384 chiều</strong> để khớp với mô hình <code>all-MiniLM-L6-v2</code>.</li>
+                <li>Lệnh đóng gói package Lambda: <code>uv run package.py</code> chạy trong thư mục <code>backend/ingest</code>.</li>
+                <li>API Key bắt buộc phải được truyền qua header <code>x-api-key</code> khi gọi API Gateway stage <code>prod</code>.</li>
+              </ol>
+            </article>
+            <article class="card">
+              <h3>Self-check - Tự kiểm tra</h3>
+              <ul class="list">
+                <li>Bạn có thể vẽ lại luồng nạp dữ liệu tri thức của Researcher Agent từ internet vào S3 Vectors không?</li>
+                <li>Sự khác nhau về mặt logic giữa Throttling limit và Burst limit trong Usage Plan là gì?</li>
+                <li>Làm thế nào để xử lý lỗi API Gateway trả về 403 Forbidden khi kiểm thử pipeline?</li>
+              </ul>
+            </article>
+          </div>
+        </section>
+
+        <footer class="footer">
+          <strong>Study note:</strong> Hướng dẫn học tập này được tự động tạo lập dựa trên tài nguyên khóa học AI in Production. Mọi kiến thức mở rộng ngoài chương trình đều được chú thích rõ ràng.
+        </footer>
+      </main>
+    </div>
+  </div>
+
+  <script>
+    const links = Array.from(document.querySelectorAll(".toc a"));
+    const sections = links.map((link) => document.querySelector(link.getAttribute("href"))).filter(Boolean);
+    const progressBar = document.getElementById("progressBar");
+    const detailsNodes = Array.from(document.querySelectorAll("details"));
+
+    function setActiveLink() {
+      let current = sections[0]?.id;
+      const offset = window.scrollY + 170;
+      for (const section of sections) {
+        if (section.offsetTop <= offset) {
+          current = section.id;
+        }
+      }
+      links.forEach((link) => {
+        link.classList.toggle("active", link.getAttribute("href") === `#${current}`);
+      });
+    }
+
+    function updateProgress() {
+      const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+      const progress = docHeight > 0 ? Math.min((window.scrollY / docHeight) * 100, 100) : 0;
+      progressBar.style.width = `${progress}%`;
+    }
+
+    document.getElementById("expandAll").addEventListener("click", () => {
+      detailsNodes.forEach((node) => {
+        node.open = true;
+      });
+    });
+
+    document.getElementById("collapseAll").addEventListener("click", () => {
+      detailsNodes.forEach((node) => {
+        node.open = false;
+      });
+    });
+
+    document.querySelectorAll("[data-reveal]").forEach((button) => {
+      button.addEventListener("click", () => {
+        const card = button.closest(".flashcard");
+        card.classList.toggle("revealed");
+        button.innerText = card.classList.contains("revealed") ? "Hide answer" : "Reveal answer";
+      });
+    });
+
+    document.querySelectorAll(".quiz-option").forEach((button) => {
+      button.addEventListener("click", () => {
+        const result = button.closest(".card").querySelector(".quiz-result");
+        if (button.dataset.correct === "true") {
+          result.style.color = "var(--accent-teal)";
+          result.innerText = "Chính xác! S3 Vectors yêu cầu vector số thực được định nghĩa dưới dạng trường khóa 'float32' trong mảng vectors truyền lên.";
+        } else {
+          result.style.color = "var(--primary-active)";
+          result.innerText = "Chưa chính xác. Xem lại định nghĩa s3_vectors.put_vectors trong tệp ingest_s3vectors.py ở phần Code Walkthrough.";
+        }
+      });
+    });
+
+    window.addEventListener("scroll", () => {
+      setActiveLink();
+      updateProgress();
+    }, { passive: true });
+
+    setActiveLink();
+    updateProgress();
+  </script>
+</body>
+
+</html>

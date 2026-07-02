@@ -1,0 +1,1289 @@
+<!doctype html>
+<html lang="vi">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Nền Tảng ALEX: AWS Permissions & SageMaker Serverless - Study Guide</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+  <style>
+    :root {
+      --canvas: #faf9f5;
+      --surface-soft: #f5f0e8;
+      --surface-card: #efe9de;
+      --surface-strong: #e8e0d2;
+      --surface-dark: #181715;
+      --surface-dark-elevated: #252320;
+      --surface-dark-soft: #1f1e1b;
+      --hairline: #e6dfd8;
+      --hairline-soft: #ebe6df;
+      --ink: #141413;
+      --body: #3d3d3a;
+      --body-strong: #252523;
+      --muted: #6c6a64;
+      --muted-soft: #8e8b82;
+      --primary: #cc785c;
+      --primary-active: #a9583e;
+      --accent-teal: #5db8a6;
+      --accent-amber: #e8a55a;
+      --on-dark: #faf9f5;
+      --on-dark-soft: #a09d96;
+      --radius-md: 8px;
+      --radius-lg: 12px;
+      --radius-xl: 16px;
+      --content: 1200px;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      margin: 0;
+      background: var(--canvas);
+      color: var(--body);
+      font-family: 'Inter', "Segoe UI", Arial, sans-serif;
+      line-height: 1.62;
+    }
+
+    h1,
+    h2 {
+      color: var(--ink);
+      font-family: 'Cormorant Garamond', Cambria, "Noto Serif", serif;
+      font-weight: 600;
+      letter-spacing: -0.02em;
+      line-height: 1.1;
+      margin: 0;
+    }
+
+    h1 {
+      font-size: clamp(2.2rem, 4.5vw, 3.8rem);
+      max-width: 25ch;
+    }
+
+    h2 {
+      font-size: clamp(1.6rem, 2.8vw, 2.2rem);
+      border-bottom: 1px solid var(--hairline-soft);
+      padding-bottom: 8px;
+    }
+
+    h3 {
+      color: var(--ink);
+      font-family: 'Inter', sans-serif;
+      font-size: 1.1rem;
+      font-weight: 600;
+      line-height: 1.35;
+      margin: 0;
+    }
+
+    p,
+    li {
+      margin: 0;
+    }
+
+    code {
+      border-radius: 6px;
+      background: var(--surface-strong);
+      color: var(--body-strong);
+      font-family: "JetBrains Mono", Consolas, monospace;
+      font-size: 0.9em;
+      padding: 2px 6px;
+    }
+
+    pre {
+      margin: 0;
+      overflow-x: auto;
+      border-radius: var(--radius-lg);
+      background: var(--surface-dark-soft);
+      color: var(--on-dark);
+      padding: 18px;
+      font-family: "JetBrains Mono", Consolas, monospace;
+      font-size: 13px;
+      line-height: 1.58;
+      white-space: pre;
+    }
+
+    pre code {
+      background: transparent;
+      color: inherit;
+      padding: 0;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.95rem;
+      margin-top: 14px;
+      background: var(--canvas);
+    }
+
+    th,
+    td {
+      border-bottom: 1px solid var(--hairline);
+      padding: 12px 16px;
+      text-align: left;
+      vertical-align: top;
+    }
+
+    th {
+      color: var(--ink);
+      background: var(--surface-soft);
+      font-weight: 700;
+    }
+
+    .page {
+      max-width: var(--content);
+      margin: 0 auto;
+      padding: 30px 20px 64px;
+    }
+
+    .hero {
+      display: grid;
+      grid-template-columns: minmax(0, 1.2fr) minmax(320px, 0.8fr);
+      gap: 28px;
+      align-items: stretch;
+      padding: 40px;
+      border: 1px solid var(--hairline);
+      border-radius: var(--radius-xl);
+      background: var(--surface-soft);
+    }
+
+    .hero-copy {
+      display: grid;
+      gap: 18px;
+      align-content: start;
+    }
+
+    .eyebrow {
+      width: fit-content;
+      border-radius: 999px;
+      background: var(--primary);
+      color: white;
+      font-size: 0.75rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      padding: 6px 12px;
+      text-transform: uppercase;
+    }
+
+    .lead {
+      max-width: 72ch;
+      color: var(--body-strong);
+      font-size: 1.1rem;
+    }
+
+    .tag-row,
+    .source-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .tag,
+    .source {
+      display: inline-flex;
+      align-items: center;
+      border-radius: 999px;
+      font-size: 0.82rem;
+      font-weight: 600;
+      padding: 5px 12px;
+    }
+
+    .tag {
+      background: var(--surface-card);
+      color: var(--ink);
+      border: 1px solid var(--hairline-soft);
+    }
+
+    .source {
+      border: 1px solid var(--hairline);
+      background: var(--canvas);
+      color: var(--muted);
+    }
+
+    .source.extended {
+      border-color: rgba(204, 120, 92, 0.38);
+      background: rgba(204, 120, 92, 0.12);
+      color: var(--primary-active);
+    }
+
+    .hero-panel,
+    .code-panel {
+      border-radius: var(--radius-lg);
+      background: var(--surface-dark);
+      color: var(--on-dark);
+      padding: 24px;
+    }
+
+    .hero-panel {
+      display: grid;
+      gap: 16px;
+      align-content: start;
+    }
+
+    .hero-panel h2,
+    .hero-panel h3,
+    .code-panel h3 {
+      color: var(--on-dark);
+      border: none;
+      padding: 0;
+    }
+
+    .hero-panel p,
+    .hero-panel li,
+    .code-panel p,
+    .code-panel li {
+      color: var(--on-dark-soft);
+    }
+
+    .progress-track {
+      height: 8px;
+      overflow: hidden;
+      border-radius: 999px;
+      background: var(--surface-dark-elevated);
+    }
+
+    .progress-bar {
+      width: 0;
+      height: 100%;
+      background: var(--primary);
+      transition: width 0.1s ease;
+    }
+
+    .layout {
+      display: grid;
+      grid-template-columns: 260px minmax(0, 1fr);
+      gap: 24px;
+      align-items: start;
+      margin-top: 26px;
+    }
+
+    .toc {
+      position: sticky;
+      top: 20px;
+      border: 1px solid var(--hairline);
+      border-radius: var(--radius-lg);
+      background: var(--canvas);
+      padding: 18px;
+    }
+
+    .toc h2 {
+      font-family: 'Inter', sans-serif;
+      font-size: 1rem;
+      font-weight: 700;
+      border: none;
+      padding: 0;
+      margin-bottom: 12px;
+    }
+
+    .toc nav {
+      display: grid;
+      gap: 4px;
+    }
+
+    .toc a {
+      border-radius: var(--radius-md);
+      color: var(--muted);
+      padding: 6px 10px;
+      text-decoration: none;
+      font-size: 0.9rem;
+      font-weight: 500;
+      transition: all 0.2s ease;
+    }
+
+    .toc a:hover,
+    .toc a.active {
+      background: var(--surface-card);
+      color: var(--ink);
+      font-weight: 600;
+    }
+
+    .toc-tools {
+      display: grid;
+      gap: 8px;
+      margin-top: 16px;
+      padding-top: 16px;
+      border-top: 1px solid var(--hairline);
+    }
+
+    .button {
+      min-height: 40px;
+      border: 1px solid var(--hairline);
+      border-radius: var(--radius-md);
+      background: var(--canvas);
+      color: var(--ink);
+      cursor: pointer;
+      font: inherit;
+      font-size: 0.9rem;
+      font-weight: 600;
+      padding: 10px 14px;
+      transition: all 0.2s ease;
+    }
+
+    .button:hover {
+      background: var(--surface-card);
+    }
+
+    .button.primary {
+      border-color: var(--primary);
+      background: var(--primary);
+      color: white;
+    }
+
+    .button.primary:hover {
+      background: var(--primary-active);
+    }
+
+    .content {
+      display: grid;
+      gap: 24px;
+    }
+
+    .section {
+      border: 1px solid var(--hairline);
+      border-radius: var(--radius-lg);
+      background: var(--canvas);
+      padding: 32px;
+    }
+
+    .section-title {
+      display: flex;
+      justify-content: space-between;
+      gap: 16px;
+      align-items: start;
+      margin-bottom: 20px;
+    }
+
+    .kicker {
+      color: var(--primary-active);
+      font-size: 0.76rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      margin-bottom: 6px;
+      text-transform: uppercase;
+    }
+
+    .grid-2,
+    .grid-3 {
+      display: grid;
+      gap: 16px;
+    }
+
+    .grid-2 {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .grid-3 {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+
+    .card,
+    details {
+      border: 1px solid var(--hairline);
+      border-radius: var(--radius-lg);
+      background: var(--surface-card);
+      padding: 20px;
+    }
+
+    .card h3 {
+      margin-bottom: 10px;
+    }
+
+    .card p,
+    .card ul,
+    .card ol,
+    details p,
+    details ul,
+    details ol {
+      margin-top: 8px;
+    }
+
+    .list {
+      padding-left: 20px;
+    }
+
+    .list li + li {
+      margin-top: 6px;
+    }
+
+    details {
+      margin-top: 14px;
+      background: var(--canvas);
+    }
+
+    summary {
+      color: var(--ink);
+      cursor: pointer;
+      font-weight: 700;
+      outline: none;
+    }
+
+    .callout {
+      border-left: 4px solid var(--primary);
+      border-radius: var(--radius-md);
+      background: var(--surface-soft);
+      padding: 14px 18px;
+      margin-top: 14px;
+    }
+
+    .code-panel {
+      display: grid;
+      gap: 14px;
+      margin-top: 16px;
+    }
+
+    .code-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      color: var(--on-dark-soft);
+      font-size: 0.86rem;
+    }
+
+    .code-meta span {
+      background: var(--surface-dark-elevated);
+      padding: 2px 8px;
+      border-radius: 4px;
+    }
+
+    .flashcard {
+      display: grid;
+      gap: 12px;
+      align-content: space-between;
+    }
+
+    .flash-answer {
+      display: none;
+      border-top: 1px solid var(--hairline);
+      padding-top: 12px;
+      margin-top: 12px;
+      color: var(--body-strong);
+    }
+
+    .flashcard.revealed .flash-answer {
+      display: block;
+    }
+
+    .quiz-options {
+      display: grid;
+      gap: 8px;
+      margin-top: 12px;
+    }
+
+    .quiz-option {
+      display: block;
+      width: 100%;
+      text-align: left;
+      font-weight: 500;
+    }
+
+    .quiz-result {
+      min-height: 24px;
+      margin-top: 12px;
+      color: var(--primary-active);
+      font-weight: 700;
+      font-size: 0.95rem;
+    }
+
+    .mermaid-container {
+      background: var(--canvas);
+      border: 1px solid var(--hairline);
+      border-radius: var(--radius-lg);
+      padding: 20px;
+      margin-top: 16px;
+      display: flex;
+      justify-content: center;
+    }
+
+    .mermaid-container.diagram-xl {
+      overflow-x: auto;
+      justify-content: flex-start;
+    }
+
+    .mermaid-container.diagram-xl .mermaid {
+      width: 100%;
+      min-width: 960px;
+    }
+
+    .mermaid-container.diagram-xl .mermaid svg {
+      display: block;
+      width: 100% !important;
+      height: auto !important;
+    }
+
+    .footer {
+      border-radius: var(--radius-lg);
+      background: var(--surface-dark);
+      color: var(--on-dark-soft);
+      padding: 32px;
+      margin-top: 32px;
+      font-size: 0.9rem;
+    }
+
+    .footer strong {
+      color: var(--on-dark);
+    }
+
+    @media (max-width: 900px) {
+      .hero,
+      .layout,
+      .grid-2,
+      .grid-3 {
+        grid-template-columns: 1fr;
+      }
+
+      .toc {
+        position: static;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="page">
+    <header class="hero">
+      <div class="hero-copy">
+        <span class="eyebrow">Study guide</span>
+        <h1>Nền Tảng ALEX: AWS Permissions & SageMaker Serverless</h1>
+        <p class="lead">
+          Tìm hiểu cách thiết lập hạ tầng bảo mật thông qua IAM group và chính sách tùy chỉnh cho S3 Vectors, đồng thời triển khai một SageMaker Serverless Endpoint chạy mô hình nhúng all-MiniLM-L6-v2 để chuẩn bị dữ liệu cho hệ thống AI đa tác tử Alex.
+        </p>
+        <div class="tag-row">
+          <span class="tag">AI Engineer Production Track</span>
+          <span class="tag">Day 3 - Foundations</span>
+          <span class="tag">Week 3: Research Infrastructure</span>
+        </div>
+        <div class="source-row">
+          <span class="source">Docx LLM (day3_summary.md)</span>
+          <span class="source">Slide (Production W3D3.pdf)</span>
+          <span class="source">Code (guides & terraform)</span>
+          <span class="source extended">Knowledge extension</span>
+        </div>
+      </div>
+      <aside class="hero-panel">
+        <h2>Quick focus - Điểm tập trung</h2>
+        <ul class="list">
+          <li><strong>IAM Policy:</strong> Tạo Group <code>AlexAccess</code> gán quyền SageMaker, Bedrock, CloudWatch, và Custom S3 Vectors.</li>
+          <li><strong>SageMaker Serverless:</strong> Triển khai mô hình <code>all-MiniLM-L6-v2</code> tạo vector 384 chiều, tự động co giãn về 0.</li>
+          <li><strong>MLOps & Drift:</strong> Quản lý vòng đời mô hình và phát hiện suy giảm chất lượng dữ liệu (model drift) trong sản xuất.</li>
+        </ul>
+        <div>
+          <p style="margin-bottom: 8px; font-weight: 600;">Reading progress - Tiến độ đọc bài</p>
+          <div class="progress-track" aria-label="Reading progress">
+            <div class="progress-bar" id="progressBar"></div>
+          </div>
+        </div>
+      </aside>
+    </header>
+
+    <div class="layout">
+      <aside class="toc">
+        <h2>Navigation - Mục lục</h2>
+        <nav>
+          <a href="#source-map">1. Source Map</a>
+          <a href="#cheat-sheet">2. Cheat Sheet</a>
+          <a href="#previous-context">3. Previous Context</a>
+          <a href="#core-theory">4. Core Theory</a>
+          <a href="#workflow">5. Workflow / Pipeline</a>
+          <a href="#techniques">6. Techniques</a>
+          <a href="#code-walkthrough">7. Code Walkthrough</a>
+          <a href="#options">8. Options / Trade-offs</a>
+          <a href="#pitfalls">9. Pitfalls</a>
+          <a href="#flashcards">10. Flashcards / Quiz</a>
+          <a href="#memory">11. Quick Memory</a>
+        </nav>
+        <div class="toc-tools">
+          <button class="button" type="button" id="expandAll">Expand notes</button>
+          <button class="button" type="button" id="collapseAll">Collapse notes</button>
+        </div>
+      </aside>
+
+      <main class="content">
+        <section id="source-map" class="section">
+          <div class="section-title">
+            <div>
+              <div class="kicker">Section 1</div>
+              <h2>Source Map - Bản đồ nguồn</h2>
+            </div>
+          </div>
+          <div class="grid-2">
+            <article class="card">
+              <h3>Sources used - Nguồn đã dùng</h3>
+              <ul class="list">
+                <li><strong>Docx LLM:</strong> Sử dụng tóm tắt từ file [day3_summary.md](file:///G:/AIProduction_t6_2026/production/tai_lieu/week3/day3_summary.md).</li>
+                <li><strong>Slide:</strong> Dựa trên slide học trình `Production W3D3.pdf` giới thiệu các thành phần kiến trúc Alex.</li>
+                <li><strong>Code:</strong> Phân tích các tài liệu hướng dẫn [1_permissions.md](file:///G:/AIProduction_t6_2026/production/week3/alex/guides/1_permissions.md), [2_sagemaker.md](file:///G:/AIProduction_t6_2026/production/week3/alex/guides/2_sagemaker.md), và mã nguồn Terraform trong thư mục [2_sagemaker](file:///G:/AIProduction_t6_2026/production/week3/alex/terraform/2_sagemaker).</li>
+              </ul>
+            </article>
+            <article class="card">
+              <h3>Grounding notes - Ghi chú căn cứ</h3>
+              <p>
+                Toàn bộ nội dung trong hướng dẫn này được đối chiếu trực tiếp giữa cấu hình Terraform thực tế và tài liệu tóm tắt ngày học. Các phần kiến trúc nâng cao hoặc MLOps bổ sung của SageMaker được gắn nhãn nguồn gốc rõ ràng nhằm giúp học viên mở rộng kiến thức mà không gây nhầm lẫn với nội dung học liệu bắt buộc.
+              </p>
+            </article>
+          </div>
+          <div class="callout">
+            <strong>Terminology rule - Quy tắc thuật ngữ:</strong> Cụm thuật ngữ kỹ thuật được biểu diễn dạng
+            <code>English - nghĩa tiếng Việt</code>. Các từ đơn phổ biến được viết dạng <code>word (nghĩa)</code>.
+            Ví dụ: <code>Serverless inference - suy luận không máy chủ</code>, <code>quota limit (hạn mức tài nguyên)</code>.
+          </div>
+        </section>
+
+        <section id="cheat-sheet" class="section">
+          <div class="section-title">
+            <div>
+              <div class="kicker">Section 2</div>
+              <h2>Cheat Sheet - Tóm tắt một trang</h2>
+            </div>
+          </div>
+          <div class="grid-3">
+            <article class="card">
+              <h3>Core idea - Ý chính</h3>
+              <p>
+                Thiết lập nền tảng bảo mật và suy luận cho ứng dụng Alex. Bằng cách gán nhóm quyền IAM có giới hạn và triển khai một SageMaker Serverless Endpoint chạy mô hình HuggingFace <code>all-MiniLM-L6-v2</code>, chúng ta có một hệ thống chuyển hóa văn bản thành vector nhúng ngữ nghĩa (embeddings) chất lượng cao với chi phí cực thấp (~$1-2/tháng), hỗ trợ cơ chế tự động co giãn về 0 khi không hoạt động.
+              </p>
+            </article>
+            <article class="card">
+              <h3>Must know - Cần nhớ</h3>
+              <ul class="list">
+                <li>Dịch vụ <strong>S3 Vectors</strong> là dịch vụ mới nên chưa có chính sách quản lý (managed policy) sẵn của AWS; ta bắt buộc phải tạo custom policy <code>AlexS3VectorsAccess</code>.</li>
+                <li>SageMaker Serverless Endpoint được cấu hình 3GB RAM để tối ưu tốc độ CPU bên dưới, giới hạn <code>max_concurrency = 2</code> để tránh chạm quota của tài khoản AWS cá nhân.</li>
+                <li>Sử dụng lệnh CLI với tiền tố <code>fileb://</code> khi truyền payload kiểm tra nhị phân.</li>
+              </ul>
+            </article>
+            <article class="card">
+              <h3>Use in practice - Dùng khi nào</h3>
+              <p>
+                Áp dụng khi cần xây dựng đường ống RAG (Retrieval-Augmented Generation - thế tạo tăng cường truy xuất) với mô hình nhúng gọn nhẹ nhằm tiết kiệm chi phí lưu trữ vector tới 90% so với OpenSearch, hoặc khi triển khai các mô hình AI mã nguồn mở từ Hugging Face lên đám mây AWS một cách nhanh chóng.
+              </p>
+            </article>
+          </div>
+        </section>
+
+        <section id="previous-context" class="section">
+          <div class="section-title">
+            <div>
+              <div class="kicker">Section 3</div>
+              <h2>Previous Context - Liên hệ với bài trước</h2>
+            </div>
+          </div>
+          <div class="callout">
+            Bài học này mở đầu cho dự án capstone Alex kéo dài trong tuần 3 và 4. Nó kết nối trực tiếp và ứng dụng các dịch vụ hạ tầng AWS đã học ở 2 tuần trước:
+            <ul class="list" style="margin-top: 8px;">
+              <li><strong>Tuần 1 (App Runner):</strong> Tái sử dụng để triển khai dịch vụ web container cho tác tử nghiên cứu thị trường độc lập (Researcher Agent) ở Day 5.</li>
+              <li><strong>Tuần 2 (AWS Lambda & Serverless):</strong> Sử dụng làm môi trường thực thi chính cho 5 tác tử phân tích chuyên biệt (Planner, Tagger, Reporter, Charter, Retirement) phối hợp với nhau qua SQS.</li>
+            </ul>
+          </div>
+        </section>
+
+        <section id="core-theory" class="section">
+          <div class="section-title">
+            <div>
+              <div class="kicker">Section 4</div>
+              <h2>Core Theory - Lý thuyết cốt lõi</h2>
+            </div>
+            <div class="source-row">
+              <span class="source">Docx LLM</span>
+              <span class="source">Slide</span>
+            </div>
+          </div>
+          <div class="grid-2">
+            <article class="card">
+              <h3>Key concepts - Khái niệm chính</h3>
+              <ul class="list">
+                <li><strong>Multi-agent collaboration - cộng tác đa tác tử:</strong> Mô hình thiết kế AI trong đó các agent chuyên biệt phối hợp cùng nhau qua hàng đợi tin nhắn (SQS) và cơ sở dữ liệu chung để giải quyết tác vụ tài chính phức tạp.</li>
+                <li><strong>Serverless architecture - kiến trúc không máy chủ:</strong> Mô hình đám mây tự quản lý việc cấp phát tài nguyên tính toán. Người dùng chỉ trả tiền cho thời gian chạy thực tế của mã nguồn và hệ thống tự động co giãn về 0 khi không có yêu cầu.</li>
+                <li><strong>Semantic Vector Embedding - nhúng vector ngữ nghĩa:</strong> Quá trình biểu diễn ý nghĩa ngữ nghĩa của một văn bản dưới dạng một mảng số thực có kích thước cố định (384 chiều với all-MiniLM-L6-v2) phục vụ so khớp ngữ nghĩa.</li>
+                <li><strong>Least Privilege Principle - nguyên tắc đặc quyền tối thiểu:</strong> Nguyên tắc bảo mật trong đó chỉ cấp những quyền truy cập tối thiểu cần thiết để hoàn thành công việc, hạn chế rủi ro lộ khóa bảo mật.</li>
+                <li><strong>Independent Terraform state - trạng thái Terraform độc lập:</strong> Việc phân tách hạ tầng thành các thư mục Terraform độc lập, mỗi thư mục giữ một file <code>.tfstate</code> cục bộ riêng biệt để tránh rủi ro ảnh hưởng chéo khi xảy ra lỗi.</li>
+              </ul>
+            </article>
+            <article class="card">
+              <h3>SageMaker vs Bedrock</h3>
+              <table style="margin-top: 0;">
+                <thead>
+                  <tr>
+                    <th>Đặc điểm</th>
+                    <th>Amazon SageMaker</th>
+                    <th>AWS Bedrock</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><strong>Mục đích</strong></td>
+                    <td>Tự host, tinh chỉnh hoặc tự huấn luyện các mô hình custom/nguồn mở.</td>
+                    <td>Truy cập các mô hình nền tảng lớn (Foundation Models) có sẵn của AWS/đối tác qua API.</td>
+                  </tr>
+                  <tr>
+                    <td><strong>Mô hình nhúng</strong></td>
+                    <td>all-MiniLM-L6-v2 hoặc bất kỳ mô hình nào từ Hugging Face.</td>
+                    <td>Cohere Embed, Titan Multimodal Embeddings,...</td>
+                  </tr>
+                  <tr>
+                    <td><strong>Cách tính phí</strong></td>
+                    <td>Thời gian compute thực tế (Serverless) hoặc giờ chạy instance (Always-on).</td>
+                    <td>Tính phí dựa trên số lượng token xử lý (gửi đi & nhận về).</td>
+                  </tr>
+                  <tr>
+                    <td><strong>Độ trễ</strong></td>
+                    <td>Thấp & ổn định (Always-on), hoặc trễ khởi động lạnh (Serverless).</td>
+                    <td>Thấp, phụ thuộc vào băng thông API của AWS Bedrock toàn cầu.</td>
+                  </tr>
+                </tbody>
+              </table>
+            </article>
+          </div>
+          <details>
+            <summary>Deep explanation - Hiện tượng Model Drift (Trôi lệch mô hình)</summary>
+            <div class="callout" style="margin-top: 8px;">
+              <span class="source.extended" style="float: right; font-size: 0.75rem; padding: 2px 8px;">Kiến thức mở rộng</span>
+              <p><strong>Model drift - trôi lệch mô hình:</strong> Là hiện tượng hiệu năng dự đoán của một mô hình máy học suy giảm theo thời gian do các thuộc tính thống kê của dữ liệu thực tế (production data) bị thay đổi so với dữ liệu huấn luyện (training data).</p>
+              <p style="margin-top: 8px;">Ví dụ trong hệ thống tài chính Alex:</p>
+              <ul class="list">
+                <li>Khi Covid-19 xuất hiện, hành vi chi tiêu và danh mục đầu tư thay đổi đột ngột. Mô hình nhúng cũ được huấn luyện trên từ vựng trước dịch sẽ không biểu diễn chính xác ngữ nghĩa của các thuật ngữ mới như "lockdown", "vaccine stock", dẫn đến kết quả phân tích RAG sai lệch ngữ nghĩa.</li>
+                <li><strong>Cách giải quyết của SageMaker:</strong> Tích hợp công cụ <em>SageMaker Model Monitor</em> để thu thập dữ liệu đầu vào thực tế (Data Capture), so sánh định kỳ với tập baseline huấn luyện, phát hiện lệch phân phối thống kê và tự động kích hoạt pipeline huấn luyện lại mô hình (automated retraining).</li>
+              </ul>
+            </div>
+          </details>
+        </section>
+
+        <section id="workflow" class="section">
+          <div class="section-title">
+            <div>
+              <div class="kicker">Section 5</div>
+              <h2>Workflow / Pipeline - Quy trình / luồng hoạt động</h2>
+            </div>
+            <div class="source-row">
+              <span class="source">Docx LLM</span>
+              <span class="source">Slide</span>
+              <span class="source">Code</span>
+            </div>
+          </div>
+
+          <h3>Sơ đồ Kiến trúc Toàn diện Hệ thống Alex (End-to-End Architecture)</h3>
+          <p style="font-size: 0.9rem; color: var(--muted); margin-bottom: 8px;">
+            Sơ đồ dưới đây minh họa toàn bộ các thành phần của nền tảng Alex. Phần viền đỏ nét đứt thể hiện phạm vi triển khai của buổi học <strong>Day 3</strong>.
+          </p>
+          <div class="mermaid-container diagram-xl">
+            <div class="mermaid">
+              graph TB
+                subgraph Client_Frontend["Client & Frontend Website"]
+                  User[fa:fa-user User] -->|Truy cập| CF[CloudFront CDN]
+                  CF -->|Tải trang| S3Static[S3 Static Website <br/> Next.js Pages Router]
+                  S3Static -->|Xác thực| Clerk[Clerk Authentication]
+                end
+
+                subgraph API_Gateway_Backend["API Gateway & Core Lambda"]
+                  APIGW[API Gateway REST API]
+                  APILambda[FastAPI backend Lambda]
+                  CF -->|Route requests| APIGW
+                  APIGW -->|Trigger| APILambda
+                end
+
+                subgraph Agent_Orchestra["Multi-Agent Orchestra"]
+                  APILambda -->|Gửi job| SQS[SQS Queue]
+                  SQS -->|Trigger| Planner[Planner Lambda <br/> Orchestrator Agent]
+                  Planner -->|Tag tài sản| Tagger[Tagger Lambda <br/> Instrument Tagger]
+                  Planner -->|Viết báo cáo| Reporter[Reporter Lambda <br/> Report Writer]
+                  Planner -->|Vẽ biểu đồ| Charter[Charter Lambda <br/> Chart Maker]
+                  Planner -->|Dự phóng| Retirement[Retirement Lambda <br/> Retirement Specialist]
+                end
+
+                subgraph Database_Storage["Storage Layer"]
+                  Tagger & Reporter & Charter & Retirement & Planner -->|Ghi kết quả / Đọc ETF| Aurora[Aurora Serverless v2 PostgreSQL]
+                  Aurora -.->|Lấy thông tin đăng nhập| Secrets[Secrets Manager]
+                end
+
+                subgraph Ingestion_Pipeline["Ingestion Pipeline (Day 3 Focus)"]
+                  EventBridge[EventBridge Scheduler] -->|Kích hoạt định kỳ 2h| SchedLambda[alex-scheduler Lambda]
+                  SchedLambda -->|Gọi api| AppRunner[App Runner: alex-researcher]
+                  AppRunner -->|Sinh bài phân tích| Bedrock[AWS Bedrock: Nova Pro]
+                  AppRunner -->|Gửi văn bản sinh| IngestAPIGW[API Gateway: alex-ingest]
+                  IngestAPIGW -->|Chuyển tiếp| IngestLambda[alex-ingest Lambda]
+                  IngestLambda -->|Gọi endpoint tạo vector| SageMaker[SageMaker Serverless Endpoint <br/> all-MiniLM-L6-v2]
+                  IngestLambda -->|Lưu trữ vector| S3Vectors[(S3 Vectors Bucket)]
+                  Planner -->|Tìm kiếm ngữ nghĩa RAG| S3Vectors
+                end
+
+                classDef highlight fill:#efe9de,stroke:#cc785c,stroke-width:2px;
+                classDef focus fill:#ffece6,stroke:#cc785c,stroke-width:2px,stroke-dasharray: 5 5;
+                class SageMaker,IngestLambda,IngestAPIGW,Ingestion_Pipeline focus;
+            </div>
+          </div>
+
+          <h3 style="margin-top: 24px;">Sơ đồ Luồng Triển khai & Kiểm tra (Day 3 Pipeline Focus)</h3>
+          <div class="mermaid-container diagram-xl">
+            <div class="mermaid">
+              graph LR
+                subgraph IAM_Permissions["1. AWS IAM Permissions"]
+                  Root[Root User] -->|Tạo custom JSON| Policy[AlexS3VectorsAccess Policy]
+                  Root -->|Attach policies| Group[AlexAccess Group]
+                  Group -->|Assign to user| IAMUser[aiengineer IAM User]
+                end
+
+                subgraph Terraform_Deployment["2. Terraform Deployment"]
+                  IAMUser -->|terraform apply| TF[Terraform engine]
+                  TF -->|Tạo Role| Role[alex-sagemaker-role]
+                  TF -->|Tạo Model| Model[alex-embedding-model]
+                  Model -->|Cấu hình container & link| HF[HuggingFace Hub: all-MiniLM-L6-v2]
+                  TF -->|Trì hoãn 15s| Sleep[time_sleep]
+                  Sleep -->|Tạo Config| Config[Serverless Config: 3GB RAM, Concurrency 2]
+                  Config -->|Tạo Endpoint| Endpoint[alex-embedding-endpoint]
+                end
+
+                subgraph Invocation_Test["3. Invocation Verification"]
+                  CLI[AWS CLI sagemaker-runtime] -->|Gửi fileb://vectorize_me.json| Endpoint
+                  Endpoint -->|Trích xuất đặc trưng| output[output.json: Mảng 384 chiều]
+                end
+            </div>
+          </div>
+
+          <h3 style="margin-top: 24px;">End-to-End Detailed Workflow Walkthrough (Mô tả chi tiết luồng hoạt động)</h3>
+          <p>
+            Quy trình hoạt động từ đầu đến cuối của việc triển khai và kiểm tra dịch vụ máy học nhúng (embeddings) được chia làm 2 giai đoạn cụ thể dưới đây:
+          </p>
+
+          <details>
+            <summary>Giai đoạn 1: Triển khai hạ tầng bằng Terraform (Infrastructure Provisioning)</summary>
+            <ol class="list" style="margin-top: 8px;">
+              <li>
+                <strong>Cung cấp cấu hình vùng (Region Provisioning):</strong> Người dùng cập nhật tệp [terraform.tfvars](file:///G:/AIProduction_t6_2026/production/week3/alex/terraform/2_sagemaker/terraform.tfvars) với giá trị <code>aws_region = "us-east-1"</code>. Terraform nạp giá trị này thông qua tệp khai báo biến [variables.tf](file:///G:/AIProduction_t6_2026/production/week3/alex/terraform/2_sagemaker/variables.tf).
+              </li>
+              <li>
+                <strong>Tạo vai trò IAM thực thi (Execution Role):</strong> Terraform thực hiện tạo tài nguyên <code>aws_iam_role.sagemaker_role</code> với thực thể tin cậy (trust relationship) cho phép dịch vụ <code>sagemaker.amazonaws.com</code> giả lập quyền (assume role). Tiếp tục tạo <code>aws_iam_role_policy_attachment.sagemaker_full_access</code> để đính kèm chính sách đặc quyền SageMaker đầy đủ của AWS.
+              </li>
+              <li>
+                <strong>Khởi tạo SageMaker Model (Model Initialization):</strong> Tạo tài nguyên <code>aws_sagemaker_model.embedding_model</code> chỉ định URI của container PyTorch suy luận CPU do AWS quản lý (`763104351884.dkr.ecr.us-east-1.amazonaws.com...`).
+                <ul class="list" style="margin-top: 4px;">
+                  <li>Tham số môi trường <code>HF_MODEL_ID</code> được đặt bằng <code>sentence-transformers/all-MiniLM-L6-v2</code>.</li>
+                  <li>Tham số môi trường <code>HF_TASK</code> được đặt bằng <code>feature-extraction</code> để xác định tác vụ sinh vector nhúng.</li>
+                </ul>
+              </li>
+              <li>
+                <strong>Trì hoãn đồng bộ quyền (IAM Propagation Delay mitigation):</strong> Terraform chạy khối tài nguyên <code>time_sleep.wait_for_iam_propagation</code>, tạm dừng toàn bộ tiến trình triển khai hạ tầng trong 15 giây. Điều này đảm bảo vai trò IAM của SageMaker được đồng bộ và đăng ký hoàn tất trên mạng lưới phân vùng vật lý của AWS toàn cầu trước khi endpoint cố gắng sử dụng role này.
+              </li>
+              <li>
+                <strong>Tạo cấu hình Endpoint Serverless:</strong> Khởi tạo <code>aws_sagemaker_endpoint_configuration.serverless_config</code> thiết lập biến thể chạy (production variant) trỏ đến mô hình nhúng vừa tạo, chỉ định tài nguyên chạy serverless với dung lượng bộ nhớ cấp phát RAM là 3072 MB (3GB) và giới hạn <code>max_concurrency = 2</code> nhằm bảo vệ hạn mức tài khoản AWS cá nhân.
+              </li>
+              <li>
+                <strong>Tạo Endpoint thực tế:</strong> Tạo tài nguyên <code>aws_sagemaker_endpoint.embedding_endpoint</code> với tên chính thức là <code>alex-embedding-endpoint</code>.
+              </li>
+            </ol>
+          </details>
+
+          <details>
+            <summary>Giai đoạn 2: Gọi suy luận tạo vector nhúng (Embedding Generation Flow)</summary>
+            <ol class="list" style="margin-top: 8px;">
+              <li>
+                <strong>Khởi chạy yêu cầu (Request Trigger):</strong> Người dùng hoặc các dịch vụ backend chạy lệnh CLI <code>aws sagemaker-runtime invoke-endpoint</code> chỉ định endpoint là <code>alex-embedding-endpoint</code>.
+              </li>
+              <li>
+                <strong>Nạp tệp nhị phân (Binary Body Load):</strong> CLI đọc tệp dữ liệu đầu vào [vectorize_me.json](file:///G:/AIProduction_t6_2026/production/week3/alex/backend/vectorize_me.json) chứa cấu trúc JSON <code>{"inputs": "vectorize me"}</code> bằng tham số đặc biệt <code>fileb://</code> để tải nội dung dưới dạng nhị phân thô, tránh lỗi mã hóa ký tự.
+              </li>
+              <li>
+                <strong>Xử lý tại container PyTorch (Feature Extraction):</strong>
+                <ul class="list" style="margin-top: 4px;">
+                  <li>Nếu endpoint đang trong trạng thái nghỉ (idle), AWS sẽ cấp phát một container ảo (Cold start - mất khoảng 10-60 giây). Trong lần đầu tiên khởi chạy, container PyTorch ECR sẽ tự động tải các tệp trọng số của mô hình nhúng <code>all-MiniLM-L6-v2</code> trực tiếp từ Hugging Face Hub về lưu trữ cục bộ.</li>
+                  <li>Hàm suy luận trong container xử lý chuỗi ký tự <code>"vectorize me"</code>, chuyển đổi các token thành các mảng số thực và đưa qua mạng nơ-ron transformer để sinh ra vector đặc trưng 384 chiều.</li>
+                </ul>
+              </li>
+              <li>
+                <strong>Trả về kết quả (Response Write):</strong> Phản hồi chứa mảng số thực 384 chiều được gửi lại cho CLI, và được lưu trực tiếp vào tệp tin <code>output.json</code> trên máy tính cục bộ của học viên để kiểm tra và xác thực chất lượng.
+              </li>
+            </ol>
+          </details>
+        </section>
+
+        <section id="techniques" class="section">
+          <div class="section-title">
+            <div>
+              <div class="kicker">Section 6</div>
+              <h2>Techniques - Kỹ thuật sử dụng</h2>
+            </div>
+          </div>
+          <div class="grid-3">
+            <article class="card">
+              <h3>IAM Propagation Sleep - Chờ lan truyền IAM</h3>
+              <p><strong>Purpose:</strong> Tránh lỗi <code>Role invalid or cannot be assumed</code> do độ trễ đồng bộ hóa quyền của AWS trên toàn cầu.</p>
+              <p><strong>When to use:</strong> Khi một IAM role vừa được tạo mới trong cùng một tệp Terraform và cần được sử dụng ngay lập tức bởi một dịch vụ phức tạp như SageMaker endpoint hoặc Lambda function.</p>
+              <p><strong>Trade-off:</strong> Làm tăng thời gian chạy của lệnh <code>terraform apply</code> thêm 15 giây bắt buộc.</p>
+            </article>
+            <article class="card">
+              <h3>HF Model Direct Integration - Tích hợp trực tiếp Hugging Face</h3>
+              <p><strong>Purpose:</strong> Loại bỏ hoàn toàn bước đóng gói mô hình thủ công thành file <code>.tar.gz</code> và upload lên S3.</p>
+              <p><strong>When to use:</strong> Áp dụng khi triển khai các mô hình nguồn mở tiêu chuẩn có hỗ trợ trực tiếp trên Hugging Face Hub cho tác vụ suy luận/trích xuất đặc trưng.</p>
+              <p><strong>Trade-off:</strong> Bị phụ thuộc vào tính sẵn sàng của Hugging Face Hub ở lần đầu container thực hiện cold start.</p>
+            </article>
+            <article class="card">
+              <h3>Serverless Scaling & Concurrency limit</h3>
+              <p><strong>Purpose:</strong> Tự động co giãn tài nguyên về 0 để tối ưu hóa chi phí và tránh lỗi quá tải quota tài khoản.</p>
+              <p><strong>When to use:</strong> Triển khai các ứng dụng thử nghiệm, học tập hoặc các service có lưu lượng truy cập không đều đặn theo thời gian.</p>
+              <p><strong>Trade-off:</strong> Bị ảnh hưởng bởi độ trễ khởi động lạnh (cold start) từ 10-60 giây ở lượt gọi đầu tiên sau thời gian nghỉ.</p>
+            </article>
+          </div>
+        </section>
+
+        <section id="code-walkthrough" class="section">
+          <div class="section-title">
+            <div>
+              <div class="kicker">Section 7</div>
+              <h2>Code Walkthrough - Phân tích code</h2>
+            </div>
+            <div class="source-row">
+              <span class="source">Code</span>
+              <span class="source">Docx LLM</span>
+            </div>
+          </div>
+
+          <article class="code-panel">
+            <div>
+              <h3>[main.tf](file:///G:/AIProduction_t6_2026/production/week3/alex/terraform/2_sagemaker/main.tf) - Định nghĩa hạ tầng SageMaker</h3>
+              <p>Tệp tin Terraform chịu trách nhiệm định nghĩa toàn bộ hạ tầng SageMaker Serverless bao gồm quyền IAM, cấu hình Model PyTorch, cơ chế trì hoãn chờ đồng bộ và cấu hình Endpoint.</p>
+            </div>
+            <div class="code-meta">
+              <span>Purpose: SageMaker Infrastructure Provisioning</span>
+              <span>Key Resources: aws_iam_role, aws_sagemaker_model, time_sleep, aws_sagemaker_endpoint</span>
+            </div>
+            <pre><code># Khai báo vai trò IAM cho phép dịch vụ SageMaker giả lập quyền truy cập tài nguyên AWS
+resource "aws_iam_role" "sagemaker_role" {
+  name = "alex-sagemaker-role"
+
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Action = "sts:AssumeRole"
+        Effect = "Allow"
+        Principal = {
+          Service = "sagemaker.amazonaws.com" # Chỉ định rõ dịch vụ được assume role này
+        }
+      }
+    ]
+  })
+}
+
+# Đính kèm chính sách quyền hạn SageMaker đầy đủ cho Role vừa tạo ở trên
+resource "aws_iam_role_policy_attachment" "sagemaker_full_access" {
+  role       = aws_iam_role.sagemaker_role.name
+  policy_arn = "arn:aws:iam::aws:policy/AmazonSageMakerFullAccess"
+}
+
+# Khai báo mô hình SageMaker Model liên kết với container PyTorch và mô hình HuggingFace
+resource "aws_sagemaker_model" "embedding_model" {
+  name               = "alex-embedding-model"
+  execution_role_arn = aws_iam_role.sagemaker_role.arn
+
+  primary_container {
+    image = var.sagemaker_image_uri # URI của container PyTorch Inference
+    environment = {
+      HF_MODEL_ID = var.embedding_model_name # sentence-transformers/all-MiniLM-L6-v2
+      HF_TASK     = "feature-extraction"     # Định nghĩa tác vụ là trích xuất đặc trưng (embedding)
+    }
+  }
+
+  depends_on = [aws_iam_role_policy_attachment.sagemaker_full_access]
+}
+
+# Cấu hình Endpoint Serverless với dung lượng bộ nhớ 3GB và concurrency tối đa là 2
+resource "aws_sagemaker_endpoint_configuration" "serverless_config" {
+  name = "alex-embedding-serverless-config"
+
+  production_variants {
+    model_name = aws_sagemaker_model.embedding_model.name
+    
+    serverless_config {
+      memory_size_in_mb = 3072 # Cấp phát 3GB RAM để tối ưu hóa CPU bên dưới
+      max_concurrency   = 2    # Giới hạn 2 yêu cầu đồng thời tránh chạm quota tài khoản
+    }
+  }
+}
+
+# Tạm dừng Terraform 15 giây chờ IAM Role lan truyền và đồng bộ xong trên AWS
+resource "time_sleep" "wait_for_iam_propagation" {
+  depends_on = [
+    aws_iam_role_policy_attachment.sagemaker_full_access
+  ]
+  
+  create_duration = "15s" # Thời gian chờ là 15 giây
+}
+
+# Tạo Endpoint thực tế để cung cấp API phục vụ RAG
+resource "aws_sagemaker_endpoint" "embedding_endpoint" {
+  name                 = "alex-embedding-endpoint"
+  endpoint_config_name = aws_sagemaker_endpoint_configuration.serverless_config.name
+  
+  depends_on = [
+    time_sleep.wait_for_iam_propagation # Chỉ tạo sau khi đã hoàn thành thời gian chờ 15s ở trên
+  ]
+}</code></pre>
+          </article>
+
+          <article class="code-panel">
+            <div>
+              <h3>[variables.tf](file:///G:/AIProduction_t6_2026/production/week3/alex/terraform/2_sagemaker/variables.tf) & [outputs.tf](file:///G:/AIProduction_t6_2026/production/week3/alex/terraform/2_sagemaker/outputs.tf) - Tham số hóa & Đầu ra</h3>
+              <p>variables.tf chứa thông tin cấu hình mô hình nhúng mặc định và container PyTorch. outputs.tf định nghĩa kết quả ARN và Endpoint Name xuất ra màn hình console.</p>
+            </div>
+            <pre><code># variables.tf: Khai báo các tham số cấu hình hạ tầng
+variable "aws_region" {
+  description = "AWS region for resources"
+  type        = string
+}
+
+variable "sagemaker_image_uri" {
+  description = "URI of the SageMaker container image"
+  type        = string
+  default     = "763104351884.dkr.ecr.us-east-1.amazonaws.com/huggingface-pytorch-inference:1.13.1-transformers4.26.0-cpu-py39-ubuntu20.04"
+}
+
+variable "embedding_model_name" {
+  description = "Name of the HuggingFace model to use"
+  type        = string
+  default     = "sentence-transformers/all-MiniLM-L6-v2"
+}
+
+# outputs.tf: Khai báo đầu ra phục vụ cấu hình tệp môi trường .env
+output "sagemaker_endpoint_name" {
+  description = "Name of the SageMaker endpoint"
+  value       = aws_sagemaker_endpoint.embedding_endpoint.name
+}</code></pre>
+          </article>
+
+          <article class="code-panel">
+            <div>
+              <h3>[vectorize_me.json](file:///G:/AIProduction_t6_2026/production/week3/alex/backend/vectorize_me.json) & Lệnh gọi CLI</h3>
+              <p>Tệp JSON chứa chuỗi văn bản cần sinh vector nhúng và lệnh gọi CLI trên Windows để gửi yêu cầu suy luận nhị phân lên SageMaker.</p>
+            </div>
+            <pre><code># Cấu trúc tệp vectorize_me.json: Chỉ định chuỗi văn bản cần tạo vector nhúng
+{
+  "inputs": "vectorize me"
+}
+
+# Lệnh gọi CLI trên hệ điều hành Windows gửi yêu cầu nhị phân (sử dụng tiền tố fileb://)
+aws sagemaker-runtime invoke-endpoint --endpoint-name "alex-embedding-endpoint" --content-type "application/json" --body "fileb://vectorize_me.json" --output json output.json</code></pre>
+          </article>
+        </section>
+
+        <section id="options" class="section">
+          <div class="section-title">
+            <div>
+              <div class="kicker">Section 8</div>
+              <h2>Options / Trade-offs - Bản đồ lựa chọn</h2>
+            </div>
+          </div>
+          <table>
+            <thead>
+              <tr>
+                <th>Lựa chọn kiến trúc</th>
+                <th>Phù hợp khi (Best for)</th>
+                <th>Đánh đổi (Trade-off)</th>
+                <th>Rủi ro (Risk)</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>Lựa chọn 1: SOTA / Sáng tạo nhất</strong><br/>Sử dụng AWS Bedrock Embeddings API (Cohere / Titan)</td>
+                <td>Khi dự án cần triển khai cực nhanh, không muốn quản lý hạ tầng hay viết cấu hình Terraform, không lo ngại về giới hạn tốc độ cuộc gọi (rate limits).</td>
+                <td>Trả phí theo số lượng token tiêu thụ, có thể đắt đỏ khi xử lý lượng tài liệu lớn đồng loạt.</td>
+                <td>Phụ thuộc hoàn toàn vào dịch vụ bên thứ ba; khó kiểm soát phiên bản và tính nhất quán của vector nhúng khi mô hình API cập nhật.</td>
+              </tr>
+              <tr>
+                <td><strong>Lựa chọn 2: Stable / An toàn nhất (Lựa chọn của dự án)</strong><br/>Host all-MiniLM-L6-v2 trên SageMaker Serverless (RAM 3GB)</td>
+                <td>(Recommended) Các dự án sản xuất (production) yêu cầu tối ưu chi phí tối đa, có lượng truy cập không đều đặn và cần kiểm soát hoàn toàn mô hình nhúng.</td>
+                <td>Bị ảnh hưởng bởi thời gian khởi động lạnh (Cold start) khoảng 10-60 giây ở yêu cầu đầu tiên sau khi co giãn về 0.</td>
+                <td>Interrupted apply: Nếu lệnh apply bị hủy giữa chừng, Terraform có thể mất dấu vết endpoint dẫn đến lỗi tài nguyên đã tồn tại ở lần chạy sau.</td>
+              </tr>
+              <tr>
+                <td><strong>Lựa chọn 3: MVP / Đơn giản nhất</strong><br/>Triển khai SageMaker Serverless với max_concurrency = 10</td>
+                <td>Khi chạy thử nghiệm chịu tải cao, nhiều tác vụ xử lý nhúng tài liệu chạy song song cùng lúc mà không bị xếp hàng.</td>
+                <td>Cấu hình concurrency cao dễ vượt quá quota cho phép của tài khoản AWS cá nhân mới lập.</td>
+                <td>Apply thất bại ngay từ bước tạo Endpoint Configuration do tài khoản không đủ quota tài nguyên.</td>
+              </tr>
+            </tbody>
+          </table>
+        </section>
+
+        <section id="pitfalls" class="section">
+          <div class="section-title">
+            <div>
+              <div class="kicker">Section 9</div>
+              <h2>Pitfalls - Lỗi / bẫy thường gặp</h2>
+            </div>
+          </div>
+          <div class="grid-2">
+            <article class="card">
+              <h3>Failure modes - Trường hợp dễ lỗi</h3>
+              <ul class="list">
+                <li><strong>Lỗi trễ quyền IAM (Propagation delay):</strong> Khi chạy <code>terraform apply</code>, quá trình khởi tạo Endpoint báo lỗi <code>Role invalid or cannot be assumed</code> dù role đã được định nghĩa.</li>
+                <li><strong>Lỗi mất dấu vết Endpoint (Endpoint already exists):</strong> Triển khai SageMaker bị ngắt giữa chừng (Ctrl+C), lần chạy sau báo lỗi Endpoint đã tồn tại trên AWS nhưng Terraform không có trong state.</li>
+                <li><strong>Phát sinh chi phí lớn từ Notebooks chạy ngầm:</strong> Học viên khởi tạo các Notebook Instance trong SageMaker Studio để thử nghiệm code nhưng quên tắt (Stop) sau khi làm việc xong.</li>
+              </ul>
+            </article>
+            <article class="card">
+              <h3>Fix / prevention - Cách khắc phục</h3>
+              <ul class="list">
+                <li><strong>Khắc phục trễ IAM:</strong> Sử dụng tài nguyên <code>time_sleep</code> cấu hình trì hoãn ít nhất 15 giây trong Terraform trước khi tiến hành khởi tạo Endpoint thực tế.</li>
+                <li><strong>Khắc phục mất dấu vết:</strong> Thực hiện lệnh import để đồng bộ trạng thái: <code>terraform import aws_sagemaker_endpoint.embedding_endpoint alex-embedding-endpoint</code> hoặc xóa thủ công endpoint trên console rồi apply lại.</li>
+                <li><strong>Khắc phục chi phí ngầm:</strong> Luôn dừng các Notebook Instance khi không làm việc. Tạo cảnh báo <em>AWS Budget</em> để theo dõi chi phí hàng ngày của tài khoản root.</li>
+              </ul>
+            </article>
+          </div>
+        </section>
+
+        <section id="flashcards" class="section">
+          <div class="section-title">
+            <div>
+              <div class="kicker">Section 10</div>
+              <h2>Flashcards / Q&A - Thẻ ôn tập</h2>
+            </div>
+          </div>
+          <div class="grid-2">
+            <article class="card flashcard">
+              <h3>Q: Tại sao phải tạo Custom Policy AlexS3VectorsAccess cho dịch vụ S3 Vectors?</h3>
+              <button class="button primary" type="button" data-reveal>Reveal answer</button>
+              <p class="flash-answer"><strong>A:</strong> Vì S3 Vectors là dịch vụ lưu trữ vector mới của AWS, tại thời điểm thiết kế khóa học AWS chưa cung cấp các chính sách quản lý (managed policies) mặc định cho dịch vụ này. Ta phải viết thủ công chính sách JSON cấp quyền `s3vectors:*`.</p>
+            </article>
+            <article class="card flashcard">
+              <h3>Q: Sự khác biệt lớn nhất giữa tệp .env và tệp terraform.tfvars là gì?</h3>
+              <button class="button primary" type="button" data-reveal>Reveal answer</button>
+              <p class="flash-answer"><strong>A:</strong> Tệp `.env` được dùng để lưu trữ các biến môi trường cho mã nguồn Python cục bộ và ứng dụng backend. Trong khi đó, các tệp `.tfvars` dùng để cấu hình tham số đầu vào cho Terraform khi triển khai cơ sở hạ tầng.</p>
+            </article>
+            <article class="card flashcard">
+              <h3>Q: Tại sao mô hình all-MiniLM-L6-v2 lại được khuyên dùng cho các endpoint serverless nhẹ?</h3>
+              <button class="button primary" type="button" data-reveal>Reveal answer</button>
+              <p class="flash-answer"><strong>A:</strong> Vì mô hình này rất nhẹ (dung lượng trọng số khoảng 90MB) và sinh ra vector chỉ có 384 chiều, giúp giảm dung lượng cơ sở dữ liệu lưu trữ vector từ 4-8 lần so với các mô hình lớn (1536 hoặc 3072 chiều) mà vẫn giữ được chất lượng so khớp tốt.</p>
+            </article>
+            <article class="card flashcard">
+              <h3>Q: Ý nghĩa của tham số "fileb://" trong lệnh AWS CLI invoke-endpoint là gì?</h3>
+              <button class="button primary" type="button" data-reveal>Reveal answer</button>
+              <p class="flash-answer"><strong>A:</strong> Nó chỉ định nạp tệp dữ liệu đầu vào dưới dạng nhị phân thô (binary), giúp bảo toàn định dạng mã hóa và tránh các lỗi phân tích cú pháp ký tự không tương thích trên CLI của các hệ điều hành khác nhau.</p>
+            </article>
+            <article class="card flashcard">
+              <h3>Q: Tại sao cấu hình RAM 3GB cho Serverless Endpoint lại giúp tối ưu hóa chi phí mặc dù mô hình rất nhẹ?</h3>
+              <button class="button primary" type="button" data-reveal>Reveal answer</button>
+              <p class="flash-answer"><strong>A:</strong> Vì trên SageMaker Serverless, CPU được cấp phát tỷ lệ thuận với bộ nhớ RAM. RAM lớn hơn giúp CPU mạnh hơn, rút ngắn thời gian tính toán nhúng (mili giây), từ đó giảm tổng chi phí thực tế do SageMaker tính tiền theo thời gian xử lý thực tế.</p>
+            </article>
+            <article class="card">
+              <h3>Quick quiz - Câu hỏi trắc nghiệm</h3>
+              <p>Trong cấu hình Terraform của SageMaker Serverless, biến môi trường nào định nghĩa mã mô hình trên HuggingFace Hub để container tự động tải về?</p>
+              <div class="quiz-options">
+                <button class="button quiz-option" type="button" data-correct="false">A. MODEL_NAME</button>
+                <button class="button quiz-option" type="button" data-correct="true">B. HF_MODEL_ID</button>
+                <button class="button quiz-option" type="button" data-correct="false">C. HUGGINGFACE_ID</button>
+                <button class="button quiz-option" type="button" data-correct="false">D. HF_TASK</button>
+              </div>
+              <div class="quiz-result" aria-live="polite"></div>
+            </article>
+          </div>
+        </section>
+
+        <section id="memory" class="section">
+          <div class="section-title">
+            <div>
+              <div class="kicker">Section 11</div>
+              <h2>Quick Memory - Ôn nhanh cuối bài</h2>
+            </div>
+          </div>
+          <div class="grid-2">
+            <article class="card">
+              <h3>Must remember - Phải nhớ</h3>
+              <ol class="list">
+                <li>Luôn sử dụng tài khoản IAM hạn chế quyền (<code>aiengineer</code>) cho công việc phát triển hàng ngày thay vì tài khoản root.</li>
+                <li>Hạn mức concurrency cho serverless endpoint của học viên nên giữ ở mức thấp (<code>max_concurrency = 2</code>) để tránh bị AWS từ chối tạo tài nguyên do thiếu quota.</li>
+                <li>all-MiniLM-L6-v2 tạo ra vector <strong>384 chiều</strong>. Hãy cấu hình đúng số chiều này cho cơ sở dữ liệu vector ở bài học sau.</li>
+                <li>Lỗi trễ IAM role trong Terraform được xử lý triệt để bằng tài nguyên dừng <code>time_sleep</code> 15 giây.</li>
+              </ol>
+            </article>
+            <article class="card">
+              <h3>Self-check - Tự kiểm tra</h3>
+              <ul class="list">
+                <li>Bạn có thể giải thích sự khác biệt lớn nhất về cấu trúc tính phí giữa SageMaker Serverless và Bedrock Cohere không?</li>
+                <li>Làm thế nào để xử lý lỗi <code>Endpoint already exists</code> khi quá trình chạy <code>terraform apply</code> bị gián đoạn?</li>
+                <li>Hiện tượng model drift ảnh hưởng như thế nào đến ứng dụng tìm kiếm ngữ nghĩa tài chính Alex?</li>
+              </ul>
+            </article>
+          </div>
+        </section>
+
+        <footer class="footer">
+          <strong>Study note:</strong> Hướng dẫn học tập này được tự động tạo lập dựa trên tài nguyên khóa học AI in Production. Mọi kiến thức mở rộng ngoài chương trình đều được chú thích rõ ràng.
+        </footer>
+      </main>
+    </div>
+  </div>
+
+  <script>
+    const links = Array.from(document.querySelectorAll(".toc a"));
+    const sections = links.map((link) => document.querySelector(link.getAttribute("href"))).filter(Boolean);
+    const progressBar = document.getElementById("progressBar");
+    const detailsNodes = Array.from(document.querySelectorAll("details"));
+
+    function setActiveLink() {
+      let current = sections[0]?.id;
+      const offset = window.scrollY + 170;
+      for (const section of sections) {
+        if (section.offsetTop <= offset) {
+          current = section.id;
+        }
+      }
+      links.forEach((link) => {
+        link.classList.toggle("active", link.getAttribute("href") === `#${current}`);
+      });
+    }
+
+    function updateProgress() {
+      const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+      const progress = docHeight > 0 ? Math.min((window.scrollY / docHeight) * 100, 100) : 0;
+      progressBar.style.width = `${progress}%`;
+    }
+
+    document.getElementById("expandAll").addEventListener("click", () => {
+      detailsNodes.forEach((node) => {
+        node.open = true;
+      });
+    });
+
+    document.getElementById("collapseAll").addEventListener("click", () => {
+      detailsNodes.forEach((node) => {
+        node.open = false;
+      });
+    });
+
+    document.querySelectorAll("[data-reveal]").forEach((button) => {
+      button.addEventListener("click", () => {
+        const card = button.closest(".flashcard");
+        card.classList.toggle("revealed");
+        button.innerText = card.classList.contains("revealed") ? "Hide answer" : "Reveal answer";
+      });
+    });
+
+    document.querySelectorAll(".quiz-option").forEach((button) => {
+      button.addEventListener("click", () => {
+        const result = button.closest(".card").querySelector(".quiz-result");
+        if (button.dataset.correct === "true") {
+          result.style.color = "var(--accent-teal)";
+          result.innerText = "Chính xác! HF_MODEL_ID chỉ định repo của HuggingFace (ví dụ: sentence-transformers/all-MiniLM-L6-v2) để container PyTorch tự động tải về.";
+        } else {
+          result.style.color = "var(--primary-active)";
+          result.innerText = "Chưa chính xác. Xem lại cấu hình environment trong tài nguyên aws_sagemaker_model ở phần Code Walkthrough.";
+        }
+      });
+    });
+
+    window.addEventListener("scroll", () => {
+      setActiveLink();
+      updateProgress();
+    }, { passive: true });
+
+    setActiveLink();
+    updateProgress();
+  </script>
+</body>
+
+</html>
