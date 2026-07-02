@@ -1,231 +1,309 @@
 # Twin
 
-AI Digital Twin project for Week 2 of the AI Engineer Production Track.
+## Link: https://github.com/Sunny-sunnyy/twin2026 
 
-This repo is complete through `week2/day3.md`.
+An AI Digital Twin project from Week 2 of the AI Engineer Production Track.
 
-Current status:
-- Day 1: local twin with file-based memory
-- Day 2: AWS deployment with Lambda, API Gateway, S3, and static frontend hosting
-- Day 3: Bedrock migration implemented in the repo backend
-- Live CDN deployment: still using the Day 2 OpenAI path with `gpt-4.1-nano` because Bedrock access is not available yet
+This repo contains:
+- a Next.js chat frontend
+- a FastAPI backend
+- personalized context loaded from local profile files
+- conversation memory stored locally or in S3
+- AWS Bedrock inference
+- Terraform infrastructure for AWS deployment
 
-## Architecture Overview
+## Status
 
-### Day 1
+The project is implemented through the Week 2 build sequence:
+- Day 1: local chat app with file-based memory
+- Day 2: AWS deployment architecture with Lambda, API Gateway, S3, and CloudFront
+- Day 3: backend migrated from OpenAI to AWS Bedrock
+- Day 4: infrastructure moved to Terraform with deploy and destroy scripts
+- Day 5: repo and remote-state deployment flow prepared; GitHub Actions workflow files are not in this repo yet
 
-Local development architecture:
+## Architecture
 
-1. Next.js frontend sends a message to `POST /chat`.
-2. FastAPI backend builds the prompt from the twin persona.
-3. The model generates a reply.
-4. Conversation history is saved into local JSON files in `memory/`.
+### Local
 
-### Day 2
+1. The frontend sends `POST /chat` to the FastAPI backend.
+2. `backend/resources.py` loads structured profile data from `backend/data/`.
+3. `backend/context.py` builds the system prompt.
+4. `backend/server.py` sends the conversation to AWS Bedrock.
+5. Memory is stored in `memory/` when `USE_S3=false`.
 
-AWS deployment architecture:
+### AWS
 
-1. Static frontend is exported from Next.js and hosted on S3.
-2. CloudFront or S3 website hosting serves the frontend.
-3. The chat UI calls API Gateway.
-4. API Gateway invokes AWS Lambda through `backend/lambda_handler.py`.
-5. Lambda runs the FastAPI app in `backend/server.py`.
-6. Conversation memory is stored in S3 instead of local files.
-7. The deployed Day 2 runtime uses OpenAI `gpt-4.1-nano`.
+1. The frontend is statically exported by Next.js.
+2. Static assets are uploaded to an S3 frontend bucket.
+3. CloudFront serves the public site.
+4. API Gateway HTTP API invokes AWS Lambda.
+5. Lambda runs the FastAPI app through Mangum.
+6. Conversation memory is stored in an S3 memory bucket.
+7. Terraform provisions and updates the infrastructure.
 
-### Day 3
-
-Repo backend architecture:
-
-1. `backend/server.py` initializes `bedrock-runtime` via `boto3`.
-2. `backend/context.py` builds a richer system prompt from structured profile data.
-3. `backend/resources.py` loads `facts.json`, `summary.txt`, `style.txt`, and `linkedin.pdf`.
-4. `call_bedrock()` sends conversation history to Bedrock using `converse()`.
-5. Conversation state remains compatible with S3-backed memory.
-
-Important distinction:
-- The repo backend reflects the Day 3 Bedrock migration.
-- The currently accessible CDN deployment still points to the Day 2 OpenAI-backed API until Bedrock permissions are available.
-
-## Project Structure
+## Repository Layout
 
 ```text
 twin/
 ├── backend/
 │   ├── context.py
 │   ├── data/
-│   │   ├── facts.json
-│   │   ├── linkedin.pdf
-│   │   ├── style.txt
-│   │   └── summary.txt
 │   ├── deploy.py
 │   ├── lambda_handler.py
-│   ├── me.txt
 │   ├── pyproject.toml
 │   ├── requirements.txt
 │   ├── resources.py
 │   ├── server.py
 │   └── uv.lock
-├── day3/
-│   ├── pic1.png
-│   ├── pic2.png
-│   ├── pic3.png
-│   └── pic4.png
 ├── frontend/
 │   ├── app/
 │   ├── components/
 │   ├── public/
 │   ├── next.config.ts
 │   └── package.json
+├── scripts/
+│   ├── deploy.sh
+│   └── destroy.sh
+├── terraform/
+│   ├── backend.tf
+│   ├── main.tf
+│   ├── outputs.tf
+│   ├── variables.tf
+│   └── versions.tf
 ├── week2/
 │   ├── day1.md
-│   ├── day1_summary.md
 │   ├── day2.md
 │   ├── day2_summary.md
 │   ├── day3.md
 │   ├── day3_summary.md
 │   ├── day4.md
-│   └── day5.md
+│   ├── day4_summary.md
+│   ├── day5.md
+│   └── day5_summary.md
 └── README.md
 ```
 
 ## Tech Stack
 
 - Frontend: Next.js 16, React 19, TypeScript, Tailwind CSS 4
-- Backend: FastAPI, `boto3`, `pypdf`, `mangum`, `python-dotenv`
+- Backend: FastAPI, boto3, Mangum, pypdf, python-dotenv
 - Python package manager: `uv`
-- Local memory: JSON files in `memory/`
-- Cloud services: AWS Lambda, API Gateway, S3, optional CloudFront
-- AI providers across project progression:
-  - Day 1-2 and current live deployment: OpenAI `gpt-4.1-nano`
-  - Day 3 repo backend: AWS Bedrock with `BEDROCK_MODEL_ID`
+- Infrastructure: Terraform
+- AWS services: Bedrock, Lambda, API Gateway v2, S3, CloudFront, IAM
+- Lambda packaging: Docker-based zip build in `backend/deploy.py`
 
-## Key Files
+## Important Files
 
-- `backend/server.py`: FastAPI app, memory management, Bedrock call path
-- `backend/context.py`: system prompt builder using profile context
-- `backend/resources.py`: loads profile resources from `backend/data/`
-- `backend/lambda_handler.py`: Lambda entrypoint via Mangum
-- `backend/deploy.py`: builds `lambda-deployment.zip` for Lambda
-- `frontend/components/twin.tsx`: chat UI and API fetch logic
-- `frontend/app/page.tsx`: landing page shell
-- `week2/day1.md`, `week2/day2.md`, `week2/day3.md`: lesson instructions
-- `week2/day1_summary.md`, `week2/day2_summary.md`, `week2/day3_summary.md`: lesson summaries
+- `backend/server.py`: API routes, memory load/save, Bedrock call
+- `backend/context.py`: system prompt builder
+- `backend/resources.py`: loads `facts.json`, `summary.txt`, `style.txt`, `linkedin.pdf`
+- `backend/lambda_handler.py`: Lambda entrypoint
+- `backend/deploy.py`: builds `lambda-deployment.zip`
+- `frontend/components/twin.tsx`: chat UI and API request flow
+- `frontend/next.config.ts`: static export configuration
+- `terraform/main.tf`: AWS resources
+- `terraform/outputs.tf`: deploy outputs consumed by scripts
+- `scripts/deploy.sh`: full deploy flow
+- `scripts/destroy.sh`: teardown flow
 
-## Local Development
+## Prerequisites
 
-### Backend
+Install:
+- `uv`
+- Python 3.13 for local backend development
+- Node.js and npm
+- Docker
+- Terraform
+- AWS CLI
 
-From `backend/`:
+You also need:
+- valid AWS credentials for `aws`, Terraform, and `boto3`
+- Bedrock access and quota for the configured model
+- personal context files in `backend/data/`
 
-```bash
-uv sync
-uv run server.py
-```
+Required backend data files:
+- `backend/data/facts.json`
+- `backend/data/summary.txt`
+- `backend/data/style.txt`
+- `backend/data/linkedin.pdf`
 
-For local Bedrock-backed execution, set environment variables such as:
+## Environment Variables
+
+Example project-level variables are in `.env.example`:
 
 ```env
+AWS_ACCOUNT_ID=your_12_digit_account_id
 DEFAULT_AWS_REGION=us-east-1
+PROJECT_NAME=twin
+```
+
+Typical local backend variables:
+
+```env
+DEFAULT_AWS_REGION=ap-southeast-1
 BEDROCK_MODEL_ID=global.amazon.nova-2-lite-v1:0
 CORS_ORIGINS=http://localhost:3000
 USE_S3=false
 MEMORY_DIR=../memory
 ```
 
-### Frontend
+The frontend reads:
+- `NEXT_PUBLIC_API_URL` when provided
+- otherwise `http://localhost:8000`
 
-From `frontend/`:
+## Local Development
+
+### 1. Start the backend
 
 ```bash
+cd backend
+uv sync
+uv run server.py
+```
+
+Backend URL:
+
+```text
+http://localhost:8000
+```
+
+### 2. Start the frontend
+
+```bash
+cd frontend
 npm install
 npm run dev
 ```
 
-Default local URLs:
-- Frontend: `http://localhost:3000`
-- Backend: `http://localhost:8000`
+Frontend URL:
 
-## Deployment Workflow
-
-### Backend package
-
-From `backend/`:
-
-```bash
-uv sync
-uv run deploy.py
+```text
+http://localhost:3000
 ```
 
-This creates `backend/lambda-deployment.zip` using the AWS Lambda Python container image.
+With this setup:
+- chat requests go from frontend to local FastAPI
+- Bedrock is still used for inference
+- conversation memory is stored in `memory/` when `USE_S3=false`
 
-### Frontend static export
+## API Endpoints
 
-From `frontend/`:
+- `GET /`: basic service metadata
+- `GET /health`: health and runtime config
+- `POST /chat`: send a user message and get a reply
+- `GET /conversation/{session_id}`: fetch saved conversation history
 
-```bash
-npm install
-npm run build
-```
-
-The Next.js app uses `output: "export"` in `frontend/next.config.ts`, so the build output can be uploaded to S3 static hosting.
-
-## Deployed Endpoints
-
-Current API and frontend endpoints referenced in the project:
-
-- API root: `https://r7ewqxjlke.execute-api.ap-southeast-1.amazonaws.com/`
-- API health: `https://r7ewqxjlke.execute-api.ap-southeast-1.amazonaws.com/health`
-- Frontend website: `http://twin-frontend-487592470523.s3-website-ap-southeast-1.amazonaws.com/`
-
-Note:
-- These live endpoints currently correspond to the Day 2 deployment path, not the Day 3 Bedrock backend.
-
-## API Surface
-
-### `GET /`
-
-Returns service metadata.
-
-### `GET /health`
-
-Returns backend health information and active model configuration.
-
-### `POST /chat`
-
-Request body:
+Example chat payload:
 
 ```json
 {
-  "message": "Hello",
+  "message": "Tell me about your AI engineering background",
   "session_id": "optional-session-id"
 }
 ```
 
-Response body:
+## Lambda Packaging
 
-```json
-{
-  "response": "Assistant reply",
-  "session_id": "session-id"
-}
+Build the Lambda artifact with Docker:
+
+```bash
+cd backend
+uv run deploy.py
 ```
 
-### `GET /conversation/{session_id}`
+This creates:
 
-Returns stored conversation history for a session.
+```text
+backend/lambda-deployment.zip
+```
 
-## Known Constraints
+Notes:
+- local backend development uses Python 3.13 via `pyproject.toml`
+- the Lambda package is built against the AWS Lambda Python 3.12 runtime image
 
-- Bedrock migration is implemented in code, but the public deployment still falls back to OpenAI because Bedrock access is not currently available.
-- `frontend/components/twin.tsx` uses a hard-coded API Gateway URL.
-- `CORS_ORIGINS=*` may be acceptable for a lab deployment but should be narrowed for production.
-- S3 JSON conversation storage is fine for the course project, but it is not a robust multi-user production memory design.
-- There is no automated test suite yet for backend or frontend behavior.
+## Terraform Infrastructure
 
-## Course Progress
+Terraform provisions:
+- S3 memory bucket
+- S3 frontend bucket with website hosting
+- IAM role and policy attachments for Lambda
+- Lambda function for the FastAPI backend
+- API Gateway HTTP API
+- CloudFront distribution
+- optional custom-domain resources when enabled
 
-- `week2/day1.md`: local twin with memory
-- `week2/day2.md`: AWS deployment with S3 and Lambda
-- `week2/day3.md`: Bedrock migration in the backend code
-- `week2/day4.md` and `week2/day5.md`: not implemented yet in this repo
+Key implementation details:
+- environments are separated by Terraform workspaces: `dev`, `test`, `prod`
+- resource names are built from `project_name` and `environment`
+- S3 bucket names include the AWS account ID for global uniqueness
+- Lambda CORS configuration depends on the CloudFront domain name
+- `terraform/backend.tf` is set up for an S3 backend configured by the deploy scripts
+
+## Deploy
+
+The main deploy path is:
+
+```bash
+chmod +x scripts/deploy.sh
+./scripts/deploy.sh dev
+```
+
+Custom project prefix:
+
+```bash
+./scripts/deploy.sh dev my-twin
+```
+
+What the script does:
+1. Builds `backend/lambda-deployment.zip`
+2. Runs `terraform init` against the S3 remote backend
+3. Selects or creates the workspace
+4. Applies Terraform
+5. Writes `frontend/.env.production`
+6. Builds the statically exported frontend
+7. Syncs the frontend build to S3
+8. Prints the CloudFront and API URLs
+
+Before first remote-state deploy, the following AWS resources must already exist:
+- `twin-terraform-state-<aws-account-id>` S3 bucket
+- `twin-terraform-locks` DynamoDB table
+
+Those bootstrap resources are referenced by the scripts, but the bootstrap Terraform files are not included in this repo.
+
+## Destroy
+
+Destroy one environment:
+
+```bash
+chmod +x scripts/destroy.sh
+./scripts/destroy.sh dev
+```
+
+The destroy script:
+1. Reconnects Terraform to the correct remote state
+2. Selects the target workspace
+3. Empties the frontend and memory buckets
+4. Runs `terraform destroy`
+5. Leaves workspace deletion as a manual follow-up step
+
+To remove the workspace after destroy:
+
+```bash
+cd terraform
+terraform workspace select default
+terraform workspace delete dev
+```
+
+## Learning Notes
+
+The `week2/` folder contains the course notes used to build this project:
+- `day1.md` to `day5.md`: daily implementation notes
+- `day2_summary.md` to `day5_summary.md`: structured study summaries
+
+Use them as project history, not as the source of truth over the actual code.
+
+## Known Gaps
+
+- No `.github/workflows/` files are currently present, so CI/CD is not yet fully implemented in-repo
+- Remote Terraform state bootstrap resources are assumed to exist already
+- The backend depends on local profile files in `backend/data/`; without them, the app will not start correctly
